@@ -1,0 +1,52 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  color: "blue" | "orange" | "pink";
+}
+
+const { src, alt, color } = Astro.props as Props;
+---
+
+<div
+  class={`image-card image-card--${color} p-8 flex items-center justify-center relative w-full lg:max-w-[610px] min-h-[280px] rounded-xl overflow-hidden shrink-0`}
+  aria-hidden="true"
+>
+  <img src={src} alt={alt} class="relative z-[2] rounded-lg" />
+</div>
+
+<style>
+  .image-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: var(--image-card-color);
+    z-index: 0;
+  }
+
+  .image-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("/bg-dotted.svg");
+    background-repeat: repeat;
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .image-card--blue {
+    --image-card-color: #2563eb;
+  }
+
+  .image-card--orange {
+    --image-card-color: #ea580c;
+  }
+
+  .image-card--pink {
+    --image-card-color: #f659b7;
+  }
+</style>

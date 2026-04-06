@@ -1,0 +1,181 @@
+---
+interface NudgeStep {
+  label: string;
+  value: string;
+}
+
+interface CardData {
+  title: string;
+  subtitle: string;
+  trigger: string;
+  condition: string;
+  action: string;
+  result: string;
+  benefit: string;
+  timeSaved: string;
+}
+
+const cardsData: CardData[] = [
+  {
+    title: "Post-Job Thank You & Review Request",
+    subtitle: "Get 5–10× more reviews",
+    trigger: "Job status = Completed",
+    condition: "Job value > $300",
+    action: 'Send "Thank You + Review Request" email',
+    result: "Automatic, instant, every time",
+    benefit: "5–10× more reviews because you actually ask consistently",
+    timeSaved: "125 hrs/yr",
+  },
+  {
+    title: "Abandoned Estimate Follow-Up",
+    subtitle: "Recover cold quotes",
+    trigger: "Estimate sent",
+    condition: "Status = Pending for 3 days",
+    action: 'Send "Any questions?" email',
+    result: "Every pending estimate followed up on Day 3",
+    benefit: "3 more conversions/month at $2,000 avg = $72,000/yr",
+    timeSaved: "135 hrs/yr",
+  },
+  {
+    title: "Overdue Invoice Reminders",
+    subtitle: "Get paid faster",
+    trigger: "Invoice overdue",
+    condition: "Unpaid for 7 days",
+    action: "Send friendly payment reminder with pay link",
+    result: "Every overdue invoice reminded on Day 7",
+    benefit: "$50K in receivables paid 20 days faster = $27K+/yr",
+    timeSaved: "165 hrs/yr",
+  },
+  {
+    title: "New Customer Welcome",
+    subtitle: "Make a great first impression",
+    trigger: "New client created in GetJobber",
+    condition: "None — welcome everyone",
+    action: "Send welcome email with service guide",
+    result: "Customers welcomed within minutes",
+    benefit: "40% higher retention from professional first impression",
+    timeSaved: "40 hrs/yr",
+  },
+  {
+    title: "Seasonal Maintenance Reminders",
+    subtitle: "Turn one-time jobs into repeat revenue",
+    trigger: "Job completed",
+    condition: "Service = HVAC, 6 months ago",
+    action: "Send seasonal tune-up reminder",
+    result: "Every customer reminded 6 months after service",
+    benefit: "40% convert to biannual at $200 = $32,000/yr",
+    timeSaved: "20 hrs/yr",
+  },
+  {
+    title: "High-Value Estimate Alert",
+    subtitle: "Never miss a big deal",
+    trigger: "Estimate sent",
+    condition: "Value > $10,000",
+    action: "Email alert to sales manager",
+    result: "Know about every big opportunity instantly",
+    benefit: "Close 20–30% more high-value deals",
+    timeSaved: "Priceless",
+  },
+];
+---
+
+<section class="w-full py-24 px-6 bg-white" id="six-ways">
+  <div class="max-w-6xl mx-auto flex flex-col items-center gap-16">
+
+    <!-- Section header -->
+    <div class="flex flex-col items-center gap-3 text-center max-w-2xl">
+      <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold tracking-wide uppercase">
+        6 Ways
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
+        6 Simple Ways to Save 17 Hours a Week
+      </h2>
+      <p class="text-gray-500 text-lg leading-relaxed">
+        Real automations field service businesses set up in minutes and run forever.
+      </p>
+    </div>
+
+    <!-- Card grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
+      {cardsData.map((card) => (
+        <article class="flex flex-col rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+
+          <!-- Card top accent line -->
+          <div class="h-0.5 w-full bg-gradient-to-r from-indigo-500 to-violet-500"></div>
+
+          <!-- Header -->
+          <div class="px-6 pt-6 pb-4 flex flex-col gap-1">
+            <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider">
+              {card.subtitle}
+            </span>
+            <h3 class="text-base font-bold text-gray-900 leading-snug">
+              {card.title}
+            </h3>
+          </div>
+
+          <!-- Automation flow -->
+          <div class="px-6 pb-4 flex flex-col gap-2 flex-1">
+            <!-- Trigger -->
+            <div class="flex items-start gap-2.5 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+              <span class="shrink-0 mt-0.5 w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+              </span>
+              <p class="text-xs text-gray-600 leading-relaxed">
+                <span class="font-semibold text-gray-800">Trigger: </span>{card.trigger}
+              </p>
+            </div>
+
+            <!-- Condition -->
+            <div class="flex items-start gap-2.5 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+              <span class="shrink-0 mt-0.5 w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="4"/>
+                </svg>
+              </span>
+              <p class="text-xs text-gray-600 leading-relaxed">
+                <span class="font-semibold text-gray-800">Condition: </span>{card.condition}
+              </p>
+            </div>
+
+            <!-- Action -->
+            <div class="flex items-start gap-2.5 rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-2.5">
+              <span class="shrink-0 mt-0.5 w-4 h-4 rounded-full bg-indigo-200 flex items-center justify-center">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.26 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.18 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </span>
+              <p class="text-xs text-gray-600 leading-relaxed">
+                <span class="font-semibold text-gray-800">Action: </span>{card.action}
+              </p>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-gray-100 my-1"></div>
+
+            <!-- Benefit -->
+            <p class="text-xs font-medium text-gray-700 leading-relaxed">
+              {card.benefit}
+            </p>
+          </div>
+
+          <!-- Footer: time saved badge -->
+          <div class="px-6 pb-6">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span class="text-xs font-bold text-emerald-700">
+                {card.timeSaved} saved
+              </span>
+            </div>
+          </div>
+
+        </article>
+      ))}
+    </div>
+
+  </div>
+</section>

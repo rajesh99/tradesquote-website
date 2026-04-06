@@ -1,0 +1,140 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Part13 from "../components/Part13.astro";
+
+const lastUpdated = "March 14, 2026";
+
+const sections = [
+  {
+    id: "acceptance",
+    title: "Acceptance of Terms",
+    content: [
+      "By accessing or using MultiNudge (“Service”), including our website and the follow-up email automation we provide in connection with GetJobber, you agree to be bound by these Terms of Service (“Terms”). If you do not agree, do not use the Service.",
+      "We may update these Terms from time to time. We will post the revised Terms on this page and update the “Last updated” date. Your continued use of the Service after changes constitutes acceptance of the new Terms.",
+    ],
+  },
+  {
+    id: "description",
+    title: "Description of Service",
+    content: [
+      "MultiNudge provides automated follow-up email and notification tools that integrate with GetJobber. You connect your account, configure your rules, and we help you send timely follow-ups. The Service is provided subject to these Terms and our Privacy Policy.",
+    ],
+  },
+  {
+    id: "account",
+    title: "Account and Eligibility",
+    content: [
+      "You must be at least 18 years old and have the authority to bind your organization to these Terms. You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. You must notify us promptly of any unauthorized use.",
+    ],
+  },
+  {
+    id: "use",
+    title: "Acceptable Use",
+    content: [
+      "You agree to use the Service only for lawful purposes and in accordance with these Terms. You must not use the Service to send spam, violate any law, infringe others’ rights, transmit malware, or attempt to gain unauthorized access to our or any third-party systems. We may suspend or terminate access for conduct we reasonably believe violates these Terms or harms the Service or others.",
+    ],
+  },
+  {
+    id: "payment",
+    title: "Fees and Payment",
+    content: [
+      "Fees for the Service are as described on our website or in your plan. You agree to pay all applicable fees when due. We may change pricing with reasonable notice. Unless otherwise stated, fees are non-refundable. Failure to pay may result in suspension or termination of the Service.",
+    ],
+  },
+  {
+    id: "ip",
+    title: "Intellectual Property",
+    content: [
+      "We own or license all rights in the Service, including software, design, and content. We grant you a limited, non-exclusive, non-transferable license to use the Service for your internal business in accordance with these Terms. You may not copy, modify, or create derivative works of the Service, or reverse engineer it, except as permitted by law.",
+    ],
+  },
+  {
+    id: "disclaimer",
+    title: "Disclaimer of Warranties",
+    content: [
+      "The Service is provided “as is” and “as available” without warranties of any kind, express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the Service will be uninterrupted, error-free, or secure.",
+    ],
+  },
+  {
+    id: "limitation",
+    title: "Limitation of Liability",
+    content: [
+      "To the maximum extent permitted by law, we and our affiliates, officers, and employees shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, data, or goodwill, arising from or related to your use of the Service. Our total liability for any claims arising from these Terms or the Service shall not exceed the amount you paid us in the twelve (12) months preceding the claim.",
+    ],
+  },
+  {
+    id: "indemnity",
+    title: "Indemnification",
+    content: [
+      "You agree to indemnify and hold harmless MultiNudge and its affiliates, officers, and employees from any claims, damages, losses, or expenses (including reasonable attorneys’ fees) arising from your use of the Service, your violation of these Terms, or your violation of any third-party rights.",
+    ],
+  },
+  {
+    id: "termination",
+    title: "Termination",
+    content: [
+      "You may stop using the Service at any time. We may suspend or terminate your access to the Service for breach of these Terms, non-payment, or for any other reason with reasonable notice where practicable. Upon termination, your right to use the Service ceases. Sections that by their nature should survive (e.g., intellectual property, disclaimers, limitation of liability, indemnity) will survive termination.",
+    ],
+  },
+  {
+    id: "governing-law",
+    title: "Governing Law and Disputes",
+    content: [
+      "These Terms are governed by the laws of India. Any dispute arising from or relating to these Terms or the Service shall be subject to the exclusive jurisdiction of the courts in Bengaluru, India, except where prohibited by law.",
+    ],
+  },
+  {
+    id: "contact",
+    title: "Contact Us",
+    content: [
+      "For questions about these Terms of Service, contact us at sales@veersoftsolutions.com or at the address provided in the footer of this website.",
+    ],
+  },
+];
+---
+
+<Layout>
+  <Header />
+  <main class="w-full min-h-screen bg-white">
+    <article class="w-full max-w-[800px] mx-auto px-6 sm:px-8 lg:px-12 py-12 sm:py-16">
+      <header class="mb-12 sm:mb-16">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 text-[#4b5563] font-medium text-sm hover:text-[#4b44d4] transition-colors mb-6"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Home
+        </a>
+        <h1 class="font-bold text-3xl sm:text-4xl text-[#1f2937] tracking-tight leading-tight">
+          Terms of Service
+        </h1>
+        <p class="mt-2 text-[#4b5563] text-base">
+          Last updated: {lastUpdated}
+        </p>
+      </header>
+
+      <div class="flex flex-col gap-10 sm:gap-12">
+        {sections.map((section) => (
+          <section id={section.id} class="scroll-mt-24">
+            <h2 class="font-semibold text-xl text-[#1f2937] tracking-normal mb-4">
+              {section.title}
+            </h2>
+            <div class="flex flex-col gap-4">
+              {section.content.map((paragraph) => (
+                <p class="text-[#4b5563] font-normal text-base leading-7 m-0">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+    </article>
+  </main>
+  <Part13 />
+</Layout>

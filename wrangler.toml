@@ -1,0 +1,27 @@
+name = "multinudge-website"
+main = "dist/_worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+assets = { directory = "dist/", binding = "ASSETS" }
+
+# ─── D1 Database ────────────────────────────────────────────────────────────
+# After running `npx wrangler d1 create multinudge-contacts`, paste the
+# database_id output below.
+[[d1_databases]]
+binding = "DB"
+database_name = "multinudge-contacts"
+database_id = "46eecbad-fe8d-4382-89fa-8fa8e2f19b27"
+
+# ─── Public vars (safe to commit) ───────────────────────────────────────────
+[vars]
+# Get your Turnstile SITE key from https://dash.cloudflare.com → Turnstile
+TURNSTILE_SITE_KEY = "0x4AAAAAAClDBSdVaZGWP3_U"
+
+# ─── Secrets (DO NOT commit values) ─────────────────────────────────────────
+# Set the Turnstile SECRET key via:
+#   npx wrangler secret put TURNSTILE_SECRET_KEY
+# Then enter the secret value when prompted.
+#
+# For local dev, add to .dev.vars (gitignored):
+TURNSTILE_SECRET_KEY="0x4AAAAAAClDBRYGhpkYoERJH_iecm8OsNw"

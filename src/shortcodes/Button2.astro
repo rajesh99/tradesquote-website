@@ -1,0 +1,44 @@
+---
+interface Props {
+  label: string;
+  link: string;
+  type?: string;
+  style?: "primary" | "secondary" | "transparent" | "light" | "outline" | "ghost" | "tertiary";
+  rel?: string;
+  className?: string;
+}
+
+const { label, link, type, style = "primary", rel, className = "" } = Astro.props;
+
+// MakerKit button base styles
+const baseStyles =
+  "flex items-center justify-center font-medium whitespace-nowrap transition-colors transition-[color,background-color,border-color,outline-color,text-decoration-color,fill,stroke] duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] cursor-pointer box-border text-sm leading-5 h-8 px-3 rounded-md border border-solid shadow-[rgba(0,0,0,0.05)_0px_1px_2px_0px] focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
+
+function getButtonStyles() {
+  switch (style) {
+    case "primary":
+      return "bg-primary text-white hover:bg-primary/90 border-primary";
+    case "tertiary":
+      return "bg-black text-white border-black hover:bg-accent hover:text-accent-foreground";
+    case "secondary":
+    case "outline":
+      return "bg-white text-[#0a0915] border-[#e5e5e5] hover:bg-accent hover:text-accent-foreground";
+    default:
+      return "bg-white text-[#0a0915] border-[#e5e5e5] hover:bg-accent hover:text-accent-foreground";
+  }
+}
+
+const target = link.startsWith("http") ? "_blank" : "_self";
+const relValue = `noopener noreferrer ${rel ? (rel === "follow" ? "" : rel) : "nofollow"}`.trim();
+const buttonStyles = getButtonStyles();
+const classList = `${baseStyles} ${buttonStyles} ${className}`.trim();
+---
+
+<a
+  href={link}
+  target={target}
+  rel={relValue}
+  class={classList}
+>
+  {label}
+</a>
