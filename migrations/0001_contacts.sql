@@ -1,5 +1,5 @@
 -- Migration: 0001_contacts
--- Run with: npx wrangler d1 execute multinudge-contacts --file=migrations/0001_contacts.sql
+-- Run with: npx wrangler d1 execute tradesquote-contacts --file=migrations/0001_contacts.sql
 
 CREATE TABLE IF NOT EXISTS contacts (
   id          INTEGER  PRIMARY KEY AUTOINCREMENT,

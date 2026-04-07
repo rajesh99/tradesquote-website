@@ -1,4 +1,8 @@
-# Trades Quote Website
+# TradesQuote Website
+
+This is the website for the TradesQuote project.
+
+tradesquote
 
 ## Astro Starter Kit: Basics
 
