@@ -1,0 +1,135 @@
+---
+const currentPath = new URL(Astro.request.url).pathname;
+
+const navigationLinks = [
+  { label: "Home", href: "/" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Contact", href: "/contact" },
+];
+
+function isActive(href: string): boolean {
+  if (href === "/") return currentPath === "/";
+  if (href.startsWith("/#")) return currentPath === "/";
+  return currentPath.startsWith(href);
+}
+---
+
+<header class="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="/" aria-label="TradesQuote Home" class="flex items-center shrink-0">
+      <img src="/logo.svg" alt="TradesQuote" width="160" height="36" class="h-8 w-auto" />
+    </a>
+
+    <!-- Nav links (desktop) -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+      {navigationLinks.map((link) => (
+        <a
+          href={link.href}
+          class={`text-sm font-medium transition-colors duration-150 ${
+            isActive(link.href)
+              ? "text-indigo-600 font-semibold"
+              : "text-gray-500 hover:text-gray-900"
+          }`}
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+
+    <!-- CTA buttons -->
+    <div class="flex items-center gap-2">
+      <a
+        href="https://tradesquote.ai/auth/sign-in"
+        class="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-150"
+      >
+        Sign in
+      </a>
+      <a
+        href="https://tradesquote.ai/auth/sign-up"
+        class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-150"
+      >
+        Sign up
+      </a>
+    </div>
+
+    <!-- Mobile menu button -->
+    <button
+      id="mobile-menu-btn"
+      type="button"
+      class="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors duration-150 ml-2"
+      aria-label="Toggle mobile menu"
+      aria-expanded="false"
+    >
+      <svg id="menu-icon-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      <svg id="menu-icon-close" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+  </div>
+
+  <!-- Mobile dropdown -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden border-t border-gray-100 bg-white"
+  >
+    <nav class="flex flex-col px-6 py-4 gap-1">
+      {navigationLinks.map((link) => (
+        <a
+          href={link.href}
+          class={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 ${
+            isActive(link.href)
+              ? "bg-indigo-50 text-indigo-600 font-semibold"
+              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          }`}
+        >
+          {link.label}
+        </a>
+      ))}
+      <div class="flex flex-col gap-2 pt-3 mt-2 border-t border-gray-100">
+        <a
+          href="https://tradesquote.ai/auth/sign-in"
+          class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-150"
+        >
+          Sign in
+        </a>
+        <a
+          href="https://tradesquote.ai/auth/sign-up"
+          class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-150"
+        >
+          Sign up
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('menu-icon-open');
+  const iconClose = document.getElementById('menu-icon-close');
+
+  btn?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    if (isOpen) {
+      menu?.classList.add('hidden');
+      iconOpen?.classList.remove('hidden');
+      iconClose?.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    } else {
+      menu?.classList.remove('hidden');
+      iconOpen?.classList.add('hidden');
+      iconClose?.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+</script>

@@ -1,0 +1,126 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Part13 from "../components/Part13.astro";
+
+const lastUpdated = "March 14, 2026";
+
+const sections = [
+  {
+    id: "introduction",
+    title: "Introduction",
+    content: [
+      "TradesQuote (“we”, “our”, or “us”) operates the TradesQuote service and related websites. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service, including our integration with GetJobber and related follow-up email automation.",
+      "By using TradesQuote, you agree to the collection and use of information in accordance with this policy. If you do not agree, please do not use our service.",
+    ],
+  },
+  {
+    id: "information-we-collect",
+    title: "Information We Collect",
+    content: [
+      "We collect information you provide directly (e.g., account details, name, email, company information when you sign up or contact us), information from GetJobber and other connected services as permitted by you (e.g., job/customer data needed to send follow-up emails), and automatically collected information (e.g., IP address, device type, usage data) to operate and improve our service.",
+    ],
+  },
+  {
+    id: "how-we-use",
+    title: "How We Use Your Information",
+    content: [
+      "We use the information to provide, maintain, and improve TradesQuote; to send automated follow-up emails and notifications according to your rules; to communicate with you about the service; to analyze usage and fix issues; and to comply with legal obligations and enforce our terms.",
+    ],
+  },
+  {
+    id: "sharing",
+    title: "Sharing and Disclosure",
+    content: [
+      "We do not sell your personal information. We may share information with service providers who assist our operations (e.g., hosting, email delivery), with GetJobber as part of the integration you authorize, or when required by law or to protect our rights and safety.",
+    ],
+  },
+  {
+    id: "data-security",
+    title: "Data Security",
+    content: [
+      "We implement appropriate technical and organizational measures to protect your data. No method of transmission or storage is 100% secure; we encourage you to use strong credentials and keep your GetJobber and TradesQuote access secure.",
+    ],
+  },
+  {
+    id: "retention",
+    title: "Data Retention",
+    content: [
+      "We retain your information for as long as your account is active or as needed to provide the service, comply with law, resolve disputes, and enforce our agreements. You may request deletion of your data subject to applicable law.",
+    ],
+  },
+  {
+    id: "your-rights",
+    title: "Your Rights",
+    content: [
+      "Depending on your location, you may have rights to access, correct, delete, or port your data, or to object to or restrict certain processing. Contact us at the email below to exercise these rights. You may also unsubscribe from marketing emails at any time.",
+    ],
+  },
+  {
+    id: "cookies",
+    title: "Cookies and Similar Technologies",
+    content: [
+      "We use cookies and similar technologies to operate our websites and service, remember preferences, and analyze usage. You can control cookies through your browser settings.",
+    ],
+  },
+  {
+    id: "changes",
+    title: "Changes to This Policy",
+    content: [
+      "We may update this Privacy Policy from time to time. We will post the updated policy on this page and update the “Last updated” date. Continued use of TradesQuote after changes constitutes acceptance of the revised policy.",
+    ],
+  },
+  {
+    id: "contact",
+    title: "Contact Us",
+    content: [
+      "For privacy-related questions or requests, contact us at sales@veersoftsolutions.com or at the address provided in the footer of this website.",
+    ],
+  },
+];
+---
+
+<Layout>
+  <Header />
+  <main class="w-full min-h-screen bg-white">
+    <article class="w-full max-w-[800px] mx-auto px-6 sm:px-8 lg:px-12 py-12 sm:py-16">
+      <header class="mb-12 sm:mb-16">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 text-[#4b5563] font-medium text-sm hover:text-[#4b44d4] transition-colors mb-6"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Home
+        </a>
+        <h1 class="font-bold text-3xl sm:text-4xl text-[#1f2937] tracking-tight leading-tight">
+          Privacy Policy
+        </h1>
+        <p class="mt-2 text-[#4b5563] text-base">
+          Last updated: {lastUpdated}
+        </p>
+      </header>
+
+      <div class="flex flex-col gap-10 sm:gap-12">
+        {sections.map((section) => (
+          <section id={section.id} class="scroll-mt-24">
+            <h2 class="font-semibold text-xl text-[#1f2937] tracking-normal mb-4">
+              {section.title}
+            </h2>
+            <div class="flex flex-col gap-4">
+              {section.content.map((paragraph) => (
+                <p class="text-[#4b5563] font-normal text-base leading-7 m-0">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+    </article>
+  </main>
+  <Part13 />
+</Layout>

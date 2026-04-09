@@ -1,0 +1,429 @@
+---
+type Plan = {
+  tierBadge: "value" | "popular" | null;
+  title: string;
+  description: string;
+  price: string;
+  priceSuffix: string;
+  billingNote: string;
+  ctaHref: string;
+  features: string[];
+  highlighted?: boolean;
+};
+
+const plansMonthly: Plan[] = [
+  {
+    tierBadge: "value",
+    title: "Starter",
+    description: "The perfect plan to get started",
+    price: "$9.99",
+    priceSuffix: "/month",
+    billingNote: "Billed monthly",
+    ctaHref:
+      "https://tradesquote.ai/auth/sign-up?next=%2Fhome&plan=starter-monthly&redirectToCheckout=true",
+    features: [
+      "50 estimates per month",
+      "Basic AI estimation",
+      "Email support",
+    ],
+  },
+  {
+    tierBadge: "popular",
+    title: "Pro",
+    description: "The perfect plan for professionals",
+    price: "$19.99",
+    priceSuffix: "/month",
+    billingNote: "Billed monthly",
+    ctaHref:
+      "https://tradesquote.ai/auth/sign-up?next=%2Fhome&plan=pro-monthly&redirectToCheckout=true",
+    features: [
+      "200 estimates per month",
+      "Advanced AI with Vision AI",
+      "Knowledge Base uploads",
+      "Priority support",
+      "QC Agent validation",
+    ],
+    highlighted: true,
+  },
+  {
+    tierBadge: null,
+    title: "Enterprise",
+    description: "The perfect plan for enterprises",
+    price: "$29.99",
+    priceSuffix: "/month",
+    billingNote: "Billed monthly",
+    ctaHref:
+      "https://tradesquote.ai/auth/sign-up?next=%2Fhome&plan=enterprise-monthly&redirectToCheckout=true",
+    features: [
+      "Unlimited estimates",
+      "Advanced AI with Vision AI",
+      "Knowledge Base uploads",
+      "Priority phone support",
+      "QC Agent validation",
+      "Custom templates",
+      "API access",
+    ],
+  },
+];
+
+const plansYearly: Plan[] = [
+  {
+    tierBadge: "value",
+    title: "Starter",
+    description: "The perfect plan to get started",
+    price: "$8.33",
+    priceSuffix: "/month",
+    billingNote: "Billed yearly",
+    ctaHref:
+      "https://tradesquote.ai/auth/sign-up?next=%2Fhome&plan=starter-yearly&redirectToCheckout=true",
+    features: [
+      "50 estimates per month",
+      "Basic AI estimation",
+      "Email support",
+    ],
+  },
+  {
+    tierBadge: "popular",
+    title: "Pro",
+    description: "The perfect plan for professionals",
+    price: "$16.67",
+    priceSuffix: "/month",
+    billingNote: "Billed yearly",
+    ctaHref:
+      "https://tradesquote.ai/auth/sign-up?next=%2Fhome&plan=pro-yearly&redirectToCheckout=true",
+    features: [
+      "200 estimates per month",
+      "Advanced AI with Vision AI",
+      "Knowledge Base uploads",
+      "Priority support",
+      "QC Agent validation",
+    ],
+    highlighted: true,
+  },
+  {
+    tierBadge: null,
+    title: "Enterprise",
+    description: "The perfect plan for enterprises",
+    price: "$24.99",
+    priceSuffix: "/month",
+    billingNote: "Billed yearly",
+    ctaHref:
+      "https://tradesquote.ai/auth/sign-up?next=%2Fhome&plan=enterprise-yearly&redirectToCheckout=true",
+    features: [
+      "Unlimited estimates",
+      "Advanced AI with Vision AI",
+      "Knowledge Base uploads",
+      "Priority phone support",
+      "QC Agent validation",
+      "Custom templates",
+      "API access",
+    ],
+  },
+];
+---
+
+<section id="pricing" class="w-full py-24 px-6 bg-gray-50">
+  <div class="max-w-6xl mx-auto flex flex-col items-center gap-12">
+    <div class="flex flex-col items-center gap-3 text-center max-w-2xl">
+      <span
+        class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold tracking-wide uppercase"
+      >
+        Pricing
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
+        Fair pricing for all types of businesses
+      </h2>
+      <p class="text-gray-500 text-lg leading-relaxed">
+        Get started on our free plan and upgrade when you are ready.
+      </p>
+    </div>
+
+    <div
+      class="inline-flex p-1 rounded-xl bg-gray-200/80 border border-gray-200"
+      role="group"
+      aria-label="Billing period"
+    >
+      <button
+        type="button"
+        class="pricing-period-btn px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-150 bg-white text-gray-900 shadow-sm"
+        data-pricing-period="monthly"
+        aria-pressed="true"
+      >
+        Billed monthly
+      </button>
+      <button
+        type="button"
+        class="pricing-period-btn px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-150 text-gray-600 hover:text-gray-900"
+        data-pricing-period="yearly"
+        aria-pressed="false"
+      >
+        Billed yearly
+      </button>
+    </div>
+
+    <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <div class="pricing-plans-grid contents" data-pricing-plans="monthly">
+        {plansMonthly.map((plan) => (
+          <div
+            class={`relative flex flex-col rounded-2xl overflow-hidden transition-all duration-200 ${
+              plan.highlighted
+                ? "bg-gray-950 border border-indigo-500/40 shadow-2xl shadow-indigo-500/10 lg:scale-[1.02] z-10"
+                : "bg-white border border-gray-100 shadow-sm hover:shadow-md"
+            }`}
+          >
+            {plan.tierBadge === "popular" && (
+              <div class="absolute top-0 inset-x-0 flex justify-center">
+                <span class="inline-flex items-center gap-1.5 px-4 py-1 bg-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-b-xl">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
+                  </svg>
+                  Popular
+                </span>
+              </div>
+            )}
+            {plan.tierBadge === "value" && (
+              <div class="absolute top-0 inset-x-0 flex justify-center">
+                <span class="inline-flex items-center px-4 py-1 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-b-xl">
+                  Value
+                </span>
+              </div>
+            )}
+
+            <div class={`flex flex-col flex-1 p-8 ${plan.tierBadge ? "pt-10" : ""}`}>
+              <div class="flex flex-col gap-2 mb-6">
+                <h3 class={`text-lg font-bold ${plan.highlighted ? "text-white" : "text-gray-900"}`}>
+                  {plan.title}
+                </h3>
+                <p class={`text-sm leading-relaxed ${plan.highlighted ? "text-gray-400" : "text-gray-500"}`}>
+                  {plan.description}
+                </p>
+              </div>
+
+              <div class="flex items-end gap-1 mb-1">
+                <span
+                  class={`text-4xl sm:text-5xl font-extrabold leading-none tracking-tight ${plan.highlighted ? "text-white" : "text-gray-900"}`}
+                >
+                  {plan.price}
+                </span>
+                <span class={`text-base font-medium mb-1 ${plan.highlighted ? "text-gray-400" : "text-gray-400"}`}>
+                  {plan.priceSuffix}
+                </span>
+              </div>
+              <p class={`text-xs font-medium mb-8 ${plan.highlighted ? "text-gray-500" : "text-gray-500"}`}>
+                {plan.billingNote}
+              </p>
+
+              <a
+                href={plan.ctaHref}
+                class={`w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-150 active:scale-[0.98] mb-8 ${
+                  plan.highlighted
+                    ? "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
+                    : "bg-gray-900 text-white hover:bg-gray-800"
+                }`}
+              >
+                Get started
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
+
+              <div class={`h-px mb-8 ${plan.highlighted ? "bg-white/10" : "bg-gray-100"}`} />
+
+              <ul class="flex flex-col gap-3 flex-1">
+                {plan.features.map((feature) => (
+                  <li class="flex items-start gap-3">
+                    <span
+                      class={`shrink-0 mt-0.5 w-4 h-4 rounded-full flex items-center justify-center ${plan.highlighted ? "bg-indigo-500/20" : "bg-indigo-50"}`}
+                    >
+                      <svg
+                        width="8"
+                        height="8"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke={plan.highlighted ? "#a5b4fc" : "#4f46e5"}
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                    <span class={`text-sm leading-relaxed ${plan.highlighted ? "text-gray-300" : "text-gray-600"}`}>
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="pricing-plans-grid hidden" data-pricing-plans="yearly">
+        {plansYearly.map((plan) => (
+          <div
+            class={`relative flex flex-col rounded-2xl overflow-hidden transition-all duration-200 ${
+              plan.highlighted
+                ? "bg-gray-950 border border-indigo-500/40 shadow-2xl shadow-indigo-500/10 lg:scale-[1.02] z-10"
+                : "bg-white border border-gray-100 shadow-sm hover:shadow-md"
+            }`}
+          >
+            {plan.tierBadge === "popular" && (
+              <div class="absolute top-0 inset-x-0 flex justify-center">
+                <span class="inline-flex items-center gap-1.5 px-4 py-1 bg-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-b-xl">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
+                  </svg>
+                  Popular
+                </span>
+              </div>
+            )}
+            {plan.tierBadge === "value" && (
+              <div class="absolute top-0 inset-x-0 flex justify-center">
+                <span class="inline-flex items-center px-4 py-1 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-b-xl">
+                  Value
+                </span>
+              </div>
+            )}
+
+            <div class={`flex flex-col flex-1 p-8 ${plan.tierBadge ? "pt-10" : ""}`}>
+              <div class="flex flex-col gap-2 mb-6">
+                <h3 class={`text-lg font-bold ${plan.highlighted ? "text-white" : "text-gray-900"}`}>
+                  {plan.title}
+                </h3>
+                <p class={`text-sm leading-relaxed ${plan.highlighted ? "text-gray-400" : "text-gray-500"}`}>
+                  {plan.description}
+                </p>
+              </div>
+
+              <div class="flex items-end gap-1 mb-1">
+                <span
+                  class={`text-4xl sm:text-5xl font-extrabold leading-none tracking-tight ${plan.highlighted ? "text-white" : "text-gray-900"}`}
+                >
+                  {plan.price}
+                </span>
+                <span class={`text-base font-medium mb-1 ${plan.highlighted ? "text-gray-400" : "text-gray-400"}`}>
+                  {plan.priceSuffix}
+                </span>
+              </div>
+              <p class={`text-xs font-medium mb-8 ${plan.highlighted ? "text-gray-500" : "text-gray-500"}`}>
+                {plan.billingNote}
+              </p>
+
+              <a
+                href={plan.ctaHref}
+                class={`w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-150 active:scale-[0.98] mb-8 ${
+                  plan.highlighted
+                    ? "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
+                    : "bg-gray-900 text-white hover:bg-gray-800"
+                }`}
+              >
+                Get started
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
+
+              <div class={`h-px mb-8 ${plan.highlighted ? "bg-white/10" : "bg-gray-100"}`} />
+
+              <ul class="flex flex-col gap-3 flex-1">
+                {plan.features.map((feature) => (
+                  <li class="flex items-start gap-3">
+                    <span
+                      class={`shrink-0 mt-0.5 w-4 h-4 rounded-full flex items-center justify-center ${plan.highlighted ? "bg-indigo-500/20" : "bg-indigo-50"}`}
+                    >
+                      <svg
+                        width="8"
+                        height="8"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke={plan.highlighted ? "#a5b4fc" : "#4f46e5"}
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                    <span class={`text-sm leading-relaxed ${plan.highlighted ? "text-gray-300" : "text-gray-600"}`}>
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <p class="text-sm text-gray-400 text-center max-w-xl">
+      Prices shown are per month; yearly plans are billed annually. Upgrade or change plans anytime from your account.
+    </p>
+  </div>
+</section>
+
+<script>
+  function initPricingToggle() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>(".pricing-period-btn");
+    const panels = document.querySelectorAll<HTMLElement>("[data-pricing-plans]");
+
+    function setPeriod(period: "monthly" | "yearly") {
+      panels.forEach((panel) => {
+        const isMatch = panel.getAttribute("data-pricing-plans") === period;
+        if (isMatch) {
+          panel.classList.remove("hidden");
+          panel.classList.add("contents");
+        } else {
+          panel.classList.add("hidden");
+          panel.classList.remove("contents");
+        }
+      });
+
+      buttons.forEach((btn) => {
+        const isActive = btn.getAttribute("data-pricing-period") === period;
+        btn.setAttribute("aria-pressed", String(isActive));
+        btn.classList.toggle("bg-white", isActive);
+        btn.classList.toggle("text-gray-900", isActive);
+        btn.classList.toggle("shadow-sm", isActive);
+        btn.classList.toggle("text-gray-600", !isActive);
+        btn.classList.toggle("hover:text-gray-900", !isActive);
+      });
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const period = btn.getAttribute("data-pricing-period") as "monthly" | "yearly" | null;
+        if (period) setPeriod(period);
+      });
+    });
+  }
+
+  initPricingToggle();
+</script>

@@ -1,0 +1,113 @@
+---
+const statistics = [
+  {
+    value: "17+",
+    suffix: "hrs/week",
+    label: "Time Saved",
+    description: "Saved on manual follow-ups, reminders, and repetitive admin emails every single week.",
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    iconBg: "bg-amber-500/10 border-amber-500/20 text-amber-400",
+    valueBg: "from-amber-400 to-orange-400",
+  },
+  {
+    value: "$330K",
+    suffix: "per year",
+    label: "Revenue Recovered",
+    description: "In recovered revenue from consistent follow-ups, closed estimates, and faster payments.",
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+    iconBg: "bg-indigo-500/10 border-indigo-500/20 text-indigo-400",
+    valueBg: "from-indigo-400 to-violet-400",
+  },
+  {
+    value: "100%",
+    suffix: "consistent",
+    label: "Follow-up Rate",
+    description: "No more forgotten emails or missed opportunities — every customer gets the right message.",
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+    iconBg: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+    valueBg: "from-emerald-400 to-teal-400",
+  },
+];
+---
+
+<section id="why-us" class="w-full py-24 px-6 bg-gray-950 relative overflow-hidden">
+
+  <!-- Background decorative blobs -->
+  <div class="pointer-events-none absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
+  <div class="pointer-events-none absolute -bottom-32 -right-32 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"></div>
+
+  <div class="max-w-6xl mx-auto flex flex-col items-center gap-16 relative z-10">
+
+    <!-- Section header -->
+    <div class="flex flex-col items-center gap-4 text-center max-w-2xl">
+      <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/5 text-white/50 text-sm font-semibold tracking-widest uppercase border border-white/10">
+        Why us?
+      </span>
+      <h2 class="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
+        The numbers <span class="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">don't lie</span>
+      </h2>
+      <p class="text-gray-400 text-lg leading-relaxed">
+        Real, measurable impact for field service businesses — from day one.
+      </p>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+      {statistics.map((stat) => (
+        <div class="relative flex flex-col gap-6 rounded-2xl bg-white/5 border border-white/8 p-8 overflow-hidden group hover:bg-white/8 transition-colors duration-300">
+
+          <!-- Top row: icon + label -->
+          <div class="flex items-center justify-between">
+            <div class={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${stat.iconBg}`}>
+              <Fragment set:html={stat.icon} />
+            </div>
+            <span class="text-xs font-bold text-white/30 uppercase tracking-widest">
+              {stat.label}
+            </span>
+          </div>
+
+          <!-- Value -->
+          <div class="flex flex-col gap-1">
+            <p class={`text-5xl sm:text-6xl font-extrabold leading-none tracking-tight bg-gradient-to-br ${stat.valueBg} bg-clip-text text-transparent`}>
+              {stat.value}
+            </p>
+            <p class="text-sm font-semibold text-white/30 uppercase tracking-widest mt-2">
+              {stat.suffix}
+            </p>
+          </div>
+
+          <!-- Divider -->
+          <div class="h-px bg-white/5"></div>
+
+          <!-- Description -->
+          <p class="text-gray-400 text-sm leading-relaxed">
+            {stat.description}
+          </p>
+
+          <!-- Subtle corner glow on hover -->
+          <div class="pointer-events-none absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-indigo-600/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      ))}
+    </div>
+
+    <!-- CTA -->
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+      <a
+        href="#pricing"
+        class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-500 active:scale-[0.98] transition-all duration-150 shadow-lg shadow-indigo-500/25"
+      >
+        See pricing
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a
+        href="https://tradesquote.ai/auth/sign-up"
+        class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/5 text-white text-sm font-semibold rounded-xl border border-white/10 hover:bg-white/10 active:scale-[0.98] transition-all duration-150"
+      >
+        Start free trial
+      </a>
+    </div>
+
+  </div>
+</section>
