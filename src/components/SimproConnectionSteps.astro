@@ -1,0 +1,73 @@
+---
+const steps = [
+  {
+    n: 1,
+    title: "Go to Connections",
+    body:
+      'From your TradesQuote dashboard, navigate to <strong class="font-semibold text-gray-800">Settings → Connections</strong>.',
+  },
+  {
+    n: 2,
+    title: "Enter your simPRO Build Name",
+    body:
+      'This is the subdomain of your simPRO account (e.g. <code class="text-[13px] px-1.5 py-0.5 rounded-md bg-gray-100 text-indigo-700 font-mono">yourcompany</code> from <code class="text-[13px] px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-800 font-mono">yourcompany.simprosuite.com</code>).',
+  },
+  {
+    n: 3,
+    title: "Click Connect simPRO",
+    body: "You will be redirected to simPRO to log in and authorise the integration.",
+  },
+  {
+    n: 4,
+    title: "Authorise access",
+    body:
+      "Log in with your simPRO credentials and approve the connection. You will be returned to TradesQuote automatically.",
+  },
+  {
+    n: 5,
+    title: "Upload your first estimate",
+    body:
+      'Open any estimate, click <strong class="font-semibold text-gray-800">Upload to simPRO</strong>, and your Quote will appear in simPRO instantly.',
+  },
+];
+---
+
+<section class="w-full" aria-labelledby="get-started-heading">
+  <h2
+    id="get-started-heading"
+    class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3"
+  >
+    How to get started
+  </h2>
+  <p class="text-gray-600 text-base leading-relaxed mb-8 max-w-2xl">
+    Getting connected takes less than two minutes.
+  </p>
+
+  <div class="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+    <ol class="list-none m-0 p-0 divide-y divide-gray-100">
+      {steps.map((step) => (
+        <li class="flex gap-4 sm:gap-6 px-5 sm:px-8 py-5 sm:py-6">
+          <span
+            class="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white text-sm font-bold"
+            aria-hidden="true"
+          >
+            {step.n}
+          </span>
+          <div class="min-w-0 pt-0.5">
+            <h3 class="text-base font-semibold text-gray-900 m-0 mb-2">{step.title}</h3>
+            <p class="text-sm sm:text-base text-gray-600 leading-relaxed m-0" set:html={step.body} />
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <figure class="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50/50 px-5 py-5 sm:px-6 sm:py-5">
+    <blockquote class="m-0">
+      <p class="text-sm sm:text-base text-indigo-950/90 leading-relaxed m-0">
+        The integration uses OAuth 2.0 — your simPRO password is never shared with TradesQuote. All
+        credentials are encrypted and stored securely.
+      </p>
+    </blockquote>
+  </figure>
+</section>

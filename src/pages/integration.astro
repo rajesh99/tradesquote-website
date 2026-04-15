@@ -1,0 +1,91 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Part13 from "../components/Part13.astro";
+import SimproBenefits from "../components/SimproBenefits.astro";
+import SimproConnectionSteps from "../components/SimproConnectionSteps.astro";
+import SimproDiagram from "../components/SimproDiagram.astro";
+import SimproFaq from "../components/SimproFaq.astro";
+
+const title = "simPRO Integration — TradesQuote";
+const description =
+  "Connect TradesQuote with simPRO in minutes. Push estimates as Quotes with OAuth 2.0 — no manual re-entry, full traceability, and automatic token refresh.";
+---
+
+<Layout {title} {description}>
+  <Header />
+
+  <main>
+    <section class="w-full pt-16 sm:pt-20 pb-10 px-6 bg-white relative overflow-hidden">
+      <div
+        class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.08),transparent)] -z-10"
+      >
+      </div>
+      <div class="max-w-3xl mx-auto flex flex-col items-center text-center gap-4">
+        <span
+          class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold tracking-wide uppercase"
+        >
+          Integration
+        </span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight">
+          TradesQuote + simPRO
+        </h1>
+        <p class="text-gray-500 text-lg leading-relaxed max-w-2xl">
+          Stop re-entering data. Send structured estimates from TradesQuote straight into simPRO as Quotes
+          — one click, full traceability, OAuth-secured.
+        </p>
+      </div>
+    </section>
+
+    <div class="w-full max-w-[800px] mx-auto px-6 sm:px-8 lg:px-12 pb-16 sm:pb-20 flex flex-col gap-14 sm:gap-16">
+  
+
+      <SimproBenefits />
+
+      <SimproConnectionSteps />
+
+      <SimproDiagram />
+
+      <section class="w-full" aria-labelledby="data-mapping-heading">
+        <h2
+          id="data-mapping-heading"
+          class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-6"
+        >
+          Data mapping
+        </h2>
+        <div class="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
+          <table class="w-full min-w-[480px] text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-gray-50/90 border-b border-gray-100">
+                <th scope="col" class="px-5 py-3.5 font-semibold text-gray-900">TradesQuote</th>
+                <th scope="col" class="px-5 py-3.5 font-semibold text-gray-900">simPRO</th>
+                <th scope="col" class="px-5 py-3.5 font-semibold text-gray-900">Direction</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <tr>
+                <td class="px-5 py-3.5 text-gray-700">Estimate</td>
+                <td class="px-5 py-3.5 text-gray-700">Quote (Service)</td>
+                <td class="px-5 py-3.5 text-gray-600">Push to simPRO</td>
+              </tr>
+              <tr>
+                <td class="px-5 py-3.5 text-gray-700">Estimate Line Items</td>
+                <td class="px-5 py-3.5 text-gray-700">Quote One-Off Items</td>
+                <td class="px-5 py-3.5 text-gray-600">Push to simPRO</td>
+              </tr>
+              <tr>
+                <td class="px-5 py-3.5 text-gray-700">Estimate Session</td>
+                <td class="px-5 py-3.5 text-gray-700">Quote Section &amp; Cost Centre</td>
+                <td class="px-5 py-3.5 text-gray-600">Push to simPRO</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <SimproFaq />
+    </div>
+  </main>
+
+  <Part13 />
+</Layout>

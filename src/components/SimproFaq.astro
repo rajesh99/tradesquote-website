@@ -1,0 +1,70 @@
+---
+const faqs = [
+  {
+    q: "Do I need a simPRO account to use this integration?",
+    a: 'Yes. You need an active simPRO subscription and admin credentials to authorise the connection. If you do not have a simPRO account, visit <a href="https://simprogroup.com" class="text-indigo-600 font-medium hover:text-indigo-700 underline underline-offset-2">simprogroup.com</a> to get started.',
+  },
+  {
+    q: "Is my simPRO password shared with TradesQuote?",
+    a: "No. The integration uses OAuth 2.0, the same secure standard used by Google and Microsoft sign-ins. TradesQuote never sees or stores your simPRO password. You log in directly on the simPRO website and grant permission from there.",
+  },
+  {
+    q: "What data is sent to simPRO?",
+    a: "Only your estimate data is pushed — the job description, line item descriptions, quantities, and unit prices. No personal user data or financial account information is transmitted.",
+  },
+  {
+    q: "Does data flow back from simPRO into TradesQuote?",
+    a: "Not at this stage. The integration is one-way: TradesQuote pushes estimates into simPRO as Quotes. Future versions may include status sync from simPRO back to TradesQuote.",
+  },
+  {
+    q: "What happens if I update an estimate after uploading it?",
+    a: 'You can re-upload the estimate at any time using the <strong class="font-semibold text-gray-800">Re-upload to simPRO</strong> button. This creates a new Quote in simPRO — it does not overwrite the previously created Quote.',
+  },
+  {
+    q: "What simPRO plan do I need?",
+    a: "The integration works with simPRO's standard API, available on business plans. Check with your simPRO account manager if you are unsure whether your plan includes API access.",
+  },
+  {
+    q: "What if the connection drops or the token expires?",
+    a: "TradesQuote automatically refreshes the connection in the background before tokens expire. In the rare case where a refresh fails (e.g. your simPRO credentials were changed), you will be prompted to reconnect from the Connections page.",
+  },
+  {
+    q: "Can multiple team members use the integration?",
+    a: "Yes. Once connected by an account owner, any team member can upload estimates to simPRO. Only the account owner can connect or disconnect the integration.",
+  },
+  {
+    q: "Is there a limit to how many estimates I can upload?",
+    a: "TradesQuote does not impose a limit. simPRO's own API rate limits may apply depending on your simPRO plan.",
+  },
+  {
+    q: "Who do I contact if something goes wrong?",
+    a: "For TradesQuote-related issues, contact our support team through the TradesQuote app. For simPRO-related issues (e.g. Quotes not appearing as expected), contact simPRO support directly.",
+  },
+];
+---
+
+<section class="w-full" aria-labelledby="faq-heading">
+  <h2 id="faq-heading" class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-8">
+    Frequently asked questions
+  </h2>
+  <div class="flex flex-col gap-3">
+    {faqs.map((item) => (
+      <details class="group rounded-xl border border-gray-100 bg-white hover:border-gray-200 transition-colors duration-150">
+        <summary class="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-left font-semibold text-gray-900 text-sm sm:text-base [&::-webkit-details-marker]:hidden">
+          <span class="pr-2">{item.q}</span>
+          <span
+            class="shrink-0 w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-open:rotate-180 transition-transform duration-200"
+            aria-hidden="true"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </summary>
+        <div class="px-5 pb-4 pt-0 border-t border-transparent group-open:border-gray-100">
+          <p class="text-sm sm:text-base text-gray-600 leading-relaxed m-0 pt-3" set:html={item.a} />
+        </div>
+      </details>
+    ))}
+  </div>
+</section>
