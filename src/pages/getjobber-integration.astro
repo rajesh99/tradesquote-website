@@ -1,0 +1,505 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Part13 from "../components/Part13.astro";
+
+const title = "GetJobber Integration — TradesQuote";
+const description =
+  "Connect TradesQuote with GetJobber in minutes. Push estimates as Quotes with OAuth 2.0 — no manual re-entry, full traceability, and automatic token refresh.";
+
+const benefits = [
+  {
+    title: "Stop re-entering data",
+    body:
+      "When you generate an estimate in TradesQuote, every line item, quantity, and price is pushed straight into GetJobber as a structured Quote in seconds — no copy-pasting or spreadsheets.",
+    accent: "violet",
+  },
+  {
+    title: "Save hours every week",
+    body:
+      "Estimators no longer need to manually recreate quotes in GetJobber after building them in TradesQuote. What used to take 20–30 minutes of data entry is now a single click.",
+    accent: "emerald",
+  },
+  {
+    title: "Eliminate costly errors",
+    body:
+      "Manual re-entry introduces typos, missed line items, and pricing mistakes. The exact data from your estimate lands in GetJobber every time.",
+    accent: "amber",
+  },
+  {
+    title: "Keep your team in sync",
+    body:
+      "The moment an estimate is uploaded, your GetJobber team can see the Quote, action it, and move it through your workflow — no lag waiting for data entry.",
+    accent: "sky",
+  },
+  {
+    title: "Full traceability",
+    body:
+      "Every estimate uploaded to GetJobber stores the Quote ID and a direct link back to the GetJobber record. Your team always knows where each estimate lives.",
+    accent: "rose",
+  },
+  {
+    title: "Stays connected automatically",
+    body:
+      "The integration silently refreshes its credentials in the background, so there is no need to reconnect every time a token expires.",
+    accent: "indigo",
+  },
+] as const;
+
+const steps = [
+  {
+    n: 1,
+    title: "Go to Connections",
+    body:
+      'From your TradesQuote dashboard, navigate to <strong class="font-semibold text-stone-900">Settings → Connections</strong>.',
+  },
+  {
+    n: 2,
+    title: "Enter your GetJobber Build Name",
+    body:
+      'This is the subdomain of your GetJobber account (e.g. <code class="text-[13px] px-1.5 py-0.5 rounded-md bg-stone-100 text-violet-700 font-mono border border-stone-200/80">yourcompany</code> from <code class="text-[13px] px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-800 font-mono border border-stone-200/80">yourcompany.GetJobbersuite.com</code>).',
+  },
+  {
+    n: 3,
+    title: "Click Connect GetJobber",
+    body: "You will be redirected to GetJobber to log in and authorise the integration.",
+  },
+  {
+    n: 4,
+    title: "Authorise access",
+    body:
+      "Log in with your GetJobber credentials and approve the connection. You will be returned to TradesQuote automatically.",
+  },
+  {
+    n: 5,
+    title: "Upload your first estimate",
+    body:
+      'Open any estimate, click <strong class="font-semibold text-stone-900">Upload to GetJobber</strong>, and your Quote will appear in GetJobber instantly.',
+  },
+];
+
+const faqs = [
+  {
+    q: "Do I need a GetJobber account to use this integration?",
+    a: 'Yes. You need an active GetJobber subscription and admin credentials to authorise the connection. If you do not have a GetJobber account, visit <a href="https://GetJobbergroup.com" class="text-violet-600 font-medium hover:text-violet-700 underline underline-offset-2">GetJobbergroup.com</a> to get started.',
+  },
+  {
+    q: "Is my GetJobber password shared with TradesQuote?",
+    a: "No. The integration uses OAuth 2.0, the same secure standard used by Google and Microsoft sign-ins. TradesQuote never sees or stores your GetJobber password. You log in directly on the GetJobber website and grant permission from there.",
+  },
+  {
+    q: "What data is sent to GetJobber?",
+    a: "Only your estimate data is pushed — the job description, line item descriptions, quantities, and unit prices. No personal user data or financial account information is transmitted.",
+  },
+  {
+    q: "Does data flow back from GetJobber into TradesQuote?",
+    a: "Not at this stage. The integration is one-way: TradesQuote pushes estimates into GetJobber as Quotes. Future versions may include status sync from GetJobber back to TradesQuote.",
+  },
+  {
+    q: "What happens if I update an estimate after uploading it?",
+    a: 'You can re-upload the estimate at any time using the <strong class="font-semibold text-stone-800">Re-upload to GetJobber</strong> button. This creates a new Quote in GetJobber — it does not overwrite the previously created Quote.',
+  },
+  {
+    q: "What GetJobber plan do I need?",
+    a: "The integration works with GetJobber's standard API, available on business plans. Check with your GetJobber account manager if you are unsure whether your plan includes API access.",
+  },
+  {
+    q: "What if the connection drops or the token expires?",
+    a: "TradesQuote automatically refreshes the connection in the background before tokens expire. In the rare case where a refresh fails (e.g. your GetJobber credentials were changed), you will be prompted to reconnect from the Connections page.",
+  },
+  {
+    q: "Can multiple team members use the integration?",
+    a: "Yes. Once connected by an account owner, any team member can upload estimates to GetJobber. Only the account owner can connect or disconnect the integration.",
+  },
+  {
+    q: "Is there a limit to how many estimates I can upload?",
+    a: "TradesQuote does not impose a limit. GetJobber's own API rate limits may apply depending on your GetJobber plan.",
+  },
+  {
+    q: "Who do I contact if something goes wrong?",
+    a: "For TradesQuote-related issues, contact our support team through the TradesQuote app. For GetJobber-related issues (e.g. Quotes not appearing as expected), contact GetJobber support directly.",
+  },
+];
+
+const mapping = [
+  { tq: "Estimate", sp: "Quote (Service)" },
+  { tq: "Estimate Line Items", sp: "Quote One-Off Items" },
+  { tq: "Estimate Session", sp: "Quote Section & Cost Centre" },
+];
+
+const accentRing: Record<(typeof benefits)[number]["accent"], string> = {
+  violet: "ring-violet-500/25 bg-violet-500/5",
+  emerald: "ring-emerald-500/25 bg-emerald-500/5",
+  amber: "ring-amber-500/25 bg-amber-500/5",
+  sky: "ring-sky-500/25 bg-sky-500/5",
+  rose: "ring-rose-500/25 bg-rose-500/5",
+  indigo: "ring-indigo-500/25 bg-indigo-500/5",
+};
+
+const nav = [
+  { id: "why", label: "Why connect" },
+  { id: "setup", label: "Get started" },
+  { id: "flow", label: "Flow" },
+  { id: "mapping", label: "Data map" },
+  { id: "faq", label: "FAQ" },
+];
+---
+
+<Layout {title} {description}>
+  <div class="bg-stone-50 min-h-screen">
+    <Header />
+
+    <!-- Dark hero: editorial + mesh -->
+    <header
+      class="relative isolate overflow-hidden bg-slate-950 text-white pt-6 pb-20 sm:pb-28 px-6 sm:px-8"
+    >
+      <div
+        class="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={`background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`}
+        aria-hidden="true"
+      >
+      </div>
+      <div
+        class="pointer-events-none absolute -top-32 right-0 h-[420px] w-[420px] rounded-full bg-violet-600/30 blur-[100px]"
+        aria-hidden="true"
+      >
+      </div>
+      <div
+        class="pointer-events-none absolute bottom-0 left-1/4 h-[280px] w-[500px] rounded-full bg-emerald-500/15 blur-[90px]"
+        aria-hidden="true"
+      >
+      </div>
+
+      <div class="relative z-10 max-w-6xl mx-auto">
+
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-12 lg:gap-8 mt-12 sm:mt-16">
+          <div class="max-w-2xl">
+            <p
+              class="text-xs font-semibold tracking-[0.25em] uppercase text-violet-300/90 mb-4"
+            >
+              Integration · GetJobber
+            </p>
+            <h1
+              class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white"
+            >
+              <span class="block text-slate-300 font-bold text-2xl sm:text-3xl mb-2 tracking-normal">
+                TradesQuote
+              </span>
+              <span
+                class="bg-gradient-to-r from-white via-violet-200 to-emerald-200 bg-clip-text text-transparent"
+              >
+                + GetJobber
+              </span>
+            </h1>
+            <p class="mt-6 text-lg sm:text-xl text-slate-400 leading-relaxed max-w-xl">
+              Stop re-entering data. Push structured estimates into GetJobber as Quotes — one workflow,
+              OAuth-secured, built for teams who outgrow copy-paste.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 lg:pb-1">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm min-w-[200px]"
+            >
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                Time saved
+              </p>
+              <p class="text-2xl font-bold text-white tabular-nums">20–30 min</p>
+              <p class="text-sm text-emerald-400/90 mt-0.5">→ one click</p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm min-w-[200px]"
+            >
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                Security
+              </p>
+              <p class="text-lg font-semibold text-white leading-snug">OAuth 2.0</p>
+              <p class="text-xs text-slate-500 mt-1">Password never shared</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sticky section nav -->
+    <nav
+      class="sticky top-16 z-40 border-b border-stone-200/80 bg-stone-50/85 backdrop-blur-md -mt-px"
+      aria-label="On this page"
+    >
+      <div
+        class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex gap-1 sm:gap-2 overflow-x-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {
+          nav.map((item) => (
+            <a
+              href={`#${item.id}`}
+              class="shrink-0 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-stone-600 hover:text-violet-700 hover:bg-violet-50 transition-colors duration-150"
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 sm:px-8 pb-20 sm:pb-24 flex flex-col gap-20 sm:gap-24">
+      <!-- Bento benefits -->
+      <section id="why" class="scroll-mt-36 pt-4" aria-labelledby="why-heading">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+          <div>
+            <h2 id="why-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
+              Why connect?
+            </h2>
+            <p class="mt-2 text-stone-600 max-w-xl">
+              Everything your estimators care about — speed, accuracy, and traceability — in one pipe
+              into GetJobber.
+            </p>
+          </div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Bento overview</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-fr">
+          <!-- Hero tile -->
+          <div
+            class="md:col-span-4 md:row-span-1 rounded-3xl p-8 sm:p-10 bg-gradient-to-br from-violet-600 via-violet-700 to-slate-900 text-white shadow-xl shadow-violet-900/20 relative overflow-hidden"
+          >
+            <div
+              class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"
+              aria-hidden="true"
+            >
+            </div>
+            <p class="relative text-sm font-semibold text-violet-200 uppercase tracking-wider mb-3">
+              Core value
+            </p>
+            <h3 class="relative text-2xl sm:text-3xl font-bold leading-tight max-w-md">
+              {benefits[0].title}
+            </h3>
+            <p class="relative mt-4 text-violet-100/95 leading-relaxed max-w-xl text-sm sm:text-base">
+              {benefits[0].body}
+            </p>
+          </div>
+
+          <!-- Side stack -->
+          <div class="md:col-span-2 flex flex-col gap-4">
+            <div
+              class={`flex-1 rounded-3xl p-6 ring-1 ${accentRing[benefits[1].accent]} border border-stone-200/60 bg-white`}
+            >
+              <h3 class="text-base font-bold text-stone-900">{benefits[1].title}</h3>
+              <p class="mt-2 text-sm text-stone-600 leading-relaxed">{benefits[1].body}</p>
+            </div>
+            <div
+              class={`flex-1 rounded-3xl p-6 ring-1 ${accentRing[benefits[2].accent]} border border-stone-200/60 bg-white`}
+            >
+              <h3 class="text-base font-bold text-stone-900">{benefits[2].title}</h3>
+              <p class="mt-2 text-sm text-stone-600 leading-relaxed">{benefits[2].body}</p>
+            </div>
+          </div>
+
+          <!-- Bottom row -->
+          {
+            benefits.slice(3).map((b) => (
+              <div
+                class={`md:col-span-2 rounded-3xl p-6 sm:p-7 ring-1 ${accentRing[b.accent]} border border-stone-200/60 bg-white hover:shadow-md hover:shadow-stone-200/50 transition-shadow duration-300`}
+              >
+                <h3 class="text-base font-bold text-stone-900">{b.title}</h3>
+                <p class="mt-3 text-sm text-stone-600 leading-relaxed">{b.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- Timeline setup -->
+      <section id="setup" class="scroll-mt-36" aria-labelledby="setup-heading">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          <div class="lg:col-span-4 lg:sticky lg:top-32">
+            <h2 id="setup-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
+              How to get started
+            </h2>
+            <p class="mt-3 text-stone-600 leading-relaxed">
+              Getting connected takes less than two minutes. Follow the trail — each step builds on
+              the last.
+            </p>
+            <div
+              class="mt-8 rounded-2xl border border-violet-200/80 bg-violet-50/80 p-5 text-sm text-violet-950 leading-relaxed"
+            >
+              <p class="font-semibold text-violet-900 mb-1 flex items-center gap-2">
+                <span
+                  class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-violet-600 text-white"
+                  aria-hidden="true"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </span>
+                OAuth 2.0
+              </p>
+              <p class="m-0 text-violet-900/90">
+                Your GetJobber password is never shared with TradesQuote. All credentials are encrypted
+                and stored securely.
+              </p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 relative">
+            <div
+              class="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-violet-400 via-violet-300 to-emerald-400 hidden sm:block"
+              aria-hidden="true"
+            >
+            </div>
+            <ol class="relative space-y-6 m-0 p-0 list-none">
+              {
+                steps.map((step) => (
+                  <li class="relative flex gap-5 sm:gap-6 pl-0 sm:pl-2">
+                    <span
+                      class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white border-2 border-violet-500 text-sm font-bold text-violet-700 shadow-sm"
+                      aria-hidden="true"
+                    >
+                      {step.n}
+                    </span>
+                    <div class="min-w-0 flex-1 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 shadow-sm">
+                      <h3 class="text-base font-bold text-stone-900 m-0">{step.title}</h3>
+                      <p class="mt-2 text-sm sm:text-base text-stone-600 leading-relaxed m-0" set:html={step.body} />
+                    </div>
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Diagram spotlight -->
+      <section id="flow" class="scroll-mt-36" aria-labelledby="flow-heading">
+        <div
+          class="rounded-[2rem] bg-slate-900 px-6 py-10 sm:px-10 sm:py-14 text-center relative overflow-hidden"
+        >
+          <div
+            class="pointer-events-none absolute inset-0 opacity-40"
+            style="background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139, 92, 246, 0.35), transparent 55%);"
+            aria-hidden="true"
+          >
+          </div>
+          <h2 id="flow-heading" class="relative text-xl sm:text-2xl font-bold text-white tracking-tight">
+            Integration diagram
+          </h2>
+          <p class="relative mt-2 text-sm text-slate-400 max-w-lg mx-auto">
+            OAuth connection and estimate upload — how TradesQuote talks to GetJobber.
+          </p>
+          <div
+            class="relative mt-8 rounded-2xl border border-white/10 bg-slate-950/50 p-3 sm:p-4 shadow-2xl shadow-black/40"
+          >
+            <img
+              src="/GetJobber-integration.png"
+              alt="Sequence diagram: user connects TradesQuote to GetJobber via OAuth 2.0, then uploads an estimate which creates a GetJobber Quote with sections, cost centres, and line items."
+              class="w-full h-auto rounded-xl"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Pipeline mapping -->
+      <section id="mapping" class="scroll-mt-36" aria-labelledby="mapping-heading">
+        <h2 id="mapping-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight mb-2">
+          Data mapping
+        </h2>
+        <p class="text-stone-600 mb-8 max-w-2xl">
+          Each TradesQuote concept lands in the right GetJobber object — always a one-way push.
+        </p>
+        <div class="flex flex-col gap-4">
+          {
+            mapping.map((row) => (
+              <div class="group flex flex-col sm:flex-row sm:items-stretch gap-3 sm:gap-0 rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div class="flex-1 px-5 py-4 sm:py-5 bg-stone-50/80 border-b sm:border-b-0 sm:border-r border-stone-100">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">
+                    TradesQuote
+                  </p>
+                  <p class="text-base font-semibold text-stone-900 m-0">{row.tq}</p>
+                </div>
+                <div
+                  class="flex sm:w-14 items-center justify-center bg-stone-100/80 sm:bg-white border-y sm:border-y-0 sm:border-x border-stone-100 py-2 sm:py-0"
+                  aria-hidden="true"
+                >
+                  <svg
+                    class="w-6 h-6 text-violet-500 sm:rotate-0 -rotate-90"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </div>
+                <div class="flex-1 px-5 py-4 sm:py-5">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">
+                    GetJobber
+                  </p>
+                  <p class="text-base font-semibold text-stone-900 m-0">{row.sp}</p>
+                </div>
+                <div class="px-5 pb-4 sm:pb-0 sm:pr-6 sm:pl-0 flex items-center justify-start sm:justify-end sm:min-w-[140px] border-t sm:border-t-0 border-stone-100">
+                  <span class="inline-flex items-center rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold px-3 py-1.5 ring-1 ring-emerald-200/80">
+                    Push to GetJobber
+                  </span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- FAQ grid -->
+      <section id="faq" class="scroll-mt-36 pb-4" aria-labelledby="faq-heading">
+        <h2 id="faq-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight mb-8">
+          Frequently asked questions
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
+          {
+            faqs.map((item, i) => (
+              <details class="group rounded-2xl border border-stone-200 bg-white p-0 hover:border-violet-200/80 transition-colors duration-200 open:ring-2 open:ring-violet-100">
+                <summary class="cursor-pointer list-none flex items-start justify-between gap-3 px-5 py-4 text-left font-semibold text-stone-900 text-sm [&::-webkit-details-marker]:hidden">
+                  <span class="pt-0.5">{item.q}</span>
+                  <span
+                    class="mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-500 group-open:bg-violet-100 group-open:text-violet-700 transition-colors"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      class="w-4 h-4 transition-transform duration-200 group-open:rotate-45"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                </summary>
+                <div
+                  class={`px-5 pb-4 text-sm text-stone-600 leading-relaxed border-t border-stone-100 ${i % 2 === 0 ? "lg:border-l-4 lg:border-l-violet-200" : "lg:border-l-4 lg:border-l-emerald-200"}`}
+                >
+                  <p class="m-0 pt-3" set:html={item.a} />
+                </div>
+              </details>
+            ))
+          }
+        </div>
+      </section>
+      
+      <p class="text-center text-xs text-[#808285] max-w-2xl mx-auto leading-relaxed px-2">
+        GetJobber® and the GetJobber logo are trademarks of GetJobber Group Ltd. Used as per their <a href="https://www.GetJobbergroup.com/legal" class="text-violet-600 font-medium hover:text-violet-700 underline underline-offset-2">trademark usage policy</a>.
+      </p>
+    </main>
+  </div>
+
+  <Part13 />
+</Layout>

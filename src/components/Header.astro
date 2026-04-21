@@ -1,11 +1,20 @@
 ---
 const currentPath = new URL(Astro.request.url).pathname;
 
-const navigationLinks = [
+type NavChild = { label: string; href: string };
+type NavLink = { label: string; href?: string; children?: NavChild[] };
+
+const navigationLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Pricing", href: "/#pricing" },
   { label: "FAQ", href: "/#faq" },
-  { label: "Integration", href: "/integration" },
+  {
+    label: "Integration",
+    children: [
+      { label: "Simpro", href: "/simpro-integration" },
+      { label: "GetJobber", href: "/getjobber-integration" },
+    ],
+  },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -13,6 +22,10 @@ function isActive(href: string): boolean {
   if (href === "/") return currentPath === "/";
   if (href.startsWith("/#")) return currentPath === "/";
   return currentPath.startsWith(href);
+}
+
+function isChildActive(children: NavChild[]): boolean {
+  return children.some((c) => isActive(c.href));
 }
 ---
 
@@ -27,16 +40,52 @@ function isActive(href: string): boolean {
     <!-- Nav links (desktop) -->
     <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
       {navigationLinks.map((link) => (
-        <a
-          href={link.href}
-          class={`text-sm font-medium transition-colors duration-150 ${
-            isActive(link.href)
-              ? "text-indigo-600 font-semibold"
-              : "text-gray-500 hover:text-gray-900"
-          }`}
-        >
-          {link.label}
-        </a>
+        link.children ? (
+          <div class="relative group">
+            <button
+              type="button"
+              class={`text-sm font-medium transition-colors duration-150 inline-flex items-center gap-1 ${
+                isChildActive(link.children)
+                  ? "text-indigo-600 font-semibold"
+                  : "text-gray-500 hover:text-gray-900"
+              }`}
+              aria-haspopup="menu"
+              aria-expanded="false"
+            >
+              {link.label}
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M5.25 7.5L10 12.25 14.75 7.5" />
+              </svg>
+            </button>
+            <div class="absolute left-0 top-full pt-2 hidden group-hover:block">
+              <div class="min-w-44 rounded-xl border border-gray-100 bg-white shadow-lg p-1">
+                {link.children.map((child) => (
+                  <a
+                    href={child.href}
+                    class={`block px-3 py-2 rounded-lg text-sm transition-colors ${
+                      isActive(child.href)
+                        ? "bg-indigo-50 text-indigo-700 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    {child.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a
+            href={link.href}
+            class={`text-sm font-medium transition-colors duration-150 ${
+              link.href && isActive(link.href)
+                ? "text-indigo-600 font-semibold"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            {link.label}
+          </a>
+        )
       ))}
     </nav>
 
@@ -84,16 +133,42 @@ function isActive(href: string): boolean {
   >
     <nav class="flex flex-col px-6 py-4 gap-1">
       {navigationLinks.map((link) => (
-        <a
-          href={link.href}
-          class={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 ${
-            isActive(link.href)
-              ? "bg-indigo-50 text-indigo-600 font-semibold"
-              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-          }`}
-        >
-          {link.label}
-        </a>
+        link.children ? (
+          <div class="px-3 py-2.5">
+            <div
+              class={`text-sm font-semibold ${
+                isChildActive(link.children) ? "text-indigo-600" : "text-gray-800"
+              }`}
+            >
+              {link.label}
+            </div>
+            <div class="mt-2 flex flex-col gap-1">
+              {link.children.map((child) => (
+                <a
+                  href={child.href}
+                  class={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ${
+                    isActive(child.href)
+                      ? "bg-indigo-50 text-indigo-600 font-semibold"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
+                >
+                  {child.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <a
+            href={link.href}
+            class={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 ${
+              link.href && isActive(link.href)
+                ? "bg-indigo-50 text-indigo-600 font-semibold"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+          >
+            {link.label}
+          </a>
+        )
       ))}
       <div class="flex flex-col gap-2 pt-3 mt-2 border-t border-gray-100">
         <a
