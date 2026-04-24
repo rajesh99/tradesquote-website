@@ -1,4 +1,5 @@
 ---
+import { IoSearch } from "react-icons/io5";
 const currentPath = new URL(Astro.request.url).pathname;
 
 type NavChild = { label: string; href: string };
@@ -87,9 +88,18 @@ function isChildActive(children: NavChild[]): boolean {
           </a>
         )
       ))}
+      <a
+        href="/search"
+        class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+        aria-label="Search"
+        title="Search"
+      >
+        <span class="sr-only">Search</span>
+        <IoSearch className="text-[18px]" aria-hidden="true" focusable="false" />
+      </a>
     </nav>
 
-    <!-- CTA buttons -->
+    <!-- CTA buttons + Search -->
     <div class="flex items-center gap-2">
       <a
         href="https://app.tradesquote.ai/auth/sign-in"
@@ -99,9 +109,20 @@ function isChildActive(children: NavChild[]): boolean {
       </a>
       <a
         href="https://app.tradesquote.ai/auth/sign-up"
-        class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-150"
+        class="hidden sm:inline-flex inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-150"
       >
         Sign up
+      </a>
+
+      <!-- Mobile search shortcut (desktop has it in the nav) -->
+      <a
+        href="/search"
+        class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+        aria-label="Search"
+        title="Search"
+      >
+        <span class="sr-only">Search</span>
+        <IoSearch className="text-[18px]" aria-hidden="true" focusable="false" />
       </a>
     </div>
 
