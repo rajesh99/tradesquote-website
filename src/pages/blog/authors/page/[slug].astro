@@ -1,11 +1,13 @@
 ---
-import Authors from "../../../layouts/components/Authors.astro";
-import config from "../../../config/config.json";
-import Base from "../../../layouts/Base.astro";
-import Pagination from "../../../layouts/components/Pagination.astro";
-import { getSinglePage } from "../../../lib/contentParser.astro";
-import { sortByDate } from "../../..//lib/utils/sortFunctions";
-import { markdownify } from "../../..//lib/utils/textConverter";
+import Authors from "../../../../layouts/components/Authors.astro";
+import config from "../../../../config/config.json";
+import Base from "../../../../layouts/Base.astro";
+import Pagination from "../../../../layouts/components/Pagination.astro";
+import { getSinglePage } from "../../../../lib/contentParser.astro";
+import { sortByDate } from "../../../../lib/utils/sortFunctions";
+import { markdownify } from "../../../../lib/utils/textConverter";
+
+export const prerender = true;
 
 export async function getStaticPaths() {
   const authors = await getSinglePage("authors");
@@ -38,10 +40,11 @@ const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
       <h1 set:text={markdownify("Authors")} class="page-heading h2" />
       <Authors authors={currentPosts} />
       <Pagination
-        section={"authors"}
+        section={"blog/authors"}
         currentPage={currentPage}
         totalPages={totalPages}
       />
     </div>
   </section>
 </Base>
+
