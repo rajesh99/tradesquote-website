@@ -2,6 +2,7 @@
 import Share from "../components/Share.astro";
 import SimilarPosts from "../components/SimilarPosts.astro";
 import NextPost from "../components/NextPost.astro";
+import LatestPosts from "../components/LatestPosts.astro";
 import { getSinglePage } from "../../lib/contentParser.astro";
 import dateFormat from "../../lib/utils/dateFormat";
 import similerItems from "../../lib/utils/similarItems";
@@ -28,8 +29,8 @@ const { title, description, authors, categories, image, date, tags } =
 
 <section class="section">
   <div class="container">
-    <article class="row justify-center">
-      <div class="md:col-10 text-center">
+    <article class="row">
+      <div class="col-12 text-center">
         <h1 set:html={markdownify(title)} class="h2" />
         <ul class="mt-4 flex flex-wrap items-center justify-center text-text">
           <li class="mx-3">
@@ -99,45 +100,55 @@ const { title, description, authors, categories, image, date, tags } =
         }
       </div>
 
-      <div class="md:col-10">
-        <div class="content mb-16 text-left">
-          <Content />
-        </div>
-        <div class="flex flex-wrap items-center justify-between">
-          <ul class="mr-4 mb-4 space-x-3">
-            {
-              tags.map((tag: string) => (
-                <li class="inline-block">
-                  <a
-                    href={`/blog/tags/${slugify(tag)}`}
-                    class="block rounded-lg bg-light px-4 py-2 font-semibold text-dark text-sm hover:text-primary transition duration-300"
-                  >
-                    #{humanize(tag)}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-          <Share
-            className="social-share mb-4"
-            title={title}
-            description={description}
-            slug={post.id}
-          />
-        </div>
-
-        {(prevPost || nextPost) && (
-          <div class="mt-12 border-t border-border pt-8">
-            <div class="grid gap-6 md:grid-cols-2">
-              <div>
-                {prevPost && <NextPost post={prevPost} label="Previous" />}
-              </div>
-              <div>
-                {nextPost && <NextPost post={nextPost} label="Next" />}
-              </div>
+      <div class="col-12 mt-10">
+        <div class="row gx-6 gy-10">
+          <div class="col-12 lg:col-8">
+            <div class="content mb-16 text-left">
+              <Content />
             </div>
+            <div class="flex flex-wrap items-center justify-between">
+              <ul class="mr-4 mb-4 space-x-3">
+                {
+                  tags.map((tag: string) => (
+                    <li class="inline-block">
+                      <a
+                        href={`/blog/tags/${slugify(tag)}`}
+                        class="block rounded-lg bg-light px-4 py-2 font-semibold text-dark text-sm hover:text-primary transition duration-300"
+                      >
+                        #{humanize(tag)}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+              <Share
+                className="social-share mb-4"
+                title={title}
+                description={description}
+                slug={post.id}
+              />
+            </div>
+
+            {(prevPost || nextPost) && (
+              <div class="mt-12 border-t border-border pt-8">
+                <div class="grid gap-6 md:grid-cols-2">
+                  <div>
+                    {prevPost && <NextPost post={prevPost} label="Previous" />}
+                  </div>
+                  <div>
+                    {nextPost && <NextPost post={nextPost} label="Next" />}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          <aside class="col-12 lg:col-4 lg:sticky lg:top-32 self-start">
+            <div class="rounded-lg border border-border bg-white p-6">
+              <LatestPosts currentPost={post} />
+            </div>
+          </aside>
+        </div>
       </div>
     </article>
   </div>
