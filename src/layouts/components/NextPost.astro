@@ -1,0 +1,22 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+type Props = {
+  post: CollectionEntry<"posts">;
+  label?: string;
+};
+
+const { post, label = "Next" } = Astro.props;
+---
+
+<aside>
+  <p class="text-sm font-semibold uppercase tracking-wide text-text">
+    {label}
+  </p>
+  <h3 class="mt-2 h6">
+    <a href={`/blog/${post.id}`} class="hover:text-primary transition duration-300">
+      {post.data.title}
+    </a>
+  </h3>
+</aside>
+
