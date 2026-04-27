@@ -1,0 +1,87 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+
+import { getSinglePage } from "../../lib/contentParser.astro";
+import { sortByDate } from "../../lib/utils/sortFunctions";
+import { humanize, plainify, slugify } from "../../lib/utils/textConverter";
+
+type Props = {
+  currentPost: CollectionEntry<"posts">;
+  limit?: number;
+  title?: string;
+};
+
+const { currentPost, limit = 5, title = "Latest Posts" } = Astro.props;
+
+const posts = await getSinglePage("posts");
+const latest = sortByDate(posts)
+  .filter((p) => p.id !== currentPost.id)
+  .slice(0, limit);
+---
+
+{
+  latest.length > 0 && (
+    <section aria-labelledby="latest-posts-heading">
+      <h2 id="latest-posts-heading" class="h5 mb-5">
+        {title}
+      </h2>
+
+      <div class="space-y-5">
+        {latest.map((post) => {
+          const category = post.data.categories?.[0];
+          const excerpt = post.data.description
+            ? post.data.description
+            : plainify(post.body ?? "");
+
+          return (
+            <article class="flex gap-4">
+              {post.data.image && (
+                <a
+                  href={`/blog/${post.id}`}
+                  class="shrink-0 rounded-lg overflow-hidden group"
+                  aria-label={post.data.title}
+                >
+                  <Image
+                    src={post.data.image}
+                    alt={post.data.title}
+                    width={88}
+                    height={72}
+                    class="h-[72px] w-[88px] object-cover group-hover:scale-[1.04] transition duration-300"
+                  />
+                </a>
+              )}
+
+              <div class="min-w-0">
+                {category && (
+                  <a
+                    href={`/blog/categories/${slugify(category)}`}
+                    class="inline-block text-xs font-semibold uppercase tracking-wide text-text hover:text-primary transition duration-300"
+                  >
+                    {humanize(category)}
+                  </a>
+                )}
+
+                <h3 class="mt-1 text-base font-semibold leading-snug">
+                  <a
+                    href={`/blog/${post.id}`}
+                    class="block hover:text-primary transition duration-300 line-clamp-2"
+                  >
+                    {post.data.title}
+                  </a>
+                </h3>
+
+                {excerpt && (
+                  <p class="mt-1 text-sm text-text line-clamp-1">
+                    {excerpt}
+                  </p>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  )
+}
+
