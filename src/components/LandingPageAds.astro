@@ -1,0 +1,485 @@
+---
+const SIGNUP_URL = 'https://app.tradesquote.ai/auth/sign-up';
+const SIGNIN_URL = 'https://app.tradesquote.ai/auth/sign-in';
+---
+
+<!-- ===== STANDALONE HEADER (no site nav, ads landing page) ===== -->
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100" role="banner">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <a href="/" aria-label="TradesQuote — AI HVAC Estimating Software" class="flex items-center shrink-0">
+      <img src="/logo.svg" alt="TradesQuote" width="160" height="36" class="h-8 w-auto" fetchpriority="high" />
+    </a>
+    <div class="flex items-center gap-3">
+      <a
+        href={SIGNIN_URL}
+        class="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+      >
+        Sign in
+      </a>
+      <a
+        href={SIGNUP_URL}
+        class="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-colors shadow-sm"
+      >
+        Start free trial
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main id="main-content">
+
+  <!-- ① HERO ─────────────────────────────────────────────────────── -->
+  <section id="hero" aria-labelledby="hero-headline" class="relative bg-white overflow-hidden">
+    <!-- Background gradient -->
+    <div class="absolute inset-x-0 top-0 h-[560px] bg-gradient-to-b from-indigo-50/60 to-transparent pointer-events-none" aria-hidden="true"></div>
+
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 md:pt-24 md:pb-28 lg:pt-28 lg:pb-32">
+      <div class="max-w-3xl">
+
+        <!-- Trust badge -->
+        <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-full px-4 py-1.5 text-sm font-semibold mb-8" aria-hidden="true">
+          <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
+          </svg>
+          AI HVAC Estimating Software
+        </div>
+
+        <h1 id="hero-headline" class="text-[2.6rem] sm:text-5xl lg:text-[3.5rem] font-extrabold text-gray-900 tracking-tight leading-[1.08] mb-6">
+          Stop doing HVAC<br class="hidden sm:block" /> estimates at <time datetime="23:00" class="text-indigo-600 underline decoration-indigo-300 decoration-4 underline-offset-[0.15em]">11pm</time>.
+        </h1>
+
+        <p class="text-xl text-gray-600 leading-relaxed mb-10 max-w-2xl">
+          TradesQuote generates complete, line-item HVAC estimates in under a minute — built on your price book. Push them straight to Simpro or Jobber. No spreadsheets. No late nights.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 mb-5">
+          <a
+            href={SIGNUP_URL}
+            class="inline-flex items-center justify-center gap-2 px-7 py-4 text-base font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 active:bg-indigo-800 transition-colors shadow-md shadow-indigo-200"
+          >
+            Start your free trial
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+          <a
+            href="#how-it-works"
+            class="inline-flex items-center justify-center gap-2 px-7 py-4 text-base font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-colors"
+          >
+            See how it works
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </a>
+        </div>
+
+        <p class="text-sm text-gray-500">No credit card required &middot; 14-day free trial &middot; Cancel anytime</p>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="mt-16 flex flex-wrap gap-x-12 gap-y-6">
+        <div>
+          <div class="text-3xl font-extrabold text-gray-900">~45s</div>
+          <div class="text-sm text-gray-500 mt-0.5">Average estimate time</div>
+        </div>
+        <div class="w-px bg-gray-200 hidden sm:block self-stretch"></div>
+        <div>
+          <div class="text-3xl font-extrabold text-gray-900">100%</div>
+          <div class="text-sm text-gray-500 mt-0.5">Based on your price book</div>
+        </div>
+        <div class="w-px bg-gray-200 hidden sm:block self-stretch"></div>
+        <div>
+          <div class="text-3xl font-extrabold text-gray-900">1-click</div>
+          <div class="text-sm text-gray-500 mt-0.5">Push to Simpro or Jobber</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② HOW IT WORKS ────────────────────────────────────────────── -->
+  <section id="how-it-works" aria-labelledby="steps-headline" class="bg-gray-50 py-20 md:py-24 lg:py-28">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 id="steps-headline" class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          From job description to quote — three steps
+        </h2>
+        <p class="text-lg text-gray-600">
+          No spreadsheets. No manual rate-hunting. No late nights.
+        </p>
+      </div>
+
+      <ol class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8" aria-label="How TradesQuote works">
+
+        <!-- Step 1 -->
+        <li class="relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col gap-5">
+          <!-- Connector line (desktop) -->
+          <div class="hidden md:block absolute top-14 -right-4 w-8 h-0.5 bg-indigo-100 z-10" aria-hidden="true"></div>
+
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shrink-0" aria-label="Step 1">
+              1
+            </div>
+          </div>
+          <div class="text-indigo-500" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Upload your price book and SOPs</h3>
+            <p class="text-gray-600 leading-relaxed text-sm">
+              Import your labour rates, material costs, and standard operating procedures. TradesQuote learns your exact pricing so every estimate reflects your real margins.
+            </p>
+          </div>
+        </li>
+
+        <!-- Step 2 -->
+        <li class="relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col gap-5">
+          <div class="hidden md:block absolute top-14 -right-4 w-8 h-0.5 bg-indigo-100 z-10" aria-hidden="true"></div>
+
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shrink-0" aria-label="Step 2">
+              2
+            </div>
+          </div>
+          <div class="text-indigo-500" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Describe the project in plain English</h3>
+            <p class="text-gray-600 leading-relaxed text-sm">
+              Type what you'd say to your apprentice — "ducted split system replacement, 3-bed brick veneer, reuse existing ductwork." No forms to fill, no drop-downs to navigate.
+            </p>
+          </div>
+        </li>
+
+        <!-- Step 3 -->
+        <li class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col gap-5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shrink-0" aria-label="Step 3">
+              3
+            </div>
+          </div>
+          <div class="text-indigo-500" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Get a complete estimate — push to Simpro or Jobber</h3>
+            <p class="text-gray-600 leading-relaxed text-sm">
+              Receive a full line-item estimate with labour, materials, and margins applied. One click sends it straight into your existing job management platform. No re-keying.
+            </p>
+          </div>
+        </li>
+
+      </ol>
+    </div>
+  </section>
+
+  <!-- ③ PRODUCT DEMO (screenshot / video) ─────────────────────── -->
+  <section id="demo" aria-labelledby="demo-headline" class="bg-white py-20 md:py-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h2 id="demo-headline" class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">See it in action</h2>
+        <p class="text-lg text-gray-600">Watch how a 20-minute estimate becomes a 45-second one.</p>
+      </div>
+
+      <!-- Video / screenshot placeholder -->
+      <div
+        class="relative max-w-4xl mx-auto rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-900 to-indigo-700 shadow-2xl shadow-indigo-200/50"
+        style="aspect-ratio: 16 / 9"
+        role="img"
+        aria-label="TradesQuote HVAC estimating software demo — coming soon"
+      >
+        <!-- Fake browser chrome -->
+        <div class="absolute top-0 left-0 right-0 h-9 bg-black/25 flex items-center px-4 gap-1.5" aria-hidden="true">
+          <span class="w-3 h-3 rounded-full bg-white/25"></span>
+          <span class="w-3 h-3 rounded-full bg-white/25"></span>
+          <span class="w-3 h-3 rounded-full bg-white/25"></span>
+        </div>
+        <!-- Centred play button -->
+        <div class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+          <div class="text-center text-white">
+            <div class="w-20 h-20 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center mx-auto mb-5">
+              <svg class="w-9 h-9 text-white ml-1.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+            <p class="text-xl font-semibold">Product demo</p>
+            <p class="text-indigo-200 text-sm mt-1">Video coming soon</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ FEATURE HIGHLIGHTS ─────────────────────────────────────── -->
+  <section id="features" aria-labelledby="features-headline" class="bg-gray-50 py-20 md:py-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 id="features-headline" class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          Built for HVAC contractors, not generic businesses
+        </h2>
+        <p class="text-lg text-gray-600">
+          Every feature is designed around how trade estimating actually works.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <article class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Your rates, not ours</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            Estimates use your uploaded price book — not generic averages. Every line reflects your actual costs and margins.
+          </p>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Seconds, not hours</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            What used to take 20–60 minutes now takes under a minute. Quote faster, win more jobs, get home on time.
+          </p>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Push to Simpro &amp; Jobber</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            No re-keying. One click sends the complete estimate straight into your existing job management system.
+          </p>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Consistent every time</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            AI follows your SOPs on every estimate — no more forgotten line items, no junior estimating mistakes.
+          </p>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Quote on-site, on mobile</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            Works on any device. Send a quote before you've left the customer's driveway.
+          </p>
+        </article>
+
+        <article class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Free trial, no lock-in</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            Try it on real jobs for 14 days. No credit card required, no long-term contracts.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ SOCIAL PROOF ──────────────────────────────────────────── -->
+  <section id="social-proof" aria-labelledby="testimonials-headline" class="bg-white py-20 md:py-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h2 id="testimonials-headline" class="text-3xl font-bold text-gray-900 mb-3">
+          What HVAC contractors say
+        </h2>
+        <p class="text-gray-600">Trusted by trade contractors to win more jobs without the admin overload.</p>
+      </div>
+
+      <!-- Testimonial placeholder -->
+      <div class="max-w-2xl mx-auto">
+        <figure class="bg-gray-50 rounded-2xl p-8 md:p-10 border border-gray-100" aria-label="Customer testimonial — coming soon">
+          <!-- Stars -->
+          <div class="flex items-center gap-1 mb-6" aria-label="5 out of 5 stars">
+            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+
+          <blockquote class="text-lg text-gray-800 leading-relaxed italic mb-6">
+            "Our first contractor testimonial will appear here once we're live. We're onboarding our first HVAC contractors now — results coming soon."
+          </blockquote>
+
+          <figcaption class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center shrink-0" aria-hidden="true">
+              <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-gray-900">HVAC Contractor</div>
+              <div class="text-xs text-gray-500">Australia</div>
+            </div>
+          </figcaption>
+        </figure>
+
+        <!-- Integration logos -->
+        <div class="mt-12 text-center">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-6">Works with your existing tools</p>
+          <div class="flex flex-wrap items-center justify-center gap-10">
+            <a href="/simpro-integration" class="flex items-center gap-2 text-gray-500 hover:text-indigo-600 font-semibold text-sm transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+              Simpro
+            </a>
+            <span class="text-gray-200 text-xl font-light" aria-hidden="true">|</span>
+            <a href="/getjobber-integration" class="flex items-center gap-2 text-gray-500 hover:text-indigo-600 font-semibold text-sm transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+              Jobber
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ FAQ ──────────────────────────────────────────────────────── -->
+  <section id="faq" aria-labelledby="faq-headline" class="bg-gray-50 py-20 md:py-24">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+
+      <div class="text-center mb-14">
+        <h2 id="faq-headline" class="text-3xl font-bold text-gray-900 mb-4">Common questions</h2>
+        <p class="text-gray-600">Everything you need to know before starting your trial.</p>
+      </div>
+
+      <div class="space-y-3" role="list">
+
+        <details class="group bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <summary class="flex items-center justify-between gap-4 px-6 py-5 cursor-pointer font-semibold text-gray-900 select-none [list-style:none] [&::-webkit-details-marker]:hidden">
+            Do I need to change my price book format?
+            <svg class="w-5 h-5 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-6 pb-5 text-sm text-gray-600 leading-relaxed">
+            No. We accept most common formats — Excel, CSV, or PDF exports from your existing system. Our team helps you set it up during onboarding at no extra cost.
+          </div>
+        </details>
+
+        <details class="group bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <summary class="flex items-center justify-between gap-4 px-6 py-5 cursor-pointer font-semibold text-gray-900 select-none [list-style:none] [&::-webkit-details-marker]:hidden">
+            Does it work for service repairs, not just new installs?
+            <svg class="w-5 h-5 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-6 pb-5 text-sm text-gray-600 leading-relaxed">
+            Yes. TradesQuote handles service repairs, maintenance agreements, and full installation quotes. Just describe the scope and the AI selects the right line items.
+          </div>
+        </details>
+
+        <details class="group bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <summary class="flex items-center justify-between gap-4 px-6 py-5 cursor-pointer font-semibold text-gray-900 select-none [list-style:none] [&::-webkit-details-marker]:hidden">
+            What if the estimate isn't quite right?
+            <svg class="w-5 h-5 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-6 pb-5 text-sm text-gray-600 leading-relaxed">
+            You can edit any line before sending. The AI is your starting point — you're always in control of the final numbers before they leave your desk.
+          </div>
+        </details>
+
+        <details class="group bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <summary class="flex items-center justify-between gap-4 px-6 py-5 cursor-pointer font-semibold text-gray-900 select-none [list-style:none] [&::-webkit-details-marker]:hidden">
+            Is my pricing data secure?
+            <svg class="w-5 h-5 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-6 pb-5 text-sm text-gray-600 leading-relaxed">
+            Yes. Your price book and job data are encrypted at rest and in transit. We never share your pricing with other contractors or third parties.
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑦ FINAL CTA BANNER ──────────────────────────────────────── -->
+  <section class="bg-indigo-600 py-20 md:py-24" aria-labelledby="cta-headline">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <h2 id="cta-headline" class="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+        Finish tomorrow's estimates tonight — in 45 seconds each.
+      </h2>
+      <p class="text-indigo-100 text-lg mb-10 leading-relaxed">
+        Start your free 14-day trial. No credit card required. Setup takes under 5 minutes.
+      </p>
+      <a
+        href={SIGNUP_URL}
+        class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-indigo-600 bg-white rounded-xl hover:bg-indigo-50 active:bg-indigo-100 transition-colors shadow-lg"
+      >
+        Start your free trial
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+      <p class="mt-5 text-indigo-200 text-sm">No credit card &middot; No lock-in contract &middot; Cancel anytime</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== STANDALONE FOOTER (minimal, no full site nav) ===== -->
+<footer class="bg-gray-900" role="contentinfo" aria-label="Site footer">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+
+      <a href="/" aria-label="TradesQuote Home" class="flex items-center shrink-0">
+        <img src="/logo.svg" alt="TradesQuote" width="140" height="32" class="h-7 w-auto brightness-0 invert" loading="lazy" />
+      </a>
+
+      <nav class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm" aria-label="Footer links">
+        <a href="/privacy-policy" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+        <a href="/terms-of-service" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+        <a href="/contact" class="text-gray-400 hover:text-white transition-colors">Contact</a>
+        <a href="/" class="text-gray-400 hover:text-white transition-colors">TradesQuote.ai</a>
+      </nav>
+
+      <p class="text-gray-500 text-sm shrink-0">
+        &copy; {new Date().getFullYear()} TradesQuote. All rights reserved.
+      </p>
+
+    </div>
+  </div>
+</footer>
