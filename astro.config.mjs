@@ -27,11 +27,22 @@ export default defineConfig({
   trailingSlash: config.site.trailing_slash ? "always" : "never",
   image: { service: sharpImageService() },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      {
+        name: "react-dom-server-edge",
+        config(_, { command }) {
+          if (command === "build") {
+            return {
+              resolve: { alias: { "react-dom/server": "react-dom/server.edge" } },
+            };
+          }
+        },
+      },
+    ],
     resolve: {
       alias: {
         "@": `${__dirname}/src`,
-        "react-dom/server": "react-dom/server.edge",
       },
     },
   },
