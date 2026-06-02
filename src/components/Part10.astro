@@ -13,25 +13,10 @@ type Plan = {
 
 const plansMonthly: Plan[] = [
   {
-    tierBadge: "value",
-    title: "Starter",
-    description: "The perfect plan to get started",
-    price: "$9.99",
-    priceSuffix: "/month",
-    billingNote: "Billed monthly",
-    ctaHref:
-      "https://app.tradesquote.ai/auth/sign-up?next=%2Fhome&plan=starter-monthly&redirectToCheckout=true",
-    features: [
-      "50 estimates per month",
-      "Basic AI estimation",
-      "Email support",
-    ],
-  },
-  {
     tierBadge: "popular",
     title: "Pro",
     description: "The perfect plan for professionals",
-    price: "$19.99",
+    price: "$29",
     priceSuffix: "/month",
     billingNote: "Billed monthly",
     ctaHref:
@@ -49,45 +34,26 @@ const plansMonthly: Plan[] = [
     tierBadge: null,
     title: "Enterprise",
     description: "The perfect plan for enterprises",
-    price: "$29.99",
+    price: "$49",
     priceSuffix: "/month",
     billingNote: "Billed monthly",
     ctaHref:
       "https://app.tradesquote.ai/auth/sign-up?next=%2Fhome&plan=enterprise-monthly&redirectToCheckout=true",
     features: [
+      "Everything in Pro",
       "Unlimited estimates",
-      "Advanced AI with Vision AI",
-      "Knowledge Base uploads",
-      "Priority phone support",
-      "QC Agent validation",
-      "Custom templates",
-      "API access",
+      "Integrations"      
     ],
   },
 ];
 
 const plansYearly: Plan[] = [
   {
-    tierBadge: "value",
-    title: "Starter",
-    description: "The perfect plan to get started",
-    price: "$8.33",
-    priceSuffix: "/month",
-    billingNote: "Billed yearly",
-    ctaHref:
-      "https://app.tradesquote.ai/auth/sign-up?next=%2Fhome&plan=starter-yearly&redirectToCheckout=true",
-    features: [
-      "50 estimates per month",
-      "Basic AI estimation",
-      "Email support",
-    ],
-  },
-  {
     tierBadge: "popular",
     title: "Pro",
     description: "The perfect plan for professionals",
-    price: "$16.67",
-    priceSuffix: "/month",
+    price: "$290",
+    priceSuffix: "/year",
     billingNote: "Billed yearly",
     ctaHref:
       "https://app.tradesquote.ai/auth/sign-up?next=%2Fhome&plan=pro-yearly&redirectToCheckout=true",
@@ -104,19 +70,15 @@ const plansYearly: Plan[] = [
     tierBadge: null,
     title: "Enterprise",
     description: "The perfect plan for enterprises",
-    price: "$24.99",
-    priceSuffix: "/month",
+    price: "$490",
+    priceSuffix: "/year",
     billingNote: "Billed yearly",
     ctaHref:
       "https://app.tradesquote.ai/auth/sign-up?next=%2Fhome&plan=enterprise-yearly&redirectToCheckout=true",
     features: [
+      "Everything in Pro",
       "Unlimited estimates",
-      "Advanced AI with Vision AI",
-      "Knowledge Base uploads",
-      "Priority phone support",
-      "QC Agent validation",
-      "Custom templates",
-      "API access",
+      "Integrations"      
     ],
   },
 ];
@@ -161,8 +123,8 @@ const plansYearly: Plan[] = [
       </button>
     </div>
 
-    <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-      <div class="pricing-plans-grid contents" data-pricing-plans="monthly">
+    <div class="w-full">
+      <div class="pricing-plans-grid grid grid-cols-[repeat(auto-fit,minmax(280px,360px))] justify-center gap-6 items-stretch max-w-[768px] mx-auto w-full" data-pricing-plans="monthly">
         {plansMonthly.map((plan) => (
           <div
             class={`relative flex flex-col rounded-2xl overflow-hidden transition-all duration-200 ${
@@ -223,7 +185,7 @@ const plansYearly: Plan[] = [
                     : "bg-gray-900 text-white hover:bg-gray-800"
                 }`}
               >
-                Get started
+                Get started - Free 14 days Trial
                 <svg
                   width="14"
                   height="14"
@@ -272,7 +234,7 @@ const plansYearly: Plan[] = [
         ))}
       </div>
 
-      <div class="pricing-plans-grid hidden" data-pricing-plans="yearly">
+      <div class="pricing-plans-grid hidden grid grid-cols-[repeat(auto-fit,minmax(280px,360px))] justify-center gap-6 items-stretch max-w-[1128px] mx-auto w-full" data-pricing-plans="yearly">
         {plansYearly.map((plan) => (
           <div
             class={`relative flex flex-col rounded-2xl overflow-hidden transition-all duration-200 ${
@@ -333,7 +295,7 @@ const plansYearly: Plan[] = [
                     : "bg-gray-900 text-white hover:bg-gray-800"
                 }`}
               >
-                Get started
+                Get started - Free 14 days Trial
                 <svg
                   width="14"
                   height="14"
@@ -399,10 +361,8 @@ const plansYearly: Plan[] = [
         const isMatch = panel.getAttribute("data-pricing-plans") === period;
         if (isMatch) {
           panel.classList.remove("hidden");
-          panel.classList.add("contents");
         } else {
           panel.classList.add("hidden");
-          panel.classList.remove("contents");
         }
       });
 
