@@ -1,0 +1,394 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+const title = "Zapier Integration — TradesQuote";
+const description =
+  "Coming soon: Connect TradesQuote to 7,000+ apps via Zapier. Automate your estimate workflow — trigger actions when estimates are created, accepted, or updated, no code required.";
+
+const benefits = [
+  {
+    title: "Connect TradesQuote to 7,000+ apps — no code",
+    body:
+      "Zapier lets you build automated workflows between TradesQuote and any app your business already uses — Google Sheets, Slack, HubSpot, Mailchimp, Trello, and thousands more. No developer needed.",
+    accent: "orange",
+  },
+  {
+    title: "Automate follow-ups when estimates are sent",
+    body:
+      "Trigger a Slack message to your team, log the estimate in a Google Sheet, or add the client to a follow-up email sequence the moment an estimate is created — automatically.",
+    accent: "amber",
+  },
+  {
+    title: "Instant notification when a job is won",
+    body:
+      "When a client accepts an estimate, Zapier can notify your operations team in Slack, create a Trello card, update your CRM, or fire off any other action you need — in seconds.",
+    accent: "yellow",
+  },
+  {
+    title: "One integration, thousands of connections",
+    body:
+      "Build the Zapier integration once and TradesQuote connects to your entire software stack. Whether you use HubSpot, Airtable, or a custom webhook — Zapier makes it possible.",
+    accent: "red",
+  },
+  {
+    title: "No marketplace approval needed to start",
+    body:
+      "Zapier integrations can be built and published without complex approval processes. The integration will be available for all TradesQuote users to use in their own Zaps.",
+    accent: "rose",
+  },
+  {
+    title: "Build your own workflows",
+    body:
+      "Every contractor's workflow is different. Zapier lets you design automations that match how your business works — not a rigid pre-built flow that may not fit.",
+    accent: "pink",
+  },
+] as const;
+
+const plannedTriggers = [
+  { label: "Estimate Created", desc: "Fires when a new estimate is generated in TradesQuote" },
+  { label: "Estimate Accepted", desc: "Fires when a client accepts an estimate via the shared link" },
+  { label: "Estimate Updated", desc: "Fires when an estimate is edited or revised" },
+  { label: "New Customer", desc: "Fires when a new customer is added to TradesQuote" },
+];
+
+const plannedActions = [
+  { label: "Create Estimate", desc: "Create a new estimate in TradesQuote from another app" },
+  { label: "Find Customer", desc: "Look up a customer by name or email in TradesQuote" },
+];
+
+const exampleZaps = [
+  {
+    trigger: "Estimate Accepted in TradesQuote",
+    action: "Create invoice draft in QuickBooks",
+    app: "QuickBooks",
+  },
+  {
+    trigger: "Estimate Accepted in TradesQuote",
+    action: "Send Slack message to #jobs-won channel",
+    app: "Slack",
+  },
+  {
+    trigger: "Estimate Created in TradesQuote",
+    action: "Add row to Google Sheets estimate tracker",
+    app: "Google Sheets",
+  },
+  {
+    trigger: "New Customer in TradesQuote",
+    action: "Create contact in HubSpot CRM",
+    app: "HubSpot",
+  },
+  {
+    trigger: "Estimate Accepted in TradesQuote",
+    action: "Create card in Trello for job scheduling",
+    app: "Trello",
+  },
+  {
+    trigger: "Estimate Created in TradesQuote",
+    action: "Add client to follow-up sequence in Mailchimp",
+    app: "Mailchimp",
+  },
+];
+
+const faqs = [
+  {
+    q: "When will the Zapier integration be available?",
+    a: "We are actively building this integration. Sign up for a free trial and you will be notified by email when it launches.",
+  },
+  {
+    q: "Do I need a paid Zapier plan to use it?",
+    a: "Zapier has a free tier that supports basic two-step Zaps. Multi-step workflows and premium app connections require a paid Zapier plan. The TradesQuote integration itself will be free for all TradesQuote subscribers.",
+  },
+  {
+    q: "What triggers and actions will be available at launch?",
+    a: "We are planning triggers for Estimate Created, Estimate Accepted, Estimate Updated, and New Customer — plus actions to create estimates and find customers. More may be added based on feedback.",
+  },
+  {
+    q: "Can I connect TradesQuote to QuickBooks via Zapier instead of the native integration?",
+    a: "Yes — you can use Zapier as a bridge between TradesQuote and QuickBooks if you prefer a no-code approach. The native QuickBooks integration (also coming soon) will be more direct and require no Zapier account.",
+  },
+  {
+    q: "Will it work with Make (formerly Integromat)?",
+    a: "Zapier is the priority for the initial release. A Make integration is on our roadmap and may follow shortly after the Zapier launch.",
+  },
+  {
+    q: "How do I get notified when it launches?",
+    a: "Sign up for a free TradesQuote account. We will send an email to all users as soon as the Zapier integration is live and ready to use.",
+  },
+];
+
+const accentRing: Record<(typeof benefits)[number]["accent"], string> = {
+  orange: "ring-orange-500/25 bg-orange-500/5",
+  amber: "ring-amber-500/25 bg-amber-500/5",
+  yellow: "ring-yellow-500/25 bg-yellow-500/5",
+  red: "ring-red-500/25 bg-red-500/5",
+  rose: "ring-rose-500/25 bg-rose-500/5",
+  pink: "ring-pink-500/25 bg-pink-500/5",
+};
+---
+
+<Layout {title} {description}>
+  <div class="bg-stone-50 min-h-screen">
+    <Header />
+
+    <!-- Coming Soon banner -->
+    <div class="w-full bg-amber-50 border-b border-amber-200 px-6 py-3">
+      <div class="max-w-6xl mx-auto flex items-center justify-center gap-3 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider border border-amber-300">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Coming Soon
+        </span>
+        <p class="text-sm text-amber-900 font-medium">
+          The Zapier integration is in development and not yet available. Sign up to be notified when it launches.
+        </p>
+        <a
+          href="https://app.tradesquote.ai/auth/sign-up"
+          class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 text-white text-xs font-semibold rounded-lg hover:bg-amber-700 transition-colors duration-150"
+        >
+          Notify me
+        </a>
+      </div>
+    </div>
+
+    <!-- Dark hero -->
+    <header class="relative isolate overflow-hidden bg-slate-950 text-white pt-6 pb-20 sm:pb-28 px-6 sm:px-8">
+      <div
+        class="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={`background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`}
+        aria-hidden="true"
+      ></div>
+      <div class="pointer-events-none absolute -top-32 right-0 h-[420px] w-[420px] rounded-full bg-orange-600/25 blur-[100px]" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute bottom-0 left-1/4 h-[280px] w-[500px] rounded-full bg-amber-500/15 blur-[90px]" aria-hidden="true"></div>
+
+      <div class="relative z-10 max-w-6xl mx-auto">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-12 lg:gap-8 mt-12 sm:mt-16">
+          <div class="max-w-2xl">
+            <p class="text-xs font-semibold tracking-[0.25em] uppercase text-orange-300/90 mb-4">
+              Integration · Zapier
+            </p>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white">
+              <span class="block text-slate-300 font-bold text-2xl sm:text-3xl mb-2 tracking-normal">
+                TradesQuote
+              </span>
+              <span class="bg-gradient-to-r from-white via-orange-200 to-amber-200 bg-clip-text text-transparent">
+                + Zapier
+              </span>
+            </h1>
+            <p class="mt-6 text-lg sm:text-xl text-slate-400 leading-relaxed max-w-xl">
+              Connect TradesQuote to 7,000+ apps without writing a line of code. Automate your estimate
+              workflow — from job won to invoice, follow-up, and beyond.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 lg:pb-1">
+            <div class="rounded-2xl border border-amber-400/40 bg-amber-500/10 px-5 py-4 backdrop-blur-sm min-w-[200px]">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-amber-300 mb-1">Status</p>
+              <p class="text-2xl font-bold text-amber-300 tabular-nums">Coming Soon</p>
+              <p class="text-sm text-amber-400/80 mt-0.5">Integration in development</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm min-w-[200px]">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Apps available</p>
+              <p class="text-lg font-semibold text-white leading-snug">7,000+</p>
+              <p class="text-xs text-slate-500 mt-1">via Zapier platform</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 sm:px-8 pb-20 sm:pb-24 flex flex-col gap-20 sm:gap-24 pt-16">
+
+      <!-- Benefits bento -->
+      <section id="why" aria-labelledby="why-heading">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10">
+          <div>
+            <h2 id="why-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">
+              Why connect TradesQuote to Zapier?
+            </h2>
+            <p class="mt-2 text-stone-600 max-w-xl">
+              One integration that plugs TradesQuote into your entire software stack — no developers, no complex API work.
+            </p>
+          </div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Planned features</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-fr">
+          <div class="md:col-span-4 md:row-span-1 rounded-3xl p-8 sm:p-10 bg-gradient-to-br from-orange-500 via-orange-600 to-slate-900 text-white shadow-xl shadow-orange-900/20 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" aria-hidden="true"></div>
+            <p class="relative text-sm font-semibold text-orange-200 uppercase tracking-wider mb-3">Core value</p>
+            <h3 class="relative text-2xl sm:text-3xl font-bold leading-tight max-w-md">{benefits[0].title}</h3>
+            <p class="relative mt-4 text-orange-100/95 leading-relaxed max-w-xl text-sm sm:text-base">{benefits[0].body}</p>
+          </div>
+
+          <div class="md:col-span-2 flex flex-col gap-4">
+            <div class={`flex-1 rounded-3xl p-6 ring-1 ${accentRing[benefits[1].accent]} border border-stone-200/60 bg-white`}>
+              <h3 class="text-base font-bold text-stone-900">{benefits[1].title}</h3>
+              <p class="mt-2 text-sm text-stone-600 leading-relaxed">{benefits[1].body}</p>
+            </div>
+            <div class={`flex-1 rounded-3xl p-6 ring-1 ${accentRing[benefits[2].accent]} border border-stone-200/60 bg-white`}>
+              <h3 class="text-base font-bold text-stone-900">{benefits[2].title}</h3>
+              <p class="mt-2 text-sm text-stone-600 leading-relaxed">{benefits[2].body}</p>
+            </div>
+          </div>
+
+          {benefits.slice(3).map((b) => (
+            <div class={`md:col-span-2 rounded-3xl p-6 sm:p-7 ring-1 ${accentRing[b.accent]} border border-stone-200/60 bg-white`}>
+              <h3 class="text-base font-bold text-stone-900">{b.title}</h3>
+              <p class="mt-3 text-sm text-stone-600 leading-relaxed">{b.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Planned triggers & actions -->
+      <section id="triggers" aria-labelledby="triggers-heading">
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4 flex items-start gap-3">
+          <svg class="shrink-0 mt-0.5 w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p class="text-sm text-amber-900 leading-relaxed">
+            <strong class="font-semibold">This integration is coming soon.</strong> The triggers and actions below are planned for the initial release. <a href="https://app.tradesquote.ai/auth/sign-up" class="underline underline-offset-2 font-medium hover:text-amber-800">Sign up</a> to be notified at launch.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 opacity-60 pointer-events-none select-none">
+          <!-- Triggers -->
+          <div>
+            <h2 id="triggers-heading" class="text-xl font-bold text-stone-900 mb-1">Triggers</h2>
+            <p class="text-stone-500 text-sm mb-5">Events in TradesQuote that start a Zap</p>
+            <div class="flex flex-col gap-3">
+              {plannedTriggers.map((t) => (
+                <div class="flex items-start gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                  <span class="shrink-0 mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 border border-orange-100">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-sm font-bold text-stone-900">{t.label}</p>
+                    <p class="text-xs text-stone-500 mt-0.5">{t.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div>
+            <h2 class="text-xl font-bold text-stone-900 mb-1">Actions</h2>
+            <p class="text-stone-500 text-sm mb-5">Things Zapier can do in TradesQuote</p>
+            <div class="flex flex-col gap-3">
+              {plannedActions.map((a) => (
+                <div class="flex items-start gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                  <span class="shrink-0 mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 border border-indigo-100">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-sm font-bold text-stone-900">{a.label}</p>
+                    <p class="text-xs text-stone-500 mt-0.5">{a.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Example Zaps -->
+      <section id="examples" aria-labelledby="examples-heading">
+        <h2 id="examples-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight mb-2">
+          Example automations
+        </h2>
+        <p class="text-stone-600 mb-8 max-w-2xl">
+          A sample of the Zaps you will be able to build once the integration launches.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-60 pointer-events-none select-none">
+          {exampleZaps.map((zap) => (
+            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-semibold border border-orange-100">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  Trigger
+                </span>
+              </div>
+              <p class="text-sm font-medium text-stone-800 leading-snug">{zap.trigger}</p>
+              <div class="flex items-center gap-2">
+                <div class="h-px flex-1 bg-stone-100"></div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12l7 7 7-7"/>
+                </svg>
+                <div class="h-px flex-1 bg-stone-100"></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold border border-indigo-100">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Action
+                </span>
+                <span class="text-xs text-stone-400 font-medium">{zap.app}</span>
+              </div>
+              <p class="text-sm font-medium text-stone-800 leading-snug">{zap.action}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" aria-labelledby="faq-heading" class="pb-4">
+        <h2 id="faq-heading" class="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight mb-8">
+          Frequently asked questions
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
+          {faqs.map((item, i) => (
+            <details class="group rounded-2xl border border-stone-200 bg-white p-0 hover:border-orange-200/80 transition-colors duration-200 open:ring-2 open:ring-orange-100">
+              <summary class="cursor-pointer list-none flex items-start justify-between gap-3 px-5 py-4 text-left font-semibold text-stone-900 text-sm [&::-webkit-details-marker]:hidden">
+                <span class="pt-0.5">{item.q}</span>
+                <span class="mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-500 group-open:bg-orange-100 group-open:text-orange-700 transition-colors" aria-hidden="true">
+                  <svg class="w-4 h-4 transition-transform duration-200 group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </summary>
+              <div class={`px-5 pb-4 text-sm text-stone-600 leading-relaxed border-t border-stone-100 ${i % 2 === 0 ? "lg:border-l-4 lg:border-l-orange-200" : "lg:border-l-4 lg:border-l-amber-200"}`}>
+                <p class="m-0 pt-3">{item.a}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <!-- Notify CTA -->
+      <section class="rounded-3xl bg-slate-950 px-8 py-12 text-center relative overflow-hidden">
+        <div class="pointer-events-none absolute inset-0" style="background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(249,115,22,0.12), transparent 60%);" aria-hidden="true"></div>
+        <p class="relative text-xs font-bold uppercase tracking-widest text-orange-400 mb-4">Coming Soon</p>
+        <h2 class="relative text-2xl sm:text-3xl font-bold text-white mb-3">Be first to automate with Zapier</h2>
+        <p class="relative text-slate-400 text-base max-w-lg mx-auto mb-8">
+          Sign up for a free 14-day trial today. We will notify you by email the moment the Zapier integration is live and ready to use.
+        </p>
+        <a
+          href="https://app.tradesquote.ai/auth/sign-up"
+          class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-orange-600 text-white text-base font-semibold rounded-xl hover:bg-orange-500 active:scale-[0.98] transition-all duration-150 shadow-lg shadow-orange-500/25"
+        >
+          Get started — free 14-day trial
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </section>
+
+      <p class="text-center text-xs text-[#808285] max-w-2xl mx-auto leading-relaxed px-2">
+        Zapier® and the Zapier logo are trademarks of Zapier Inc. TradesQuote is not affiliated with or endorsed by Zapier Inc.
+      </p>
+    </main>
+  </div>
+
+  <Footer />
+</Layout>
