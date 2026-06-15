@@ -1,0 +1,796 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+const title = "HVAC BTU Calculator — Free Online AC & Heating Sizing Tool | TradesQuote";
+const description =
+  "Free HVAC BTU calculator. Estimate the cooling capacity (BTU and tonnage) you need for any room or home — based on square footage, climate, sun exposure, insulation, and occupancy. Instant results, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-btu-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "HVAC BTU Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC BTU Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC BTU calculator that estimates the cooling capacity and air conditioner size needed for a room or home based on square footage, climate, sun exposure, insulation, and occupancy.",
+};
+
+const faqData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How many BTUs do I need per square foot?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "A common rule of thumb is about 20 BTU per square foot for cooling in a moderate climate with 8-foot ceilings. So a 600 sq ft space needs roughly 12,000 BTU, or one ton. This baseline rises in hot, sunny, or poorly insulated spaces and falls in cool, shaded, well-sealed ones.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What size air conditioner do I need for a 1,500 square foot house?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Using the 20 BTU per square foot rule, 1,500 sq ft works out to about 30,000 BTU, or roughly 2.5 tons, as a starting point. After adjusting for climate, sun, insulation, and occupancy it usually lands between 2.5 and 3 tons.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do I convert BTU to tons?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "One ton of cooling equals 12,000 BTU per hour. To convert, divide the BTU figure by 12,000. For example, 36,000 BTU divided by 12,000 equals 3 tons.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is it better to oversize or undersize an AC unit?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Neither. An oversized unit short-cycles, cooling the air quickly but not running long enough to remove humidity, which wastes energy and wears out the compressor. An undersized unit runs constantly and never keeps up. Right-sizing gives the best comfort, efficiency, and equipment life.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Does ceiling height affect how many BTUs I need?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. The standard 20 BTU per square foot assumes 8-foot ceilings. Taller ceilings mean more air volume to condition, so the load scales up proportionally. A 10-foot ceiling adds roughly 25 percent to the requirement.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How accurate is this BTU calculator compared to a Manual J load calculation?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "This tool gives a fast, reliable ballpark using the same factors a contractor weighs first: area, climate, sun, insulation, and occupancy. A full ACCA Manual J calculation goes further, accounting for window types, orientation, duct losses, and air infiltration, and is required for permits and equipment warranties. Use this for quick planning and a Manual J for final installation.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Why does the number of people in a room matter for sizing?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Each person gives off body heat, roughly 600 BTU per hour of additional cooling load. The calculator assumes two occupants by default and adds for each extra person, which matters most in offices, gyms, and busy living areas.",
+      },
+    },
+  ],
+};
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Size ductwork and required airflow per room.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Estimate heating capacity for your climate.",
+  },
+  {
+    href: "/calculators/hvac/hvac-seer-savings-calculator",
+    title: "SEER Savings Calculator",
+    description: "Compare efficiency ratings and energy costs.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC BTU Calculator — Free Online AC Sizing Tool" />
+    <meta
+      property="og:description"
+      content="Estimate the BTU and tonnage you need for any space. Factors in size, climate, sun, insulation, and occupancy. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC BTU Calculator — Free Online AC Sizing Tool" />
+    <meta
+      name="twitter:description"
+      content="Estimate the BTU and tonnage you need for any space. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+            <a href="/" class="hover:text-blue-600 transition">Home</a>
+            <span>/</span>
+            <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
+            <span>/</span>
+            <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
+            <span>/</span>
+            <span class="text-slate-700 font-medium">HVAC BTU Calculator</span>
+          </nav>
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M10 1a1 1 0 011 1v1.07A7.002 7.002 0 0116.93 9H18a1 1 0 110 2h-1.07A7.002 7.002 0 0111 16.93V18a1 1 0 11-2 0v-1.07A7.002 7.002 0 013.07 11H2a1 1 0 110-2h1.07A7.002 7.002 0 019 3.07V2a1 1 0 011-1z"
+                ></path>
+              </svg>
+              HVAC Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              HVAC BTU Calculator <span class="text-blue-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This HVAC BTU calculator estimates the cooling capacity — in BTU per hour and equivalent
+              tonnage — that an air conditioner or heat pump needs to comfortably cool a given space.
+              It adjusts the industry rule of thumb for your room size, ceiling height, climate, sun exposure,
+              insulation, and number of occupants, so you get a realistic size instead of a generic guess.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter your space details
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="area" class="text-sm font-semibold text-slate-800">Room / area size</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="area"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      value="600"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">sq ft</span>
+                  </div>
+                </div>
+                <input
+                  id="areaRange"
+                  type="range"
+                  min="50"
+                  max="5000"
+                  step="50"
+                  value="600"
+                  class="btu-range mt-3 w-full bg-slate-200 accent-blue-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>50</span><span>5,000 sq ft</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ceiling" class="text-sm font-semibold text-slate-800">Ceiling height</label>
+                  <select
+                    id="ceiling"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="8" selected>8 ft (standard)</option>
+                    <option value="9">9 ft</option>
+                    <option value="10">10 ft</option>
+                    <option value="12">12 ft or higher</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="climate" class="text-sm font-semibold text-slate-800">Climate zone</label>
+                  <select
+                    id="climate"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="0.9">Cool (Northern US / Canada)</option>
+                    <option value="1.0" selected>Moderate (Midwest / Mid-Atlantic)</option>
+                    <option value="1.1">Warm (Southern US)</option>
+                    <option value="1.2">Hot (Desert / Deep South)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="sun" class="text-sm font-semibold text-slate-800">Sun exposure</label>
+                  <select
+                    id="sun"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="0.9">Heavily shaded</option>
+                    <option value="1.0" selected>Average / partial sun</option>
+                    <option value="1.1">Very sunny / lots of windows</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="insulation" class="text-sm font-semibold text-slate-800"
+                    >Insulation quality</label
+                  >
+                  <select
+                    id="insulation"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="1.15">Poor (older, drafty home)</option>
+                    <option value="1.0" selected>Average</option>
+                    <option value="0.92">Excellent (new / well-sealed)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="occupants" class="text-sm font-semibold text-slate-800"
+                    >Number of occupants</label
+                  >
+                  <input
+                    id="occupants"
+                    type="number"
+                    min="0"
+                    max="50"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <span class="text-sm font-semibold text-slate-800">Space includes a kitchen?</span>
+                  <label
+                    for="kitchen"
+                    class="mt-2 flex items-center gap-3 cursor-pointer rounded-lg border border-slate-300 px-3 py-2.5"
+                  >
+                    <input
+                      id="kitchen"
+                      type="checkbox"
+                      class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span class="text-sm text-slate-600">Add 4,000 BTU for kitchen heat</span>
+                  </label>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-blue-100">Recommended cooling capacity</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="btuResult" class="text-5xl font-extrabold tracking-tight">12,000</span>
+                <span class="text-lg font-semibold text-blue-100">BTU/hr</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-blue-100">Equivalent to</p>
+                  <p id="tonsResult" class="mt-1 text-2xl font-bold">1.0 tons</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-blue-100">Per square foot</p>
+                  <p id="perSqftResult" class="mt-1 text-2xl font-bold">20 BTU</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-blue-100">Suggested system size</p>
+                <p id="unitResult" class="mt-1 text-base font-semibold leading-snug">
+                  1-ton AC or heat pump system
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-blue-50">
+                  <div class="flex justify-between">
+                    <span>Base load (area × 20 × ceiling)</span><span id="bd-base" class="font-semibold"
+                      >—</span
+                    >
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Climate adjustment</span><span id="bd-climate" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Sun exposure</span><span id="bd-sun" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Insulation</span><span id="bd-insulation" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Occupants</span><span id="bd-occupants" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Kitchen</span><span id="bd-kitchen" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Total</span><span id="bd-total" class="font-bold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-blue-100 leading-relaxed">
+                This is a planning estimate. For permits, equipment warranties, and final installation,
+                confirm with a full ACCA Manual J load calculation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Sizing an air conditioner starts with one well-known rule of thumb and then nudges it up or down
+            for the things that actually change how hard a unit has to work. Here is exactly what this calculator does.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Base cooling load</div>
+            <div>base&nbsp;=&nbsp;area (sq ft) × <span class="text-amber-300">20 BTU</span> × (ceiling height ÷ 8)</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Apply adjustment factors</div>
+            <div>adjusted&nbsp;=&nbsp;base × climate × sun × insulation</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Add fixed heat sources</div>
+            <div>
+              total&nbsp;=&nbsp;adjusted + (extra people × <span class="text-amber-300">600</span>) + kitchen
+              (<span class="text-amber-300">4,000</span>)
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 4 — Convert to tons</div>
+            <div>tons&nbsp;=&nbsp;total ÷ <span class="text-amber-300">12,000</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 20 BTU per square foot?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It's the long-standing baseline for a room with 8-foot ceilings in a moderate climate. Most spaces start here, then get adjusted.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why divide by 12,000?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                One "ton" of air conditioning equals 12,000 BTU per hour — a historical reference to the cooling power of a ton of melting ice.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The adjustment factors</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Climate (0.9–1.2), sun exposure (0.9–1.1), and insulation (0.92–1.15) scale the base load up or down based on how much heat the space gains.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">People and kitchens</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Each person beyond two adds ~600 BTU of body heat, and a kitchen's appliances add about 4,000 BTU on top of the base load.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three real-world scenarios showing how the same formula scales from a single bedroom to a whole house.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Small bedroom — 200 sq ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              8 ft ceiling · moderate climate · average sun · average insulation · 2 occupants · no kitchen.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              200 × 20 × 1.00 = 4,000 BTU<br />
+              × 1.0 × 1.0 × 1.0 = 4,000 BTU<br />
+              + 0 people + 0 kitchen = <span class="font-bold text-blue-700">≈ 4,000 BTU/hr</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> about 4,000 BTU — a small 5,000 BTU window unit or mini-split is the right fit. Tonnage isn't typically used at this size.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Sunny apartment — 1,200 sq ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              9 ft ceilings · warm climate (×1.1) · very sunny (×1.1) · average insulation · 3 occupants · kitchen included.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              1,200 × 20 × 1.125 = 27,000 BTU<br />
+              × 1.1 × 1.1 × 1.0 = 32,670 BTU<br />
+              + 600 (1 extra person) + 4,000 (kitchen) = <span class="font-bold text-blue-700"
+                >≈ 37,500 BTU/hr</span
+              >
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> about 37,500 BTU, or roughly 3.1 tons — so a 3.5-ton system is the safe install size for this sun-soaked, multi-occupant space.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Efficient house — 2,000 sq ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              8 ft ceilings · cool climate (×0.9) · shaded (×0.9) · excellent insulation (×0.92) · 4 occupants · kitchen included.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              2,000 × 20 × 1.00 = 40,000 BTU<br />
+              × 0.9 × 0.9 × 0.92 = 29,808 BTU<br />
+              + 1,200 (2 extra people) + 4,000 (kitchen) = <span class="font-bold text-blue-700"
+                >≈ 35,000 BTU/hr</span
+              >
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> about 35,000 BTU, or roughly 3 tons. Notice how good insulation, shade, and a cool climate keep a 2,000 sq ft home at nearly the same size as the 1,200 sq ft sunny apartment above.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
+            Frequently asked questions
+          </h2>
+          <p class="mt-3 text-center text-slate-600">
+            Common questions about BTU sizing and air conditioner capacity.
+          </p>
+
+          <div class="mt-8 space-y-3">
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                How many BTUs do I need per square foot?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                A common rule of thumb is about <strong>20 BTU per square foot</strong> for cooling in a moderate climate with 8-foot ceilings. So a 600 sq ft space needs roughly 12,000 BTU, or one ton. This baseline rises in hot, sunny, or poorly insulated spaces and falls in cool, shaded, well-sealed ones — which is exactly what the calculator above adjusts for.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                What size air conditioner do I need for a 1,500 square foot house?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Using the 20 BTU per square foot rule, 1,500 sq ft works out to about <strong
+                  >30,000 BTU, or roughly 2.5 tons</strong
+                >, as a starting point. After accounting for climate, sun, insulation, and occupancy it typically lands between 2.5 and 3 tons. Enter your exact details in the calculator above for a tailored number.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                How do I convert BTU to tons?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                One ton of cooling equals <strong>12,000 BTU per hour</strong>. To convert, divide the BTU figure by 12,000 — for example, 36,000 BTU ÷ 12,000 = 3 tons. The calculator does this automatically and rounds up to the nearest standard system size.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                Is it better to oversize or undersize an AC unit?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                <strong>Neither.</strong> An oversized unit short-cycles — cooling the air fast but not running long enough to remove humidity, which wastes energy and wears out the compressor. An undersized unit runs constantly and never quite keeps up. Right-sizing (what this calculator estimates) gives the best comfort, efficiency, and equipment life.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                Does ceiling height affect how many BTUs I need?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Yes. The standard 20 BTU per square foot assumes 8-foot ceilings. Taller ceilings mean more air volume to condition, so the calculator scales the load up proportionally — a 10-foot ceiling adds roughly <strong>25%</strong> to the requirement.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                How accurate is this BTU calculator vs. a Manual J load calculation?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                This tool gives a fast, reliable ballpark using the same factors a contractor weighs first: area, climate, sun, insulation, and occupancy. A full <strong>ACCA Manual J</strong> calculation goes further — accounting for window types, orientation, duct losses, and air infiltration — and is required for permits and equipment warranties. Use this for quick planning and a Manual J for final installation.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                Why does the number of people in a room matter?
+                <svg
+                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Each person gives off body heat — roughly <strong>600 BTU per hour</strong> of additional cooling load. The calculator assumes two occupants by default and adds for each extra person, which matters most in offices, gyms, and busy living areas.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        <div
+          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
+        >
+          <div class="relative">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              Sizing is step one. Win the job with a full estimate.
+            </h2>
+            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
+              A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed,
+              line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities,
+              unit prices, and totals, validated by a built-in quality control agent.
+            </p>
+
+            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
+              <div class="rounded-xl bg-white/10 p-4">
+                <p class="font-semibold">AI line-item estimates</p>
+                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
+              </div>
+              <div class="rounded-xl bg-white/10 p-4">
+                <p class="font-semibold">Knowledge base</p>
+                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
+              </div>
+              <div class="rounded-xl bg-white/10 p-4">
+                <p class="font-semibold">Shareable & signable</p>
+                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
+              </div>
+            </div>
+
+            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="https://app.tradesquote.ai/auth/sign-up"
+                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
+                >Get started — Free 14-day trial</a
+              >
+              <a
+                href="/#pricing"
+                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
+                >View pricing</a
+              >
+            </div>
+            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
+        <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">More HVAC calculators</h2>
+        <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {
+            relatedCalculators.map((calc) => (
+              <a
+                href={calc.href}
+                class="group rounded-xl border border-slate-200 bg-white p-5 hover:border-blue-300 hover:shadow-md transition"
+              >
+                <p class="font-semibold text-slate-900 group-hover:text-blue-600">{calc.title}</p>
+                <p class="mt-1 text-sm text-slate-500">{calc.description}</p>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacBtuCalculator } from "@/scripts/calculators/hvac-btu-calculator";
+    initHvacBtuCalculator();
+  </script>
+</Layout>
+
+<style>
+  .btu-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .btu-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .btu-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

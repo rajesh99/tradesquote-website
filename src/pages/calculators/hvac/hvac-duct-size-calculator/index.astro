@@ -1,0 +1,820 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+const title = "Duct Size Calculator — CFM to Duct Diameter Chart | TradesQuote";
+const description =
+  "Free duct size calculator. Enter your airflow in CFM and get the round duct diameter you need — for sheet metal or flex duct — plus velocity check and a full duct sizing chart.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-duct-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Duct Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Duct Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online duct size calculator that converts airflow in CFM to the recommended round duct diameter for sheet metal or flex duct, with an air velocity check and a complete duct sizing chart.",
+};
+
+const faqData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What size duct do I need for 400 CFM?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "At the standard residential friction rate, 400 CFM needs a 10-inch round sheet-metal duct, which carries about 425 CFM. In flex duct, which has roughly 25 percent more friction, the same airflow needs a 12-inch run. Air velocity at 10 inches is about 733 feet per minute, comfortably under the 900 fpm noise threshold.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How is duct size calculated?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Residential ducts are sized so the friction loss is about 0.1 inches of water column per 100 feet of duct, while keeping air velocity below roughly 900 feet per minute on supply trunks. Each round diameter has a known CFM capacity at that friction rate; you pick the smallest size whose capacity meets your airflow.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Why does flex duct need to be bigger than metal duct?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The ribbed inner liner of flex duct creates roughly 25 percent more friction than smooth sheet metal, so a flex run carries less air at the same diameter. Sizing up one diameter compensates — and flex must also be pulled tight and supported, because sagging or compressed flex can cut airflow drastically.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is a good air velocity in residential ducts?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Keep supply trunks at or below about 900 feet per minute and branch runs near 600 fpm; returns are typically sized for about 700 fpm or less. Higher velocities whistle at registers and waste blower energy; much lower velocities usually mean the duct is oversized for the job.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What size duct does each ton of AC need?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Each ton of cooling moves about 400 CFM, so one ton fits a 10-inch round metal duct, two tons (800 CFM) need 14 inches, and three tons (1,200 CFM) need a 16-inch metal trunk. These are trunk sizes — individual branch runs are sized for each room's share of the airflow.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do I size rectangular duct from this?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Rectangular duct is matched to round duct by equivalent diameter, not equal cross-section area, because corners add friction. A 10-inch round is roughly equivalent to an 8 by 11 rectangular duct. Contractors convert using the equivalent-diameter tables in ACCA Manual D or a duct calculator wheel.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is this calculator a substitute for Manual D?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. This sizes individual runs with the standard friction-rate shortcut, which is reliable for single branches and simple trunks. ACCA Manual D designs the whole system — balancing every branch, accounting for fittings, total effective length, and the blower's available static pressure — and is what permits and warranties expect.",
+      },
+    },
+  ],
+};
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Room airflow by air changes and CFM per ton.",
+  },
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (Cooling)",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Heating size by climate zone and AFUE efficiency.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Duct Size Calculator — CFM to Duct Diameter Chart" />
+    <meta
+      property="og:description"
+      content="Enter your CFM and get the round duct diameter you need — metal or flex — plus a velocity check and full sizing chart."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Duct Size Calculator — CFM to Duct Diameter Chart" />
+    <meta
+      name="twitter:description"
+      content="Enter your CFM and get the round duct diameter you need. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+            <a href="/" class="hover:text-teal-600 transition">Home</a>
+            <span>/</span>
+            <a href="/calculators" class="hover:text-teal-600 transition">Calculators</a>
+            <span>/</span>
+            <a href="/calculators/hvac" class="hover:text-teal-600 transition">HVAC</a>
+            <span>/</span>
+            <span class="text-slate-700 font-medium">Duct Size Calculator</span>
+          </nav>
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                ></path>
+              </svg>
+              HVAC Tools · Ductwork · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Duct Size Calculator <span class="text-teal-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This duct size calculator converts airflow in CFM into the round duct diameter you need — for
+              smooth sheet metal or flex duct — using the standard residential friction rate, with an air-velocity
+              check so the run won't whistle. Use it to size a new branch, verify a trunk, or diagnose a room
+              that never gets enough air.
+            </p>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl border border-teal-100 bg-teal-50 p-4">
+              <svg
+                class="h-5 w-5 shrink-0 text-teal-600 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900">Don't know the CFM yet?</span>
+                Get it first from the
+                <a
+                  href="/calculators/hvac/hvac-cfm-calculator"
+                  class="font-semibold text-teal-700 underline decoration-teal-300 hover:decoration-teal-600"
+                  >CFM / Airflow Calculator</a
+                >
+                — room CFM by air changes, or system CFM by tonnage — then size the duct here.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-teal-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter your airflow
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ductCfm" class="text-sm font-semibold text-slate-800">Airflow</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ductCfm"
+                      type="number"
+                      min="0"
+                      max="5000"
+                      step="5"
+                      value="400"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">CFM</span>
+                  </div>
+                </div>
+                <input
+                  id="ductRange"
+                  type="range"
+                  min="25"
+                  max="2750"
+                  step="5"
+                  value="400"
+                  class="duct-range mt-3 w-full bg-slate-200 accent-teal-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>25</span><span>2,750 CFM</span>
+                </div>
+              </div>
+
+              <div>
+                <label for="ductType" class="text-sm font-semibold text-slate-800">Duct material</label>
+                <select
+                  id="ductType"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                >
+                  <option value="1" selected>Round sheet metal (smooth wall)</option>
+                  <option value="0.75">Flex duct (~25% more friction)</option>
+                </select>
+                <p class="mt-2 text-xs text-slate-500">
+                  Flex duct carries less air at the same diameter — the calculator sizes up automatically.
+                </p>
+              </div>
+
+              <div>
+                <span class="text-sm font-semibold text-slate-800">Common airflows</span>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <button
+                    data-cfm="100"
+                    class="quickPick rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-teal-400 hover:text-teal-700 transition"
+                    >Bedroom · 100</button
+                  >
+                  <button
+                    data-cfm="213"
+                    class="quickPick rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-teal-400 hover:text-teal-700 transition"
+                    >Kitchen · 213</button
+                  >
+                  <button
+                    data-cfm="400"
+                    class="quickPick rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-teal-400 hover:text-teal-700 transition"
+                    >1 ton · 400</button
+                  >
+                  <button
+                    data-cfm="800"
+                    class="quickPick rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-teal-400 hover:text-teal-700 transition"
+                    >2 tons · 800</button
+                  >
+                  <button
+                    data-cfm="1200"
+                    class="quickPick rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-teal-400 hover:text-teal-700 transition"
+                    >3 tons · 1,200</button
+                  >
+                  <button
+                    data-cfm="1600"
+                    class="quickPick rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-teal-400 hover:text-teal-700 transition"
+                    >4 tons · 1,600</button
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-teal-100">Recommended round duct</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sizeResult" class="text-5xl font-extrabold tracking-tight">10"</span>
+                <span id="sizeMaterial" class="text-lg font-semibold text-teal-100">sheet metal</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-teal-100">Air velocity</p>
+                  <p id="velResult" class="mt-1 text-2xl font-bold">733 fpm</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-teal-100">Size capacity</p>
+                  <p id="capResult" class="mt-1 text-2xl font-bold">425 CFM</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-teal-100" id="altLabel">Same airflow in flex duct</p>
+                <p id="altResult" class="mt-1 text-base font-semibold leading-snug">12" flex duct</p>
+              </div>
+
+              <p id="velNote" class="mt-4 text-xs text-teal-100 leading-relaxed">
+                Velocity is under the 900 fpm supply-trunk comfort threshold — this run should be quiet.
+              </p>
+              <p class="mt-2 text-xs text-teal-100 leading-relaxed">
+                Sized at 0.1 in. w.c./100 ft friction rate. Final whole-system duct design should follow ACCA Manual D.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Round duct sizing chart (quick reference)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Approximate CFM capacity per diameter at the 0.1 in/100 ft residential friction rate. Flex values assume
+            properly stretched duct.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Duct diameter</th>
+                  <th class="py-2.5 pr-4 font-semibold">Sheet metal (CFM)</th>
+                  <th class="py-2.5 font-semibold">Flex duct (CFM)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">4"</td><td class="py-2.5 pr-4">35</td><td class="py-2.5"
+                    >~25</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">5"</td><td class="py-2.5 pr-4">60</td><td class="py-2.5"
+                    >~45</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">6"</td><td class="py-2.5 pr-4">100</td><td class="py-2.5"
+                    >~75</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">7"</td><td class="py-2.5 pr-4">160</td><td class="py-2.5"
+                    >~120</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">8"</td><td class="py-2.5 pr-4">230</td><td class="py-2.5"
+                    >~170</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">9"</td><td class="py-2.5 pr-4">320</td><td class="py-2.5"
+                    >~240</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">10"</td><td class="py-2.5 pr-4">425</td><td class="py-2.5"
+                    >~320</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">12"</td><td class="py-2.5 pr-4">700</td><td class="py-2.5"
+                    >~525</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">14"</td><td class="py-2.5 pr-4">1,050</td><td class="py-2.5"
+                    >~790</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">16"</td><td class="py-2.5 pr-4">1,500</td><td class="py-2.5"
+                    >~1,125</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">18"</td><td class="py-2.5 pr-4">2,050</td><td class="py-2.5"
+                    >~1,540</td
+                  ></tr
+                >
+                <tr
+                  ><td class="py-2.5 pr-4 font-semibold">20"</td><td class="py-2.5 pr-4">2,750</td><td class="py-2.5"
+                    >~2,060</td
+                  ></tr
+                >
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Capacities are planning values for straight runs. Long runs, elbows, and fittings reduce real-world capacity
+            — Manual D accounts for total effective length.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The method, explained in plain English</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Duct sizing balances two limits: friction (how hard the blower works) and velocity (how loud
+            the air is). The residential shortcut fixes the friction rate and reads sizes off a chart —
+            exactly what this calculator automates.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-teal-300"># Step 1 — Fix the friction rate (residential standard)</div>
+            <div>friction&nbsp;=&nbsp;<span class="text-amber-300">0.1</span> in. w.c. per 100 ft of duct</div>
+            <div class="mt-4 text-teal-300"># Step 2 — Pick the smallest size that carries your CFM</div>
+            <div>
+              size&nbsp;=&nbsp;smallest diameter where capacity ≥ CFM&nbsp;&nbsp;(flex: capacity × <span
+                class="text-amber-300">0.75</span
+              >)
+            </div>
+            <div class="mt-4 text-teal-300"># Step 3 — Check the velocity (noise check)</div>
+            <div>
+              velocity&nbsp;=&nbsp;CFM ÷ duct area (sq ft)&nbsp;&nbsp;→&nbsp;&nbsp;keep ≤ <span class="text-amber-300"
+                >900</span
+              > fpm on trunks
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why fix the friction rate?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A residential blower has a limited pressure budget. Sizing every run at 0.1 in/100 ft keeps the whole
+                system inside what the blower can push.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why the velocity check?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Past ~900 fpm, supply air whistles at registers and rumbles in trunks. The calculator shows velocity so
+                you can size up if a run gets loud.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The flex duct penalty</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Flex duct's ribbed liner adds ~25% friction, so it carries less air per inch of diameter — and far less
+                if it sags or gets compressed. Pull it tight.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Branches vs. trunks</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Size each branch for its room's CFM and the trunk for the total it carries at that point — trunks taper
+                as branches peel off airflow.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three runs sized end to end — the same rooms used in the <a
+            href="/calculators/hvac/hvac-cfm-calculator"
+            class="font-semibold text-teal-600 hover:underline">CFM calculator's</a
+          > examples.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Bedroom branch — 100 CFM</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              metal: 6" carries 100 CFM → <span class="font-bold text-teal-700">6" duct</span> (velocity ≈ 509 fpm)<br
+              />
+              flex: 6" only carries ~75 → <span class="font-bold text-teal-700">7" flex</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the classic bedroom run — 6-inch metal or
+              7-inch flex. Quiet at ~509 fpm, with capacity to spare.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Kitchen branch — 213 CFM</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              metal: 8" carries 230 ≥ 213 → <span class="font-bold text-teal-700">8" duct</span> (velocity ≈ 610 fpm)<br
+              />
+              flex: 8" carries ~173 → <span class="font-bold text-teal-700">9" flex</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 8-inch metal or 9-inch flex. The kitchen needs
+              double the bedroom's air — and two duct sizes more to deliver it quietly.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">3-ton system trunk — 1,200 CFM</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              metal: 14" carries 1,050 &lt; 1,200 → next size <span class="font-bold text-teal-700">16" trunk</span> (velocity
+              ≈ 859 fpm)<br />
+              flex: 16" carries ~1,125 → <span class="font-bold text-teal-700">18" flex</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 16-inch metal trunk, right at the comfortable
+              edge of the 900 fpm velocity limit — exactly why 3-ton systems get 16-inch (not 14-inch) main trunks.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
+            Frequently asked questions
+          </h2>
+          <p class="mt-3 text-center text-slate-600">Common questions about duct sizing and airflow.</p>
+
+          <div class="mt-8 space-y-3">
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                What size duct do I need for 400 CFM?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                At the standard residential friction rate, 400 CFM needs a <strong>10-inch round sheet-metal duct</strong
+                > (carries ~425 CFM). In flex duct — about 25% more friction — the same airflow needs a <strong
+                  >12-inch</strong
+                > run. Velocity at 10 inches is ~733 fpm, comfortably under the 900 fpm noise threshold.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                How is duct size calculated?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Residential ducts are sized so friction loss is about <strong
+                  >0.1 inches of water column per 100 feet</strong
+                >, while keeping velocity below ~900 fpm on supply trunks. Each round diameter has a known CFM capacity
+                at that friction rate — you pick the smallest size whose capacity meets your airflow.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                Why does flex duct need to be bigger than metal?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                The ribbed inner liner of flex creates roughly <strong>25% more friction</strong> than smooth sheet
+                metal, so it carries less air at the same diameter. Sizing up one diameter compensates — and flex must be
+                pulled tight and supported, because sagging or compressed flex can cut airflow drastically.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                What's a good air velocity in residential ducts?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Keep supply trunks at or below <strong>~900 feet per minute</strong> and branch runs near 600 fpm;
+                returns are typically sized for ~700 fpm or less. Higher velocities whistle at registers and waste
+                blower energy; much lower usually means the duct is oversized.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                What size duct does each ton of AC need?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Each ton moves about 400 CFM, so one ton fits a <strong>10-inch</strong> round metal duct, two tons
+                (800 CFM) need <strong>14 inches</strong>, and three tons (1,200 CFM) a <strong>16-inch</strong> metal
+                trunk. These are trunk sizes — branches are sized for each room's share of the airflow.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                How do I size rectangular duct from this?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                Rectangular duct is matched to round by <strong>equivalent diameter</strong>, not equal area, because
+                corners add friction — a 10-inch round is roughly an 8×11 rectangular. Contractors convert with the
+                equivalent-diameter tables in ACCA Manual D or a duct calculator wheel.
+              </p>
+            </details>
+
+            <details class="group rounded-xl border border-slate-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
+                Is this a substitute for Manual D?
+                <svg
+                  class="h-5 w-5 shrink-0 text-teal-600 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </summary>
+              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+                No. This sizes individual runs with the standard friction-rate shortcut — reliable for single branches
+                and simple trunks. <strong>ACCA Manual D</strong> designs the whole system: balancing every branch,
+                fittings, total effective length, and the blower's available static pressure. Permits and warranties
+                expect it.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        <div
+          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
+        >
+          <div class="relative">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              Ducts sized? Quote the whole run in seconds.
+            </h2>
+            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
+              Diameters are the design — TradesQuote prices the install. Describe the duct runs, registers, and
+              fittings (or upload photos and drawings), and our AI builds a line-item estimate with quantities,
+              unit prices, and totals, validated by a built-in quality control agent.
+            </p>
+
+            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
+              <div class="rounded-xl bg-white/10 p-4">
+                <p class="font-semibold">AI line-item estimates</p>
+                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
+              </div>
+              <div class="rounded-xl bg-white/10 p-4">
+                <p class="font-semibold">Vision AI</p>
+                <p class="mt-1 text-sm text-blue-100">Upload photos or drawings and the AI reads the job.</p>
+              </div>
+              <div class="rounded-xl bg-white/10 p-4">
+                <p class="font-semibold">Shareable & signable</p>
+                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
+              </div>
+            </div>
+
+            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="https://app.tradesquote.ai/auth/sign-up"
+                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
+                >Get started — Free 14-day trial</a
+              >
+              <a
+                href="/#pricing"
+                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
+                >View pricing</a
+              >
+            </div>
+            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
+        <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">More HVAC calculators</h2>
+        <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {
+            relatedCalculators.map((calc) => (
+              <a
+                href={calc.href}
+                class="group rounded-xl border border-slate-200 bg-white p-5 hover:border-teal-300 hover:shadow-md transition"
+              >
+                <p class="font-semibold text-slate-900 group-hover:text-teal-600">{calc.title}</p>
+                <p class="mt-1 text-sm text-slate-500">{calc.description}</p>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacDuctSizeCalculator } from "@/scripts/calculators/hvac-duct-size-calculator";
+    initHvacDuctSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .duct-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .duct-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .duct-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

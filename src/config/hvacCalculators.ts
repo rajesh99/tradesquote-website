@@ -1,0 +1,262 @@
+export type HvacCalculatorAccent =
+  | "blue"
+  | "sky"
+  | "orange"
+  | "cyan"
+  | "teal"
+  | "emerald"
+  | "violet"
+  | "rose";
+
+export type HvacCalculator = {
+  slug: string;
+  title: string;
+  description: string;
+  question: string;
+  accent: HvacCalculatorAccent;
+  icon: string;
+};
+
+export const hvacCalculators: HvacCalculator[] = [
+  {
+    slug: "hvac-btu-calculator",
+    title: "HVAC BTU Calculator",
+    description:
+      "The full cooling load for any room or home — adjusted for climate, sun exposure, insulation, ceiling height, and occupancy.",
+    question: "What size AC do I need for 1,500 sq ft?",
+    accent: "blue",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>`,
+  },
+  {
+    slug: "hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description:
+      "Convert BTU to tons and back instantly, estimate tonnage from square footage, and decode the size hidden in any unit's model number.",
+    question: "How many tons is 36,000 BTU?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
+  },
+  {
+    slug: "hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description:
+      "Heating load by climate zone and insulation, converted into the furnace input size to buy using AFUE efficiency.",
+    question: "What size furnace for a 2,000 sq ft house?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>`,
+  },
+  {
+    slug: "hvac-cfm-calculator",
+    title: "HVAC CFM Calculator",
+    description:
+      "Room airflow from volume and air changes per hour, plus the total system CFM target from tonnage (350–450 CFM per ton).",
+    question: "How many CFM does this room need?",
+    accent: "cyan",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h9a2.5 2.5 0 10-2.5-2.5M4 12h13a2.5 2.5 0 11-2.5 2.5M4 16h7"/></svg>`,
+  },
+  {
+    slug: "hvac-duct-size-calculator",
+    title: "Duct Size Calculator",
+    description:
+      "Convert CFM into the round duct diameter you need — sheet metal or flex — with a velocity check and full sizing chart.",
+    question: "What size duct for 400 CFM?",
+    accent: "teal",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
+  },
+  {
+    slug: "hvac-seer-savings-calculator",
+    title: "SEER Savings Calculator",
+    description:
+      "Compare two SEER ratings and see annual electricity use, yearly cost, and the 15-year savings of the more efficient unit.",
+    question: "Is SEER 16 worth it over SEER 14?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "hvac-replacement-cost-calculator",
+    title: "Replacement Cost Calculator",
+    description:
+      "Installed price range for a new AC, furnace, heat pump, or full system — by size, efficiency tier, ductwork, and region.",
+    question: "How much does a new HVAC system cost?",
+    accent: "violet",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
+  {
+    slug: "hvac-estimate-calculator",
+    title: "HVAC Estimate Calculator",
+    description:
+      "Contractor job pricing from the bottom up — labor, equipment, materials, overhead, and true profit margin (not markup).",
+    question: "What should I quote for this job?",
+    accent: "rose",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>`,
+  },
+];
+
+export const hvacAccentStyles: Record<
+  HvacCalculatorAccent,
+  {
+    iconBg: string;
+    iconColor: string;
+    hoverBorder: string;
+    hoverTitle: string;
+    ctaColor: string;
+    linkColor: string;
+  }
+> = {
+  blue: {
+    iconBg: "bg-blue-100",
+    iconColor: "text-blue-600",
+    hoverBorder: "hover:border-blue-300",
+    hoverTitle: "group-hover:text-blue-600",
+    ctaColor: "text-blue-600",
+    linkColor: "text-blue-600",
+  },
+  sky: {
+    iconBg: "bg-sky-100",
+    iconColor: "text-sky-600",
+    hoverBorder: "hover:border-sky-300",
+    hoverTitle: "group-hover:text-sky-600",
+    ctaColor: "text-sky-600",
+    linkColor: "text-blue-600",
+  },
+  orange: {
+    iconBg: "bg-orange-100",
+    iconColor: "text-orange-600",
+    hoverBorder: "hover:border-orange-300",
+    hoverTitle: "group-hover:text-orange-600",
+    ctaColor: "text-orange-600",
+    linkColor: "text-orange-600",
+  },
+  cyan: {
+    iconBg: "bg-cyan-100",
+    iconColor: "text-cyan-600",
+    hoverBorder: "hover:border-cyan-300",
+    hoverTitle: "group-hover:text-cyan-600",
+    ctaColor: "text-cyan-600",
+    linkColor: "text-cyan-600",
+  },
+  teal: {
+    iconBg: "bg-teal-100",
+    iconColor: "text-teal-600",
+    hoverBorder: "hover:border-teal-300",
+    hoverTitle: "group-hover:text-teal-600",
+    ctaColor: "text-teal-600",
+    linkColor: "text-teal-600",
+  },
+  emerald: {
+    iconBg: "bg-emerald-100",
+    iconColor: "text-emerald-600",
+    hoverBorder: "hover:border-emerald-300",
+    hoverTitle: "group-hover:text-emerald-600",
+    ctaColor: "text-emerald-600",
+    linkColor: "text-emerald-600",
+  },
+  violet: {
+    iconBg: "bg-violet-100",
+    iconColor: "text-violet-600",
+    hoverBorder: "hover:border-violet-300",
+    hoverTitle: "group-hover:text-violet-600",
+    ctaColor: "text-violet-600",
+    linkColor: "text-violet-600",
+  },
+  rose: {
+    iconBg: "bg-rose-100",
+    iconColor: "text-rose-600",
+    hoverBorder: "hover:border-rose-300",
+    hoverTitle: "group-hover:text-rose-600",
+    ctaColor: "text-rose-600",
+    linkColor: "text-rose-600",
+  },
+};
+
+export const hvacCalculatorGuide = [
+  {
+    question: "What size AC do I need?",
+    slug: "hvac-btu-calculator",
+    tool: "BTU Calculator",
+    accent: "blue" as const,
+    rule: "~20 BTU per sq ft, adjusted for climate, sun & insulation",
+  },
+  {
+    question: "How many tons is X BTU? / What tonnage for my house?",
+    slug: "hvac-tonnage-calculator",
+    tool: "Tonnage Calculator",
+    accent: "blue" as const,
+    rule: "1 ton = 12,000 BTU/hr",
+  },
+  {
+    question: "What size furnace do I need?",
+    slug: "hvac-furnace-btu-calculator",
+    tool: "Furnace BTU Calculator",
+    accent: "orange" as const,
+    rule: "30–60 BTU per sq ft by climate, ÷ AFUE for input size",
+  },
+  {
+    question: "How much airflow does this room / system need?",
+    slug: "hvac-cfm-calculator",
+    tool: "CFM Calculator",
+    accent: "cyan" as const,
+    rule: "volume × ACH ÷ 60 · 400 CFM per ton",
+  },
+  {
+    question: "What size duct does that airflow need?",
+    slug: "hvac-duct-size-calculator",
+    tool: "Duct Size Calculator",
+    accent: "teal" as const,
+    rule: "smallest diameter whose capacity ≥ CFM (flex −25%)",
+  },
+  {
+    question: "Is the higher-efficiency unit worth the price?",
+    slug: "hvac-seer-savings-calculator",
+    tool: "SEER Savings Calculator",
+    accent: "emerald" as const,
+    rule: "% saved = 1 − (old SEER ÷ new SEER)",
+  },
+  {
+    question: "How much will the replacement cost?",
+    slug: "hvac-replacement-cost-calculator",
+    tool: "Replacement Cost Calculator",
+    accent: "violet" as const,
+    rule: "base price × size × efficiency + ducts, × regional labor",
+  },
+  {
+    question: "What should I quote for this job? (contractors)",
+    slug: "hvac-estimate-calculator",
+    tool: "HVAC Estimate Calculator",
+    accent: "rose" as const,
+    rule: "(labor + equipment + materials + overhead) ÷ (1 − margin)",
+  },
+];
+
+export const hvacFaqs = [
+  {
+    question: "Are these HVAC calculators really free?",
+    answer:
+      "Yes. All eight are completely free, run instantly in your browser, and require no account or sign-up. They're planning tools built by TradesQuote, the AI estimating platform for trades businesses.",
+  },
+  {
+    question: "Which HVAC calculator should I use first?",
+    answer:
+      "For cooling, the natural order is BTU → Tonnage → CFM: get the load, translate it into a system size, then set airflow targets. For heating, use the Furnace BTU calculator. Use the SEER calculator whenever you're comparing equipment efficiency and operating cost.",
+  },
+  {
+    question: "Are the results accurate enough to buy equipment?",
+    answer:
+      "They give reliable planning estimates using the same rules of thumb contractors start with. Before purchasing or pulling permits, confirm final sizing with a full ACCA Manual J load calculation and Manual D duct design, which account for windows, orientation, infiltration, and duct losses.",
+  },
+  {
+    question: "What are Manual J and Manual D?",
+    answer:
+      "They're the ACCA design standards used across the US industry. Manual J is the room-by-room heating and cooling load calculation; Manual D is the duct design method that turns airflow targets into duct sizes. Permits and equipment warranties typically require them.",
+  },
+  {
+    question: "Do these calculators work for commercial buildings?",
+    answer:
+      "They're tuned for residential and light-commercial spaces. Large commercial buildings have ventilation codes, occupancy loads, and zoning requirements that need engineering-grade load calculations — treat results there as rough first approximations only.",
+  },
+  {
+    question: "Will calculators for other trades be added?",
+    answer:
+      "Yes. HVAC is the first set — calculators for carpentry, painting, cleaning, electrical, and plumbing are planned next, matching the trades TradesQuote supports for AI-powered estimating.",
+  },
+];

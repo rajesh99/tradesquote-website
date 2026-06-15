@@ -1,0 +1,158 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorCategoryCard from "@/components/CalculatorCategoryCard.astro";
+import { calculatorCategories } from "@/config/calculatorCategories";
+
+const title = "Free Trade Calculators | TradesQuote";
+const description =
+  "Free online calculators for trades professionals — HVAC sizing, airflow, efficiency, and cost tools today, with carpentry, painting, cleaning, electrical, and plumbing coming soon.";
+
+const liveCategories = calculatorCategories.filter((c) => c.status === "live");
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Free Trade Calculators",
+  description,
+  itemListElement: liveCategories.map((category, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: `${category.name} Calculators`,
+    url: `https://tradesquote.ai/calculators/${category.slug}`,
+  })),
+};
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://tradesquote.ai/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Calculators",
+      item: "https://tradesquote.ai/calculators",
+    },
+  ],
+};
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href="https://tradesquote.ai/calculators" />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- Hero -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+            <a href="/" class="hover:text-blue-600 transition">Home</a>
+            <span>/</span>
+            <span class="text-slate-700 font-medium">Calculators</span>
+          </nav>
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg
+                class="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Free trade calculators
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Free Calculators for <span class="text-blue-600">Trades Professionals</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Sizing, material, and pricing tools built for the trades TradesQuote supports. Pick a
+              category to browse free calculators — instant results in your browser, no account
+              required. HVAC is live now; more trades are on the way.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Category grid -->
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-14">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {calculatorCategories.map((category) => (
+            <CalculatorCategoryCard category={category} />
+          ))}
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        <div
+          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
+        >
+          <div class="relative">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              Calculators plan the job. TradesQuote prices it.
+            </h2>
+            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
+              Once you have your numbers, the real work is the quote. Describe the job or upload
+              photos, and TradesQuote's AI builds a detailed line-item estimate — quantities, unit
+              prices, and totals — validated by a built-in quality control agent.
+            </p>
+
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="https://app.tradesquote.ai/auth/sign-up"
+                class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
+              >
+                Start free trial
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </a>
+              <a
+                href="/#pricing"
+                class="inline-flex items-center gap-2 rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
+              >
+                View pricing
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>
