@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "HVAC CFM Calculator — Free Airflow & Air Changes Tool | TradesQuote";
 const description = "Free HVAC CFM calculator. Find the airflow a room needs from its size and air changes per hour, or the target system CFM from AC tonnage (350–450 CFM per ton). Instant, no sign-up.";
@@ -31,68 +35,48 @@ const webAppData = {
   description: "Free online HVAC CFM calculator that finds the airflow a room needs from its volume and air changes per hour, and the target system airflow from air-conditioner tonnage.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How many CFM do I need per square foot?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "A common whole-home rule of thumb is about 1 CFM per square foot, which assumes 8-foot ceilings and roughly 7.5 air changes per hour. Individual rooms vary: bedrooms need less (around 0.65 CFM per sq ft) while kitchens and bathrooms need more.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How many CFM per ton of air conditioning?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "The standard design target is 400 CFM per ton of cooling. In humid climates contractors drop to about 350 CFM per ton to improve moisture removal, and in hot, dry climates they raise it to about 450. A 3-ton system at the standard rate moves 1,200 CFM.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What does ACH (air changes per hour) mean?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "ACH is how many times the air in a room is completely replaced in one hour. Typical comfort targets are 4 to 6 for bedrooms and basements, 6 to 8 for living rooms and offices, and 7 to 8 for kitchens, bathrooms, and laundry rooms where heat and moisture build up.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How many CFM do I need for a bedroom?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "A typical 150 sq ft bedroom with an 8-foot ceiling holds 1,200 cubic feet of air. At 5 air changes per hour that works out to about 100 CFM. Larger master bedrooms in the 250 sq ft range need roughly 165 CFM at the same air-change rate.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What happens if my HVAC airflow is too low?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Low airflow makes rooms heat and cool unevenly, lets humidity linger, and can freeze the evaporator coil because too little warm air passes over it. It also forces the blower to fight high static pressure, which shortens motor life. Common causes are dirty filters, undersized ducts, and closed registers.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can airflow be too high?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. Air moving too fast over the evaporator coil does not stay in contact long enough to shed moisture, so the home cools but stays clammy. High CFM also means noisy registers and drafts. That is why humid-climate designs target 350 CFM per ton instead of 400 to 450.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Does this calculator size my ductwork?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "It gives you the CFM target each room and the system need, which is the required first input. Actual duct diameters then come from an ACCA Manual D calculation that balances CFM against friction rate, duct length, and fittings. Use this for targets and Manual D for final duct design.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many CFM do I need per square foot?",
+    answer:
+      "A common whole-home rule of thumb is about <strong>1 CFM per square foot</strong>, which assumes 8-foot ceilings and roughly 7.5 air changes per hour. Individual rooms vary: bedrooms need less (around 0.65 CFM/sq ft) while kitchens and bathrooms need more — which is what the room tool above adjusts for.",
+  },
+  {
+    question: "How many CFM per ton of air conditioning?",
+    answer:
+      "The standard design target is <strong>400 CFM per ton</strong> of cooling. In humid climates contractors drop to about 350 CFM/ton to improve moisture removal, and in hot, dry climates they raise it to about 450. A 3-ton system at the standard rate moves 1,200 CFM.",
+  },
+  {
+    question: "What does ACH (air changes per hour) mean?",
+    answer:
+      "ACH is how many times the air in a room is completely replaced in one hour. Typical comfort targets: <strong>4–6 for bedrooms and basements, 6–8 for living rooms and offices, and 7–8 for kitchens, bathrooms, and laundry rooms</strong> where heat and moisture build up.",
+  },
+  {
+    question: "How many CFM do I need for a bedroom?",
+    answer:
+      "A typical 150 sq ft bedroom with an 8-foot ceiling holds 1,200 cubic feet of air. At 5 air changes per hour that works out to about <strong>100 CFM</strong>. Larger master bedrooms around 250 sq ft need roughly 165 CFM at the same air-change rate.",
+  },
+  {
+    question: "What happens if my HVAC airflow is too low?",
+    answer:
+      "Low airflow makes rooms heat and cool unevenly, lets humidity linger, and can <strong>freeze the evaporator coil</strong> because too little warm air passes over it. It also forces the blower to fight high static pressure, shortening motor life. Common causes: dirty filters, undersized ducts, closed registers.",
+  },
+  {
+    question: "Can airflow be too high?",
+    answer:
+      "Yes. Air moving too fast over the evaporator coil doesn't stay in contact long enough to shed moisture, so the home cools but stays <strong>clammy</strong>. High CFM also means noisy registers and drafts — which is why humid-climate designs target 350 CFM/ton instead of 400–450.",
+  },
+  {
+    question: "Does this calculator size my ductwork?",
+    answer:
+      "It gives you the CFM target each room and the system need — the required first input. Actual duct diameters then come from an <strong>ACCA Manual D</strong> calculation that balances CFM against friction rate, duct length, and fittings. Use this for targets and Manual D for final duct design.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Airflow targets set? Quote the ductwork job in seconds.";
+const ctaDescription =
+  "CFM numbers are the spec — TradesQuote turns the whole job into the price. Describe the duct runs, registers, and equipment (or upload photos and drawings), and our AI builds a line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -143,16 +127,7 @@ const relatedCalculators = [
           <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
       
-              <!-- Breadcrumb -->
-              <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-                  <a href="/" class="hover:text-blue-600 transition">Home</a>
-                  <span>/</span>
-                  <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-                  <span>/</span>
-                  <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
-                  <span>/</span>
-                  <span class="text-slate-700 font-medium">HVAC CFM Calculator</span>
-                </nav>
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC CFM Calculator" />
       
               <div class="max-w-3xl">
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">
@@ -416,109 +391,14 @@ const relatedCalculators = [
             </div>
           </section>
       
-          <!-- ============================ (6) FAQ ============================ -->
-          <section id="faq" class="bg-slate-50 border-y border-slate-200">
-            <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">Frequently asked questions</h2>
-              <p class="mt-3 text-center text-slate-600">Common questions about CFM, airflow, and air changes.</p>
-      
-              <div class="mt-8 space-y-3">
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How many CFM do I need per square foot?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">A common whole-home rule of thumb is about <strong>1 CFM per square foot</strong>, which assumes 8-foot ceilings and roughly 7.5 air changes per hour. Individual rooms vary: bedrooms need less (around 0.65 CFM/sq ft) while kitchens and bathrooms need more — which is what the room tool above adjusts for.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How many CFM per ton of air conditioning?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">The standard design target is <strong>400 CFM per ton</strong> of cooling. In humid climates contractors drop to about 350 CFM/ton to improve moisture removal, and in hot, dry climates they raise it to about 450. A 3-ton system at the standard rate moves 1,200 CFM.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What does ACH (air changes per hour) mean?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">ACH is how many times the air in a room is completely replaced in one hour. Typical comfort targets: <strong>4–6 for bedrooms and basements, 6–8 for living rooms and offices, and 7–8 for kitchens, bathrooms, and laundry rooms</strong> where heat and moisture build up.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How many CFM do I need for a bedroom?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">A typical 150 sq ft bedroom with an 8-foot ceiling holds 1,200 cubic feet of air. At 5 air changes per hour that works out to about <strong>100 CFM</strong>. Larger master bedrooms around 250 sq ft need roughly 165 CFM at the same air-change rate.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What happens if my HVAC airflow is too low?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Low airflow makes rooms heat and cool unevenly, lets humidity linger, and can <strong>freeze the evaporator coil</strong> because too little warm air passes over it. It also forces the blower to fight high static pressure, shortening motor life. Common causes: dirty filters, undersized ducts, closed registers.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Can airflow be too high?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Yes. Air moving too fast over the evaporator coil doesn't stay in contact long enough to shed moisture, so the home cools but stays <strong>clammy</strong>. High CFM also means noisy registers and drafts — which is why humid-climate designs target 350 CFM/ton instead of 400–450.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Does this calculator size my ductwork?
-                    <svg class="h-5 w-5 shrink-0 text-cyan-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">It gives you the CFM target each room and the system need — the required first input. Actual duct diameters then come from an <strong>ACCA Manual D</strong> calculation that balances CFM against friction rate, duct length, and fittings. Use this for targets and Manual D for final duct design.</p>
-                </details>
-              </div>
-            </div>
-          </section>
-      
-          <!-- ============================ (7) CTA → TRADESQUOTE ============================ -->
-          <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden">
-              <div class="relative">
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Airflow targets set? Quote the ductwork job in seconds.</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-                  CFM numbers are the spec — TradesQuote turns the whole job into the price. Describe the duct runs,
-                  registers, and equipment (or upload photos and drawings), and our AI builds a line-item estimate
-                  with quantities, unit prices, and totals, validated by a built-in quality control agent.
-                </p>
-      
-                <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">AI line-item estimates</p>
-                    <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Knowledge base</p>
-                    <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Shareable & signable</p>
-                    <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-                  </div>
-                </div>
-      
-                <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="https://app.tradesquote.ai/auth/sign-up"
-                    class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition">Get started — Free 14-day trial</a>
-                  <a href="/#pricing"
-                    class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">View pricing</a>
-                </div>
-                <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-              </div>
-            </div>
-          </section>
-      
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="cyan"
+            subtitle="Common questions about CFM, airflow, and air changes."
+          />
+
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
           <HvacRelatedCalculators calculators={relatedCalculators} accent="cyan" />
     </main>
 

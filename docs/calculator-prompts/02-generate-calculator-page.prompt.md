@@ -29,7 +29,9 @@ Create **exactly two files** and edit nothing else (config + hub are handled by 
 - Always read `src/layouts/Layout.astro`.
 
 Reproduce the template's structure, Tailwind classes, and JSON-LD block shapes **exactly** — only
-content, colors, IDs, and math change.
+content, colors, IDs, and math change. Import shared components from the template:
+`CalculatorBreadcrumb`, `CalculatorFaqSection`, `CalculatorTradesQuoteCta`, `HvacRelatedCalculators`,
+and `buildFaqPageSchema` / `CalculatorFaq` from `@/lib/calculatorFaq`.
 
 ## Step 2 — Build the page (sections, in order)
 
@@ -39,11 +41,13 @@ content, colors, IDs, and math change.
    - `BreadcrumbList` — Home / Calculators / `<Category>` / `<TITLE>` (4 levels; `<Category>` href
      = `/calculators/<category-slug>`).
    - `WebApplication` — `name = TITLE`, `applicationCategory: "BusinessApplication"`, free offer.
-   - `FAQPage` — built from `FAQS` (must match the on-page FAQ verbatim).
-   Also a `relatedCalculators` array from `RELATED`.
+   - `FAQPage` — `const faqs: CalculatorFaq[]` from `FAQS` (HTML answers allowed); then
+     `const faqData = buildFaqPageSchema(faqs)` from `@/lib/calculatorFaq` (must match visible FAQ).
+   Also `relatedCalculators` from `RELATED`, plus `ctaHeading` (= `CTA_H2`) and `ctaDescription`
+   (1–2 sentences for the TradesQuote CTA body).
 2. **`<Fragment slot="head">`:** canonical + OG (`og:title/description/url/site_name/image`) +
    Twitter (`summary_large_image`) + the three `<script type="application/ld+json">` blocks.
-3. **Hero:** breadcrumb, accent pill badge ("`<Category>` Tools · Free"), H1 =
+3. **Hero:** `<CalculatorBreadcrumb category="<Category>" categoryHref="/calculators/<category-slug>" current="<TITLE>" />`, accent pill badge ("`<Category>` Tools · Free"), H1 =
    `"<TITLE> <span class='text-<ACCENT>-600'>— Free Online Calculator</span>"`, and a 2-sentence
    intro derived from `SEARCH_QUESTION` + what it computes. (Comparison/cost pages may add the
    emerald-style "differentiator" note box linking to sibling calculators — see the SEER template.)
@@ -60,10 +64,10 @@ content, colors, IDs, and math change.
    explainer cards.
 6. **"Worked examples":** the 3 `WORKED_EXAMPLES`, each a card with a mono arithmetic block and a
    bolded "Result:" sentence. For `comparison/cost`, one example must show when it's NOT worth it.
-7. **FAQ** (`<section id="faq">`): the `FAQS` as `<details>` accordions (markup from the template).
-8. **CTA:** the standard TradesQuote gradient CTA block (3 feature tiles, both buttons, fine
-   print) with H2 = `CTA_H2`.
-9. **"More `<Category>` calculators":** 4-card grid from `relatedCalculators`.
+7. **FAQ:** `<CalculatorFaqSection faqs={faqs} accent="<ACCENT>" subtitle="…" />` — pass the
+   `faqs` array; answers may include `<strong>` and internal `<a>` links.
+8. **CTA:** `<CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />`.
+9. **"More `<Category>` calculators":** `<HvacRelatedCalculators calculators={relatedCalculators} accent="<ACCENT>" />` (or the category-equivalent when other trades are added).
 10. **Bottom:** `<script>import { init<Name> } from "@/scripts/calculators/<SLUG>"; init<Name>();</script>`
     and the `<style>` range-thumb block (class `.<short>-range`, thumb = the accent's hex).
 

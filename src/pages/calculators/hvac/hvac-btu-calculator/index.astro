@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "HVAC BTU Calculator — Free Online AC & Heating Sizing Tool | TradesQuote";
 const description =
@@ -33,68 +37,48 @@ const webAppData = {
     "Free online HVAC BTU calculator that estimates the cooling capacity and air conditioner size needed for a room or home based on square footage, climate, sun exposure, insulation, and occupancy.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How many BTUs do I need per square foot?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "A common rule of thumb is about 20 BTU per square foot for cooling in a moderate climate with 8-foot ceilings. So a 600 sq ft space needs roughly 12,000 BTU, or one ton. This baseline rises in hot, sunny, or poorly insulated spaces and falls in cool, shaded, well-sealed ones.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What size air conditioner do I need for a 1,500 square foot house?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Using the 20 BTU per square foot rule, 1,500 sq ft works out to about 30,000 BTU, or roughly 2.5 tons, as a starting point. After adjusting for climate, sun, insulation, and occupancy it usually lands between 2.5 and 3 tons.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How do I convert BTU to tons?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "One ton of cooling equals 12,000 BTU per hour. To convert, divide the BTU figure by 12,000. For example, 36,000 BTU divided by 12,000 equals 3 tons.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is it better to oversize or undersize an AC unit?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Neither. An oversized unit short-cycles, cooling the air quickly but not running long enough to remove humidity, which wastes energy and wears out the compressor. An undersized unit runs constantly and never keeps up. Right-sizing gives the best comfort, efficiency, and equipment life.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Does ceiling height affect how many BTUs I need?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. The standard 20 BTU per square foot assumes 8-foot ceilings. Taller ceilings mean more air volume to condition, so the load scales up proportionally. A 10-foot ceiling adds roughly 25 percent to the requirement.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How accurate is this BTU calculator compared to a Manual J load calculation?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "This tool gives a fast, reliable ballpark using the same factors a contractor weighs first: area, climate, sun, insulation, and occupancy. A full ACCA Manual J calculation goes further, accounting for window types, orientation, duct losses, and air infiltration, and is required for permits and equipment warranties. Use this for quick planning and a Manual J for final installation.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Why does the number of people in a room matter for sizing?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Each person gives off body heat, roughly 600 BTU per hour of additional cooling load. The calculator assumes two occupants by default and adds for each extra person, which matters most in offices, gyms, and busy living areas.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many BTUs do I need per square foot?",
+    answer:
+      "A common rule of thumb is about <strong>20 BTU per square foot</strong> for cooling in a moderate climate with 8-foot ceilings. So a 600 sq ft space needs roughly 12,000 BTU, or one ton. This baseline rises in hot, sunny, or poorly insulated spaces and falls in cool, shaded, well-sealed ones — which is exactly what the calculator above adjusts for.",
+  },
+  {
+    question: "What size air conditioner do I need for a 1,500 square foot house?",
+    answer:
+      "Using the 20 BTU per square foot rule, 1,500 sq ft works out to about <strong>30,000 BTU, or roughly 2.5 tons</strong>, as a starting point. After accounting for climate, sun, insulation, and occupancy it typically lands between 2.5 and 3 tons. Enter your exact details in the calculator above for a tailored number.",
+  },
+  {
+    question: "How do I convert BTU to tons?",
+    answer:
+      "One ton of cooling equals <strong>12,000 BTU per hour</strong>. To convert, divide the BTU figure by 12,000 — for example, 36,000 BTU ÷ 12,000 = 3 tons. The calculator does this automatically and rounds up to the nearest standard system size.",
+  },
+  {
+    question: "Is it better to oversize or undersize an AC unit?",
+    answer:
+      "<strong>Neither.</strong> An oversized unit short-cycles — cooling the air fast but not running long enough to remove humidity, which wastes energy and wears out the compressor. An undersized unit runs constantly and never quite keeps up. Right-sizing (what this calculator estimates) gives the best comfort, efficiency, and equipment life.",
+  },
+  {
+    question: "Does ceiling height affect how many BTUs I need?",
+    answer:
+      "Yes. The standard 20 BTU per square foot assumes 8-foot ceilings. Taller ceilings mean more air volume to condition, so the calculator scales the load up proportionally — a 10-foot ceiling adds roughly <strong>25%</strong> to the requirement.",
+  },
+  {
+    question: "How accurate is this BTU calculator vs. a Manual J load calculation?",
+    answer:
+      "This tool gives a fast, reliable ballpark using the same factors a contractor weighs first: area, climate, sun, insulation, and occupancy. A full <strong>ACCA Manual J</strong> calculation goes further — accounting for window types, orientation, duct losses, and air infiltration — and is required for permits and equipment warranties. Use this for quick planning and a Manual J for final installation.",
+  },
+  {
+    question: "Why does the number of people in a room matter?",
+    answer:
+      "Each person gives off body heat — roughly <strong>600 BTU per hour</strong> of additional cooling load. The calculator assumes two occupants by default and adds for each extra person, which matters most in offices, gyms, and busy living areas.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sizing is step one. Win the job with a full estimate.";
+const ctaDescription =
+  "A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -149,15 +133,7 @@ const relatedCalculators = [
     <main>
       <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-blue-600 transition">Home</a>
-            <span>/</span>
-            <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-            <span>/</span>
-            <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
-            <span>/</span>
-            <span class="text-slate-700 font-medium">HVAC BTU Calculator</span>
-          </nav>
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC BTU Calculator" />
 
           <div class="max-w-3xl">
             <span
@@ -553,192 +529,13 @@ const relatedCalculators = [
         </div>
       </section>
 
-      <section id="faq" class="bg-slate-50 border-y border-slate-200">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
-            Frequently asked questions
-          </h2>
-          <p class="mt-3 text-center text-slate-600">
-            Common questions about BTU sizing and air conditioner capacity.
-          </p>
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about BTU sizing and air conditioner capacity."
+      />
 
-          <div class="mt-8 space-y-3">
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How many BTUs do I need per square foot?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                A common rule of thumb is about <strong>20 BTU per square foot</strong> for cooling in a moderate climate with 8-foot ceilings. So a 600 sq ft space needs roughly 12,000 BTU, or one ton. This baseline rises in hot, sunny, or poorly insulated spaces and falls in cool, shaded, well-sealed ones — which is exactly what the calculator above adjusts for.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What size air conditioner do I need for a 1,500 square foot house?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Using the 20 BTU per square foot rule, 1,500 sq ft works out to about <strong
-                  >30,000 BTU, or roughly 2.5 tons</strong
-                >, as a starting point. After accounting for climate, sun, insulation, and occupancy it typically lands between 2.5 and 3 tons. Enter your exact details in the calculator above for a tailored number.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How do I convert BTU to tons?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                One ton of cooling equals <strong>12,000 BTU per hour</strong>. To convert, divide the BTU figure by 12,000 — for example, 36,000 BTU ÷ 12,000 = 3 tons. The calculator does this automatically and rounds up to the nearest standard system size.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Is it better to oversize or undersize an AC unit?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                <strong>Neither.</strong> An oversized unit short-cycles — cooling the air fast but not running long enough to remove humidity, which wastes energy and wears out the compressor. An undersized unit runs constantly and never quite keeps up. Right-sizing (what this calculator estimates) gives the best comfort, efficiency, and equipment life.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Does ceiling height affect how many BTUs I need?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Yes. The standard 20 BTU per square foot assumes 8-foot ceilings. Taller ceilings mean more air volume to condition, so the calculator scales the load up proportionally — a 10-foot ceiling adds roughly <strong>25%</strong> to the requirement.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How accurate is this BTU calculator vs. a Manual J load calculation?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                This tool gives a fast, reliable ballpark using the same factors a contractor weighs first: area, climate, sun, insulation, and occupancy. A full <strong>ACCA Manual J</strong> calculation goes further — accounting for window types, orientation, duct losses, and air infiltration — and is required for permits and equipment warranties. Use this for quick planning and a Manual J for final installation.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Why does the number of people in a room matter?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Each person gives off body heat — roughly <strong>600 BTU per hour</strong> of additional cooling load. The calculator assumes two occupants by default and adds for each extra person, which matters most in offices, gyms, and busy living areas.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div
-          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
-        >
-          <div class="relative">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Sizing is step one. Win the job with a full estimate.
-            </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-              A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed,
-              line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities,
-              unit prices, and totals, validated by a built-in quality control agent.
-            </p>
-
-            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">AI line-item estimates</p>
-                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Knowledge base</p>
-                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Shareable & signable</p>
-                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-              </div>
-            </div>
-
-            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://app.tradesquote.ai/auth/sign-up"
-                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
-                >Get started — Free 14-day trial</a
-              >
-              <a
-                href="/#pricing"
-                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-                >View pricing</a
-              >
-            </div>
-            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-          </div>
-        </div>
-      </section>
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
 
       <HvacRelatedCalculators calculators={relatedCalculators} accent="blue" />
     </main>

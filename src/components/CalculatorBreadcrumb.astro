@@ -1,0 +1,29 @@
+---
+interface Props {
+  category: string;
+  categoryHref: string;
+  current?: string;
+}
+
+const { category, categoryHref, current } = Astro.props;
+---
+
+<nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+  <a href="/" class="hover:text-blue-600 transition">Home</a>
+  <span>/</span>
+  <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
+  <span>/</span>
+  {
+    current ? (
+      <>
+        <a href={categoryHref} class="hover:text-blue-600 transition">
+          {category}
+        </a>
+        <span>/</span>
+        <span class="text-slate-700 font-medium">{current}</span>
+      </>
+    ) : (
+      <span class="text-slate-700 font-medium">{category}</span>
+    )
+  }
+</nav>

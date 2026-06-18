@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "HVAC Estimate Calculator — Free Job Pricing Tool | TradesQuote";
 const description =
@@ -33,68 +37,48 @@ const webAppData = {
     "Free online HVAC estimate calculator that prices a job from the bottom up: labor hours and rate, equipment, materials, overhead percentage, and true profit margin, producing a quote price and profit breakdown.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How do I calculate an HVAC estimate?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Add up direct costs first: labor hours times your hourly rate, plus equipment and materials. Apply your overhead percentage to get break-even, then divide by one minus your target profit margin to get the quote price. A 16-hour install with $4,800 in equipment and materials at 15 percent overhead and 20 percent margin prices at $9,200.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What is the difference between markup and margin?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Markup multiplies cost upward; margin is profit as a share of the selling price. A 20 percent markup on a $7,360 break-even gives $8,832, but a true 20 percent margin requires $9,200 — dividing by 0.8, not multiplying by 1.2. Pricing by markup when you mean margin silently underprices every job.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How much should HVAC contractors charge per hour?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Billed labor rates typically run $75 to $150 per hour depending on market and specialty. The billed rate must cover far more than the technician's wage: payroll taxes, insurance, the truck, tools, training, and unbillable drive time all ride on every billable hour.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What profit margin should an HVAC company target?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Many shops target a 20 to 35 percent gross margin on installations and 40 to 60 percent on service and repair work, which typically nets out to single-digit to low-teens net profit after all overhead. Thin margins on installs are usually a markup-versus-margin mistake, not a market problem.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What counts as overhead in an HVAC estimate?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Overhead is every cost that is not tied to one specific job: rent, office staff, insurance, vehicle payments, fuel, software, marketing, and licenses. Most HVAC businesses run 10 to 25 percent overhead, and it must be loaded into every estimate or the company loses money while jobs look profitable.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Should I show the full cost breakdown to customers?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Show line items — equipment, labor, materials — because itemized quotes build trust and win against single-number bids. Keep internal numbers like your overhead percentage and margin private; customers should see what they get, not your cost accounting.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How is this different from the HVAC replacement cost calculator?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "The replacement cost calculator gives homeowners a top-down national price range for budgeting. This estimate calculator works bottom-up from a contractor's actual numbers — hours, rates, equipment, overhead, and margin — to build the price a specific business should quote for a specific job.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I calculate an HVAC estimate?",
+    answer:
+      "Add up direct costs first: <strong>labor hours × your rate, plus equipment and materials</strong>. Apply your overhead percentage to get break-even, then divide by (1 − target margin) to get the quote price. A 16-hour install with $4,800 in equipment and materials at 15% overhead and 20% margin prices at $9,200.",
+  },
+  {
+    question: "What's the difference between markup and margin?",
+    answer:
+      "Markup multiplies cost upward; margin is profit as a share of the <strong>selling price</strong>. A 20% markup on a $7,360 break-even gives $8,832 — but a true 20% margin requires $9,200 (divide by 0.8, don't multiply by 1.2). Pricing by markup when you mean margin silently underprices every job.",
+  },
+  {
+    question: "How much should HVAC contractors charge per hour?",
+    answer:
+      "Billed labor rates typically run <strong>$75 to $150 per hour</strong> depending on market and specialty. The billed rate must cover far more than the technician's wage: payroll taxes, insurance, the truck, tools, training, and unbillable drive time all ride on every billable hour.",
+  },
+  {
+    question: "What profit margin should an HVAC company target?",
+    answer:
+      "Many shops target <strong>20–35% gross margin on installations and 40–60% on service and repair</strong>, which typically nets out to single-digit to low-teens net profit after all overhead. Thin margins on installs are usually a markup-versus-margin mistake, not a market problem.",
+  },
+  {
+    question: "What counts as overhead in an HVAC estimate?",
+    answer:
+      "Overhead is every cost not tied to one specific job: <strong>rent, office staff, insurance, vehicle payments, fuel, software, marketing, licenses</strong>. Most HVAC businesses run 10–25% overhead — and it must be loaded into every estimate, or the company loses money while jobs look profitable.",
+  },
+  {
+    question: "Should I show the full cost breakdown to customers?",
+    answer:
+      "Show <strong>line items</strong> — equipment, labor, materials — because itemized quotes build trust and win against single-number bids. Keep internal numbers like your overhead percentage and margin private; customers should see what they get, not your cost accounting.",
+  },
+  {
+    question: "How is this different from the replacement cost calculator?",
+    answer:
+      'The <a href="/calculators/hvac/hvac-replacement-cost-calculator" class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">replacement cost calculator</a> gives homeowners a top-down national price range for budgeting. This one works <strong>bottom-up from a contractor\'s actual numbers</strong> — hours, rates, equipment, overhead, and margin — to build the price a specific business should quote.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "This math, automated — for every job.";
+const ctaDescription =
+  "The calculator prices one job; TradesQuote prices them all. Describe the work or upload photos, and our AI builds the full line-item estimate with your real labor rates and pricing from your knowledge base — margins applied consistently, validated by a quality control agent, signed by the client online.";
 
 const relatedCalculators = [
   {
@@ -149,15 +133,7 @@ const relatedCalculators = [
     <main>
       <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-blue-600 transition">Home</a>
-            <span>/</span>
-            <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-            <span>/</span>
-            <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
-            <span>/</span>
-            <span class="text-slate-700 font-medium">HVAC Estimate Calculator</span>
-          </nav>
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Estimate Calculator" />
 
           <div class="max-w-3xl">
             <span
@@ -594,194 +570,13 @@ const relatedCalculators = [
         </div>
       </section>
 
-      <section id="faq" class="bg-slate-50 border-y border-slate-200">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
-            Frequently asked questions
-          </h2>
-          <p class="mt-3 text-center text-slate-600">Common questions about pricing HVAC jobs.</p>
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about pricing HVAC jobs."
+      />
 
-          <div class="mt-8 space-y-3">
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How do I calculate an HVAC estimate?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Add up direct costs first: <strong>labor hours × your rate, plus equipment and materials</strong>. Apply your overhead percentage to get break-even, then divide by (1 − target margin) to get the quote price. A 16-hour install with $4,800 in equipment and materials at 15% overhead and 20% margin prices at $9,200.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What's the difference between markup and margin?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Markup multiplies cost upward; margin is profit as a share of the <strong>selling price</strong>. A 20% markup on a $7,360 break-even gives $8,832 — but a true 20% margin requires $9,200 (divide by 0.8, don't multiply by 1.2). Pricing by markup when you mean margin silently underprices every job.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How much should HVAC contractors charge per hour?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Billed labor rates typically run <strong>$75 to $150 per hour</strong> depending on market and specialty. The billed rate must cover far more than the technician's wage: payroll taxes, insurance, the truck, tools, training, and unbillable drive time all ride on every billable hour.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What profit margin should an HVAC company target?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Many shops target <strong>20–35% gross margin on installations and 40–60% on service and repair</strong>, which typically nets out to single-digit to low-teens net profit after all overhead. Thin margins on installs are usually a markup-versus-margin mistake, not a market problem.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What counts as overhead in an HVAC estimate?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Overhead is every cost not tied to one specific job: <strong>rent, office staff, insurance, vehicle payments, fuel, software, marketing, licenses</strong>. Most HVAC businesses run 10–25% overhead — and it must be loaded into every estimate, or the company loses money while jobs look profitable.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Should I show the full cost breakdown to customers?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Show <strong>line items</strong> — equipment, labor, materials — because itemized quotes build trust and win against single-number bids. Keep internal numbers like your overhead percentage and margin private; customers should see what they get, not your cost accounting.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How is this different from the replacement cost calculator?
-                <svg
-                  class="h-5 w-5 shrink-0 text-rose-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                The <a
-                  href="/calculators/hvac/hvac-replacement-cost-calculator"
-                  class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600"
-                  >replacement cost calculator</a
-                > gives homeowners a top-down national price range for budgeting. This one works <strong
-                  >bottom-up from a contractor's actual numbers</strong
-                > — hours, rates, equipment, overhead, and margin — to build the price a specific business should quote.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div
-          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
-        >
-          <div class="relative">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">This math, automated — for every job.</h2>
-            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-              The calculator prices one job; TradesQuote prices them all. Describe the work or upload photos,
-              and our AI builds the full line-item estimate with your real labor rates and pricing from your
-              knowledge base — margins applied consistently, validated by a quality control agent, signed by
-              the client online.
-            </p>
-
-            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">AI line-item estimates</p>
-                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Learns your pricing</p>
-                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates use your real rates and margins.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Shareable & signable</p>
-                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-              </div>
-            </div>
-
-            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://app.tradesquote.ai/auth/sign-up"
-                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
-                >Get started — Free 14-day trial</a
-              >
-              <a
-                href="/#pricing"
-                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-                >View pricing</a
-              >
-            </div>
-            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-          </div>
-        </div>
-      </section>
-
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
       <HvacRelatedCalculators calculators={relatedCalculators} accent="rose" />
     </main>
 

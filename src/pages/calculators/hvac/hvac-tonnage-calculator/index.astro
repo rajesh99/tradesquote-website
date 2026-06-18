@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "HVAC Tonnage Calculator — Free BTU to Tons Converter | TradesQuote";
 const description =
@@ -33,68 +37,48 @@ const webAppData = {
     "Free online HVAC tonnage calculator that converts BTU to tons and back, and estimates the air conditioner tonnage needed for a space by square footage.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How many tons of AC do I need per square foot?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "A common rule of thumb is one ton of cooling for every 500 to 600 square feet, which comes from the 20 BTU per square foot guideline (12,000 BTU equals one ton). A 1,500 sq ft home usually needs about 2.5 to 3 tons, before adjusting for climate, sun, and insulation.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How many BTU is a 2-ton or 3-ton AC unit?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Since one ton equals 12,000 BTU per hour, a 2-ton unit is 24,000 BTU and a 3-ton unit is 36,000 BTU. To convert any tonnage to BTU, multiply by 12,000; to go from BTU to tons, divide by 12,000.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What does tonnage mean in HVAC?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Tonnage measures an air conditioner's cooling capacity, not its weight. One ton equals 12,000 BTU per hour, the amount of heat needed to melt one ton of ice in 24 hours. Residential systems typically range from 1.5 to 5 tons.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How do I find the tonnage of my existing AC unit?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Check the model number on the outdoor unit's data plate and look for a 2- or 3-digit number such as 018, 024, 030, 036, 042, 048, or 060. That number is the nominal capacity in BTU (036 = 36,000 BTU). Divide by 12,000 to get tons, so 036 equals 3 tons.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What size AC in tons do I need for a 2,000 square foot house?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Using 20 BTU per square foot, 2,000 sq ft works out to about 40,000 BTU, or roughly 3.5 tons, as a starting point. The exact size depends on climate, sun exposure, insulation, and ceiling height, which can move it between 3 and 4 tons.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can I size my air conditioner by square footage alone?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Square footage gives a solid starting estimate, but it is not a substitute for a full ACCA Manual J load calculation. Manual J also accounts for windows, orientation, insulation, duct losses, and air infiltration, and is required for permits and equipment warranties.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is a higher-tonnage air conditioner always better?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "No. An oversized unit cools quickly but short-cycles, so it never runs long enough to remove humidity, which wastes energy and shortens compressor life. Matching tonnage to the actual load gives the best comfort, efficiency, and equipment lifespan.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many tons of AC do I need per square foot?",
+    answer:
+      "A common rule of thumb is <strong>one ton for every 500–600 square feet</strong>, which comes from the 20 BTU/sq ft guideline (12,000 BTU = one ton). A 1,500 sq ft home usually needs about 2.5–3 tons, before adjusting for climate, sun, and insulation.",
+  },
+  {
+    question: "How many BTU is a 2-ton or 3-ton AC unit?",
+    answer:
+      "Since one ton equals 12,000 BTU/hr, a <strong>2-ton unit is 24,000 BTU</strong> and a <strong>3-ton unit is 36,000 BTU</strong>. To convert any tonnage to BTU, multiply by 12,000; to go from BTU to tons, divide by 12,000.",
+  },
+  {
+    question: 'What does "tonnage" mean in HVAC?',
+    answer:
+      "Tonnage measures an air conditioner's <strong>cooling capacity, not its weight</strong>. One ton equals 12,000 BTU/hr — the heat needed to melt one ton of ice in 24 hours. Residential systems typically range from 1.5 to 5 tons.",
+  },
+  {
+    question: "How do I find the tonnage of my existing AC unit?",
+    answer:
+      "Check the model number on the outdoor unit's data plate and look for a 2–3 digit number such as <strong>018, 024, 030, 036, 042, 048, or 060</strong>. That's the capacity in BTU (036 = 36,000 BTU). Divide by 12,000 for tons — so 036 = 3 tons.",
+  },
+  {
+    question: "What size AC (in tons) do I need for a 2,000 square foot house?",
+    answer:
+      "Using 20 BTU/sq ft, 2,000 sq ft is about <strong>40,000 BTU, or roughly 3.5 tons</strong>, as a starting point. The exact size depends on climate, sun, insulation, and ceiling height, which can move it between 3 and 4 tons.",
+  },
+  {
+    question: "Can I size my air conditioner by square footage alone?",
+    answer:
+      "Square footage gives a solid starting estimate, but it isn't a substitute for a full <strong>ACCA Manual J</strong> load calculation. Manual J also accounts for windows, orientation, insulation, duct losses, and air infiltration, and is required for permits and equipment warranties.",
+  },
+  {
+    question: "Is a higher-tonnage air conditioner always better?",
+    answer:
+      "No. An oversized unit cools quickly but <strong>short-cycles</strong>, so it never runs long enough to remove humidity — wasting energy and shortening compressor life. Matching tonnage to the actual load gives the best comfort, efficiency, and lifespan.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Know the tonnage? Turn it into a winning quote.";
+const ctaDescription =
+  "Sizing is just the start. TradesQuote turns the whole job — equipment, materials, and labor — into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -149,15 +133,7 @@ const relatedCalculators = [
     <main>
       <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-blue-600 transition">Home</a>
-            <span>/</span>
-            <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-            <span>/</span>
-            <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
-            <span>/</span>
-            <span class="text-slate-700 font-medium">HVAC Tonnage Calculator</span>
-          </nav>
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Tonnage Calculator" />
 
           <div class="max-w-3xl">
             <span
@@ -521,188 +497,13 @@ const relatedCalculators = [
         </div>
       </section>
 
-      <section id="faq" class="bg-slate-50 border-y border-slate-200">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
-            Frequently asked questions
-          </h2>
-          <p class="mt-3 text-center text-slate-600">Common questions about AC tonnage and BTU conversion.</p>
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about AC tonnage and BTU conversion."
+      />
 
-          <div class="mt-8 space-y-3">
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How many tons of AC do I need per square foot?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                A common rule of thumb is <strong>one ton for every 500–600 square feet</strong>, which comes from the 20 BTU/sq ft guideline (12,000 BTU = one ton). A 1,500 sq ft home usually needs about 2.5–3 tons, before adjusting for climate, sun, and insulation.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How many BTU is a 2-ton or 3-ton AC unit?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Since one ton equals 12,000 BTU/hr, a <strong>2-ton unit is 24,000 BTU</strong> and a <strong>3-ton unit is 36,000 BTU</strong>. To convert any tonnage to BTU, multiply by 12,000; to go from BTU to tons, divide by 12,000.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What does "tonnage" mean in HVAC?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Tonnage measures an air conditioner's <strong>cooling capacity, not its weight</strong>. One ton equals 12,000 BTU/hr — the heat needed to melt one ton of ice in 24 hours. Residential systems typically range from 1.5 to 5 tons.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How do I find the tonnage of my existing AC unit?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Check the model number on the outdoor unit's data plate and look for a 2–3 digit number such as <strong>018, 024, 030, 036, 042, 048, or 060</strong>. That's the capacity in BTU (036 = 36,000 BTU). Divide by 12,000 for tons — so 036 = 3 tons.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What size AC (in tons) do I need for a 2,000 square foot house?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Using 20 BTU/sq ft, 2,000 sq ft is about <strong>40,000 BTU, or roughly 3.5 tons</strong>, as a starting point. The exact size depends on climate, sun, insulation, and ceiling height, which can move it between 3 and 4 tons.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Can I size my air conditioner by square footage alone?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Square footage gives a solid starting estimate, but it isn't a substitute for a full <strong>ACCA Manual J</strong> load calculation. Manual J also accounts for windows, orientation, insulation, duct losses, and air infiltration, and is required for permits and equipment warranties.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Is a higher-tonnage air conditioner always better?
-                <svg
-                  class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                No. An oversized unit cools quickly but <strong>short-cycles</strong>, so it never runs long enough to remove humidity — wasting energy and shortening compressor life. Matching tonnage to the actual load gives the best comfort, efficiency, and lifespan.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div
-          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
-        >
-          <div class="relative">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Know the tonnage? Turn it into a winning quote.
-            </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-              Sizing is just the start. TradesQuote turns the whole job — equipment, materials, and labor —
-              into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI
-              builds quantities, unit prices, and totals, validated by a built-in quality control agent.
-            </p>
-
-            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">AI line-item estimates</p>
-                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Knowledge base</p>
-                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Shareable & signable</p>
-                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-              </div>
-            </div>
-
-            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://app.tradesquote.ai/auth/sign-up"
-                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
-                >Get started — Free 14-day trial</a
-              >
-              <a
-                href="/#pricing"
-                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-                >View pricing</a
-              >
-            </div>
-            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-          </div>
-        </div>
-      </section>
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
 
       <HvacRelatedCalculators calculators={relatedCalculators} accent="sky" />
     </main>

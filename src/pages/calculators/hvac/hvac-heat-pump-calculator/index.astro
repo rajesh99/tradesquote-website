@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "Heat Pump Sizing Calculator — What Size Heat Pump Do I Need? | TradesQuote";
 const description =
@@ -33,60 +37,43 @@ const webAppData = {
     "Free online heat pump sizing calculator that estimates the heating and cooling load (BTU and tonnage) needed for a home based on square footage, climate zone, insulation, and ceiling height, with cold-climate balance-point guidance.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "What size heat pump do I need?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Size to the larger of your heating and cooling loads, but in practice most US homes size the heat pump to the cooling load (about 20 BTU per square foot adjusted for climate, sun, and insulation) so it dehumidifies properly, then cover any winter shortfall with backup heat or a cold-climate model. A 1,800 sq ft mixed-climate home is typically 3 tons.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Are heat pumps sized differently from air conditioners?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "The cooling side is sized just like an air conditioner. The difference is you must also check the heating load, which in cold climates is much larger — that is why heat pump sizing adds a balance-point check.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What is a heat pump's balance point?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "The outdoor temperature where the heat pump's output exactly equals the home's heat loss. Above it the heat pump handles everything; below it you need supplemental or backup heat. Cold-climate inverter heat pumps push the balance point much lower.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do I need a cold-climate heat pump?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "If your heating load is far above your cooling load (Zone 5 and up), yes — ENERGY STAR cold-climate models keep at least 70 percent of rated capacity at 5°F and have an HSPF2 of 8.5 or higher, so they heat efficiently without leaning on resistance backup.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Should I oversize a heat pump for cold winters?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Not by oversizing the cooling capacity — that causes short-cycling and poor summer humidity control. Instead pick a cold-climate unit or add staged backup heat. Right-size to cooling, solve heating separately.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How accurate is this vs. a Manual J?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "It is a solid planning estimate using climate-zone BTU-per-square-foot rules. A full ACCA Manual J accounts for windows, orientation, infiltration, and duct losses and is required for permits and warranties. Use this to plan, a Manual J to install.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size heat pump do I need?",
+    answer:
+      "Size to the larger of your heating and cooling loads, but in practice most US homes size the heat pump to the <strong>cooling load</strong> (≈20 BTU/sq ft adjusted for climate, sun, insulation) so it dehumidifies properly, then cover any winter shortfall with backup heat or a cold-climate model. A 1,800 sq ft mixed-climate home is typically 3 tons.",
+  },
+  {
+    question: "Are heat pumps sized differently from air conditioners?",
+    answer:
+      "The cooling side is sized just like an AC. The difference is you must <strong>also</strong> check the heating load, which in cold climates is much larger — that's why heat pump sizing adds a balance-point check.",
+  },
+  {
+    question: "What is a heat pump's balance point?",
+    answer:
+      "The outdoor temperature where the heat pump's output exactly equals the home's heat loss. Above it the heat pump handles everything; below it you need supplemental/backup heat. Cold-climate (inverter) heat pumps push the balance point much lower.",
+  },
+  {
+    question: "Do I need a cold-climate heat pump?",
+    answer:
+      "If your heating load is far above your cooling load (Zone 5+), yes — ENERGY STAR cold-climate models keep <strong>≥70% of rated capacity at 5°F</strong> and have <strong>HSPF2 ≥ 8.5</strong>, so they heat efficiently without leaning on resistance backup.",
+  },
+  {
+    question: "Should I oversize a heat pump for cold winters?",
+    answer:
+      "Not by oversizing the cooling capacity — that causes short-cycling and poor summer humidity control. Instead pick a cold-climate unit or add staged backup heat. Right-size to cooling, solve heating separately.",
+  },
+  {
+    question: "How accurate is this vs. a Manual J?",
+    answer:
+      "It's a solid planning estimate using climate-zone BTU-per-sq-ft rules. A full <strong>ACCA Manual J</strong> accounts for windows, orientation, infiltration, and duct losses and is required for permits and warranties. Use this to plan, a Manual J to install.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the system? Win the install with a full quote.";
+const ctaDescription =
+  "A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -142,15 +129,7 @@ const relatedCalculators = [
       <!-- ============================ HERO + H1 + INTRO ============================ -->
       <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-indigo-600 transition">Home</a>
-            <span>/</span>
-            <a href="/calculators" class="hover:text-indigo-600 transition">Calculators</a>
-            <span>/</span>
-            <a href="/calculators/hvac" class="hover:text-indigo-600 transition">HVAC</a>
-            <span>/</span>
-            <span class="text-slate-700 font-medium">Heat Pump Sizing Calculator</span>
-          </nav>
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Heat Pump Sizing Calculator" />
 
           <div class="max-w-3xl">
             <span
@@ -605,188 +584,13 @@ const relatedCalculators = [
         </div>
       </section>
 
-      <!-- ============================ FAQ ============================ -->
-      <section id="faq" class="bg-slate-50 border-y border-slate-200">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
-            Frequently asked questions
-          </h2>
-          <p class="mt-3 text-center text-slate-600">
-            Common questions about heat pump sizing, heating vs. cooling loads, and cold-climate units.
-          </p>
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about heat pump sizing, heating vs. cooling loads, and cold-climate units."
+      />
 
-          <div class="mt-8 space-y-3">
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What size heat pump do I need?
-                <svg
-                  class="h-5 w-5 shrink-0 text-indigo-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Size to the larger of your heating and cooling loads, but in practice most US homes size the
-                heat pump to the <strong>cooling load</strong> (≈20 BTU/sq ft adjusted for climate, sun,
-                insulation) so it dehumidifies properly, then cover any winter shortfall with backup heat or
-                a cold-climate model. A 1,800 sq ft mixed-climate home is typically 3 tons.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Are heat pumps sized differently from air conditioners?
-                <svg
-                  class="h-5 w-5 shrink-0 text-indigo-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                The cooling side is sized just like an AC. The difference is you must <strong>also</strong>
-                check the heating load, which in cold climates is much larger — that's why heat pump sizing
-                adds a balance-point check.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What is a heat pump's balance point?
-                <svg
-                  class="h-5 w-5 shrink-0 text-indigo-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                The outdoor temperature where the heat pump's output exactly equals the home's heat loss.
-                Above it the heat pump handles everything; below it you need supplemental/backup heat.
-                Cold-climate (inverter) heat pumps push the balance point much lower.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Do I need a cold-climate heat pump?
-                <svg
-                  class="h-5 w-5 shrink-0 text-indigo-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                If your heating load is far above your cooling load (Zone 5+), yes — ENERGY STAR cold-climate
-                models keep <strong>≥70% of rated capacity at 5°F</strong> and have <strong>HSPF2 ≥ 8.5</strong>,
-                so they heat efficiently without leaning on resistance backup.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Should I oversize a heat pump for cold winters?
-                <svg
-                  class="h-5 w-5 shrink-0 text-indigo-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Not by oversizing the cooling capacity — that causes short-cycling and poor summer humidity
-                control. Instead pick a cold-climate unit or add staged backup heat. Right-size to cooling,
-                solve heating separately.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How accurate is this vs. a Manual J?
-                <svg
-                  class="h-5 w-5 shrink-0 text-indigo-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                It's a solid planning estimate using climate-zone BTU-per-sq-ft rules. A full
-                <strong>ACCA Manual J</strong> accounts for windows, orientation, infiltration, and duct
-                losses and is required for permits and warranties. Use this to plan, a Manual J to install.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================ CTA → TRADESQUOTE ============================ -->
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div
-          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
-        >
-          <div class="relative">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Sized the system? Win the install with a full quote.
-            </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-              A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed,
-              line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities,
-              unit prices, and totals, validated by a built-in quality control agent.
-            </p>
-
-            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">AI line-item estimates</p>
-                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Knowledge base</p>
-                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Shareable & signable</p>
-                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-              </div>
-            </div>
-
-            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://app.tradesquote.ai/auth/sign-up"
-                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
-                >Get started — Free 14-day trial</a
-              >
-              <a
-                href="/#pricing"
-                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-                >View pricing</a
-              >
-            </div>
-            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-          </div>
-        </div>
-      </section>
-
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
       <HvacRelatedCalculators calculators={relatedCalculators} accent="indigo" />
     </main>
 

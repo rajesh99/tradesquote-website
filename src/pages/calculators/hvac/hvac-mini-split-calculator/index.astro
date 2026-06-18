@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "Mini-Split Sizing Calculator — What Size Mini Split Do I Need? | TradesQuote";
 const description =
@@ -33,60 +37,43 @@ const webAppData = {
     "Free online mini-split sizing calculator that estimates the BTU capacity and nearest standard ductless head size for a room or zone based on area, insulation, climate, ceiling height, sun exposure, and kitchen heat.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "What size mini-split do I need?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Size per room: about 20 BTU per square foot for a well-insulated space, 25 for average, and 30 for drafty, sunny, or kitchen areas. A 400 sq ft average room needs roughly 10,000 BTU, so a 12,000 BTU (1-ton) head. Enter your room above for an exact figure.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How many square feet does a 12,000 BTU mini-split cool?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Roughly 450 to 550 sq ft in good conditions — less with poor insulation, big windows, sun, or tall ceilings, and a bit more in a tight, shaded room.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What size mini-split for a 1,000 sq ft space?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "About 24,000 BTU (2 tons) for an average open 1,000 sq ft area — but if it is several rooms, a multi-zone system with a head per room is usually better than one big head.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How do I size a multi-zone mini-split?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Size each room individually, then pick an outdoor condenser rated at or above the combined indoor load. Because rooms rarely peak at once (load diversity), manufacturers let connected head capacity modestly exceed the condenser rating.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can a mini-split be too big?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes — oversizing is the most common ductless mistake. An oversized head short-cycles, leaving the room cold and clammy because it never runs long enough to remove humidity, and it wears the compressor. Right-sizing matters more than going big.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do mini-splits heat too?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Most are heat pumps that both heat and cool. In cold climates check the heating load and pick a cold-climate model; see our Heat Pump Sizing Calculator for the heating-side math.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size mini-split do I need?",
+    answer:
+      "Size per room: about <strong>20 BTU/sq ft</strong> for a well-insulated space, 25 average, and 30 for drafty, sunny, or kitchen areas. A 400 sq ft average room needs ≈10,000 BTU, so a 12,000 BTU (1-ton) head. Enter your room above for an exact figure.",
+  },
+  {
+    question: "How many square feet does a 12,000 BTU mini-split cool?",
+    answer:
+      "Roughly <strong>450–550 sq ft</strong> in good conditions — less with poor insulation, big windows, sun, or tall ceilings, and a bit more in a tight, shaded room.",
+  },
+  {
+    question: "What size mini-split for a 1,000 sq ft space?",
+    answer:
+      "About <strong>24,000 BTU (2 tons)</strong> for an average open 1,000 sq ft area — but if it's several rooms, a multi-zone system with a head per room is usually better than one big head.",
+  },
+  {
+    question: "How do I size a multi-zone mini-split?",
+    answer:
+      "Size each room individually, then pick an outdoor condenser rated at or above the combined indoor load. Because rooms rarely peak at once (<strong>load diversity</strong>), manufacturers let connected head capacity modestly exceed the condenser rating.",
+  },
+  {
+    question: "Can a mini-split be too big?",
+    answer:
+      "<strong>Yes</strong> — oversizing is the most common ductless mistake. An oversized head short-cycles, leaving the room cold and clammy because it never runs long enough to remove humidity, and it wears the compressor. Right-sizing matters more than going big.",
+  },
+  {
+    question: "Do mini-splits heat too?",
+    answer:
+      'Most are heat pumps that both heat and cool. In cold climates check the heating load and pick a cold-climate model; see our <a href="/calculators/hvac/hvac-heat-pump-calculator" class="font-semibold text-amber-700 underline decoration-amber-300 hover:decoration-amber-600">Heat Pump Sizing Calculator</a> for the heating-side math.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the zones? Quote the whole install in seconds.";
+const ctaDescription =
+  "A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -142,15 +129,7 @@ const relatedCalculators = [
       <!-- ============================ HERO + H1 + INTRO ============================ -->
       <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-amber-600 transition">Home</a>
-            <span>/</span>
-            <a href="/calculators" class="hover:text-amber-600 transition">Calculators</a>
-            <span>/</span>
-            <a href="/calculators/hvac" class="hover:text-amber-600 transition">HVAC</a>
-            <span>/</span>
-            <span class="text-slate-700 font-medium">Mini-Split Sizing Calculator</span>
-          </nav>
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Mini-Split Sizing Calculator" />
 
           <div class="max-w-3xl">
             <span
@@ -569,186 +548,13 @@ const relatedCalculators = [
         </div>
       </section>
 
-      <!-- ============================ FAQ ============================ -->
-      <section id="faq" class="bg-slate-50 border-y border-slate-200">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
-            Frequently asked questions
-          </h2>
-          <p class="mt-3 text-center text-slate-600">
-            Common questions about mini-split sizing and ductless head capacity.
-          </p>
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about mini-split sizing and ductless head capacity."
+      />
 
-          <div class="mt-8 space-y-3">
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What size mini-split do I need?
-                <svg
-                  class="h-5 w-5 shrink-0 text-amber-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Size per room: about <strong>20 BTU/sq ft</strong> for a well-insulated space, 25 average, and
-                30 for drafty, sunny, or kitchen areas. A 400 sq ft average room needs ≈10,000 BTU, so a
-                12,000 BTU (1-ton) head. Enter your room above for an exact figure.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How many square feet does a 12,000 BTU mini-split cool?
-                <svg
-                  class="h-5 w-5 shrink-0 text-amber-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Roughly <strong>450–550 sq ft</strong> in good conditions — less with poor insulation, big
-                windows, sun, or tall ceilings, and a bit more in a tight, shaded room.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                What size mini-split for a 1,000 sq ft space?
-                <svg
-                  class="h-5 w-5 shrink-0 text-amber-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                About <strong>24,000 BTU (2 tons)</strong> for an average open 1,000 sq ft area — but if it's
-                several rooms, a multi-zone system with a head per room is usually better than one big head.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                How do I size a multi-zone mini-split?
-                <svg
-                  class="h-5 w-5 shrink-0 text-amber-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Size each room individually, then pick an outdoor condenser rated at or above the combined
-                indoor load. Because rooms rarely peak at once (<strong>load diversity</strong>), manufacturers
-                let connected head capacity modestly exceed the condenser rating.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Can a mini-split be too big?
-                <svg
-                  class="h-5 w-5 shrink-0 text-amber-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                <strong>Yes</strong> — oversizing is the most common ductless mistake. An oversized head
-                short-cycles, leaving the room cold and clammy because it never runs long enough to remove
-                humidity, and it wears the compressor. Right-sizing matters more than going big.
-              </p>
-            </details>
-
-            <details class="group rounded-xl border border-slate-200 bg-white p-5">
-              <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                Do mini-splits heat too?
-                <svg
-                  class="h-5 w-5 shrink-0 text-amber-600 transition-transform group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-              </summary>
-              <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-                Most are heat pumps that both heat and cool. In cold climates check the heating load and pick a
-                cold-climate model; see our
-                <a href="/calculators/hvac/hvac-heat-pump-calculator" class="font-semibold text-amber-700 underline decoration-amber-300 hover:decoration-amber-600">Heat Pump Sizing Calculator</a>
-                for the heating-side math.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================ CTA → TRADESQUOTE ============================ -->
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div
-          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
-        >
-          <div class="relative">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Sized the zones? Quote the whole install in seconds.
-            </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-              A BTU number tells you the equipment size — TradesQuote turns the whole job into a detailed,
-              line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities,
-              unit prices, and totals, validated by a built-in quality control agent.
-            </p>
-
-            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">AI line-item estimates</p>
-                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Knowledge base</p>
-                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Shareable & signable</p>
-                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-              </div>
-            </div>
-
-            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://app.tradesquote.ai/auth/sign-up"
-                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
-                >Get started — Free 14-day trial</a
-              >
-              <a
-                href="/#pricing"
-                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-                >View pricing</a
-              >
-            </div>
-            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-          </div>
-        </div>
-      </section>
-
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
       <HvacRelatedCalculators calculators={relatedCalculators} accent="amber" />
     </main>
 

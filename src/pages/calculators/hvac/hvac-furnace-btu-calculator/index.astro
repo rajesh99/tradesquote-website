@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "Furnace BTU Calculator — Free Furnace Sizing Tool | TradesQuote";
 const description = "Free furnace BTU calculator. Find what size furnace you need by square footage, climate zone, and insulation — including AFUE efficiency and the furnace input size to buy.";
@@ -31,68 +35,48 @@ const webAppData = {
   description: "Free online furnace BTU calculator that estimates the heating load for a home by square footage, climate zone, and insulation, then converts it to the furnace input size to buy using AFUE efficiency.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How many BTUs of heat do I need per square foot?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Heating needs run from about 30 to 60 BTU per square foot depending on climate. Hot southern climates need roughly 30 to 35, moderate climates 40 to 45, and very cold northern climates 50 to 60. Insulation quality moves the number up or down about 10 percent.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What size furnace do I need for a 2,000 square foot house?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "In a moderate climate at 45 BTU per square foot, a 2,000 sq ft home needs about 90,000 BTU of heat output. With a 95 percent AFUE furnace that means roughly 95,000 BTU of input, so a 100,000 BTU furnace. In warm climates an 80,000 BTU unit often suffices.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What is the difference between furnace input and output BTU?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Input BTU is the fuel energy a furnace burns; output BTU is the heat it actually delivers to your home. Output equals input multiplied by the AFUE efficiency. An 80,000 BTU input furnace at 95 percent AFUE delivers 76,000 BTU of heat. Furnaces are sold by input rating.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What does AFUE mean on a furnace?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "AFUE stands for Annual Fuel Utilization Efficiency — the percentage of fuel converted into usable heat over a season. A standard furnace is about 80 percent AFUE, while high-efficiency condensing furnaces reach 95 to 97 percent. Higher AFUE means you can buy a smaller input rating for the same heat.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is a bigger furnace always better?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "No. An oversized furnace heats the air quickly and shuts off, a pattern called short-cycling that causes uneven temperatures, wasted fuel, and extra wear on the heat exchanger and blower. A right-sized furnace runs longer, steadier cycles and is more comfortable and efficient.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What furnace sizes are available?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Residential gas furnaces are typically sold in input ratings of 40,000, 60,000, 80,000, 100,000, and 120,000 BTU, with some brands offering 45,000, 70,000, or 140,000 BTU models. Calculate your required input, then round up to the nearest available size.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How accurate is this furnace calculator compared to a Manual J calculation?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "This tool gives a fast planning estimate using the factors that matter most: area, climate, insulation, and furnace efficiency. A full ACCA Manual J calculation also accounts for windows, orientation, air infiltration, and duct losses, and is required for permits and equipment warranties. Use this to plan and a Manual J to install.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many BTUs of heat do I need per square foot?",
+    answer:
+      "Heating needs run from about <strong>30 to 60 BTU per square foot</strong> depending on climate. Hot southern climates need roughly 30–35, moderate climates 40–45, and very cold northern climates 50–60. Insulation quality moves the number up or down about 10%.",
+  },
+  {
+    question: "What size furnace do I need for a 2,000 square foot house?",
+    answer:
+      "In a moderate climate at 45 BTU/sq ft, a 2,000 sq ft home needs about <strong>90,000 BTU of heat output</strong>. With a 95% AFUE furnace that means roughly 95,000 BTU of input — so a <strong>100,000 BTU furnace</strong>. In warm climates an 80,000 BTU unit often suffices.",
+  },
+  {
+    question: "What's the difference between furnace input and output BTU?",
+    answer:
+      "<strong>Input</strong> is the fuel energy a furnace burns; <strong>output</strong> is the heat it actually delivers. Output = input × AFUE. An 80,000 BTU input furnace at 95% AFUE delivers 76,000 BTU of heat. Furnaces are sold by input rating, which is why this calculator converts for you.",
+  },
+  {
+    question: "What does AFUE mean on a furnace?",
+    answer:
+      "AFUE stands for <strong>Annual Fuel Utilization Efficiency</strong> — the percentage of fuel converted into usable heat over a season. A standard furnace is about 80% AFUE; high-efficiency condensing furnaces reach 95–97%. Higher AFUE means you can buy a smaller input rating for the same delivered heat.",
+  },
+  {
+    question: "Is a bigger furnace always better?",
+    answer:
+      "No. An oversized furnace heats the air fast and shuts off — a pattern called <strong>short-cycling</strong> that causes uneven temperatures, wasted fuel, and extra wear on the heat exchanger and blower. A right-sized furnace runs longer, steadier, more comfortable cycles.",
+  },
+  {
+    question: "What furnace sizes are available?",
+    answer:
+      "Residential gas furnaces are typically sold in input ratings of <strong>40,000, 60,000, 80,000, 100,000, and 120,000 BTU</strong>, with some brands offering 45,000, 70,000, or 140,000 BTU models. Calculate your required input, then round up to the nearest size your brand offers.",
+  },
+  {
+    question: "How accurate is this vs. a Manual J load calculation?",
+    answer:
+      "This tool gives a fast planning estimate from the factors that matter most: area, climate, insulation, and efficiency. A full <strong>ACCA Manual J</strong> calculation also accounts for windows, orientation, air infiltration, and duct losses — and is required for permits and equipment warranties. Use this to plan and a Manual J to install.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Furnace sized? Quote the whole install in seconds.";
+const ctaDescription =
+  "A furnace size is one line of the job. TradesQuote turns the full replacement — equipment, venting, ductwork, labor, and disposal — into a detailed, line-item estimate. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -143,16 +127,7 @@ const relatedCalculators = [
           <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
       
-              <!-- Breadcrumb -->
-              <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-                  <a href="/" class="hover:text-blue-600 transition">Home</a>
-                  <span>/</span>
-                  <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-                  <span>/</span>
-                  <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
-                  <span>/</span>
-                  <span class="text-slate-700 font-medium">Furnace BTU Calculator</span>
-                </nav>
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Furnace BTU Calculator" />
       
               <div class="max-w-3xl">
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
@@ -430,109 +405,13 @@ const relatedCalculators = [
             </div>
           </section>
       
-          <!-- ============================ (6) FAQ ============================ -->
-          <section id="faq" class="bg-slate-50 border-y border-slate-200">
-            <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">Frequently asked questions</h2>
-              <p class="mt-3 text-center text-slate-600">Common questions about furnace sizing, BTUs, and AFUE.</p>
-      
-              <div class="mt-8 space-y-3">
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How many BTUs of heat do I need per square foot?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Heating needs run from about <strong>30 to 60 BTU per square foot</strong> depending on climate. Hot southern climates need roughly 30–35, moderate climates 40–45, and very cold northern climates 50–60. Insulation quality moves the number up or down about 10%.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What size furnace do I need for a 2,000 square foot house?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">In a moderate climate at 45 BTU/sq ft, a 2,000 sq ft home needs about <strong>90,000 BTU of heat output</strong>. With a 95% AFUE furnace that means roughly 95,000 BTU of input — so a <strong>100,000 BTU furnace</strong>. In warm climates an 80,000 BTU unit often suffices.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What's the difference between furnace input and output BTU?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed"><strong>Input</strong> is the fuel energy a furnace burns; <strong>output</strong> is the heat it actually delivers. Output = input × AFUE. An 80,000 BTU input furnace at 95% AFUE delivers 76,000 BTU of heat. Furnaces are sold by input rating, which is why this calculator converts for you.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What does AFUE mean on a furnace?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">AFUE stands for <strong>Annual Fuel Utilization Efficiency</strong> — the percentage of fuel converted into usable heat over a season. A standard furnace is about 80% AFUE; high-efficiency condensing furnaces reach 95–97%. Higher AFUE means you can buy a smaller input rating for the same delivered heat.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Is a bigger furnace always better?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">No. An oversized furnace heats the air fast and shuts off — a pattern called <strong>short-cycling</strong> that causes uneven temperatures, wasted fuel, and extra wear on the heat exchanger and blower. A right-sized furnace runs longer, steadier, more comfortable cycles.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What furnace sizes are available?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Residential gas furnaces are typically sold in input ratings of <strong>40,000, 60,000, 80,000, 100,000, and 120,000 BTU</strong>, with some brands offering 45,000, 70,000, or 140,000 BTU models. Calculate your required input, then round up to the nearest size your brand offers.</p>
-                </details>
-      
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How accurate is this vs. a Manual J load calculation?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">This tool gives a fast planning estimate from the factors that matter most: area, climate, insulation, and efficiency. A full <strong>ACCA Manual J</strong> calculation also accounts for windows, orientation, air infiltration, and duct losses — and is required for permits and equipment warranties. Use this to plan and a Manual J to install.</p>
-                </details>
-              </div>
-            </div>
-          </section>
-      
-          <!-- ============================ (7) CTA → TRADESQUOTE ============================ -->
-          <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden">
-              <div class="relative">
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Furnace sized? Quote the whole install in seconds.</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-                  A furnace size is one line of the job. TradesQuote turns the full replacement — equipment, venting,
-                  ductwork, labor, and disposal — into a detailed, line-item estimate. Describe the work or upload photos,
-                  and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.
-                </p>
-      
-                <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">AI line-item estimates</p>
-                    <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Knowledge base</p>
-                    <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Shareable & signable</p>
-                    <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-                  </div>
-                </div>
-      
-                <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="https://app.tradesquote.ai/auth/sign-up"
-                    class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition">Get started — Free 14-day trial</a>
-                  <a href="/#pricing"
-                    class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">View pricing</a>
-                </div>
-                <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-              </div>
-            </div>
-          </section>
-      
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="orange"
+            subtitle="Common questions about furnace sizing, BTUs, and AFUE."
+          />
+
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
           <HvacRelatedCalculators calculators={relatedCalculators} accent="orange" />
     </main>
 

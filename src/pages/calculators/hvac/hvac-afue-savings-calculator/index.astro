@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "AFUE Savings Calculator — Furnace Efficiency Cost Comparison | TradesQuote";
 const description = "Free AFUE savings calculator. Compare two furnace AFUE ratings and see the annual fuel cost, dollar savings, and 15-year payoff of a higher-efficiency furnace. Instant, no sign-up.";
@@ -31,68 +35,48 @@ const webAppData = {
   description: "Free online AFUE savings calculator that compares two furnace AFUE ratings and estimates annual fuel use, cost, dollar savings, and 15-year savings based on furnace size, heating climate, and natural gas price.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "What is AFUE?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "AFUE — Annual Fuel Utilization Efficiency — is the percentage of a furnace's fuel energy that becomes usable heat over a full season. 95% AFUE means 95% of the gas becomes heat and 5% is lost up the flue.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How much does upgrading from 80% to 95% AFUE save?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "It cuts fuel use about 15.8 percent (1 minus 80 divided by 95). For an 80,000 BTU furnace running 1,000 hours a year at $1.50 per therm that's roughly $237 per year, or about $3,550 over a 15-year life.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What's the formula for AFUE savings?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Percent fuel saved equals 1 minus old AFUE divided by new AFUE. For dollars: output therms equals furnace BTU times heating hours divided by 100,000; input therms equals output divided by AFUE divided by 100; multiply by your dollars per therm and subtract.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What AFUE should I buy?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Today's minimum is 80%. The U.S. DOE has finalized a 95% AFUE minimum for new non-weatherized gas furnaces effective December 2028, so a 95–96% condensing furnace is the future-proof choice for most homes — especially in cold climates.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is a 96% AFUE furnace worth it over 80%?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Usually yes when you're replacing the furnace anyway: the fuel savings (about 17%) plus the coming 95% standard make condensing furnaces the default. Replacing a healthy 90%-plus furnace just to gain a few points rarely pays back on fuel alone.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Does AFUE apply to electric furnaces or heat pumps?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "No. AFUE rates fuel-burning furnaces and boilers. Electric furnaces are nearly 100% efficient at the unit but expensive to run; heat pump heating is rated by HSPF. Use our Operating Cost Calculator to compare fuels.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What's a condensing furnace?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "A 90%-plus AFUE furnace with a second heat exchanger that pulls extra heat from the exhaust, condensing its water vapor. It vents through PVC and needs a condensate drain, but wrings far more heat from the same gas.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is AFUE?",
+    answer:
+      "<strong>Annual Fuel Utilization Efficiency</strong>: the percentage of a furnace's fuel energy that becomes usable heat over a full season. 95% AFUE means 95% of the gas becomes heat and 5% is lost up the flue.",
+  },
+  {
+    question: "How much does upgrading from 80% to 95% AFUE save?",
+    answer:
+      "It cuts fuel use about <strong>15.8%</strong> (1 − 80/95). For an 80,000 BTU furnace running 1,000 hours a year at $1.50/therm that's roughly <strong>$237/year</strong>, or about $3,550 over a 15-year life.",
+  },
+  {
+    question: "What's the formula for AFUE savings?",
+    answer:
+      "<strong>% fuel saved = 1 − (old AFUE ÷ new AFUE)</strong>. For dollars: output therms = furnace BTU × heating hours ÷ 100,000; input therms = output ÷ (AFUE ÷ 100); multiply by your $/therm and subtract. The calculator above runs all of it instantly.",
+  },
+  {
+    question: "What AFUE should I buy?",
+    answer:
+      "Today's minimum is 80%. The U.S. DOE has finalized a <strong>95% AFUE minimum for new non-weatherized gas furnaces effective December 2028</strong>, so a 95–96% condensing furnace is the future-proof choice for most homes — especially in cold climates.",
+  },
+  {
+    question: "Is a 96% AFUE furnace worth it over 80%?",
+    answer:
+      "Usually yes when you're replacing the furnace anyway: the fuel savings (<strong>~17%</strong>) plus the coming 95% standard make condensing furnaces the default. Replacing a healthy 90%+ furnace just to gain a few points rarely pays back on fuel alone.",
+  },
+  {
+    question: "Does AFUE apply to electric furnaces or heat pumps?",
+    answer:
+      'No. AFUE rates fuel-burning furnaces and boilers. Electric furnaces are nearly 100% efficient at the unit but expensive to run; heat pump heating is rated by HSPF. Use our <a href="/calculators/hvac/hvac-operating-cost-calculator" class="font-semibold text-orange-700 underline decoration-orange-300 hover:decoration-orange-600">Operating Cost Calculator</a> to compare fuels.',
+  },
+  {
+    question: "What's a condensing furnace?",
+    answer:
+      "A 90%+ AFUE furnace with a second heat exchanger that pulls extra heat from the exhaust, condensing its water vapor. It vents through PVC and needs a condensate drain, but wrings far more heat from the same gas.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Selling the high-efficiency upgrade? Quote it in seconds.";
+const ctaDescription =
+  "Energy savings win the conversation — a fast, professional estimate wins the job. TradesQuote turns the full replacement into a line-item quote: equipment, labor, materials, and disposal, with quantities, unit prices, and totals validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -143,16 +127,7 @@ const relatedCalculators = [
           <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
 
-              <!-- Breadcrumb -->
-              <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-                  <a href="/" class="hover:text-blue-600 transition">Home</a>
-                  <span>/</span>
-                  <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-                  <span>/</span>
-                  <a href="/calculators/hvac" class="hover:text-blue-600 transition">HVAC</a>
-                  <span>/</span>
-                  <span class="text-slate-700 font-medium">AFUE Savings Calculator</span>
-                </nav>
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="AFUE Savings Calculator" />
 
               <div class="max-w-3xl">
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
@@ -445,109 +420,13 @@ const relatedCalculators = [
             </div>
           </section>
 
-          <!-- ============================ (6) FAQ ============================ -->
-          <section id="faq" class="bg-slate-50 border-y border-slate-200">
-            <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">Frequently asked questions</h2>
-              <p class="mt-3 text-center text-slate-600">Common questions about AFUE ratings and furnace efficiency savings.</p>
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="orange"
+            subtitle="Common questions about AFUE ratings and furnace efficiency savings."
+          />
 
-              <div class="mt-8 space-y-3">
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What is AFUE?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed"><strong>Annual Fuel Utilization Efficiency</strong>: the percentage of a furnace's fuel energy that becomes usable heat over a full season. 95% AFUE means 95% of the gas becomes heat and 5% is lost up the flue.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How much does upgrading from 80% to 95% AFUE save?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">It cuts fuel use about <strong>15.8%</strong> (1 − 80/95). For an 80,000 BTU furnace running 1,000 hours a year at $1.50/therm that's roughly <strong>$237/year</strong>, or about $3,550 over a 15-year life.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What's the formula for AFUE savings?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed"><strong>% fuel saved = 1 − (old AFUE ÷ new AFUE)</strong>. For dollars: output therms = furnace BTU × heating hours ÷ 100,000; input therms = output ÷ (AFUE ÷ 100); multiply by your $/therm and subtract. The calculator above runs all of it instantly.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What AFUE should I buy?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Today's minimum is 80%. The U.S. DOE has finalized a <strong>95% AFUE minimum for new non-weatherized gas furnaces effective December 2028</strong>, so a 95–96% condensing furnace is the future-proof choice for most homes — especially in cold climates.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Is a 96% AFUE furnace worth it over 80%?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Usually yes when you're replacing the furnace anyway: the fuel savings (<strong>~17%</strong>) plus the coming 95% standard make condensing furnaces the default. Replacing a healthy 90%+ furnace just to gain a few points rarely pays back on fuel alone.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Does AFUE apply to electric furnaces or heat pumps?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">No. AFUE rates fuel-burning furnaces and boilers. Electric furnaces are nearly 100% efficient at the unit but expensive to run; heat pump heating is rated by HSPF. Use our <a href="/calculators/hvac/hvac-operating-cost-calculator" class="font-semibold text-orange-700 underline decoration-orange-300 hover:decoration-orange-600">Operating Cost Calculator</a> to compare fuels.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What's a condensing furnace?
-                    <svg class="h-5 w-5 shrink-0 text-orange-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">A 90%+ AFUE furnace with a second heat exchanger that pulls extra heat from the exhaust, condensing its water vapor. It vents through PVC and needs a condensate drain, but wrings far more heat from the same gas.</p>
-                </details>
-              </div>
-            </div>
-          </section>
-
-          <!-- ============================ (7) CTA → TRADESQUOTE ============================ -->
-          <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden">
-              <div class="relative">
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Selling the high-efficiency upgrade? Quote it in seconds.</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-                  Energy savings win the conversation — a fast, professional estimate wins the job. TradesQuote turns
-                  the full replacement into a line-item quote: equipment, labor, materials, and disposal, with
-                  quantities, unit prices, and totals validated by a built-in quality control agent.
-                </p>
-
-                <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">AI line-item estimates</p>
-                    <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Knowledge base</p>
-                    <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Shareable & signable</p>
-                    <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-                  </div>
-                </div>
-
-                <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="https://app.tradesquote.ai/auth/sign-up"
-                    class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition">Get started — Free 14-day trial</a>
-                  <a href="/#pricing"
-                    class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">View pricing</a>
-                </div>
-                <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-              </div>
-            </div>
-          </section>
-
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
           <HvacRelatedCalculators calculators={relatedCalculators} accent="orange" />
     </main>
 

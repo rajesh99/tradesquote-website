@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
 const title = "HVAC Operating Cost Calculator — Cost to Run AC, Heat Pump & Furnace | TradesQuote";
 const description = "Free HVAC operating cost calculator. See what it actually costs to run a central AC, heat pump, gas furnace, or electric furnace — per hour, per day, and per year — from its efficiency, runtime, and your energy price. Instant, no sign-up.";
@@ -31,68 +35,48 @@ const webAppData = {
   description: "Free online HVAC operating cost calculator that estimates the cost to run a central AC, heat pump, gas furnace, or electric furnace per hour, per day, and per year based on capacity, efficiency rating, runtime, and energy price.",
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How much does it cost to run an air conditioner per hour?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "For a typical 3-ton, SEER 15 central AC at the U.S. average $0.17/kWh, about $0.41 per hour (2.4 kWh). Bigger or less efficient units cost more; the calculator above runs your exact numbers.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How much does it cost to run an AC per day or per month?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "At about $0.41 per hour, running 8 hours a day is about $3.26 a day, or roughly $98 a month. Hot-climate homes running 12 or more hours a day pay proportionally more.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What's the formula for HVAC running cost?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "For AC and heat pumps: kWh per hour = capacity BTU divided by efficiency (SEER or HSPF) divided by 1,000, then multiplied by your $/kWh. For gas: therms per hour = BTU divided by (AFUE divided by 100) divided by 100,000, then multiplied by your $/therm.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is it cheaper to heat with a gas furnace or a heat pump?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "It depends on local gas and electricity prices, but a heat pump delivers 2 to 4 units of heat per unit of electricity, so it usually beats electric resistance heat outright and is competitive with gas — especially in milder weather above its balance point.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Why is electric (resistance) furnace heat so expensive?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Resistance heat has a COP of 1.0: every BTU of heat needs a full BTU of electricity. A heat pump moves heat instead of making it, delivering several BTU per BTU of power, which is why it costs a fraction as much to run.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Does a higher SEER or HSPF really lower my bill?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes — operating cost is inversely proportional to the efficiency number. Going from SEER 14 to 20 cuts cooling energy about 30 percent. Compare two specific units with our SEER Savings and AFUE Savings calculators.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Why doesn't this match my utility bill exactly?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "It assumes rated efficiency and steady runtime. Real bills vary with weather, thermostat settings, duct leakage, cycling losses, tiered rates, and fixed charges. Use this to compare equipment, not to predict a bill to the penny.",
-      },
-    },
-  ],
-};
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to run an air conditioner per hour?",
+    answer:
+      "For a typical 3-ton, SEER 15 central AC at the U.S. average $0.17/kWh, about <strong>$0.41 per hour</strong> (2.4 kWh). Bigger or less efficient units cost more; the calculator above runs your exact numbers.",
+  },
+  {
+    question: "How much does it cost to run an AC per day / per month?",
+    answer:
+      "At ~$0.41/hr, running 8 hours a day is about <strong>$3.26/day</strong>, or roughly $98 a month. Hot-climate homes running 12+ hours a day pay proportionally more.",
+  },
+  {
+    question: "What's the formula for HVAC running cost?",
+    answer:
+      "For AC/heat pumps: <strong>kWh/hr = capacity BTU ÷ efficiency (SEER or HSPF) ÷ 1,000</strong>, then × your $/kWh. For gas: therms/hr = BTU ÷ (AFUE ÷ 100) ÷ 100,000, then × $/therm.",
+  },
+  {
+    question: "Is it cheaper to heat with a gas furnace or a heat pump?",
+    answer:
+      "It depends on local gas and electricity prices, but a heat pump delivers <strong>2–4 units of heat per unit of electricity</strong>, so it usually beats electric resistance heat outright and is competitive with gas — especially in milder weather above its balance point.",
+  },
+  {
+    question: "Why is electric (resistance) furnace heat so expensive?",
+    answer:
+      "Resistance heat has a <strong>COP of 1.0</strong>: every BTU of heat needs a full BTU of electricity. A heat pump moves heat instead of making it, delivering several BTU per BTU of power, which is why it costs a fraction as much to run.",
+  },
+  {
+    question: "Does a higher SEER or HSPF really lower my bill?",
+    answer:
+      'Yes — operating cost is <strong>inversely proportional to the efficiency number</strong>. Going from SEER 14 to 20 cuts cooling energy about 30%. Compare two specific units with our <a href="/calculators/hvac/hvac-seer-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">SEER Savings</a> and <a href="/calculators/hvac/hvac-afue-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">AFUE Savings</a> calculators.',
+  },
+  {
+    question: "Why doesn't this match my utility bill exactly?",
+    answer:
+      "It assumes rated efficiency and steady runtime. Real bills vary with weather, thermostat settings, duct leakage, cycling losses, tiered rates, and fixed charges. Use this to <strong>compare equipment</strong>, not to predict a bill to the penny.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Show the savings — then send the quote.";
+const ctaDescription =
+  "Energy savings win the conversation — a fast, professional estimate wins the job. TradesQuote turns the full replacement into a line-item quote: equipment, labor, materials, and disposal, with quantities, unit prices, and totals validated by a built-in quality control agent.";
 
 const relatedCalculators = [
   {
@@ -143,16 +127,7 @@ const relatedCalculators = [
           <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
 
-              <!-- Breadcrumb -->
-              <nav class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-                  <a href="/" class="hover:text-red-600 transition">Home</a>
-                  <span>/</span>
-                  <a href="/calculators" class="hover:text-red-600 transition">Calculators</a>
-                  <span>/</span>
-                  <a href="/calculators/hvac" class="hover:text-red-600 transition">HVAC</a>
-                  <span>/</span>
-                  <span class="text-slate-700 font-medium">HVAC Operating Cost Calculator</span>
-                </nav>
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Operating Cost Calculator" />
 
               <div class="max-w-3xl">
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
@@ -463,109 +438,13 @@ const relatedCalculators = [
             </div>
           </section>
 
-          <!-- ============================ (6) FAQ ============================ -->
-          <section id="faq" class="bg-slate-50 border-y border-slate-200">
-            <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">Frequently asked questions</h2>
-              <p class="mt-3 text-center text-slate-600">Common questions about what it costs to run heating and cooling equipment.</p>
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="red"
+            subtitle="Common questions about what it costs to run heating and cooling equipment."
+          />
 
-              <div class="mt-8 space-y-3">
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How much does it cost to run an air conditioner per hour?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">For a typical 3-ton, SEER 15 central AC at the U.S. average $0.17/kWh, about <strong>$0.41 per hour</strong> (2.4 kWh). Bigger or less efficient units cost more; the calculator above runs your exact numbers.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    How much does it cost to run an AC per day / per month?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">At ~$0.41/hr, running 8 hours a day is about <strong>$3.26/day</strong>, or roughly $98 a month. Hot-climate homes running 12+ hours a day pay proportionally more.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    What's the formula for HVAC running cost?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">For AC/heat pumps: <strong>kWh/hr = capacity BTU ÷ efficiency (SEER or HSPF) ÷ 1,000</strong>, then × your $/kWh. For gas: therms/hr = BTU ÷ (AFUE ÷ 100) ÷ 100,000, then × $/therm.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Is it cheaper to heat with a gas furnace or a heat pump?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">It depends on local gas and electricity prices, but a heat pump delivers <strong>2–4 units of heat per unit of electricity</strong>, so it usually beats electric resistance heat outright and is competitive with gas — especially in milder weather above its balance point.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Why is electric (resistance) furnace heat so expensive?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Resistance heat has a <strong>COP of 1.0</strong>: every BTU of heat needs a full BTU of electricity. A heat pump moves heat instead of making it, delivering several BTU per BTU of power, which is why it costs a fraction as much to run.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Does a higher SEER or HSPF really lower my bill?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">Yes — operating cost is <strong>inversely proportional to the efficiency number</strong>. Going from SEER 14 to 20 cuts cooling energy about 30%. Compare two specific units with our <a href="/calculators/hvac/hvac-seer-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">SEER Savings</a> and <a href="/calculators/hvac/hvac-afue-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">AFUE Savings</a> calculators.</p>
-                </details>
-
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    Why doesn't this match my utility bill exactly?
-                    <svg class="h-5 w-5 shrink-0 text-red-600 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">It assumes rated efficiency and steady runtime. Real bills vary with weather, thermostat settings, duct leakage, cycling losses, tiered rates, and fixed charges. Use this to <strong>compare equipment</strong>, not to predict a bill to the penny.</p>
-                </details>
-              </div>
-            </div>
-          </section>
-
-          <!-- ============================ (7) CTA → TRADESQUOTE ============================ -->
-          <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden">
-              <div class="relative">
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Show the savings — then send the quote.</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-                  Energy savings win the conversation — a fast, professional estimate wins the job. TradesQuote turns
-                  the full replacement into a line-item quote: equipment, labor, materials, and disposal, with
-                  quantities, unit prices, and totals validated by a built-in quality control agent.
-                </p>
-
-                <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">AI line-item estimates</p>
-                    <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Knowledge base</p>
-                    <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-                  </div>
-                  <div class="rounded-xl bg-white/10 p-4">
-                    <p class="font-semibold">Shareable & signable</p>
-                    <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-                  </div>
-                </div>
-
-                <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="https://app.tradesquote.ai/auth/sign-up"
-                    class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition">Get started — Free 14-day trial</a>
-                  <a href="/#pricing"
-                    class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">View pricing</a>
-                </div>
-                <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-              </div>
-            </div>
-          </section>
-
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
           <HvacRelatedCalculators calculators={relatedCalculators} accent="red" />
     </main>
 

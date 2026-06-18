@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import CalculatorToolCard from "@/components/CalculatorToolCard.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema } from "@/lib/calculatorFaq";
 import { calculatorCategories } from "@/config/calculatorCategories";
 import {
   hvacCalculators,
@@ -43,15 +47,11 @@ const itemListData = {
   })),
 };
 
-const faqData = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: hvacFaqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: { "@type": "Answer", text: faq.answer },
-  })),
-};
+const faqData = buildFaqPageSchema(hvacFaqs);
+
+const ctaHeading = "Calculators size the equipment. TradesQuote prices the job.";
+const ctaDescription =
+  "Once you know the BTUs, tons, and CFM, the real work is the quote. Describe the job or upload photos, and TradesQuote's AI builds a detailed line-item estimate — quantities, unit prices, and totals — validated by a built-in quality control agent and ready for your client to sign online.";
 ---
 
 <Layout {title} {description}>
@@ -84,13 +84,7 @@ const faqData = {
       <!-- Hero -->
       <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
-          <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
-            <a href="/" class="hover:text-blue-600 transition">Home</a>
-            <span>/</span>
-            <a href="/calculators" class="hover:text-blue-600 transition">Calculators</a>
-            <span>/</span>
-            <span class="text-slate-700 font-medium">HVAC</span>
-          </nav>
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" />
 
           <div class="max-w-3xl">
             <span
@@ -260,86 +254,13 @@ const faqData = {
         </p>
       </section>
 
-      <!-- FAQ -->
-      <section id="faq" class="bg-slate-50 border-y border-slate-200">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-14">
-          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 text-center">
-            Frequently asked questions
-          </h2>
-          <p class="mt-3 text-center text-slate-600">About the calculators, their accuracy, and what's next.</p>
+      <CalculatorFaqSection
+        faqs={hvacFaqs}
+        accent="blue"
+        subtitle="About the calculators, their accuracy, and what's next."
+      />
 
-          <div class="mt-8 space-y-3">
-            {
-              hvacFaqs.map((faq) => (
-                <details class="group rounded-xl border border-slate-200 bg-white p-5">
-                  <summary class="flex items-center justify-between cursor-pointer font-semibold text-slate-900">
-                    {faq.question}
-                    <svg
-                      class="h-5 w-5 shrink-0 text-blue-600 transition-transform group-open:rotate-45"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                  </summary>
-                  <p class="mt-3 text-slate-600 text-sm leading-relaxed">{faq.answer}</p>
-                </details>
-              ))
-            }
-          </div>
-        </div>
-      </section>
-
-      <!-- CTA -->
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div
-          class="rounded-3xl bg-gradient-to-br from-slate-900 to-blue-900 px-6 py-12 sm:px-12 sm:py-16 text-center text-white relative overflow-hidden"
-        >
-          <div class="relative">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Calculators size the equipment. TradesQuote prices the job.
-            </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-blue-100 leading-relaxed">
-              Once you know the BTUs, tons, and CFM, the real work is the quote. Describe the job or upload
-              photos, and TradesQuote's AI builds a detailed line-item estimate — quantities, unit prices, and
-              totals — validated by a built-in quality control agent and ready for your client to sign online.
-            </p>
-
-            <div class="mt-8 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">AI line-item estimates</p>
-                <p class="mt-1 text-sm text-blue-100">Quantities, unit prices, and totals generated instantly.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Knowledge base</p>
-                <p class="mt-1 text-sm text-blue-100">Upload past jobs so estimates reflect your real pricing.</p>
-              </div>
-              <div class="rounded-xl bg-white/10 p-4">
-                <p class="font-semibold">Shareable & signable</p>
-                <p class="mt-1 text-sm text-blue-100">Clients review, accept, and sign from a public link.</p>
-              </div>
-            </div>
-
-            <div class="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://app.tradesquote.ai/auth/sign-up"
-                class="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-blue-50 transition"
-              >
-                Get started — Free 14-day trial
-              </a>
-              <a
-                href="/#pricing"
-                class="rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
-              >
-                View pricing
-              </a>
-            </div>
-            <p class="mt-4 text-xs text-blue-200">No credit card required · 14-day free trial · Cancel anytime</p>
-          </div>
-        </div>
-      </section>
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
     </main>
 
     <Footer />
