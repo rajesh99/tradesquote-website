@@ -4,19 +4,19 @@ overview: Audit of HVAC calculator coverage vs the docs workflow and competitor 
 todos:
   - id: wire-delta-t
     content: Register hvac-delta-t-calculator in hvacCalculators.ts, guide table, hub copy, and toolCount
-    status: in_progress
+    status: completed
   - id: build-static-pressure
     content: Create hvac-static-pressure-calculator page + script (fixes 404 from Delta T related link)
-    status: pending
+    status: completed
   - id: write-hvac-wave2-brief
     content: Create briefs/hvac-wave2.md with calculator blocks for P1 tools (superheat, subcooling, target superheat, HSPF savings) per category-brief.template.md
-    status: pending
+    status: completed
   - id: generate-p1-calculators
     content: Run Prompt 02 (or manual build) for each P1 calculator; update config/hub via Prompt 01
-    status: pending
+    status: completed
   - id: verify-acceptance
     content: npm run build; confirm no dangling /calculators/hvac/* links; FAQ JSON-LD matches; toolCount matches real page count
-    status: pending
+    status: completed
 isProject: false
 ---
 

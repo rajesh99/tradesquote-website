@@ -17,7 +17,7 @@ import {
 
 const title = "Free HVAC Calculators & Formulas | TradesQuote";
 const description =
-  "Twelve free HVAC calculators in one place — BTU sizing, tonnage, heat pump and mini-split sizing, furnace sizing, CFM airflow, duct size, SEER & AFUE savings, operating cost, replacement cost, and job pricing. Plus every formula explained in plain English.";
+  "Eighteen free HVAC calculators — BTU sizing, tonnage, heat pump and mini-split sizing, furnace sizing, CFM airflow, duct size, Delta T, static pressure, superheat and subcooling, SEER and HSPF savings, operating cost, replacement cost, and job pricing. Plus every formula explained in plain English.";
 
 const pageUrl = "https://tradesquote.ai/calculators/hvac";
 
@@ -38,7 +38,7 @@ const itemListData = {
   "@type": "ItemList",
   name: "Free HVAC Calculators",
   description:
-    "Free online HVAC calculators for sizing, airflow, efficiency, and cost: BTU cooling load, AC tonnage, heat pump and mini-split sizing, furnace BTU with AFUE, CFM airflow, duct size, SEER and AFUE savings, operating cost, replacement cost, and contractor job pricing.",
+    "Free online HVAC calculators for sizing, airflow, diagnostics, efficiency, and cost: BTU cooling load, AC tonnage, heat pump and mini-split sizing, furnace BTU with AFUE, CFM airflow, duct size, Delta T and static pressure, superheat and subcooling, SEER and HSPF savings, operating cost, replacement cost, and contractor job pricing.",
   itemListElement: hvacCalculators.map((calc, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -61,7 +61,7 @@ const ctaDescription =
     <meta property="og:title" content="Free HVAC Calculators & Formulas" />
     <meta
       property="og:description"
-      content="BTU, tonnage, heat pump, mini-split, furnace, CFM, duct, SEER & AFUE savings, operating and replacement cost, and job pricing — twelve free tools plus every formula explained."
+      content="BTU, tonnage, heat pump, mini-split, furnace, CFM, duct, Delta T, static pressure, superheat, SEER & HSPF savings, operating and replacement cost, and job pricing — eighteen free tools plus every formula explained."
     />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:site_name" content="TradesQuote" />
@@ -70,7 +70,7 @@ const ctaDescription =
     <meta name="twitter:title" content="Free HVAC Calculators & Formulas" />
     <meta
       name="twitter:description"
-      content="Twelve free HVAC sizing, efficiency, and cost tools, plus every formula explained in plain English."
+      content="Eighteen free HVAC sizing, diagnostic, efficiency, and cost tools, plus every formula explained in plain English."
     />
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
     <script type="application/ld+json" set:html={JSON.stringify(itemListData)} />
@@ -103,7 +103,7 @@ const ctaDescription =
                   d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
                 />
               </svg>
-              HVAC Tools · 12 Free Calculators
+              HVAC Tools · 18 Free Calculators
             </span>
 
             <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
@@ -235,8 +235,18 @@ const ctaDescription =
           <div>room CFM&nbsp;=&nbsp;volume × ACH ÷ <span class="text-amber-300">60</span>&nbsp;&nbsp;·&nbsp;&nbsp;system CFM&nbsp;=&nbsp;tons × <span class="text-amber-300">400</span></div>
           <div class="mt-4 text-teal-300"># Duct size (duct calculator)</div>
           <div>size&nbsp;=&nbsp;smallest diameter with capacity ≥ CFM&nbsp;&nbsp;(flex × <span class="text-amber-300">0.75</span> · velocity ≤ <span class="text-amber-300">900</span> fpm)</div>
+          <div class="mt-4 text-violet-300"># Delta T (temperature split / rise)</div>
+          <div>cooling ΔT&nbsp;=&nbsp;return − supply (<span class="text-amber-300">16–22°F</span>)&nbsp;&nbsp;·&nbsp;&nbsp;heating rise&nbsp;=&nbsp;supply − return (<span class="text-amber-300">40–70°F</span>)</div>
+          <div class="mt-4 text-red-300"># Static pressure (TESP)</div>
+          <div>TESP&nbsp;=&nbsp;supply static + |return static|&nbsp;&nbsp;≤ equipment nameplate max</div>
+          <div class="mt-4 text-orange-300"># Superheat & subcooling (charge check)</div>
+          <div>superheat&nbsp;=&nbsp;suction line temp − sat temp&nbsp;&nbsp;·&nbsp;&nbsp;subcooling&nbsp;=&nbsp;sat temp − liquid line temp</div>
+          <div class="mt-4 text-amber-300"># Target superheat (fixed orifice)</div>
+          <div>target SH&nbsp;=&nbsp;((3 × indoor WB) − 80 − outdoor DB) ÷ <span class="text-amber-300">2</span></div>
           <div class="mt-4 text-emerald-300"># Cooling efficiency savings (SEER calculator)</div>
           <div>% saved&nbsp;=&nbsp;1 − (old SEER ÷ new SEER)</div>
+          <div class="mt-4 text-indigo-300"># Heat pump heating savings (HSPF calculator)</div>
+          <div>% saved&nbsp;=&nbsp;1 − (old HSPF ÷ new HSPF)</div>
           <div class="mt-4 text-orange-300"># Heating efficiency savings (AFUE calculator)</div>
           <div>% saved&nbsp;=&nbsp;1 − (old AFUE ÷ new AFUE)</div>
           <div class="mt-4 text-red-300"># Operating cost (operating cost calculator)</div>

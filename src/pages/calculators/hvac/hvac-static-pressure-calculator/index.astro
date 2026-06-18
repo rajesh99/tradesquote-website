@@ -1,0 +1,535 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Static Pressure Calculator — TESP (Supply + Return) | TradesQuote";
+const description =
+  "Free HVAC static pressure calculator. Add supply and return readings to get total external static pressure (TESP), compare to your equipment's max rating, and see whether airflow is healthy, borderline, or over limit. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-static-pressure-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Static Pressure Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Static Pressure Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC static pressure calculator that totals supply and return duct static pressure into TESP, compares the reading to equipment maximum rated external static pressure, and flags healthy, borderline, or over-limit airflow restrictions.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is TESP (total external static pressure)?",
+    answer:
+      "TESP is the sum of the <strong>supply-side static pressure</strong> (positive, leaving the air handler) plus the <strong>return-side static pressure</strong> (entered here as a positive magnitude) — everything the blower works against outside the cabinet. It is measured in inches of water column (in. w.c.) with a manometer or digital gauge.",
+  },
+  {
+    question: "What is a normal TESP for residential HVAC?",
+    answer:
+      "Most residential furnaces and air handlers are rated for <strong>0.5 in. w.c. TESP</strong> at rated airflow — always confirm on the nameplate. A healthy installed system often reads <strong>0.3–0.45 in. w.c.</strong> with a clean filter, leaving headroom before the blower loses capacity.",
+  },
+  {
+    question: "What causes high static pressure?",
+    answer:
+      "Common restrictions: <strong>dirty or high-MERV filter</strong>, undersized or crushed return duct, too few or small return grilles, sharp duct transitions, closed dampers, flex duct pulled tight, or coil/filters stacked in series. Each adds resistance the blower must overcome.",
+  },
+  {
+    question: "How does static pressure relate to Delta T?",
+    answer:
+      "They measure the same problem from different angles. <strong>High TESP means restricted airflow</strong>; restricted airflow often drives a <strong>high cooling Delta T</strong> (return minus supply) because air moves too slowly across the coil. Check static pressure when the split is high but charge looks fine.",
+  },
+  {
+    question: "How much does a dirty filter raise static pressure?",
+    answer:
+      "A clean 1\" filter might add <strong>0.05–0.10 in. w.c.</strong>; a loaded filter can add <strong>0.15–0.25+ in. w.c.</strong> by itself. That is why TESP is measured with the filter installed — and why a neglected filter alone can push a borderline duct system over the equipment limit.",
+  },
+  {
+    question: "Are commercial TESP limits different from residential?",
+    answer:
+      "Yes. Residential equipment is commonly rated at <strong>0.5 in. w.c.</strong> Commercial packaged units and larger blowers are often rated at <strong>1.0–1.5+ in. w.c.</strong> because duct systems are bigger and longer. Always use the <strong>manufacturer nameplate TESP rating</strong> for the unit you are testing — do not assume 0.5 in. w.c. on every job.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Found the restriction? Quote the duct fix in seconds.";
+const ctaDescription =
+  "A TESP number tells you the duct is fighting the blower — TradesQuote turns the repair into a detailed, line-item estimate in seconds. Describe the duct modification or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description: "Temperature split flags airflow problems from another angle.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM Calculator",
+    description: "Target airflow per room and per ton.",
+  },
+  {
+    href: "/calculators/hvac/hvac-duct-size-calculator",
+    title: "Duct Size Calculator",
+    description: "Right-size trunk and branch ducts.",
+  },
+  {
+    href: "/calculators/hvac/hvac-superheat-calculator",
+    title: "Superheat Calculator",
+    description: "Verify refrigerant charge on fixed-orifice systems.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Static Pressure Calculator — TESP (Supply + Return)" />
+    <meta
+      property="og:description"
+      content="Total supply and return static pressure, compared to your equipment max. Healthy, borderline, or over limit — free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Static Pressure Calculator — TESP (Supply + Return)" />
+    <meta
+      name="twitter:description"
+      content="Add supply and return static pressure readings to get TESP and compare to equipment max. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Static Pressure Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+                ></path>
+              </svg>
+              HVAC Tools · Diagnostics · Free
+            </span>
+
+            <!-- (1) H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Static Pressure Calculator <span class="text-red-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- (2) What this calculates — 2 sentences -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Total external static pressure (TESP) tells you how hard the blower is working against the duct
+              system — the single best number for spotting airflow restrictions before they show up as comfort
+              complaints or high energy bills. Enter your supply and return readings and this tool totals TESP,
+              compares it to your equipment's rated maximum, and flags whether you're healthy, borderline, or over
+              limit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter your static pressure readings
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="sp-supply" class="text-sm font-semibold text-slate-800"
+                    >Supply static (in. w.c.)</label
+                  >
+                  <input
+                    id="sp-supply"
+                    type="number"
+                    min="0"
+                    max="2"
+                    step="0.01"
+                    value="0.25"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Positive reading on the supply side of the air handler.</p>
+                </div>
+
+                <div>
+                  <label for="sp-return" class="text-sm font-semibold text-slate-800"
+                    >Return static (in. w.c.)</label
+                  >
+                  <input
+                    id="sp-return"
+                    type="number"
+                    min="0"
+                    max="2"
+                    step="0.01"
+                    value="0.20"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Enter as a positive magnitude (vacuum on the return).</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="sp-max" class="text-sm font-semibold text-slate-800"
+                    >Equipment max TESP (in. w.c.)</label
+                  >
+                  <input
+                    id="sp-max"
+                    type="number"
+                    min="0.1"
+                    max="3"
+                    step="0.05"
+                    value="0.5"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    From the unit nameplate — 0.5 in. w.c. is typical for residential; commercial units are often
+                    higher.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-red-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-red-600 to-rose-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-red-100">Total external static pressure (TESP)</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sp-result" class="text-5xl font-extrabold tracking-tight">0.45 in. w.c.</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-red-100">Status</p>
+                  <p id="sp-status" class="mt-1 text-2xl font-bold">Healthy</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-red-100">Of equipment max</p>
+                  <p id="sp-pct" class="mt-1 text-2xl font-bold">90% of max</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-red-100">Likely causes / next steps</p>
+                <p id="sp-causes" class="mt-1 text-sm font-medium leading-snug">
+                  TESP is comfortably below the equipment maximum — blower and duct system have adequate headroom
+                  for normal filter loading and seasonal changes.
+                </p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-red-50">
+                  <div class="flex justify-between">
+                    <span>Supply static</span><span id="sp-bd-supply" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Return static</span><span id="sp-bd-return" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>TESP total</span><span id="sp-bd-total" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Equipment max</span><span id="sp-bd-max" class="font-bold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-red-100 leading-relaxed">
+                Measure with the filter installed and all grilles open. TESP is a duct/airflow check — pair with
+                Delta T and actual CFM when diagnosing comfort or capacity issues.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">What your TESP reading means</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Compared to a 0.5 in. w.c. residential nameplate rating. Adjust the max field above for your
+            equipment.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">TESP (vs 0.5 max)</th>
+                  <th class="py-2.5 pr-4 font-semibold">Status</th>
+                  <th class="py-2.5 font-semibold">Typical cause</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Under 0.35 in. w.c.</td>
+                  <td class="py-2.5 pr-4 text-red-700 font-semibold">Healthy</td>
+                  <td class="py-2.5">Good duct design with headroom — normal filter loading OK</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">0.35–0.45 in. w.c.</td>
+                  <td class="py-2.5 pr-4 text-red-700 font-semibold">Healthy</td>
+                  <td class="py-2.5">Typical installed residential system — monitor filter</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">0.45–0.50 in. w.c.</td>
+                  <td class="py-2.5 pr-4">Borderline</td>
+                  <td class="py-2.5">Little headroom — check filter, returns, and flex duct</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Over 0.50 in. w.c.</td>
+                  <td class="py-2.5 pr-4">Over limit</td>
+                  <td class="py-2.5">Exceeds most residential ratings — restricted airflow, reduced capacity</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">Over 0.65 in. w.c.</td>
+                  <td class="py-2.5 pr-4">Severe</td>
+                  <td class="py-2.5">Major restriction — blower may be far below rated CFM</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: ACCA Manual D (residential duct design) · ENERGY STAR HVAC Quality
+            Installation (airflow verification) · Manufacturer nameplate TESP ratings.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Static pressure is the resistance the blower fights in the duct system. Total external static pressure
+            (TESP) adds what the blower sees on the supply side plus what it pulls against on the return side.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-red-300"># Total external static pressure:</div>
+            <div>TESP&nbsp;=&nbsp;supply static + return static&nbsp;&nbsp;&nbsp;(both as positive in. w.c.)</div>
+            <div class="mt-4 text-red-300"># Compare to equipment rating:</div>
+            <div>% of max&nbsp;=&nbsp;TESP ÷ nameplate max TESP × 100</div>
+            <div class="mt-4 text-red-300"># Read it:</div>
+            <div>
+              under 90% of max = <span class="text-amber-300">Healthy</span> · 90–100% ={" "}
+              <span class="text-amber-300">Borderline</span> · over max ={" "}
+              <span class="text-amber-300">Over limit</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Where to tap the ducts</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Supply: between the coil/heat exchanger and the first supply takeoff. Return: between the filter
+                and the blower inlet. Use test ports or a pitot tube per your gauge manufacturer's method.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Filter in, grilles open</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                TESP is measured under real operating conditions — filter installed, blower at cooling or heating
+                speed, and all supply/return grilles fully open.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 0.5 in. w.c. matters</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Blowers are sized to deliver rated CFM only up to the nameplate TESP. Above that, airflow drops,
+                efficiency falls, and coils may freeze or furnaces may trip on high limit.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Pair with Delta T</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                High static pressure and a high cooling temperature split often point to the same root cause —
+                restricted airflow. Use both checks before adjusting refrigerant charge.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three readings showing a healthy system, a borderline duct with little headroom, and an over-limit
+          restriction.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Healthy system — 0.25 supply + 0.20 return (max 0.5)</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              0.25 + 0.20 = <span class="font-bold text-red-700">0.45 in. w.c. → Healthy (90% of max)</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> typical residential readings with room to
+              spare before the blower loses rated airflow — filter and returns are doing their job.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Borderline — 0.28 supply + 0.20 return (max 0.5)</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              0.28 + 0.20 = <span class="font-bold text-red-700">0.48 in. w.c. → Borderline (96% of max)</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> within 90–100% of the rating — a slightly
+              dirty filter or seasonal flex-duct sag could push TESP over limit. Inspect returns and filter before
+              peak season.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Over limit — 0.35 supply + 0.22 return (max 0.5)</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              0.35 + 0.22 = <span class="font-bold text-red-700">0.57 in. w.c. → Over limit (114% of max)</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> exceeds the 0.5 in. w.c. nameplate —
+              blower is likely below rated CFM. Check for collapsed flex, undersized return trunk, or a
+              high-MERV filter choking the system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="red"
+        subtitle="Common questions about TESP, static pressure limits, and airflow diagnostics."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="red" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacStaticPressureCalculator } from "@/scripts/calculators/hvac-static-pressure-calculator";
+    initHvacStaticPressureCalculator();
+  </script>
+</Layout>

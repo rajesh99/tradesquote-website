@@ -85,6 +85,51 @@ export const hvacCalculators: HvacCalculator[] = [
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
   },
   {
+    slug: "hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description:
+      "Check an AC temperature split (return minus supply, normally 16–22°F) or furnace temperature rise — and what a high or low reading means.",
+    question: "What is a good Delta T for an AC?",
+    accent: "violet",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>`,
+  },
+  {
+    slug: "hvac-static-pressure-calculator",
+    title: "Static Pressure Calculator",
+    description:
+      "Add supply and return static pressure readings to get total external static pressure (TESP) and compare it to the equipment's rated maximum.",
+    question: "What should total static pressure be?",
+    accent: "red",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`,
+  },
+  {
+    slug: "hvac-superheat-calculator",
+    title: "Superheat Calculator",
+    description:
+      "Calculate measured superheat from suction line temperature and saturation temperature, with TXV and fixed-orifice target guidance.",
+    question: "What should superheat be on my AC?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>`,
+  },
+  {
+    slug: "hvac-subcooling-calculator",
+    title: "Subcooling Calculator",
+    description:
+      "Calculate measured subcooling from liquid saturation temperature and liquid line temperature, with TXV charging targets.",
+    question: "What should subcooling be on my AC?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>`,
+  },
+  {
+    slug: "hvac-target-superheat-calculator",
+    title: "Target Superheat Calculator",
+    description:
+      "Find the target superheat for a fixed-orifice system from indoor wet-bulb and outdoor dry-bulb temperatures.",
+    question: "What is the target superheat for a piston meter?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>`,
+  },
+  {
     slug: "hvac-seer-savings-calculator",
     title: "SEER Savings Calculator",
     description:
@@ -92,6 +137,15 @@ export const hvacCalculators: HvacCalculator[] = [
     question: "Is SEER 16 worth it over SEER 14?",
     accent: "emerald",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "hvac-hspf-savings-calculator",
+    title: "HSPF Savings Calculator",
+    description:
+      "Compare two heat pump HSPF ratings and see annual heating electricity use, yearly cost, and 15-year savings of the more efficient unit.",
+    question: "Is HSPF 10 worth it over HSPF 8?",
+    accent: "indigo",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l4 4-4 4"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 7H8a4 4 0 00-4 4v1"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 21l-4-4 4-4"/></svg>`,
   },
   {
     slug: "hvac-afue-savings-calculator",
@@ -283,11 +337,53 @@ export const hvacCalculatorGuide = [
     rule: "smallest diameter whose capacity ≥ CFM (flex −25%)",
   },
   {
+    question: "Is my AC temperature split healthy?",
+    slug: "hvac-delta-t-calculator",
+    tool: "Delta T Calculator",
+    accent: "violet" as const,
+    rule: "cooling split 16–22°F · furnace rise 40–70°F",
+  },
+  {
+    question: "Is my duct system restricting airflow?",
+    slug: "hvac-static-pressure-calculator",
+    tool: "Static Pressure Calculator",
+    accent: "red" as const,
+    rule: "TESP = supply static + |return static| ≤ nameplate max",
+  },
+  {
+    question: "Is my refrigerant charge correct (suction side)?",
+    slug: "hvac-superheat-calculator",
+    tool: "Superheat Calculator",
+    accent: "orange" as const,
+    rule: "superheat = suction line temp − saturation temp",
+  },
+  {
+    question: "Is my refrigerant charge correct (liquid side)?",
+    slug: "hvac-subcooling-calculator",
+    tool: "Subcooling Calculator",
+    accent: "sky" as const,
+    rule: "subcooling = saturation temp − liquid line temp",
+  },
+  {
+    question: "What superheat should a fixed-orifice system target?",
+    slug: "hvac-target-superheat-calculator",
+    tool: "Target Superheat Calculator",
+    accent: "amber" as const,
+    rule: "((3 × indoor WB) − 80 − outdoor DB) ÷ 2",
+  },
+  {
     question: "Is the higher-efficiency unit worth the price?",
     slug: "hvac-seer-savings-calculator",
     tool: "SEER Savings Calculator",
     accent: "emerald" as const,
     rule: "% saved = 1 − (old SEER ÷ new SEER)",
+  },
+  {
+    question: "Is a higher-efficiency heat pump worth it for heating?",
+    slug: "hvac-hspf-savings-calculator",
+    tool: "HSPF Savings Calculator",
+    accent: "indigo" as const,
+    rule: "% saved = 1 − (old HSPF ÷ new HSPF)",
   },
   {
     question: "Is a higher-efficiency furnace worth it?",
@@ -323,12 +419,12 @@ export const hvacFaqs = [
   {
     question: "Are these HVAC calculators really free?",
     answer:
-      "Yes. All twelve are completely free, run instantly in your browser, and require no account or sign-up. They're planning tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. All eighteen are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which HVAC calculator should I use first?",
     answer:
-      "For cooling, the natural order is BTU → Tonnage → CFM: get the load, translate it into a system size, then set airflow targets. For heating, use the Furnace BTU calculator. Use the SEER calculator whenever you're comparing equipment efficiency and operating cost.",
+      "For cooling installs, the natural order is BTU → Tonnage → CFM. For field diagnostics, start with Delta T, then Static Pressure if the split is high, and Superheat or Subcooling if charge is suspect. For efficiency comparisons, use SEER (cooling), HSPF (heat pump heating), or AFUE (furnaces).",
   },
   {
     question: "Are the results accurate enough to buy equipment?",
