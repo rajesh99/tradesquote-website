@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
 
 const title = "HVAC BTU Calculator — Free Online AC & Heating Sizing Tool | TradesQuote";
 const description =
@@ -739,22 +740,7 @@ const relatedCalculators = [
         </div>
       </section>
 
-      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
-        <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">More HVAC calculators</h2>
-        <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {
-            relatedCalculators.map((calc) => (
-              <a
-                href={calc.href}
-                class="group rounded-xl border border-slate-200 bg-white p-5 hover:border-blue-300 hover:shadow-md transition"
-              >
-                <p class="font-semibold text-slate-900 group-hover:text-blue-600">{calc.title}</p>
-                <p class="mt-1 text-sm text-slate-500">{calc.description}</p>
-              </a>
-            ))
-          }
-        </div>
-      </section>
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="blue" />
     </main>
 
     <Footer />

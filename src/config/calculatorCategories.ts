@@ -22,8 +22,8 @@ export const calculatorCategories: CalculatorCategory[] = [
     slug: "hvac",
     name: "HVAC",
     description:
-      "Sizing, airflow, efficiency, and cost — BTU load, AC tonnage, furnace BTU with AFUE, CFM airflow, duct size, SEER savings, replacement cost, and job pricing.",
-    toolCount: 8,
+      "Sizing, airflow, efficiency, and cost — BTU load, AC tonnage, heat pump & mini-split sizing, furnace BTU, CFM airflow, duct size, SEER & AFUE savings, operating cost, replacement cost, and job pricing.",
+    toolCount: 12,
     status: "live",
     accent: "blue",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>`,

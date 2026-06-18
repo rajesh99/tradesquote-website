@@ -6,7 +6,10 @@ export type HvacCalculatorAccent =
   | "teal"
   | "emerald"
   | "violet"
-  | "rose";
+  | "rose"
+  | "indigo"
+  | "amber"
+  | "red";
 
 export type HvacCalculator = {
   slug: string;
@@ -46,6 +49,24 @@ export const hvacCalculators: HvacCalculator[] = [
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>`,
   },
   {
+    slug: "hvac-heat-pump-calculator",
+    title: "Heat Pump Sizing Calculator",
+    description:
+      "Size a heat pump for both heating and cooling — BTU and tonnage by climate zone, insulation, and ceiling height, with cold-climate balance-point guidance.",
+    question: "What size heat pump do I need?",
+    accent: "indigo",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l4 4-4 4"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 7H8a4 4 0 00-4 4v1"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 21l-4-4 4-4"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 17h12a4 4 0 004-4v-1"/></svg>`,
+  },
+  {
+    slug: "hvac-mini-split-calculator",
+    title: "Mini-Split Sizing Calculator",
+    description:
+      "Find the right BTU size for a ductless mini-split — per room or multi-zone — adjusted for insulation, climate, ceiling height, sun, and kitchen heat.",
+    question: "What size mini-split do I need?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="7" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M7 16h.01M11 17h.01M15 16h.01"/></svg>`,
+  },
+  {
     slug: "hvac-cfm-calculator",
     title: "HVAC CFM Calculator",
     description:
@@ -71,6 +92,24 @@ export const hvacCalculators: HvacCalculator[] = [
     question: "Is SEER 16 worth it over SEER 14?",
     accent: "emerald",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "hvac-afue-savings-calculator",
+    title: "AFUE Savings Calculator",
+    description:
+      "Compare two furnace AFUE ratings and see the annual fuel cost, dollar savings, and 15-year payoff of a higher-efficiency furnace.",
+    question: "Is a 95% AFUE furnace worth it?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 5L5 19M9 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM20 17.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>`,
+  },
+  {
+    slug: "hvac-operating-cost-calculator",
+    title: "HVAC Operating Cost Calculator",
+    description:
+      "What it actually costs to run your AC, heat pump, or furnace — per hour, per day, and per year — from efficiency, runtime, and energy price.",
+    question: "How much does it cost to run my AC?",
+    accent: "red",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
   },
   {
     slug: "hvac-replacement-cost-calculator",
@@ -167,6 +206,30 @@ export const hvacAccentStyles: Record<
     ctaColor: "text-rose-600",
     linkColor: "text-rose-600",
   },
+  indigo: {
+    iconBg: "bg-indigo-100",
+    iconColor: "text-indigo-600",
+    hoverBorder: "hover:border-indigo-300",
+    hoverTitle: "group-hover:text-indigo-600",
+    ctaColor: "text-indigo-600",
+    linkColor: "text-indigo-600",
+  },
+  amber: {
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
+    hoverBorder: "hover:border-amber-300",
+    hoverTitle: "group-hover:text-amber-600",
+    ctaColor: "text-amber-600",
+    linkColor: "text-amber-600",
+  },
+  red: {
+    iconBg: "bg-red-100",
+    iconColor: "text-red-600",
+    hoverBorder: "hover:border-red-300",
+    hoverTitle: "group-hover:text-red-600",
+    ctaColor: "text-red-600",
+    linkColor: "text-red-600",
+  },
 };
 
 export const hvacCalculatorGuide = [
@@ -192,6 +255,20 @@ export const hvacCalculatorGuide = [
     rule: "30–60 BTU per sq ft by climate, ÷ AFUE for input size",
   },
   {
+    question: "What size heat pump do I need?",
+    slug: "hvac-heat-pump-calculator",
+    tool: "Heat Pump Sizing Calculator",
+    accent: "indigo" as const,
+    rule: "Size to cooling tons; check heating load & balance point",
+  },
+  {
+    question: "What size ductless mini-split for this room?",
+    slug: "hvac-mini-split-calculator",
+    tool: "Mini-Split Sizing Calculator",
+    accent: "amber" as const,
+    rule: "20–30 BTU/sq ft per zone, rounded to the nearest head",
+  },
+  {
     question: "How much airflow does this room / system need?",
     slug: "hvac-cfm-calculator",
     tool: "CFM Calculator",
@@ -213,6 +290,20 @@ export const hvacCalculatorGuide = [
     rule: "% saved = 1 − (old SEER ÷ new SEER)",
   },
   {
+    question: "Is a higher-efficiency furnace worth it?",
+    slug: "hvac-afue-savings-calculator",
+    tool: "AFUE Savings Calculator",
+    accent: "orange" as const,
+    rule: "% saved = 1 − (old AFUE ÷ new AFUE)",
+  },
+  {
+    question: "What does it cost to run my system?",
+    slug: "hvac-operating-cost-calculator",
+    tool: "Operating Cost Calculator",
+    accent: "red" as const,
+    rule: "BTU ÷ efficiency × hours × energy price",
+  },
+  {
     question: "How much will the replacement cost?",
     slug: "hvac-replacement-cost-calculator",
     tool: "Replacement Cost Calculator",
@@ -232,7 +323,7 @@ export const hvacFaqs = [
   {
     question: "Are these HVAC calculators really free?",
     answer:
-      "Yes. All eight are completely free, run instantly in your browser, and require no account or sign-up. They're planning tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. All twelve are completely free, run instantly in your browser, and require no account or sign-up. They're planning tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which HVAC calculator should I use first?",
