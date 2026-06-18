@@ -40,6 +40,15 @@ export const hvacCalculators: HvacCalculator[] = [
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
   },
   {
+    slug: "hvac-unit-converter",
+    title: "HVAC Unit Converter",
+    description:
+      "Convert HVAC units in the field — tons to BTU/h and kW, Fahrenheit to Celsius, inches of water column to Pascals, and PSI to kPa.",
+    question: "How many BTU is 3 tons?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
+  },
+  {
     slug: "hvac-furnace-btu-calculator",
     title: "Furnace BTU Calculator",
     description:
@@ -128,6 +137,60 @@ export const hvacCalculators: HvacCalculator[] = [
     question: "What is the target superheat for a piston meter?",
     accent: "amber",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>`,
+  },
+  {
+    slug: "hvac-refrigerant-charge-calculator",
+    title: "Refrigerant Charge Calculator",
+    description:
+      "Calculate line-set add-on refrigerant charge beyond the factory allowance — by refrigerant type, line diameters, and total run length.",
+    question: "How much refrigerant do I add for extra line set?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>`,
+  },
+  {
+    slug: "hvac-dew-point-calculator",
+    title: "Dew Point Calculator",
+    description:
+      "Find dew point from dry-bulb temperature and relative humidity (or RH from dew point), with condensation-risk flags for ducts and surfaces.",
+    question: "What is the dew point at 75°F and 55% RH?",
+    accent: "cyan",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>`,
+  },
+  {
+    slug: "hvac-sensible-latent-heat-calculator",
+    title: "Sensible & Latent Heat Calculator",
+    description:
+      "Split total coil load into sensible and latent BTU/h from CFM, temperature change, and humidity ratio change — plus sensible heat ratio (SHR).",
+    question: "How much latent heat is my coil removing?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>`,
+  },
+  {
+    slug: "hvac-fan-laws-calculator",
+    title: "Fan Laws Calculator",
+    description:
+      "Apply fan affinity laws to predict CFM, static pressure, and brake horsepower when blower RPM changes.",
+    question: "What happens to CFM if I slow the blower 10%?",
+    accent: "blue",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>`,
+  },
+  {
+    slug: "hvac-ventilation-calculator",
+    title: "Ventilation Calculator",
+    description:
+      "Size whole-building ventilation CFM using ASHRAE 62.2 residential rates or ASHRAE 62.1 commercial people-and-area rates.",
+    question: "How much ventilation CFM does my home need?",
+    accent: "teal",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h9a2.5 2.5 0 10-2.5-2.5M4 12h13a2.5 2.5 0 11-2.5 2.5M4 16h7"/></svg>`,
+  },
+  {
+    slug: "hvac-humidity-control-calculator",
+    title: "Humidity Control Calculator",
+    description:
+      "Size a humidifier or dehumidifier from indoor RH targets, room volume, and airflow — latent load in BTU/h, pints/day, or gallons/day.",
+    question: "What size dehumidifier do I need?",
+    accent: "rose",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>`,
   },
   {
     slug: "hvac-seer-savings-calculator",
@@ -302,6 +365,13 @@ export const hvacCalculatorGuide = [
     rule: "1 ton = 12,000 BTU/hr",
   },
   {
+    question: "Convert tons, BTU/h, °F, or static pressure units?",
+    slug: "hvac-unit-converter",
+    tool: "HVAC Unit Converter",
+    accent: "sky" as const,
+    rule: "tons × 12,000 = BTU/h · °C = (°F−32)×5/9 · Pa = in.w.c.×249",
+  },
+  {
     question: "What size furnace do I need?",
     slug: "hvac-furnace-btu-calculator",
     tool: "Furnace BTU Calculator",
@@ -372,6 +442,48 @@ export const hvacCalculatorGuide = [
     rule: "((3 × indoor WB) − 80 − outdoor DB) ÷ 2",
   },
   {
+    question: "How much refrigerant for extra line set length?",
+    slug: "hvac-refrigerant-charge-calculator",
+    tool: "Refrigerant Charge Calculator",
+    accent: "orange" as const,
+    rule: "(total length − factory allowance) × oz/ft by line size",
+  },
+  {
+    question: "What is the dew point / RH for this air sample?",
+    slug: "hvac-dew-point-calculator",
+    tool: "Dew Point Calculator",
+    accent: "cyan" as const,
+    rule: "Magnus approximation from dry-bulb + RH (or inverse)",
+  },
+  {
+    question: "How is coil load split between sensible and latent heat?",
+    slug: "hvac-sensible-latent-heat-calculator",
+    tool: "Sensible & Latent Heat Calculator",
+    accent: "emerald" as const,
+    rule: "Qs = 1.08×CFM×ΔT · Ql = 0.68×CFM×Δgrains · SHR = Qs/Qt",
+  },
+  {
+    question: "What happens to CFM and static pressure if RPM changes?",
+    slug: "hvac-fan-laws-calculator",
+    tool: "Fan Laws Calculator",
+    accent: "blue" as const,
+    rule: "CFM ∝ RPM · SP ∝ RPM² · BHP ∝ RPM³",
+  },
+  {
+    question: "How much whole-building ventilation CFM is required?",
+    slug: "hvac-ventilation-calculator",
+    tool: "Ventilation Calculator",
+    accent: "teal" as const,
+    rule: "62.2: 0.03×area + 7.5×(beds+1) · 62.1: occ×cfm/person + area×cfm/sqft",
+  },
+  {
+    question: "What size humidifier or dehumidifier do I need?",
+    slug: "hvac-humidity-control-calculator",
+    tool: "Humidity Control Calculator",
+    accent: "rose" as const,
+    rule: "Ql = 0.68×CFM×Δgrains · pints/day = Ql×24÷12,000",
+  },
+  {
     question: "Is the higher-efficiency unit worth the price?",
     slug: "hvac-seer-savings-calculator",
     tool: "SEER Savings Calculator",
@@ -419,12 +531,12 @@ export const hvacFaqs = [
   {
     question: "Are these HVAC calculators really free?",
     answer:
-      "Yes. All eighteen are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. All twenty-five are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which HVAC calculator should I use first?",
     answer:
-      "For cooling installs, the natural order is BTU → Tonnage → CFM. For field diagnostics, start with Delta T, then Static Pressure if the split is high, and Superheat or Subcooling if charge is suspect. For efficiency comparisons, use SEER (cooling), HSPF (heat pump heating), or AFUE (furnaces).",
+      "For cooling installs, the natural order is BTU → Tonnage → CFM. For code ventilation, use the Ventilation Calculator after CFM targets. For field diagnostics, start with Delta T, then Static Pressure if the split is high, Superheat or Subcooling if charge is suspect, and the Refrigerant Charge Calculator for long line sets. For moisture and coil load, use Dew Point and Sensible & Latent Heat; for humidifier or dehumidifier sizing, use Humidity Control.",
   },
   {
     question: "Are the results accurate enough to buy equipment?",

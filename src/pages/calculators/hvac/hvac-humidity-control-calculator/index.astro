@@ -1,0 +1,602 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Humidity Control Calculator — Dehumidifier & Humidifier Sizing | TradesQuote";
+const description =
+  "Free humidity control calculator. Size a dehumidifier or humidifier from floor area, ceiling height, air changes, dry-bulb temperature, and RH targets. Latent load in BTU/h, pints/day, and CFM — instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-humidity-control-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Humidity Control Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Humidity Control Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online humidity control calculator that sizes dehumidifier or humidifier capacity from indoor RH targets, room volume, air changes per hour, and dry-bulb temperature using latent load psychrometrics.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size dehumidifier do I need for a 2,000 sq ft home?",
+    answer:
+      "Start with the moisture you need to remove, not just square footage. At <strong>2,000 sq ft × 8 ft ceiling, 5 ACH, 75°F, and 65→50% RH</strong>, this calculator shows about <strong>36 pints/day</strong> latent load — a whole-home or large basement unit in the 50–70 pint/day class. Tighter homes with lower ACH need less; damp basements with higher RH need more.",
+  },
+  {
+    question: "How is dehumidifier capacity calculated?",
+    answer:
+      "This tool uses the standard latent-load shortcut: <strong>Ql = 0.68 × CFM × Δgrains</strong>, where CFM comes from room volume and air changes per hour, and Δgrains is the moisture difference between current and target RH at the same dry-bulb temperature. Pints per day = Ql × 24 ÷ 12,000. AHRI-rated pint/day labels on retail units are tested at specific conditions — use this as a sizing starting point, then verify with manufacturer data.",
+  },
+  {
+    question: "What indoor humidity should I target?",
+    answer:
+      "ASHRAE comfort guidance recommends <strong>30–50% RH</strong> in occupied spaces. Below 30% feels dry and can crack wood; above 60% feels clammy and supports mold growth. In winter, 35–45% is common with humidification; in summer, 45–55% is often acceptable if the cooling coil handles latent load.",
+  },
+  {
+    question: "When do I humidify vs dehumidify?",
+    answer:
+      "Select <strong>Dehumidify</strong> when current RH is above your target — summer basements, post-flood drying, or oversized cooling that leaves the space clammy. Select <strong>Humidify</strong> when current RH is below target — dry winter air in cold climates. The same latent-load formula applies; results show pints/day for removal and gallons/day for addition.",
+  },
+  {
+    question: "How does ACH affect dehumidifier sizing?",
+    answer:
+      "Air changes per hour set how much air passes through the space being conditioned. <strong>Higher ACH means more CFM and higher latent load</strong> for the same RH change — common for basements (3–5 ACH) or when the HVAC blower circulates whole-home air (5+ ACH). A sealed room with minimal airflow needs a lower ACH input.",
+  },
+  {
+    question: "Does this replace a full Manual J load calculation?",
+    answer:
+      "No — this is a <strong>field sizing shortcut</strong> for humidifier or dehumidifier capacity from psychrometric targets. It does not account for infiltration, ventilation makeup air, occupant moisture generation, or coil-only latent removal. Use it to ballpark equipment class and quote scope; confirm with a full load analysis or manufacturer sizing tools on larger jobs.",
+  },
+  {
+    question: "How do grains relate to relative humidity?",
+    answer:
+      "Grains of moisture per pound of dry air (gr/lb) express absolute humidity — the actual water mass in the air. RH is relative to saturation at that temperature. Two air samples at the same RH but different dry-bulb temperatures carry different grain counts. This calculator converts RH to grains using the Magnus approximation — same method as the <a href=\"/calculators/hvac/hvac-dew-point-calculator\" class=\"font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600\">Dew Point Calculator</a>.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the moisture fix? Quote the humidifier or dehumidifier job in seconds.";
+const ctaDescription =
+  "Latent-load numbers tell you the equipment class — TradesQuote turns the install into a detailed, line-item estimate in seconds. Describe the humidifier, dehumidifier, duct tie-in, or ventilation upgrade (or upload photos), and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-dew-point-calculator",
+    title: "Dew Point Calculator",
+    description: "Dew point and condensation risk from dry-bulb and RH.",
+  },
+  {
+    href: "/calculators/hvac/hvac-sensible-latent-heat-calculator",
+    title: "Sensible & Latent Heat Calculator",
+    description: "Split total coil load into sensible and latent BTU.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM Calculator",
+    description: "Target airflow per room and per ton.",
+  },
+  {
+    href: "/calculators/hvac/hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description: "Temperature split flags airflow and latent issues.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Humidity Control Calculator — Dehumidifier & Humidifier Sizing" />
+    <meta
+      property="og:description"
+      content="Size dehumidifier or humidifier capacity from RH targets, room volume, and airflow. Latent load in BTU/h and pints/day. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Humidity Control Calculator — Dehumidifier & Humidifier Sizing" />
+    <meta
+      name="twitter:description"
+      content="Size humidifier or dehumidifier from indoor RH targets and airflow. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Humidity Control Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                ></path>
+              </svg>
+              HVAC Tools · Psychrometrics · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Humidity Control Calculator <span class="text-rose-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Whether you are pulling moisture out of a damp basement or adding humidity to dry winter air, you need
+              the latent load in BTU/h and pints or gallons per day — not a guess from square footage alone. Enter
+              floor area, ceiling height, air changes, dry-bulb temperature, and current vs target RH; this tool
+              converts RH to grains, calculates CFM and latent load, and sizes dehumidifier or humidifier capacity
+              instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-rose-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter space and humidity targets
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <label for="hc-mode" class="text-sm font-semibold text-slate-800">Mode</label>
+                <select
+                  id="hc-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                >
+                  <option value="dehumidify" selected>Dehumidify (remove moisture)</option>
+                  <option value="humidify">Humidify (add moisture)</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Dehumidify when current RH is above target; humidify when it is below.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="hc-area" class="text-sm font-semibold text-slate-800">Floor area (sq ft)</label>
+                  <input
+                    id="hc-area"
+                    type="number"
+                    min="0"
+                    max="50000"
+                    step="100"
+                    value="2000"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Conditioned floor area or zone being sized.</p>
+                </div>
+
+                <div>
+                  <label for="hc-ceiling" class="text-sm font-semibold text-slate-800">Ceiling height (ft)</label>
+                  <input
+                    id="hc-ceiling"
+                    type="number"
+                    min="1"
+                    max="30"
+                    step="0.5"
+                    value="8"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Average ceiling height for volume calculation.</p>
+                </div>
+
+                <div>
+                  <label for="hc-ach" class="text-sm font-semibold text-slate-800">Air changes per hour (ACH)</label>
+                  <input
+                    id="hc-ach"
+                    type="number"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    value="5"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">How often the air volume turns over per hour.</p>
+                </div>
+
+                <div>
+                  <label for="hc-db" class="text-sm font-semibold text-slate-800">Dry-bulb temperature (°F)</label>
+                  <input
+                    id="hc-db"
+                    type="number"
+                    min="32"
+                    max="100"
+                    step="1"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Space temperature for psychrometric conversion.</p>
+                </div>
+
+                <div>
+                  <label for="hc-rh-current" class="text-sm font-semibold text-slate-800"
+                    >Current relative humidity (%)</label
+                  >
+                  <input
+                    id="hc-rh-current"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="65"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Measured or estimated RH in the space today.</p>
+                </div>
+
+                <div>
+                  <label for="hc-rh-target" class="text-sm font-semibold text-slate-800"
+                    >Target relative humidity (%)</label
+                  >
+                  <input
+                    id="hc-rh-target"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="50"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Desired RH — typically 45–50% in summer, 35–40% in winter.</p>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-rose-600 to-pink-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-rose-100">Moisture removal capacity</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="hc-result-capacity" class="text-5xl font-extrabold tracking-tight">36 pints/day</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-rose-100">Latent load</p>
+                  <p id="hc-result-ql" class="mt-1 text-2xl font-bold">17,916 BTU/h</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-rose-100">Airflow (CFM)</p>
+                  <p id="hc-result-cfm" class="mt-1 text-2xl font-bold">1,333 CFM</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-rose-100">Moisture difference (Δgrains)</p>
+                <p id="hc-result-grains" class="mt-1 text-2xl font-bold">20 gr/lb</p>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-rose-100">What this means</p>
+                <p id="hc-status" class="mt-1 text-sm font-medium leading-snug">
+                  Whole-home range — Typical whole-home or large basement load — look at 50–70 pint/day rated units or ducted dehumidification.
+                </p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-rose-50">
+                  <div class="flex justify-between">
+                    <span>Room volume</span><span id="hc-bd-volume" class="font-semibold">16,000 cu ft</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Airflow (CFM)</span><span id="hc-bd-cfm" class="font-semibold">1,333 CFM</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Latent load (Ql)</span><span id="hc-bd-ql" class="font-bold">17,916 BTU/h</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-rose-100 leading-relaxed">
+                Sizing shortcut from psychrometric targets — not a substitute for Manual J or manufacturer test
+                conditions. Verify rated capacity against AHRI dehumidifier ratings and actual field RH readings.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Dehumidifier sizing at common RH targets</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            2,000 sq ft × 8 ft ceiling · 5 ACH · 75°F dry-bulb. Same space — only the RH change varies.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Current → target RH</th>
+                  <th class="py-2.5 pr-4 font-semibold">Δgrains</th>
+                  <th class="py-2.5 pr-4 font-semibold">Latent load</th>
+                  <th class="py-2.5 font-semibold">Capacity needed</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">65% → 50%</td>
+                  <td class="py-2.5 pr-4">20 gr/lb</td>
+                  <td class="py-2.5 pr-4">17,916 BTU/h</td>
+                  <td class="py-2.5">36 pints/day</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">70% → 50%</td>
+                  <td class="py-2.5 pr-4">26 gr/lb</td>
+                  <td class="py-2.5 pr-4">23,923 BTU/h</td>
+                  <td class="py-2.5">48 pints/day</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">60% → 45%</td>
+                  <td class="py-2.5 pr-4">20 gr/lb</td>
+                  <td class="py-2.5 pr-4">17,862 BTU/h</td>
+                  <td class="py-2.5">36 pints/day</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">55% → 45%</td>
+                  <td class="py-2.5 pr-4">13 gr/lb</td>
+                  <td class="py-2.5 pr-4">11,891 BTU/h</td>
+                  <td class="py-2.5">24 pints/day</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: ASHRAE Handbook — Fundamentals (psychrometrics and latent load) · AHRI Standard
+            920 (dehumidifier performance ratings) · ACCA Manual J (whole-building load methodology).
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Humidifier and dehumidifier sizing starts with how much moisture you need to add or remove per hour.
+            Relative humidity tells you the starting and ending moisture state; room volume and air changes set how
+            much air carries that load.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-rose-300"># Airflow from volume and ACH:</div>
+            <div>volume&nbsp;=&nbsp;area × ceiling_height</div>
+            <div>CFM&nbsp;=&nbsp;volume × ACH ÷ 60</div>
+            <div class="mt-4 text-rose-300"># Latent load (standard HVAC shortcut):</div>
+            <div>Ql&nbsp;=&nbsp;0.68 × CFM × Δgrains</div>
+            <div class="mt-4 text-rose-300"># Capacity conversion:</div>
+            <div>pints/day&nbsp;=&nbsp;Ql × 24 ÷ 12,000</div>
+            <div>gal/day&nbsp;=&nbsp;pints/day ÷ 8</div>
+            <div class="mt-4 text-rose-300"># Example (defaults):</div>
+            <div>
+              2,000 × 8 ft · 5 ACH · 65→50% RH →{" "}
+              <span class="text-amber-300">36 pints/day · 17,916 BTU/h · 1,333 CFM</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">CFM from ACH</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Air changes per hour express how fast the space air turns over. Multiply room volume by ACH and divide
+                by 60 to get CFM — the airflow basis for the latent-load equation.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Grains from RH</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Current and target RH convert to grains per pound of dry air at the same dry-bulb temperature using
+                the Magnus approximation. The difference (Δgrains) is the moisture change the equipment must handle.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">0.68 × CFM × Δgrains</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The 0.68 factor is the standard latent-load constant for grains and CFM at typical indoor conditions.
+                Result is Ql in BTU/h — the same latent quantity used in coil and ventilation load calculations.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Pints vs gallons</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Dehumidifiers are rated in pints/day (AHRI 920); humidifiers in gallons/day. Divide BTU/h latent load
+                by 500 (12,000 ÷ 24) to get pints/day — then divide by 8 for gallons when humidifying.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three humidity-control scenarios — a whole-home dehumidify, a basement dry-out, and a winter humidify job.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Whole-home dehumidify — 2,000 sq ft, 65→50% RH</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              volume = 2,000 × 8 = 16,000 cu ft<br />
+              CFM = 16,000 × 5 ÷ 60 = <span class="font-bold text-rose-700">1,333 CFM</span><br />
+              Δgrains (75°F, 65→50% RH) = <span class="font-bold text-rose-700">20 gr/lb</span><br />
+              Ql = 0.68 × 1,333 × 20 = <span class="font-bold text-rose-700">17,916 BTU/h</span><br />
+              pints/day = 17,916 × 24 ÷ 12,000 = <span class="font-bold text-rose-700">36 pints/day</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> typical clammy summer home — a 50–70
+              pint/day whole-home or ducted dehumidifier class. Pair with the cooling coil if it already handles
+              part of the latent load.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Basement dry-out — 1,200 sq ft, 70→50% RH, 3 ACH</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              volume = 1,200 × 8 = 9,600 cu ft<br />
+              CFM = 9,600 × 3 ÷ 60 = <span class="font-bold text-rose-700">480 CFM</span><br />
+              Δgrains (70°F, 70→50% RH) = <span class="font-bold text-rose-700">22 gr/lb</span><br />
+              Ql = 0.68 × 480 × 22 = <span class="font-bold text-rose-700">7,234 BTU/h</span><br />
+              pints/day = 7,234 × 24 ÷ 12,000 = <span class="font-bold text-rose-700">14 pints/day</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> portable range — a 20–30 pint/day class unit
+              may cover this zone. Lower ACH reflects a partially sealed basement; increase ACH if the HVAC blower
+              circulates the whole volume.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Winter humidify — 2,000 sq ft, 25→40% RH, 2 ACH</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              volume = 2,000 × 8 = 16,000 cu ft<br />
+              CFM = 16,000 × 2 ÷ 60 = <span class="font-bold text-rose-700">533 CFM</span><br />
+              Δgrains (68°F, 25→40% RH) = <span class="font-bold text-rose-700">15 gr/lb</span><br />
+              Ql = 0.68 × 533 × 15 = <span class="font-bold text-rose-700">5,546 BTU/h</span><br />
+              gal/day = (5,546 × 24 ÷ 12,000) ÷ 8 = <span class="font-bold text-rose-700">1.4 gal/day</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> low winter moisture addition — a bypass or
+              small steam humidifier may suffice. Verify furnace CFM can carry the vapor without condensing in ducts;
+              check the <a href="/calculators/hvac/hvac-dew-point-calculator" class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Dew Point Calculator</a> on supply-air conditions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about dehumidifier sizing, humidifier capacity, latent load, and indoor RH targets."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="rose" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacHumidityControlCalculator } from "@/scripts/calculators/hvac-humidity-control-calculator";
+    initHvacHumidityControlCalculator();
+  </script>
+</Layout>

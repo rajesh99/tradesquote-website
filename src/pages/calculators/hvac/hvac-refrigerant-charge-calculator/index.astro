@@ -1,0 +1,546 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Refrigerant Charge Calculator — Line-Set Add-On by Length | TradesQuote";
+const description =
+  "Free HVAC refrigerant charge calculator. Enter refrigerant type, line-set diameters, total run length, and factory allowance to get the add-on charge in ounces and pounds. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-refrigerant-charge-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Refrigerant Charge Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Refrigerant Charge Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC refrigerant charge calculator that estimates line-set add-on refrigerant beyond the factory allowance using standard oz-per-foot rates by liquid and suction line diameter.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much refrigerant do I add for extra line set?",
+    answer:
+      "Multiply the <strong>extra line length</strong> (total run minus factory allowance) by the <strong>oz-per-foot rate</strong> for your liquid and suction diameters. Example: 50 ft total with 15 ft included on 3/8″ + 3/4″ lines → 35 ft × 0.98 oz/ft = <strong>34 oz add-on</strong>. Always verify with superheat or subcooling after charging.",
+  },
+  {
+    question: "What is the factory line-set allowance?",
+    answer:
+      "Most residential split-system nameplates include refrigerant for a <strong>factory-specified line length</strong> — commonly 15 ft for R-410A mini-splits and many central splits. Check the unit's charging chart or installation manual; the allowance varies by manufacturer and model.",
+  },
+  {
+    question: "Do R-410A and R-32 use the same charge rates?",
+    answer:
+      "The <strong>oz-per-foot rates are based on line volume</strong>, so they depend on liquid and suction diameters, not refrigerant chemistry. R-410A and R-32 systems with the same line sizes use the same add-on ounces per foot — but always confirm total charge against the nameplate and weigh in with the correct refrigerant type.",
+  },
+  {
+    question: "Why does line diameter change the charge rate?",
+    answer:
+      "Larger suction and liquid lines hold more refrigerant per foot. A <strong>1/2″ + 7/8″</strong> pair needs 1.25 oz/ft versus 0.43 oz/ft for a <strong>1/4″ + 1/2″</strong> pair. Undercharging on undersized lines causes high superheat; overcharging on oversized runs can flood the compressor.",
+  },
+  {
+    question: "Should I charge by weight or superheat/subcooling?",
+    answer:
+      "Use <strong>both</strong>. Line-set tables give you the starting add-on weight; superheat and subcooling confirm the charge in the actual operating conditions. TXV systems lean on superheat; fixed-orifice systems use target superheat charts. Never rely on length alone on a long or complex run.",
+  },
+  {
+    question: "What if my total line length is shorter than the allowance?",
+    answer:
+      "When total length is within the factory allowance, <strong>no add-on is needed</strong> beyond the factory charge on the nameplate. Some manufacturers specify recovering excess refrigerant on very short runs — check the charging chart before leaving extra charge in the system.",
+  },
+  {
+    question: "How does line-set charge relate to superheat and subcooling?",
+    answer:
+      "Line-set math estimates <strong>how much refrigerant the pipes hold</strong>; superheat and subcooling tell you whether that total charge is correct at runtime. After adding the calculated ounces, verify TXV superheat or piston target superheat, and check subcooling on systems with a clear liquid line target. Pair with the <a href=\"/calculators/hvac/hvac-delta-t-calculator\" class=\"font-semibold text-orange-700 underline decoration-orange-300 hover:decoration-orange-600\">Delta T Calculator</a> to confirm coil performance.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Charge calculated? Quote the install or service call in seconds.";
+const ctaDescription =
+  "Line-set add-on charge tells you how much refrigerant to weigh in — TradesQuote turns the install or service call into a detailed, line-item estimate in seconds. Describe the split install, line-set run, or recovery-and-recharge (or upload photos), and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-superheat-calculator",
+    title: "Superheat Calculator",
+    description: "Measured superheat from suction line and saturation temps.",
+  },
+  {
+    href: "/calculators/hvac/hvac-subcooling-calculator",
+    title: "Subcooling Calculator",
+    description: "Liquid-line subcooling for TXV charging checks.",
+  },
+  {
+    href: "/calculators/hvac/hvac-target-superheat-calculator",
+    title: "Target Superheat Calculator",
+    description: "Piston meter target from wet-bulb and outdoor DB.",
+  },
+  {
+    href: "/calculators/hvac/hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description: "Temperature split flags airflow and charge issues.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Refrigerant Charge Calculator — Line-Set Add-On by Length" />
+    <meta
+      property="og:description"
+      content="Calculate line-set add-on refrigerant charge by diameter and length. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Refrigerant Charge Calculator — Line-Set Add-On by Length" />
+    <meta
+      name="twitter:description"
+      content="Estimate add-on refrigerant for extra line-set length by liquid and suction diameter. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Refrigerant Charge Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                ></path>
+              </svg>
+              HVAC Tools · Refrigerant · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Refrigerant Charge Calculator <span class="text-orange-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Split-system nameplates include refrigerant for a factory line-set length — anything beyond that needs
+              add-on charge by the ounce. Enter refrigerant type, liquid and suction diameters, total run length, and
+              the factory allowance; this tool calculates extra feet and the add-on charge in ounces and pounds using
+              standard manufacturer charging rates.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-orange-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter line-set details
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="rc-refrigerant" class="text-sm font-semibold text-slate-800">Refrigerant type</label>
+                  <select
+                    id="rc-refrigerant"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none bg-white"
+                  >
+                    <option value="R-410A" selected>R-410A</option>
+                    <option value="R-32">R-32</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Rates are by line size — confirm total charge on nameplate.</p>
+                </div>
+
+                <div>
+                  <label for="rc-lineset" class="text-sm font-semibold text-slate-800"
+                    >Line-set diameters (liquid + suction)</label
+                  >
+                  <select
+                    id="rc-lineset"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none bg-white"
+                  >
+                    <option value="14-12">1/4″ + 1/2″</option>
+                    <option value="38-58">3/8″ + 5/8″</option>
+                    <option value="38-34" selected>3/8″ + 3/4″</option>
+                    <option value="12-78">1/2″ + 7/8″</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Liquid line first, then suction — match factory spec.</p>
+                </div>
+
+                <div>
+                  <label for="rc-length" class="text-sm font-semibold text-slate-800">Total line length (ft)</label>
+                  <input
+                    id="rc-length"
+                    type="number"
+                    min="0"
+                    max="500"
+                    step="1"
+                    value="50"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Measured run from outdoor to indoor unit.</p>
+                </div>
+
+                <div>
+                  <label for="rc-included" class="text-sm font-semibold text-slate-800"
+                    >Factory allowance (ft included)</label
+                  >
+                  <input
+                    id="rc-included"
+                    type="number"
+                    min="0"
+                    max="200"
+                    step="1"
+                    value="15"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">From nameplate or charging chart — often 15 ft.</p>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-orange-600 to-amber-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-orange-100">Add-on refrigerant charge</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="rc-result-oz" class="text-5xl font-extrabold tracking-tight">34 oz</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-orange-100">Weight (lb)</p>
+                  <p id="rc-result-lb" class="mt-1 text-2xl font-bold">2.13 lb</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-orange-100">Extra line length</p>
+                  <p id="rc-result-extra" class="mt-1 text-2xl font-bold">35 ft</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-orange-100">Charge rate</p>
+                <p id="rc-result-rate" class="mt-1 text-2xl font-bold">0.98 oz/ft (R-410A)</p>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-orange-100">What this means</p>
+                <p id="rc-status" class="mt-1 text-sm font-medium leading-snug">
+                  Moderate add-on — Common for longer runs on split systems — charge in stages and confirm TXV superheat
+                  or piston target superheat.
+                </p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-orange-50">
+                  <div class="flex justify-between">
+                    <span>Total line length</span><span id="rc-bd-length" class="font-semibold">50 ft</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Factory allowance</span><span id="rc-bd-included" class="font-semibold">15 ft</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Extra length</span><span id="rc-bd-extra" class="font-bold">35 ft</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-orange-100 leading-relaxed">
+                Line-set tables estimate add-on charge by pipe volume. Weigh in carefully, then verify superheat or
+                subcooling before leaving the system.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Line-set add-on charge rates</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Standard oz-per-foot rates by liquid and suction diameter. Extra length = total run minus factory allowance.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Liquid + suction</th>
+                  <th class="py-2.5 pr-4 font-semibold">Rate (oz/ft)</th>
+                  <th class="py-2.5 font-semibold">Example (35 ft extra)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">1/4″ + 1/2″</td>
+                  <td class="py-2.5 pr-4">0.43 oz/ft</td>
+                  <td class="py-2.5">15.1 oz</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">3/8″ + 5/8″</td>
+                  <td class="py-2.5 pr-4">0.78 oz/ft</td>
+                  <td class="py-2.5">27.3 oz</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">3/8″ + 3/4″</td>
+                  <td class="py-2.5 pr-4">0.98 oz/ft</td>
+                  <td class="py-2.5">34.3 oz</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">1/2″ + 7/8″</td>
+                  <td class="py-2.5 pr-4">1.25 oz/ft</td>
+                  <td class="py-2.5">43.8 oz</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: AHRI refrigerant charging guidance · Carrier and Trane line-set charging tables ·
+            Manufacturer installation manuals and nameplate data.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Factory charge on a split system assumes a specific line-set length. Pipes beyond that allowance hold extra
+            refrigerant — you add ounces proportional to the extra feet and the internal volume of the liquid and
+            suction lines.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-orange-300"># Extra length:</div>
+            <div>extra_ft&nbsp;=&nbsp;max(0, total_length − factory_allowance)</div>
+            <div class="mt-4 text-orange-300"># Add-on charge:</div>
+            <div>add_on_oz&nbsp;=&nbsp;extra_ft × oz_per_foot (by line diameter)</div>
+            <div>add_on_lb&nbsp;=&nbsp;add_on_oz ÷ 16</div>
+            <div class="mt-4 text-orange-300"># Example (defaults):</div>
+            <div>
+              50 − 15 = 35 ft extra × 0.98 oz/ft →{" "}
+              <span class="text-amber-300">34 oz · 2.13 lb</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Factory allowance first</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Nameplates list a base charge for a standard line length — often 15 ft. Only length beyond that needs
+                add-on refrigerant. Always pull the allowance from the specific unit's charging chart.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Diameter drives the rate</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Bigger suction lines hold more refrigerant per foot. A 1/2″ + 7/8″ pair at 1.25 oz/ft needs nearly
+                three times the add-on of a 1/4″ + 1/2″ pair at 0.43 oz/ft for the same extra length.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Weigh, then verify</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Use the calculated ounces as your starting point, then confirm with superheat on TXV systems or target
+                superheat on fixed-orifice meters. Subcooling adds a second check on many residential splits.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Short runs need care</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                When total length is within the allowance, no add-on is needed. Very short runs may require recovering
+                excess factory charge — check the manufacturer chart before assuming the nameplate charge is correct.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three line-set scenarios: typical residential run, short run within allowance, and long run with large
+          diameters.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Typical run — 3/8″ + 3/4″, 50 ft total, 15 ft included</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              extra_ft = max(0, 50 − 15) = 35 ft<br />
+              rate = 0.98 oz/ft (3/8″ + 3/4″)<br />
+              add_on = 35 × 0.98 = <span class="font-bold text-orange-700">34 oz</span><br />
+              lb = 34 ÷ 16 = <span class="font-bold text-orange-700">2.13 lb</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> common central split or ductless run — weigh in
+              34 oz of R-410A beyond the factory charge, then verify TXV superheat or target superheat before sealing
+              the system.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Short run — 3/8″ + 5/8″, 12 ft total, 15 ft included</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              extra_ft = max(0, 12 − 15) = 0 ft<br />
+              add_on = 0 × 0.78 = <span class="font-bold text-orange-700">0 oz</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> no add-on needed — the run is within the
+              factory allowance. Check whether the manufacturer requires recovering excess charge on very short line
+              sets before leaving the nameplate charge in the system.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Long commercial run — 1/2″ + 7/8″, 80 ft total, 15 ft included</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              extra_ft = max(0, 80 − 15) = 65 ft<br />
+              rate = 1.25 oz/ft (1/2″ + 7/8″)<br />
+              add_on = 65 × 1.25 = <span class="font-bold text-orange-700">81.3 oz</span><br />
+              lb = 81.3 ÷ 16 = <span class="font-bold text-orange-700">5.08 lb</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> large add-on on a long run with big lines —
+              charge in stages, confirm total system charge against the nameplate maximum, and verify both superheat and
+              subcooling before commissioning.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about line-set add-on charge, factory allowances, and refrigerant weighing."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="orange" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacRefrigerantChargeCalculator } from "@/scripts/calculators/hvac-refrigerant-charge-calculator";
+    initHvacRefrigerantChargeCalculator();
+  </script>
+</Layout>
