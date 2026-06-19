@@ -1,0 +1,427 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Amp Draw Calculator | TradesQuote";
+const description =
+  "Free HVAC amp draw calculator. Enter BTU/h and SEER2 to get running load amps (RLA), minimum circuit ampacity (MCA), and max overcurrent protection (MOP) per NEC 440.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-amp-draw-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "HVAC Amp Draw Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Amp Draw Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC amp draw calculator. Calculates running load amps (RLA), minimum circuit ampacity (MCA), and maximum overcurrent protection (MOP) from cooling capacity and SEER2 rating per NEC 440.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is MCA for HVAC?",
+    answer:
+      "Minimum Circuit Ampacity (MCA) is the minimum wire rating required to safely power the unit. Per NEC 440.32, MCA = 1.25 × the largest motor FLA + all other loads. The conductor from the disconnect to the unit must be rated at least this ampacity. MCA is always on the unit nameplate.",
+  },
+  {
+    question: "What is MOP (MOCP)?",
+    answer:
+      "Maximum Overcurrent Protection (MOP or MOCP) is the largest fuse or circuit breaker that can protect the equipment circuit. It is listed on the unit nameplate and must not be exceeded. Using a breaker larger than MOP may not adequately protect the wiring against fault current.",
+  },
+  {
+    question: "Why is my calculated MCA different from the nameplate?",
+    answer:
+      "The calculator estimates MCA from BTU/h and SEER2. The nameplate MCA is calculated from the actual FLA of the compressor motor, fan motor, and controls combined. Nameplate values are authoritative — always use them for final wiring design.",
+  },
+  {
+    question: "Can I use this to size a heat pump?",
+    answer:
+      "Yes. A heat pump's cooling-mode electrical draw is similar to an equivalent AC. For heating mode, input power is lower (higher EER in heating). Use the cooling-mode figure to size the circuit, since it represents the maximum current draw.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Cooling Load Calculator",
+    description: "Determine the BTU/h input for this calculator.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert tons to BTU/h.",
+  },
+  {
+    href: "/calculators/hvac/hvac-seer2-converter",
+    title: "SEER / SEER2 Converter",
+    description: "Convert SEER to SEER2 for the efficiency input.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Amp Draw Calculator | TradesQuote" />
+    <meta
+      property="og:description"
+      content="Free HVAC amp draw calculator. Enter BTU/h and SEER2 to get RLA, MCA, and MOP per NEC 440. Instant, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Amp Draw Calculator | TradesQuote" />
+    <meta
+      name="twitter:description"
+      content="Calculate HVAC running load amps, minimum circuit ampacity, and max overcurrent protection from BTU/h and SEER2. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Amp Draw Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-600"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
+              </svg>
+              HVAC Tools · Electrical · Free
+            </span>
+
+            <!-- H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              HVAC Amp Draw Calculator <span class="text-sky-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- Intro paragraph -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Estimate the running load amps (RLA), minimum circuit ampacity (MCA), and maximum overcurrent
+              protection (MOP) for any air conditioner or heat pump from its cooling capacity (BTU/h) and SEER2
+              rating. Results follow NEC 440.32 (MCA) and NEC 440.22 (MOP). Always verify against the unit
+              nameplate before final wiring.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-sky-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter equipment details
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ad-btuh" class="text-sm font-semibold text-slate-800">Cooling capacity (BTU/h)</label>
+                  <input
+                    id="ad-btuh"
+                    type="number"
+                    min="6000"
+                    max="600000"
+                    step="1000"
+                    value="36000"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-400">e.g. 24 000 BTU/h = 2 tons</p>
+                </div>
+
+                <div>
+                  <label for="ad-seer2" class="text-sm font-semibold text-slate-800">SEER2 rating</label>
+                  <input
+                    id="ad-seer2"
+                    type="number"
+                    min="13"
+                    max="30"
+                    step="0.5"
+                    value="16"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-400">Min 13 SEER2 per 2023 federal standards</p>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ad-voltage" class="text-sm font-semibold text-slate-800">Supply voltage</label>
+                  <select
+                    id="ad-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="115">115 V (residential single-phase small)</option>
+                    <option value="208">208 V (commercial 3-phase wye)</option>
+                    <option value="230" selected>230 V (residential standard)</option>
+                    <option value="240">240 V (residential split-phase)</option>
+                    <option value="460">460 V (commercial 3-phase)</option>
+                    <option value="480">480 V (industrial 3-phase)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ad-phase" class="text-sm font-semibold text-slate-800">Phase</label>
+                  <select
+                    id="ad-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="1" selected>Single-phase</option>
+                    <option value="3">Three-phase</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="ad-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-sky-600 to-blue-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-sky-100">Running Load Amps (RLA est.)</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ad-result-rla" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span class="text-xl font-semibold text-sky-200">A</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Min. Circuit Ampacity (MCA)</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="ad-result-mca">—</span>
+                    <span class="text-base font-semibold text-sky-200"> A</span>
+                  </p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Max. Overcurrent Protection (MOP)</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="ad-result-mop">—</span>
+                    <span class="text-base font-semibold text-sky-200"> A</span>
+                  </p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4 col-span-2">
+                  <p class="text-xs text-sky-100">Input power (kW)</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="ad-result-kw">—</span>
+                    <span class="text-base font-semibold text-sky-200"> kW</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Warning box -->
+              <div
+                id="ad-warning"
+                class="hidden mt-4 rounded-xl bg-yellow-400/20 border border-yellow-300/40 p-4"
+              >
+                <p class="text-xs font-bold text-yellow-200 uppercase tracking-wide mb-1">High Current Warning</p>
+                <p class="text-sm font-medium text-yellow-100 leading-snug">
+                  Estimated RLA exceeds 80 A. Verify nameplate data and consult a licensed electrician for
+                  service-entrance conductor sizing and disconnect requirements.
+                </p>
+              </div>
+
+              <p class="mt-4 text-xs text-sky-100 leading-relaxed">
+                Estimated from BTU/h and SEER2. Always verify against the unit nameplate before sizing wire,
+                disconnect, or overcurrent protection devices.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How the HVAC Amp Draw Calculator Works
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The calculator converts cooling capacity and SEER2 into an approximate input power draw, then
+            derives running load amps from the supply voltage and phase. MCA and MOP are then calculated per
+            NEC Article 440. All values are estimates — the unit nameplate is the authoritative source for
+            final electrical design.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-sky-300"># Step 1: Convert SEER2 to EER (approximate):</div>
+            <div>EER &asymp; SEER2 &times; 0.875&nbsp;&nbsp;&nbsp;&nbsp;(approximation for sizing; use nameplate EER for accuracy)</div>
+            <div class="mt-4 text-sky-300"># Step 2: Input power:</div>
+            <div>kW_input = BTU/h &divide; (EER &times; 1000)</div>
+            <div class="mt-4 text-sky-300"># Step 3: Running Load Amps:</div>
+            <div>Single-phase RLA = kW_input &times; 1000 &divide; (Voltage &times; PF)&nbsp;&nbsp;&nbsp;where PF &asymp; 0.95</div>
+            <div>Three-phase RLA = kW_input &times; 1000 &divide; (&radic;3 &times; Voltage &times; PF)</div>
+            <div class="mt-4 text-sky-300"># Step 4: NEC 440 sizing:</div>
+            <div>MCA = RLA &times; 1.25&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(NEC 440.32)</div>
+            <div>MOP = next standard breaker &ge; RLA &times; 2.25&nbsp;&nbsp;(NEC 440.22)</div>
+            <div class="mt-2 text-slate-400">Standard breakers: 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125 A</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 0.95 power factor?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                HVAC compressors are inductive loads. A power factor of 0.95 is a reasonable estimate for
+                modern scroll compressors with run capacitors. Older reciprocating compressors may have PF
+                closer to 0.85, which would result in higher actual amps.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">SEER2 vs EER</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                SEER2 is a seasonal metric; EER is a steady-state rating at AHRI 95°F conditions. The 0.875
+                multiplier is an empirical approximation. For precise sizing, use the EER listed on the unit
+                energy guide or nameplate.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">NEC 440.32 — MCA</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                For a hermetic refrigerant motor-compressor circuit, the minimum conductor ampacity is 125%
+                of the compressor nameplate RLA. Branch-circuit conductors must be sized to carry this
+                ampacity continuously.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">NEC 440.22 — MOP</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The branch-circuit short-circuit and ground-fault protective device must not exceed 225% of
+                the compressor RLA, rounded up to the next standard overcurrent device rating listed in
+                NEC 240.6(A).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLE ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked example</h2>
+        <p class="mt-4 text-slate-600">
+          A 3-ton residential split-system air conditioner rated at 16 SEER2 operating on a 230 V
+          single-phase supply.
+        </p>
+
+        <div class="mt-8">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-600 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                3-ton AC — 36 000 BTU/h, 16 SEER2, 230 V, single-phase
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 leading-relaxed">
+              <div>EER &asymp; 16 &times; 0.875 = <span class="font-bold text-sky-600">14.0</span></div>
+              <div class="mt-1">kW = 36 000 &divide; (14.0 &times; 1 000) = <span class="font-bold text-sky-600">2.571 kW</span></div>
+              <div class="mt-1">RLA = 2 571 &divide; (230 &times; 0.95) = <span class="font-bold text-sky-600">11.8 A</span></div>
+              <div class="mt-1">MCA = 11.8 &times; 1.25 = <span class="font-bold text-sky-600">14.8 A</span> &rarr; use <span class="font-bold text-sky-600">15 A</span> wire minimum</div>
+              <div class="mt-1">MOP target = 11.8 &times; 2.25 = 26.5 A &rarr; next standard breaker = <span class="font-bold text-sky-600">30 A</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> A 15 A minimum circuit conductor with a
+              30 A breaker satisfies NEC 440 for this unit. Always confirm against the nameplate, which
+              will show the actual MCA and MOP based on measured compressor and fan motor FLA.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about HVAC amp draw, MCA, and MOP per NEC 440."
+      />
+
+      <CalculatorTradesQuoteCta
+        heading="Electrical sizing done. Now quote the installation."
+        description="TradesQuote turns your load calculations into a detailed, line-item estimate in seconds. Describe the job or upload photos, and our AI builds quantities, unit prices, and totals — validated by a built-in quality control agent."
+      />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="sky" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacAmpDrawCalculator } from "@/scripts/calculators/hvac-amp-draw-calculator";
+    initHvacAmpDrawCalculator();
+  </script>
+</Layout>

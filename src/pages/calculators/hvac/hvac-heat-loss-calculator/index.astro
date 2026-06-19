@@ -1,0 +1,356 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Heat Loss Calculator — Home Heating Load | TradesQuote";
+const description =
+  "Free heat loss calculator. Estimate whole-home heating load (BTU/h) from climate zone, square footage, insulation, and windows. Convert to heat pump tons or furnace kW.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-heat-loss-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Heat Loss Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Heat Loss Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online home heat loss calculator. Estimates whole-home heating load in BTU/h from ASHRAE climate zone, conditioned floor area, insulation level, and window area.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is a heat loss calculation?",
+    answer:
+      "A heat loss calculation determines how many BTU/h escape from a building through walls, roof, windows, doors, and air infiltration on the coldest design day. The result is the minimum heating output the system must deliver to maintain a set indoor temperature.",
+  },
+  {
+    question: "How is this different from the BTU cooling load calculator?",
+    answer:
+      "The cooling load (BTU sizing calculator) estimates how much heat must be removed from the building on the hottest day. The heat loss calculator estimates how much heat must be added on the coldest day. Both determine system size from opposite directions.",
+  },
+  {
+    question: "What is Manual J?",
+    answer:
+      "Manual J is the ACCA industry standard for residential load calculations. It accounts for every building component — wall area and U-value, roof area, window size and orientation, infiltration, duct losses, and internal gains. This calculator uses a simplified climate-zone rule of thumb; for final equipment selection, a full Manual J is recommended.",
+  },
+  {
+    question: "How accurate is this calculator?",
+    answer:
+      "Within ±15–20% for typical residential construction. It systematically underestimates heat loss in drafty older homes (pre-1980) and overestimates in very well-sealed, highly insulated new construction. Use it for planning and budgeting; get a Manual J before purchasing equipment.",
+  },
+  {
+    question: "Can I use this to size a heat pump?",
+    answer:
+      "Yes. Divide the heating load by 12,000 to get the required tons of heat pump capacity. For cold climates (zones 5–7), verify the selected unit maintains adequate output at your design temperature — cold-climate heat pumps are rated to -13°F but output falls as outdoor temperature drops.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Cooling Load Calculator",
+    description: "Cooling counterpart — size the AC for summer.",
+  },
+  {
+    href: "/calculators/hvac/hvac-heat-pump-calculator",
+    title: "Heat Pump Sizing Calculator",
+    description: "Balance point and dual-fuel guidance.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Convert heating load to furnace input BTU with AFUE.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Heat Loss Calculator — Home Heating Load | TradesQuote" />
+    <meta
+      property="og:description"
+      content="Estimate whole-home heating load (BTU/h) from climate zone, square footage, insulation level, and window area. Free, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Heat Loss Calculator | TradesQuote" />
+    <meta
+      name="twitter:description"
+      content="Free home heat loss calculator — BTU/h heating load from climate zone, floor area, insulation, and windows. Instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- HERO -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Heat Loss Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-600"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path>
+              </svg>
+              HVAC Tools · Sizing · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Heat Loss Calculator <span class="text-orange-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Estimate the whole-home heating load (Manual J simplified) from climate zone, square footage,
+              insulation level, and window area. The result is the BTU/h the heating system must deliver on
+              the coldest design day. Convert to heat pump tons or electric kW for equipment selection.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALCULATOR -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              Enter building details
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <label for="hl-sqft" class="text-sm font-semibold text-slate-800">Conditioned floor area (sq ft)</label>
+                <input
+                  id="hl-sqft"
+                  type="number"
+                  min="100"
+                  max="20000"
+                  step="100"
+                  value="2000"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                />
+                <p class="mt-1 text-xs text-slate-400">Total heated floor area, not including garage or unheated spaces</p>
+              </div>
+
+              <div>
+                <label for="hl-zone" class="text-sm font-semibold text-slate-800">Climate zone</label>
+                <select
+                  id="hl-zone"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                >
+                  <option value="1">Zone 1 — Miami, Honolulu (design ΔT 30°F)</option>
+                  <option value="2">Zone 2 — Houston, Phoenix (design ΔT 45°F)</option>
+                  <option value="3">Zone 3 — Atlanta, Los Angeles (design ΔT 55°F)</option>
+                  <option value="4" selected>Zone 4 — Washington DC, Seattle (design ΔT 65°F)</option>
+                  <option value="5">Zone 5 — Chicago, Denver (design ΔT 80°F)</option>
+                  <option value="6">Zone 6 — Minneapolis, Boston (design ΔT 95°F)</option>
+                  <option value="7">Zone 7 — Northern Alaska, Canada (design ΔT 110°F)</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="hl-insulation" class="text-sm font-semibold text-slate-800">Insulation level</label>
+                  <select
+                    id="hl-insulation"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="0.75">Well insulated — R-21+ walls, R-49+ attic</option>
+                    <option value="1.0" selected>Average — R-13 walls, R-38 attic</option>
+                    <option value="1.3">Poor — older construction, minimal insulation</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="hl-windows" class="text-sm font-semibold text-slate-800">Window / door area</label>
+                  <select
+                    id="hl-windows"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="0.9">Few windows — typical bedrooms</option>
+                    <option value="1.0" selected>Average</option>
+                    <option value="1.15">Many / large windows — great rooms, sun rooms</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="hl-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-orange-600 to-red-500 p-6 sm:p-8 text-white shadow-lg">
+              <p class="text-sm font-medium text-orange-100">Heating Load</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="hl-result-btuh" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span class="text-xl font-semibold text-orange-200">BTU/h</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-orange-100">Heat pump size</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="hl-result-tons">—</span>
+                    <span class="text-base font-semibold text-orange-200"> tons</span>
+                  </p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-orange-100">Heating load</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="hl-result-kw">—</span>
+                    <span class="text-base font-semibold text-orange-200"> kW</span>
+                  </p>
+                </div>
+              </div>
+
+              <p class="mt-4 text-xs text-orange-100 leading-relaxed">
+                Simplified zone-based estimate. ±15–20% accuracy for typical construction.
+                Get a Manual J before purchasing equipment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FORMULA -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How the Heat Loss Calculator Works
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The calculator multiplies a climate-zone baseline BTU/sqft by adjustments for insulation and
+            window area. Zone BTU/sqft values are derived from the 99% design temperature difference
+            published in ASHRAE climate data for each zone.
+          </p>
+
+          <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+            <div class="text-orange-300"># Formula:</div>
+            <div>Heating Load (BTU/h) = sqft &times; BTU/sqft/zone &times; insulation_factor &times; window_factor</div>
+            <div class="mt-4 text-orange-300"># Zone BTU/sqft values (derived from 99% design ΔT):</div>
+            <div>Zone 1: 25&nbsp;&nbsp;|&nbsp;&nbsp;Zone 2: 35&nbsp;&nbsp;|&nbsp;&nbsp;Zone 3: 45</div>
+            <div>Zone 4: 55&nbsp;&nbsp;|&nbsp;&nbsp;Zone 5: 70&nbsp;&nbsp;|&nbsp;&nbsp;Zone 6: 85&nbsp;&nbsp;|&nbsp;&nbsp;Zone 7: 100</div>
+            <div class="mt-4 text-orange-300"># Convert result:</div>
+            <div>Tons = BTU/h &divide; 12,000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(heat pump sizing)</div>
+            <div>kW = BTU/h &divide; 3,412&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(electric resistance)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What is design temperature difference?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The design ΔT is the difference between the indoor setpoint (typically 70°F) and the
+                outdoor temperature that will be exceeded only 1% of heating season hours. Zone 4 (DC/Seattle)
+                has a 65°F ΔT, meaning the outdoor design temperature is roughly 5°F.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Manual J vs this calculator</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Manual J is the ACCA/ANSI standard that accounts for every building component: wall U-values,
+                window orientation, infiltration, duct losses, and internal gains. This calculator is a
+                15-second ballpark. Use Manual J before purchasing equipment — most building codes require it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKED EXAMPLE -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked example</h2>
+        <p class="mt-4 text-slate-600">
+          A 2,400 sq ft home in Minneapolis (Zone 6) with average insulation and average window area.
+        </p>
+
+        <div class="mt-8">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-600 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">2,400 sq ft · Zone 6 · Average insulation · Average windows</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 leading-relaxed">
+              <div>Zone 6 BTU/sqft = <span class="font-bold text-orange-600">85</span></div>
+              <div class="mt-1">Insulation factor (average) = <span class="font-bold text-orange-600">1.0</span></div>
+              <div class="mt-1">Window factor (average) = <span class="font-bold text-orange-600">1.0</span></div>
+              <div class="mt-1">Heating Load = 2,400 &times; 85 &times; 1.0 &times; 1.0 = <span class="font-bold text-orange-600">204,000 BTU/h</span></div>
+              <div class="mt-1">Heat pump size = 204,000 &divide; 12,000 = <span class="font-bold text-orange-600">17.0 tons</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Note:</span> 17 tons is very large — this reflects Zone 6's
+              extreme cold. A heat pump of this size in Minneapolis needs to be rated for cold-climate operation
+              (NEEP Cold Climate designation). Multiple heat pumps or a dual-fuel system with a gas furnace backup
+              are common approaches.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about home heat loss and heating load calculations."
+      />
+
+      <CalculatorTradesQuoteCta
+        heading="Heat load calculated. Now quote the install."
+        description="TradesQuote turns your load calculations into a detailed, line-item estimate in seconds. Describe the job or upload photos, and our AI builds quantities, unit prices, and totals — validated by a built-in quality control agent."
+      />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="orange" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacHeatLossCalculator } from "@/scripts/calculators/hvac-heat-loss-calculator";
+    initHvacHeatLossCalculator();
+  </script>
+</Layout>

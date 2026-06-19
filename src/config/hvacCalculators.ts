@@ -302,6 +302,54 @@ export const hvacCalculators: HvacCalculator[] = [
     accent: "indigo",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`,
   },
+  {
+    slug: "hvac-heat-loss-calculator",
+    title: "Heat Loss Calculator",
+    description: "Whole-home heating load from climate zone, square footage, insulation level, and window area — the heating counterpart to the BTU cooling load calculator.",
+    question: "How many BTU of heat does my home lose per hour?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>`,
+  },
+  {
+    slug: "hvac-amp-draw-calculator",
+    title: "HVAC Amp Draw Calculator",
+    description: "Estimate running amperage, minimum circuit ampacity (MCA), and maximum overcurrent protection (MOP) from system BTU/h, SEER2 rating, and supply voltage.",
+    question: "What size breaker do I need for a 3-ton AC?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "hvac-gas-line-sizing-calculator",
+    title: "Gas Line Sizing Calculator",
+    description: "Pipe diameter for natural gas or LP lines from BTU/h load and pipe length — from IFGC/NFPA 54 Table 402.4 pressure-drop values.",
+    question: "What size gas pipe for a 200,000 BTU furnace at 50 feet?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
+  },
+  {
+    slug: "hvac-refrigerant-pt-chart",
+    title: "Refrigerant PT Chart",
+    description: "Saturation pressure–temperature reference for R-410A, R-32, R-454B, and R-22 — look up by temperature or pressure with phase-state indication.",
+    question: "What is the saturation pressure of R-410A at 40°F?",
+    accent: "cyan",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`,
+  },
+  {
+    slug: "hvac-mixed-air-temperature-calculator",
+    title: "Mixed Air Temperature Calculator",
+    description: "Mixed air temperature from outdoor and return CFM and temperatures — for economizer design, AHU commissioning, and outdoor air fraction.",
+    question: "What is the mixed air temperature at 20% outside air?",
+    accent: "teal",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h9a2.5 2.5 0 10-2.5-2.5M4 12h13a2.5 2.5 0 11-2.5 2.5M4 16h7"/></svg>`,
+  },
+  {
+    slug: "hvac-seer2-converter",
+    title: "SEER / SEER2 Converter",
+    description: "Convert between SEER and SEER2 efficiency ratings, compare to 2023 federal minimum standards, and see how the test-procedure change affects real-world comparisons.",
+    question: "What is SEER 16 in SEER2?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
+  },
 ];
 
 export type HvacCalculatorGroup = {
@@ -313,7 +361,7 @@ export type HvacCalculatorGroup = {
 export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
   {
     label: "Sizing",
-    description: "Find the right system for any space — cooling load, tonnage, heating, and heat pump balance point.",
+    description: "Find the right system for any space — cooling load, heating load, tonnage, heat pump sizing, and electrical and gas service requirements.",
     slugs: [
       "hvac-btu-calculator",
       "hvac-tonnage-calculator",
@@ -321,6 +369,9 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
       "hvac-furnace-btu-calculator",
       "hvac-heat-pump-calculator",
       "hvac-mini-split-calculator",
+      "hvac-heat-loss-calculator",
+      "hvac-amp-draw-calculator",
+      "hvac-gas-line-sizing-calculator",
     ],
   },
   {
@@ -335,7 +386,7 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
   },
   {
     label: "Diagnostics & Refrigerant",
-    description: "Check temperature splits, total external static pressure, refrigerant charge, and boiler combustion efficiency.",
+    description: "Check temperature splits, total external static pressure, refrigerant charge, PT chart lookup, and boiler combustion efficiency.",
     slugs: [
       "hvac-delta-t-calculator",
       "hvac-static-pressure-calculator",
@@ -344,14 +395,16 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
       "hvac-target-superheat-calculator",
       "hvac-refrigerant-charge-calculator",
       "hvac-combustion-efficiency-calculator",
+      "hvac-refrigerant-pt-chart",
     ],
   },
   {
     label: "Psychrometrics & Indoor Air Quality",
-    description: "Dew point, sensible and latent heat, ASHRAE ventilation, humidity sizing, HRV/ERV effectiveness, and full moist-air properties.",
+    description: "Dew point, sensible and latent heat, mixed air temperature, ASHRAE ventilation, humidity sizing, HRV/ERV effectiveness, and full moist-air properties.",
     slugs: [
       "hvac-dew-point-calculator",
       "hvac-sensible-latent-heat-calculator",
+      "hvac-mixed-air-temperature-calculator",
       "hvac-ventilation-calculator",
       "hvac-humidity-control-calculator",
       "hvac-hrv-erv-effectiveness-calculator",
@@ -361,9 +414,10 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
   },
   {
     label: "Efficiency & Cost",
-    description: "Compare SEER, HSPF, and AFUE ratings, calculate operating cost and replacement cost, size hydronic systems, and price contractor jobs.",
+    description: "Compare SEER/SEER2, HSPF, and AFUE ratings, calculate operating cost and replacement cost, size hydronic systems, and price contractor jobs.",
     slugs: [
       "hvac-seer-savings-calculator",
+      "hvac-seer2-converter",
       "hvac-hspf-savings-calculator",
       "hvac-afue-savings-calculator",
       "hvac-operating-cost-calculator",

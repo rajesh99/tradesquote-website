@@ -1,0 +1,482 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Refrigerant PT Chart | TradesQuote";
+const description =
+  "Free refrigerant PT chart for R-410A, R-32, R-454B, and R-22. Look up saturation pressure (psig and bar) at any temperature for superheat and subcooling field work.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-refrigerant-pt-chart";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Refrigerant PT Chart", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Refrigerant PT Chart",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online refrigerant pressure-temperature (PT) chart for R-410A, R-32, R-454B, and R-22. Enter a saturation temperature to get gauge pressure in psig and bar(a) with linear interpolation from ASHRAE 2021 tabulated data.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is a PT chart used for?",
+    answer:
+      "A pressure-temperature (PT) chart gives the saturation pressure of a refrigerant at any temperature. HVAC technicians use it to convert gauge pressure readings from their manifold gauges into the saturation temperature, then calculate superheat (suction side) or subcooling (liquid side). Every refrigerant has its own PT chart.",
+  },
+  {
+    question: "Why are R-410A and R-32 pressures so similar?",
+    answer:
+      "R-410A is a near-azeotropic blend of R-32 and R-125 (50/50 by weight). R-32 alone has slightly higher pressures than R-410A, particularly at higher temperatures. R-454B is designed to replace R-410A with lower GWP while maintaining similar pressures.",
+  },
+  {
+    question: "What pressure should I expect on the suction side of an R-410A AC?",
+    answer:
+      "At normal operating conditions (40°F evaporator saturation temperature), R-410A suction pressure is approximately 118 psig. During hot summer pulldown, suction pressure may temporarily be higher.",
+  },
+  {
+    question: "What is R-454B and when do I need it?",
+    answer:
+      "R-454B (trade name Opteon XL41) is an A2L mildly flammable refrigerant replacing R-410A in new equipment starting with DOE efficiency standards. Equipment designed for R-454B requires A2L-rated tools and procedures. Never substitute refrigerants without manufacturer authorization.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "PT chart readings. Now quote the refrigerant repair.";
+const ctaDescription =
+  "A PT chart lookup tells you what the saturation condition should be — TradesQuote turns the service call scope into a detailed, line-item estimate in seconds. Describe the job or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-superheat-calculator",
+    title: "Superheat Calculator",
+    description: "Use PT chart pressures to calculate suction-side superheat.",
+  },
+  {
+    href: "/calculators/hvac/hvac-subcooling-calculator",
+    title: "Subcooling Calculator",
+    description: "Use PT chart pressures to calculate liquid-side subcooling.",
+  },
+  {
+    href: "/calculators/hvac/hvac-target-superheat-calculator",
+    title: "Target Superheat Calculator",
+    description: "Find the target superheat for fixed-orifice systems.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Refrigerant PT Chart — R-410A, R-32, R-454B, R-22 | TradesQuote" />
+    <meta
+      property="og:description"
+      content="Free refrigerant PT chart for R-410A, R-32, R-454B, and R-22. Look up saturation pressure in psig and bar at any temperature for superheat and subcooling field work."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Refrigerant PT Chart — R-410A, R-32, R-454B, R-22 | TradesQuote" />
+    <meta
+      name="twitter:description"
+      content="Instant refrigerant saturation pressure from temperature — R-410A, R-32, R-454B, R-22. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Refrigerant PT Chart" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-600"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                ></path>
+              </svg>
+              HVAC Tools · Refrigerant · Free
+            </span>
+
+            <!-- H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Refrigerant PT Chart <span class="text-cyan-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- Intro paragraph -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Look up the saturation pressure for R-410A, R-32, R-454B, or R-22 at any temperature between
+              −40°F and 130°F. Enter the saturation temperature from your manifold gauge reading to get psig
+              and bar(a) instantly — essential for calculating superheat and subcooling in the field.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-cyan-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter refrigerant and temperature
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="pt-refrigerant" class="text-sm font-semibold text-slate-800">Refrigerant</label>
+                  <select
+                    id="pt-refrigerant"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="r410a" selected>R-410A</option>
+                    <option value="r32">R-32</option>
+                    <option value="r454b">R-454B (Opteon XL41)</option>
+                    <option value="r22">R-22</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="pt-unit" class="text-sm font-semibold text-slate-800">Temperature unit</label>
+                  <select
+                    id="pt-unit"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="F" selected>Fahrenheit (°F)</option>
+                    <option value="C">Celsius (°C)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="pt-temp" class="text-sm font-semibold text-slate-800">Saturation temperature</label>
+                <input
+                  id="pt-temp"
+                  type="number"
+                  value="40"
+                  step="1"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Typical range: −40 to 130°F (−40 to 54°C). Values outside this range are clamped to the table ends.
+                </p>
+              </div>
+
+              <button
+                id="pt-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-cyan-600 to-teal-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-cyan-100">Saturation Pressure (psig)</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="pt-result-psig" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span class="text-xl font-semibold text-cyan-200">psig</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-cyan-100">Pressure bar(a)</p>
+                  <p id="pt-result-bara" class="mt-1 text-2xl font-bold">—</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-cyan-100">Phase state</p>
+                  <p id="pt-result-phase" class="mt-1 text-sm font-bold leading-snug">—</p>
+                </div>
+              </div>
+
+              <!-- Warning box -->
+              <div
+                id="pt-chart-warning"
+                class="hidden mt-4 rounded-xl bg-yellow-400/20 border border-yellow-300/40 p-4"
+              >
+                <p class="text-xs font-bold text-yellow-200 uppercase tracking-wide mb-1">Warning</p>
+                <p id="pt-chart-warning-text" class="text-sm font-medium text-yellow-100 leading-snug"></p>
+              </div>
+
+              <p class="mt-4 text-xs text-cyan-100 leading-relaxed">
+                Data from ASHRAE 2021 tabulated values with linear interpolation. Pressures are gauge (psig)
+                referenced to 14.696 psia atmospheric. For certification work, use a calibrated manifold set.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Common operating pressure reference</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Condition</th>
+                  <th class="py-2.5 pr-4 font-semibold">Sat. Temp</th>
+                  <th class="py-2.5 pr-4 font-semibold">R-410A (psig)</th>
+                  <th class="py-2.5 pr-4 font-semibold">R-22 (psig)</th>
+                  <th class="py-2.5 font-semibold">R-32 (psig)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Normal suction (AC)</td>
+                  <td class="py-2.5 pr-4">40°F</td>
+                  <td class="py-2.5 pr-4">118 psig</td>
+                  <td class="py-2.5 pr-4">69 psig</td>
+                  <td class="py-2.5">142.9 psig</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Normal discharge (AC)</td>
+                  <td class="py-2.5 pr-4">120°F</td>
+                  <td class="py-2.5 pr-4">392 psig</td>
+                  <td class="py-2.5 pr-4">214 psig</td>
+                  <td class="py-2.5">411.1 psig</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Heat pump suction (heating)</td>
+                  <td class="py-2.5 pr-4">20°F</td>
+                  <td class="py-2.5 pr-4">105.7 psig</td>
+                  <td class="py-2.5 pr-4">40.4 psig</td>
+                  <td class="py-2.5">100.2 psig</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">Ambient lock-out (~−10°F)</td>
+                  <td class="py-2.5 pr-4">−10°F</td>
+                  <td class="py-2.5 pr-4">59.4 psig</td>
+                  <td class="py-2.5 pr-4">16.2 psig</td>
+                  <td class="py-2.5">52.4 psig</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources: ASHRAE Handbook — Fundamentals (2021); manufacturer PT charts from Honeywell, Chemours, and Daikin.
+            R-454B pressures closely track R-32 at −3 to −5%.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How the Refrigerant PT Chart Works
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The pressure-temperature relationship for a pure refrigerant (or near-azeotropic blend) follows
+            the Clausius-Clapeyron equation. Antoine constants are fit to measured saturation data from ASHRAE
+            Fundamentals. This calculator uses tabulated data with linear interpolation between points for
+            accurate field results without requiring iterative calculations.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Saturation data from ASHRAE Fundamentals (2021) and manufacturer PT charts.</div>
+            <div class="mt-2">R-410A: ln(P_abs) = A &minus; B/(C+T)&nbsp; Antoine constants: A=7.069, B=1122.3, C=229.4</div>
+            <div>R-32:&nbsp;&nbsp; A=7.091, B=1058.2, C=236.5</div>
+            <div>R-454B: Closely tracks R-32 with ~3% lower pressure at equivalent temperatures</div>
+            <div>R-22:&nbsp;&nbsp; A=6.893, B=1023.9, C=228.5</div>
+            <div class="mt-4 text-slate-400">All pressures in kPa(absolute); subtract 101.325 for psig (gauge).</div>
+            <div class="text-slate-400">The calculator uses tabulated data with linear interpolation for field accuracy.</div>
+            <div class="mt-4 text-cyan-300"># Unit conversion:</div>
+            <div>P_bara = (P_psig + 14.696) &times; 0.068948</div>
+            <div class="mt-2 text-slate-400">T_F = T_C &times; 9/5 + 32&nbsp;&nbsp;(for Celsius input)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Gauge vs absolute pressure</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Manifold gauges read psig (gauge pressure), which is absolute pressure minus atmospheric (14.696 psi).
+                Bar(a) is absolute pressure in bar. Add 14.696 psi to convert psig to psia, then multiply by 0.068948
+                to get bar(a).
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why refrigerants need their own PT chart</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Each refrigerant has unique thermodynamic properties — molecular weight, critical point, and
+                intermolecular forces — that determine how rapidly pressure changes with temperature. Never use
+                one refrigerant's PT chart to diagnose a system charged with a different refrigerant.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Superheat calculation</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Superheat = suction line temperature − saturation temperature at suction pressure. Read suction
+                pressure, look up the corresponding saturation temperature on this chart, then subtract from the
+                actual suction line temperature measured with a clamp probe.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">R-454B and A2L safety</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                R-454B is an A2L mildly flammable refrigerant. Its PT curve is very close to R-410A — but
+                equipment must be specifically rated for A2L refrigerants. A2L-rated manifold sets, recovery
+                machines, and leak detectors are required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLE ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked example</h2>
+        <p class="mt-4 text-slate-600">
+          A concrete field example showing how to use the PT chart to diagnose refrigerant charge on an
+          R-410A system.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-600 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Diagnosing superheat on an R-410A split system
+              </h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              You connect your manifold to an R-410A system and read <strong>124 psig</strong> on the suction
+              gauge. Your clamp thermometer on the suction line reads <strong>52°F</strong>.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              <div class="text-cyan-600"># Step 1: Look up saturation temperature at 124 psig</div>
+              <div>From the R-410A PT chart: 124.9 psig &rarr; 30°F saturation temperature</div>
+              <div class="mt-2 text-cyan-600"># Step 2: Calculate superheat</div>
+              <div>Superheat = suction line temp &minus; saturation temp</div>
+              <div>Superheat = 52&deg;F &minus; 30&deg;F = <span class="font-bold text-cyan-700">22&deg;F</span></div>
+              <div class="mt-2 text-cyan-600"># Step 3: Compare to target</div>
+              <div>TXV system target: typically 8&ndash;12&deg;F. Fixed-orifice: use Target Superheat Calculator.</div>
+              <div>22&deg;F superheat suggests <span class="font-bold text-cyan-700">slightly low charge or high load</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Conclusion:</span> The suction pressure of 124 psig
+              corresponds to a 30°F saturation temperature. With a 22°F superheat, the system is operating
+              above the typical TXV target — check outdoor ambient, indoor conditions, and airflow before
+              adding refrigerant.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-600 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Checking discharge pressure on an R-410A condenser at 95°F outdoor ambient
+              </h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              At 95°F outdoor ambient, the condensing saturation temperature is typically 30–35°F above
+              ambient, so approximately <strong>125–130°F</strong>.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              <div class="text-cyan-600"># Expected discharge pressure at 125°F sat. temp (R-410A)</div>
+              <div>From PT chart: 120&deg;F &rarr; 392.3 psig · 130&deg;F &rarr; 433.6 psig</div>
+              <div>At 125&deg;F: interpolate &rarr; <span class="font-bold text-cyan-700">~413 psig</span></div>
+              <div class="mt-2 text-cyan-600"># If reading is 450+ psig at this ambient</div>
+              <div>Suspect: dirty condenser coil, non-condensables, or overcharge</div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Conclusion:</span> A discharge pressure significantly
+              above the PT-chart value for the expected condensing temperature indicates a problem — dirty
+              coil, non-condensables in the system, or excessive charge are the primary suspects.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about refrigerant PT charts and field pressure-temperature diagnostics."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="cyan" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacRefrigerantPtChart } from "@/scripts/calculators/hvac-refrigerant-pt-chart";
+    initHvacRefrigerantPtChart();
+  </script>
+</Layout>
