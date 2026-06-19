@@ -1,0 +1,614 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Air Changes Per Hour (ACH) Calculator — ASHRAE 62.1 & 170 Ventilation | TradesQuote";
+const description =
+  "Free ACH ventilation calculator. Convert CFM to air changes per hour (or reverse), check against ASHRAE 62.1 commercial and ASHRAE 170 healthcare minimum rates by space type, and flag non-compliant ventilation instantly. No sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-ach-ventilation-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "ACH Ventilation Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Air Changes Per Hour (ACH) Ventilation Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online ACH ventilation calculator that converts CFM to air changes per hour or calculates required CFM from a target ACH, with automatic ASHRAE 62.1 and ASHRAE 170 compliance checking by space type.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is ACH (air changes per hour)?",
+    answer:
+      "ACH is the number of times per hour the total air volume of a room is replaced by ventilation supply air. It equals airflow in CFM times 60 (to convert to per-hour), divided by the room volume in cubic feet: <em>ACH = (CFM × 60) / volume</em>. Higher ACH means more dilution ventilation — critical for spaces with high pollutant loads, infection risk, or odour levels.",
+  },
+  {
+    question: "What ACH is required for an office?",
+    answer:
+      "ASHRAE 62.1 for commercial buildings specifies ventilation by people and floor area — typically resulting in <strong>4–6 total ACH</strong> for a standard office depending on occupancy density. The code formula: outdoor air = (occupants × 5 CFM/person) + (floor area × 0.06 CFM/sq ft).",
+  },
+  {
+    question: "What ACH is required for a hospital operating room?",
+    answer:
+      "ASHRAE 170 (ventilation for healthcare facilities) requires a minimum of <strong>20 total ACH</strong> for operating rooms, of which at least 4 ACH must be outdoor air. Air must be supplied from ceiling HEPA diffusers in a unidirectional downward pattern, with exhaust from low side-wall returns.",
+  },
+  {
+    question: "What is a good ACH for a residential home?",
+    answer:
+      "ASHRAE 62.2 sets a minimum of <strong>0.35 ACH</strong> (or 15 CFM, whichever is greater) for residential whole-house mechanical ventilation. Modern tight construction often requires mechanical ventilation — HRV or ERV — to meet this minimum. Well-sealed passive houses typically need 0.3–0.5 ACH of mechanical ventilation.",
+  },
+  {
+    question: "How many CFM do I need for a target ACH?",
+    answer:
+      "Rearrange the ACH formula: <em>CFM = ACH × room volume (ft³) / 60</em>. For example, a 10×10×9 ft room (900 ft³) needing 10 ACH requires: 10 × 900 / 60 = <strong>150 CFM</strong>.",
+  },
+  {
+    question: "Is higher ACH always better?",
+    answer:
+      "Not necessarily. Very high ACH in a heating or cooling climate increases the ventilation energy load — you must condition all that outside air. ASHRAE standards set <em>minimums</em> for health and code compliance, not targets to maximise. For energy efficiency, use demand-controlled ventilation (DCV) to modulate ACH based on actual occupancy and CO₂ sensors.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Confirmed the ventilation rate. Now price the IAQ work.";
+const ctaDescription =
+  "ASHRAE compliance defines the scope — TradesQuote converts it into a detailed line-item estimate in seconds. Describe the ventilation work or upload the drawings, and our AI builds equipment, ductwork, labour, and accessories, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-ventilation-calculator",
+    title: "ASHRAE 62.2 / 62.1 Ventilation CFM",
+    description: "Required whole-building ventilation CFM by occupancy.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Room airflow and system total CFM targets.",
+  },
+  {
+    href: "/calculators/hvac/hvac-hrv-erv-effectiveness-calculator",
+    title: "HRV / ERV Effectiveness",
+    description: "Verify energy recovery ventilator performance.",
+  },
+  {
+    href: "/calculators/hvac/hvac-humidity-control-calculator",
+    title: "Humidity Control Calculator",
+    description: "Dehumidifier and humidifier sizing from latent load.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Air Changes Per Hour (ACH) Calculator — ASHRAE 62.1 & 170 Ventilation" />
+    <meta
+      property="og:description"
+      content="Convert CFM to air changes per hour, check against ASHRAE 62.1 and ASHRAE 170 minimums by space type, and flag non-compliant ventilation instantly. Free."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Air Changes Per Hour (ACH) Calculator — ASHRAE 62.1 & 170 Ventilation" />
+    <meta
+      name="twitter:description"
+      content="Free ACH ventilation calculator. Check ASHRAE compliance by space type instantly, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="ACH Ventilation Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                ></path>
+              </svg>
+              HVAC Tools · IAQ · Free
+            </span>
+
+            <!-- H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Air Changes Per Hour (ACH) Calculator <span class="text-emerald-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- Hero intro -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Air changes per hour (ACH) is the ratio of total ventilation airflow to room volume, normalized to a
+              one-hour period. It is the standard metric for comparing ventilation intensity across different room sizes
+              — from residential bedrooms to hospital operating rooms. Enter room volume and airflow to calculate ACH,
+              or enter target ACH to find the required CFM, with automatic ASHRAE 62.1 and ASHRAE 170 compliance
+              checking by space type.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-emerald-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter room dimensions &amp; airflow
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <!-- Calculation mode -->
+              <div>
+                <label for="ach-mode" class="text-sm font-semibold text-slate-800">Calculation mode</label>
+                <select
+                  id="ach-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="cfmToAch" selected>CFM → ACH (calculate air changes from airflow)</option>
+                  <option value="achToCfm">ACH → CFM (calculate required airflow from target ACH)</option>
+                </select>
+              </div>
+
+              <!-- Room dimensions -->
+              <div class="grid sm:grid-cols-3 gap-5">
+                <div>
+                  <label for="ach-length" class="text-sm font-semibold text-slate-800">Room length (ft)</label>
+                  <input
+                    id="ach-length"
+                    type="number"
+                    min="1"
+                    value="20"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ach-width" class="text-sm font-semibold text-slate-800">Room width (ft)</label>
+                  <input
+                    id="ach-width"
+                    type="number"
+                    min="1"
+                    value="15"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ach-height" class="text-sm font-semibold text-slate-800">Ceiling height (ft)</label>
+                  <input
+                    id="ach-height"
+                    type="number"
+                    min="6"
+                    max="50"
+                    value="9"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <!-- Airflow input (CFM→ACH mode) -->
+              <div id="ach-cfm-field">
+                <label for="ach-cfm" class="text-sm font-semibold text-slate-800">Airflow (CFM)</label>
+                <input
+                  id="ach-cfm"
+                  type="number"
+                  min="0"
+                  value="200"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                />
+              </div>
+
+              <!-- Target ACH input (ACH→CFM mode) -->
+              <div id="ach-target-field" class="hidden">
+                <label for="ach-target" class="text-sm font-semibold text-slate-800">Target ACH</label>
+                <input
+                  id="ach-target"
+                  type="number"
+                  min="0.1"
+                  step="0.5"
+                  value="6"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                />
+              </div>
+
+              <!-- Space type -->
+              <div>
+                <label for="ach-space" class="text-sm font-semibold text-slate-800"
+                  >Space type (ASHRAE minimum ACH)</label
+                >
+                <select
+                  id="ach-space"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="general">General office / commercial (0.15 cfm/sqft + people)</option>
+                  <option value="bedroom">Residential bedroom (0.35 ACH per ASHRAE 62.2)</option>
+                  <option value="classroom">Classroom / conference room (4 ACH typical)</option>
+                  <option value="restroom">Restroom / toilet room (10 ACH per ASHRAE 62.1)</option>
+                  <option value="kitchen">Commercial kitchen (12–20 ACH)</option>
+                  <option value="laboratory">Laboratory / clean room (6–10 ACH)</option>
+                  <option value="hospital_ward">Hospital patient room (2 ACH ASHRAE 170)</option>
+                  <option value="hospital_or">Operating room (20 ACH ASHRAE 170)</option>
+                  <option value="hospital_iso">Isolation room (12 ACH ASHRAE 170)</option>
+                  <option value="parking">Parking garage (1.5 ACH per IMC)</option>
+                </select>
+              </div>
+
+              <button
+                id="ach-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p id="ach-result-label" class="text-sm font-medium text-emerald-100">Air changes per hour</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ach-result-main" class="text-5xl font-extrabold tracking-tight">6.0</span>
+                <span id="ach-result-unit" class="text-xl font-semibold text-emerald-100">ACH</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-emerald-100">Room volume</p>
+                  <p id="ach-result-volume" class="mt-1 text-xl font-bold">2,700 ft³</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-emerald-100">ASHRAE minimum</p>
+                  <p id="ach-result-min" class="mt-1 text-xl font-bold">4 ACH</p>
+                </div>
+              </div>
+
+              <!-- Compliance badge -->
+              <div class="mt-3">
+                <span
+                  id="ach-compliance"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold"
+                >
+                  Compliant
+                </span>
+              </div>
+
+              <!-- Warning box -->
+              <div id="ach-warning" class="hidden mt-3 rounded-xl bg-red-500/30 border border-red-300/40 p-4">
+                <p class="text-xs font-semibold text-red-100 uppercase tracking-wide">Non-compliant</p>
+                <p id="ach-warning-text" class="mt-1 text-sm text-red-50 leading-snug"></p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-emerald-50">
+                  <div class="flex justify-between">
+                    <span>Dimensions</span><span id="ach-bd-dims" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Volume</span><span id="ach-bd-volume" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Airflow</span><span id="ach-bd-cfm" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>ACH</span><span id="ach-bd-ach" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Minimum ACH</span><span id="ach-bd-min" class="font-bold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-emerald-100 leading-relaxed">
+                ACH = (CFM × 60) ÷ room volume (ft³). ASHRAE minimums shown are representative; always verify the
+                applicable code edition and space classification with the authority having jurisdiction (AHJ).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">ASHRAE minimum ACH by space type (representative values)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Always consult the adopted code edition and authority having jurisdiction (AHJ) for project-specific
+            requirements.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Space</th>
+                  <th class="py-2.5 pr-4 font-semibold">Code reference</th>
+                  <th class="py-2.5 font-semibold">Min ACH</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Residential bedroom</td>
+                  <td class="py-2.5 pr-4">ASHRAE 62.2 (0.35 ACH)</td>
+                  <td class="py-2.5">0.35</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">General office</td>
+                  <td class="py-2.5 pr-4">ASHRAE 62.1 (per-person + area)</td>
+                  <td class="py-2.5">~4 typical</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Conference room</td>
+                  <td class="py-2.5 pr-4">ASHRAE 62.1</td>
+                  <td class="py-2.5">4–6</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Restroom</td>
+                  <td class="py-2.5 pr-4">ASHRAE 62.1</td>
+                  <td class="py-2.5">10</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Commercial kitchen</td>
+                  <td class="py-2.5 pr-4">ASHRAE 62.1 / IMC</td>
+                  <td class="py-2.5">12–20</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Hospital patient room</td>
+                  <td class="py-2.5 pr-4">ASHRAE 170</td>
+                  <td class="py-2.5">2 (+ 2 OA)</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Operating room</td>
+                  <td class="py-2.5 pr-4">ASHRAE 170</td>
+                  <td class="py-2.5">20 (+ 4 OA)</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Isolation (negative)</td>
+                  <td class="py-2.5 pr-4">ASHRAE 170</td>
+                  <td class="py-2.5">12 (+ 2 OA)</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">Parking garage</td>
+                  <td class="py-2.5 pr-4">IMC 406</td>
+                  <td class="py-2.5">1.5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA SECTION ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The ACH formula, explained</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Air changes per hour is a dimensionless index that describes how many times per hour the total air volume of
+            a space is exchanged. It standardises ventilation comparisons across different room sizes: a 500 CFM system
+            in a 5,000 cubic foot room delivers the same 6 ACH as a 50 CFM system in a 500 cubic foot room. ASHRAE
+            prescribes minimum ACH values by space type to protect indoor air quality — ASHRAE 62.1 for commercial
+            spaces, ASHRAE 62.2 for residential, and ASHRAE 170 for healthcare environments.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-emerald-400"># Imperial ACH calculation:</div>
+            <div>ACH = (Q × 60) / V &nbsp;&nbsp;&nbsp;<span class="text-slate-400">[air changes per hour]</span></div>
+            <div class="mt-1 text-slate-400">&nbsp;&nbsp;Q = ventilation airflow (CFM — cubic feet per minute)</div>
+            <div class="text-slate-400">&nbsp;&nbsp;V = room volume (ft³) = length × width × ceiling height</div>
+            <div class="text-slate-400">&nbsp;&nbsp;60 = minutes per hour</div>
+            <div class="mt-4 text-emerald-400"># Reverse: required airflow from target ACH:</div>
+            <div>Q_required = ACH × V / 60 &nbsp;&nbsp;&nbsp;<span class="text-slate-400">[CFM]</span></div>
+            <div class="mt-4 text-emerald-400"># Room volume:</div>
+            <div>V = L × W × H &nbsp;&nbsp;&nbsp;<span class="text-slate-400">[ft³]</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">ACH vs. CFM per person</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                ACH is a volume-based metric useful for dilution ventilation. ASHRAE 62.1 Table 6-1 specifies both a
+                per-person component (CFM/person) and an area component (CFM/sq ft) — the per-person method ensures
+                adequate outdoor air regardless of room size.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Total vs. outside air ACH</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A space may have 10 total ACH (recirculated + outside air) but only 2 outside air ACH. ASHRAE 170
+                healthcare requirements specify outside air ACH separately from total ACH. Confirm whether a code
+                requirement refers to total supply air or outside air only.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Residential 0.35 ACH</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                ASHRAE 62.2 sets a minimum of 0.35 ACH or 15 CFM, whichever is greater, for residential
+                whole-building mechanical ventilation. This is a much lower rate than commercial standards because
+                dwellings rely on envelope infiltration for a portion of fresh air.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Healthcare isolation rooms</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                ASHRAE 170 requires negative-pressure isolation rooms to maintain 12+ total ACH (2 outside air ACH
+                minimum) with 100% exhaust to prevent cross-contamination. Positive-pressure protective environment
+                rooms require 12 ACH with HEPA-filtered supply.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three real-world scenarios showing compliant ventilation, an ASHRAE 170 sizing calculation, and a
+          non-compliant restroom exhaust fan.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Office break room — 15×12×9 ft, 150 CFM supply
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              V = 15 × 12 × 9 = <span class="font-bold">1,620 ft³</span><br />
+              ACH = (150 × 60) / 1,620 = 9,000 / 1,620 = <span class="font-bold text-emerald-700">5.6 ACH</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> General office ASHRAE 62.1 typical ≈ 4 ACH —
+              <span class="font-semibold text-emerald-700">Compliant.</span>
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Hospital patient room — 14×12×9 ft, what CFM for 2 ACH minimum?
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              V = 14 × 12 × 9 = <span class="font-bold">1,512 ft³</span><br />
+              Q (outside air) = 2 × 1,512 / 60 = <span class="font-bold text-emerald-700">50.4 CFM minimum OA</span><br />
+              Q (total supply, 4 ACH) = 4 × 1,512 / 60 = <span class="font-bold text-emerald-700">100.8 CFM total supply</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> ASHRAE 170 requires 2 outside air ACH for
+              patient rooms; total supply is typically 4 ACH. The outside air CFM and total supply CFM are sized
+              independently.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Commercial restroom — 8×6×9 ft, 70 CFM exhaust fan
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              V = 8 × 6 × 9 = <span class="font-bold">432 ft³</span><br />
+              ACH = (70 × 60) / 432 = 4,200 / 432 = <span class="font-bold text-red-600">9.7 ACH</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> ASHRAE 62.1 restroom minimum = 10 ACH —
+              <span class="font-semibold text-red-600">Non-compliant</span> (just below). Increase exhaust fan to
+              73 CFM: Q = 10 × 432 / 60 = 72 CFM.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about ACH, ASHRAE ventilation requirements, and code compliance."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="emerald" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacAchVentilationCalculator } from "@/scripts/calculators/hvac-ach-ventilation-calculator";
+    initHvacAchVentilationCalculator();
+  </script>
+</Layout>

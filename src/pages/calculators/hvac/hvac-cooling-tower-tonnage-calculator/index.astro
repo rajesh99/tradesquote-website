@@ -1,0 +1,593 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Cooling Tower Tonnage Calculator — Condenser Water Heat Rejection | TradesQuote";
+const description =
+  "Free cooling tower heat rejection calculator. Enter GPM, hot and cold water temperatures, and wet-bulb temperature to get heat rejection (BTU/h and tons), approach temperature, and chiller under-capacity warnings. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-cooling-tower-tonnage-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Cooling Tower Tonnage Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Cooling Tower Tonnage Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online cooling tower heat rejection calculator. Computes heat rejection in BTU/h and tons using the 500-GPM formula, calculates approach temperature to wet-bulb, and flags approach violations and chiller under-capacity conditions.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What does a cooling tower do in an HVAC system?",
+    answer:
+      "A cooling tower removes heat from the condenser water loop of a water-cooled chiller. The chiller transfers building heat to condenser water, which flows to the tower where evaporative cooling rejects the heat to the atmosphere. Because the chiller compressor also adds heat, the tower must reject roughly <strong>1.2–1.3 times the building's cooling load</strong>.",
+  },
+  {
+    question: "What is the 500 × GPM × ΔT formula?",
+    answer:
+      "This formula calculates the rate of heat rejection from a cooling tower in BTU/h: <em>Q = 500 × GPM × ΔT</em>. The factor 500 equals 8.34 lb/gal (water density) × 60 min/hr. Multiplied by flow (GPM) and temperature range (°F), it gives the heat rejection rate in BTU/h. It assumes water at standard density — accurate to within 1% across typical condenser water ranges.",
+  },
+  {
+    question: "What is the approach temperature of a cooling tower?",
+    answer:
+      "Approach is the difference between the cold water leaving the tower and the ambient wet-bulb temperature: <em>Approach = T_cold − WBT</em>. It measures how close the tower gets to the thermodynamic limit. A <strong>minimum approach of 5°F</strong> is the practical lower bound; closer approaches require exponentially larger tower fill areas and are rarely cost-effective.",
+  },
+  {
+    question: "Why is a minimum 5°F approach required?",
+    answer:
+      "Cooling towers work by evaporating water — the wet-bulb temperature is the thermodynamic floor for leaving cold water temperature. As approach decreases toward zero, the required tower size increases exponentially. In practice, <strong>5°F is the economic and mechanical minimum</strong>; designing below this results in an impractically large tower with extreme fan energy.",
+  },
+  {
+    question: "How do I account for chiller compressor heat?",
+    answer:
+      "The compressor adds heat equal to its work input: <em>Q_compression = chiller cooling load ÷ COP</em>. For a COP-5 chiller, this adds 20% to the reject load. The tower's total required capacity is: <em>Q_required = Q_evaporator × (1 + 1/COP)</em>. A common rule of thumb is 1.25 tower tons per chiller ton for a COP-4 machine.",
+  },
+  {
+    question: "What causes a chiller high-pressure trip?",
+    answer:
+      "If the cooling tower cannot reject enough heat, condenser water temperature rises above the chiller's high-pressure setpoint, triggering a compressor trip on high discharge pressure. Common causes: undersized tower, high ambient wet-bulb, fouled tower fill, low water flow, or strainer blockage. This calculator's under-capacity warning flags this condition at design.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the tower. Now quote the chiller plant.";
+const ctaDescription =
+  "Condenser water system sizing tells you what's needed — TradesQuote converts the full plant scope into a detailed line-item estimate in seconds. Describe the equipment, piping, and controls, or upload drawings, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert chiller tons to BTU/h and back.",
+  },
+  {
+    href: "/calculators/hvac/hvac-operating-cost-calculator",
+    title: "Operating Cost Calculator",
+    description: "Annual chiller energy cost from efficiency and runtime.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "AHU airflow from cooling load and coil ΔT.",
+  },
+  {
+    href: "/calculators/hvac/hvac-sensible-latent-heat-calculator",
+    title: "Sensible & Latent Heat Calculator",
+    description: "Split building load into sensible and latent components.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cooling Tower Tonnage Calculator — Condenser Water Heat Rejection" />
+    <meta
+      property="og:description"
+      content="Calculate cooling tower heat rejection capacity in BTU/h and tons, approach temperature to wet-bulb, and chiller under-capacity warnings. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cooling Tower Tonnage Calculator — Condenser Water Heat Rejection" />
+    <meta
+      name="twitter:description"
+      content="Cooling tower heat rejection, approach temperature, and chiller capacity check. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Cooling Tower Tonnage Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"
+                ></path>
+              </svg>
+              HVAC Tools · Chiller Plant · Free
+            </span>
+
+            <!-- (1) H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Cooling Tower Tonnage Calculator <span class="text-cyan-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- (2) Intro -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A cooling tower rejects both the evaporator load from the chiller and the heat of compression added
+              by the compressor — typically 1.25× the chiller's cooling capacity. This calculator uses the simple
+              500-GPM formula to find the tower's heat rejection capacity in BTU/h and cooling tons, calculates the
+              approach temperature to wet-bulb, and flags two critical design errors: an approach below 5°F and a
+              tower capacity smaller than the total chiller reject load.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-cyan-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter your cooling tower parameters
+            </h2>
+
+            <div class="mt-6 space-y-5">
+              <div>
+                <label for="ct-gpm" class="text-sm font-semibold text-slate-800"
+                  >Condenser water flow rate (GPM)</label
+                >
+                <input
+                  id="ct-gpm"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value="300"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                />
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ct-hot" class="text-sm font-semibold text-slate-800"
+                    >Hot water entering tower (T_hot, °F)</label
+                  >
+                  <input
+                    id="ct-hot"
+                    type="number"
+                    min="40"
+                    max="130"
+                    value="95"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label for="ct-cold" class="text-sm font-semibold text-slate-800"
+                    >Cold water leaving tower (T_cold, °F)</label
+                  >
+                  <input
+                    id="ct-cold"
+                    type="number"
+                    min="40"
+                    max="100"
+                    value="85"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label for="ct-wbt" class="text-sm font-semibold text-slate-800"
+                  >Ambient wet-bulb temperature (WBT, °F)</label
+                >
+                <input
+                  id="ct-wbt"
+                  type="number"
+                  min="40"
+                  max="95"
+                  value="78"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                />
+              </div>
+
+              <div>
+                <label for="ct-chiller-tons" class="text-sm font-semibold text-slate-800"
+                  >Chiller evaporator load (tons)</label
+                >
+                <input
+                  id="ct-chiller-tons"
+                  type="number"
+                  min="1"
+                  max="5000"
+                  value="200"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">The chiller's rated cooling capacity at design conditions.</p>
+              </div>
+
+              <div>
+                <label for="ct-cop" class="text-sm font-semibold text-slate-800"
+                  >Chiller COP (or EER ÷ 3.412)</label
+                >
+                <input
+                  id="ct-cop"
+                  type="number"
+                  min="1"
+                  max="15"
+                  step="0.1"
+                  value="5.0"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Typical COP 4–6 for centrifugal chillers. Heat of compression = chiller load / COP.
+                </p>
+              </div>
+
+              <button
+                id="ct-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-cyan-600 to-teal-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-cyan-100">Heat Rejection</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ct-result-rejection" class="text-4xl font-extrabold tracking-tight">—</span>
+                <span class="text-lg font-medium text-cyan-100">BTU/h</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-3 gap-3">
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-cyan-100">Tons</p>
+                  <p id="ct-result-tons" class="mt-1 text-xl font-bold">—</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-cyan-100">Approach</p>
+                  <p id="ct-result-approach" class="mt-1 text-xl font-bold">—</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-cyan-100">Required</p>
+                  <p id="ct-result-required" class="mt-1 text-xl font-bold">—</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-cyan-100">Status</p>
+                <p id="ct-status" class="mt-1 text-lg font-bold">—</p>
+              </div>
+
+              <!-- Warning box -->
+              <div
+                id="ct-warning"
+                class="mt-3 hidden rounded-xl bg-amber-400/30 border border-amber-300/40 p-4"
+              >
+                <p class="text-xs font-semibold text-amber-100 uppercase tracking-wide">Warning</p>
+                <p id="ct-warning-text" class="mt-1 text-sm font-medium text-white leading-snug">—</p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-cyan-50">
+                  <div class="flex justify-between">
+                    <span>GPM</span><span id="ct-bd-gpm" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Range (ΔT)</span><span id="ct-bd-range" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Heat rejection</span><span id="ct-bd-rejection" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Approach</span><span id="ct-bd-approach" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Required reject</span><span id="ct-bd-required" class="font-bold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-cyan-100 leading-relaxed">
+                Heat rejection formula: Q = 500 × GPM × ΔT. Approach = leaving cold water − ambient wet-bulb.
+                Tower selection requires approach ≥ 5°F at peak wet-bulb conditions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Cooling tower design benchmarks</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Metric</th>
+                  <th class="py-2.5 pr-4 font-semibold">Conservative</th>
+                  <th class="py-2.5 pr-4 font-semibold">Target</th>
+                  <th class="py-2.5 font-semibold">Minimum</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Approach temperature</td>
+                  <td class="py-2.5 pr-4">8–12°F</td>
+                  <td class="py-2.5 pr-4">5–8°F</td>
+                  <td class="py-2.5">5°F absolute minimum</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Condenser ΔT (range)</td>
+                  <td class="py-2.5 pr-4">8–12°F</td>
+                  <td class="py-2.5 pr-4">10°F</td>
+                  <td class="py-2.5">5°F</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">GPM per ton rejected</td>
+                  <td class="py-2.5 pr-4">2.5–3.5</td>
+                  <td class="py-2.5 pr-4">3.0</td>
+                  <td class="py-2.5">2.0</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">Tower tons to chiller tons ratio</td>
+                  <td class="py-2.5 pr-4">1.35:1</td>
+                  <td class="py-2.5 pr-4">1.25:1</td>
+                  <td class="py-2.5">1.15:1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The cooling tower heat rejection formula
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The 500-GPM formula is derived from the specific heat of water (1 BTU/lb/°F) and the density of water
+            (8.34 lb/gal). For water at standard temperature, the heat rejection rate equals 500 times the flow
+            rate in GPM times the temperature range across the tower. The tower must reject not just the building's
+            cooling load but also the heat of compression added by the chiller compressor — making the tower's
+            required capacity roughly 1.2–1.3 times the chiller's cooling tonnage.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Evaporative Heat Rejection Rate:</div>
+            <div>Q_rejection = 500 × GPM × (T_hot − T_cold)&nbsp;&nbsp;&nbsp;<span class="text-slate-400">[BTU/h]</span></div>
+            <div class="mt-1 text-slate-400">&nbsp;&nbsp;500 = 8.34 lb/gal × 60 min/hr&nbsp;&nbsp;(water density × unit conversion)</div>
+            <div class="text-slate-400">&nbsp;&nbsp;GPM = condenser water flow (gallons per minute)</div>
+            <div class="mt-4 text-cyan-300"># Approach Temperature:</div>
+            <div>Approach = T_cold − WBT&nbsp;&nbsp;&nbsp;<span class="text-slate-400">[°F]</span></div>
+            <div class="mt-1 text-slate-400">&nbsp;&nbsp;WBT = ambient wet-bulb temperature</div>
+            <div class="text-amber-300">&nbsp;&nbsp;→ minimum design approach ≥ 5°F</div>
+            <div class="mt-4 text-cyan-300"># Chiller heat of compression:</div>
+            <div>Q_compression = chiller_cooling_load_BTU / COP</div>
+            <div class="mt-4 text-cyan-300"># Required tower reject load:</div>
+            <div>Q_required = chiller_cooling_BTU + Q_compression</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = chiller_cooling_BTU × (1 + 1/COP)</div>
+            <div class="mt-4 text-cyan-300"># Tower tons (cooling tons = BTU/h ÷ 12,000):</div>
+            <div>Tower_tons = Q_rejection ÷ 12,000</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 500 × GPM?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The factor 500 comes from 8.34 lb/gal (water density) × 60 min/hr. This gives BTU/h when
+                multiplied by GPM and temperature difference. It is exact for water at ~60°F and accurate to within
+                1% across the typical condenser water temperature range of 75–105°F.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Approach vs. range</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Range is the temperature difference across the tower (hot entering minus cold leaving). Approach is
+                the difference between cold leaving water and ambient wet-bulb. Range is set by the heat load and
+                flow rate; approach is set by the tower's size (fill area, fan energy). A tighter approach requires
+                a larger, more expensive tower.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Heat of compression</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A chiller compressor adds work (heat) to the refrigerant circuit, and all of that work ultimately
+                becomes heat that the condenser and cooling tower must reject. For a COP-5 chiller, the compressor
+                heat equals 20% of the cooling load, so the tower must reject 120% of the chiller's rated tons.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Wet-bulb and tower capacity</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Cooling tower capacity is a function of wet-bulb temperature, not dry-bulb. On a humid day (high
+                wet-bulb), the driving force for evaporation decreases, reducing the tower's capacity. Towers
+                should always be selected at the design wet-bulb temperature for the site (typically the 1% or
+                0.4% ASHRAE wet-bulb design condition).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three scenarios showing an adequate design, a tight-approach violation, and a severely undersized tower.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                200-ton chiller plant — 600 GPM, T_hot=95°F, T_cold=85°F, WBT=78°F, COP=5.0
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>Q_rejection = 500 × 600 × (95−85) = <span class="font-bold text-cyan-700">3,000,000 BTU/h = 250 tons</span></div>
+              <div>Approach = 85 − 78 = <span class="font-bold text-cyan-700">7°F — acceptable (≥ 5°F)</span></div>
+              <div>Q_required = 200 × 12,000 × (1 + 1/5) = 2,880,000 BTU/h = 240 tons</div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Tower capacity (250 tons) &gt; required (240 tons) — adequate design.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Tight approach design — 400 GPM, T_hot=90°F, T_cold=83°F, WBT=80°F, COP=4.5
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>Q_rejection = 500 × 400 × 7 = <span class="font-bold text-amber-600">1,400,000 BTU/h ≈ 117 tons</span></div>
+              <div>Approach = 83 − 80 = <span class="font-bold text-red-600">3°F — below 5°F minimum, warning triggered</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Tower is thermodynamically unrealisable at this wet-bulb. Increase cold-water setpoint or select a larger tower.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Undersized tower — 200 GPM, T_hot=95°F, T_cold=85°F, WBT=75°F, chiller 200 tons, COP=5.5
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>Q_rejection = 500 × 200 × 10 = <span class="font-bold text-cyan-700">1,000,000 BTU/h ≈ 83 tons</span></div>
+              <div>Q_required = 200 × 12,000 × (1 + 1/5.5) = 2,400,000 + 436,000 = <span class="font-bold text-red-600">2,836,000 BTU/h ≈ 237 tons</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Tower (83 tons) &lt; required (237 tons) — severe under-capacity, compressor high-pressure trip.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about cooling tower sizing and condenser water system design."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="cyan" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacCoolingTowerTonnageCalculator } from "@/scripts/calculators/hvac-cooling-tower-tonnage-calculator";
+    initHvacCoolingTowerTonnageCalculator();
+  </script>
+</Layout>

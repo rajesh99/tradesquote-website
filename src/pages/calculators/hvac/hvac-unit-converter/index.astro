@@ -1,0 +1,548 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Unit Converter — Tons, BTU, kW, °F, °C, Pressure | TradesQuote";
+const description =
+  "Free HVAC unit converter. Convert cooling capacity (tons, BTU/h, kW), temperature (°F/°C), and pressure (in. w.c., Pa, PSI, kPa) in one tool. Instant field conversions, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-unit-converter";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Unit Converter", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Unit Converter",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC unit converter for cooling capacity (tons, BTU/h, kW), temperature (Fahrenheit and Celsius), and pressure (inches of water column, Pascals, PSI, and kPa).",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many BTU is 3 tons of cooling?",
+    answer:
+      "Three tons equals <strong>36,000 BTU/h</strong>. One ton of refrigeration is defined as 12,000 BTU/h — the heat needed to melt one short ton of ice in 24 hours. Multiply any tonnage by 12,000 to get BTU/h, or divide BTU/h by 12,000 to get tons.",
+  },
+  {
+    question: "How do I convert HVAC tons to kW?",
+    answer:
+      "First convert tons to BTU/h (tons × 12,000), then divide by <strong>3,412</strong> to get kilowatts. A 3-ton system is 36,000 BTU/h, which equals about <strong>10.6 kW</strong> of cooling capacity at standard rating conditions.",
+  },
+  {
+    question: "What is in. w.c. in HVAC ductwork?",
+    answer:
+      "<strong>Inches of water column (in. w.c.)</strong> is the standard unit for measuring total external static pressure (TESP) on residential and light-commercial duct systems. Manometers and digital gauges on the air side typically read in. w.c.; manufacturer limits are usually 0.5–0.8 in. w.c. for residential equipment.",
+  },
+  {
+    question: "How do I convert °F to °C for line temperatures?",
+    answer:
+      "Use <strong>°C = (°F − 32) × 5/9</strong>. For example, 75°F dry-bulb is 24°C. Reverse it with °F = (°C × 9/5) + 32. Field thermometers and manufacturer charts may use either scale — convert before comparing to a charging chart or superheat table.",
+  },
+  {
+    question: "When do I use PSI vs kPa on refrigerant gauges?",
+    answer:
+      "Refrigerant manifold gauges in the US typically read <strong>PSI</strong>; metric charts and European equipment often use <strong>kPa</strong>. Convert with kPa = PSI × 6.895. Static pressure on the air side uses in. w.c. or Pa — do not mix air-side and refrigerant-side units on the same reading.",
+  },
+  {
+    question: "Why is one ton equal to 12,000 BTU/h?",
+    answer:
+      "The ton dates to ice-storage cooling: one ton of refrigeration removes heat at the rate needed to melt <strong>2,000 lb of ice in 24 hours</strong>, which works out to 12,000 BTU/h. Modern equipment is still rated in tons and BTU/h even though ice-based cooling is obsolete.",
+  },
+  {
+    question: "When do HVAC techs need a unit converter in the field?",
+    answer:
+      "Any time specs cross unit systems: matching a <strong>36,000 BTU nameplate to 3 tons</strong>, comparing a 0.5 in. w.c. duct reading to a 125 Pa spec, converting a 95°F saturation temp for a metric PT chart, or quoting kW for a customer who thinks in tons. This tool covers the three conversions that come up most on service calls.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Units converted? Quote the equipment job in seconds.";
+const ctaDescription =
+  "Capacity and pressure numbers tell you what equipment fits — TradesQuote turns the install or replacement into a detailed, line-item estimate in seconds. Describe the tonnage swap, duct upgrade, or line-set run (or upload photos), and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "Tonnage Calculator",
+    description: "Convert BTU to tons and estimate AC size by sq ft.",
+  },
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator",
+    description: "Full cooling load with climate, sun, and insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-static-pressure-calculator",
+    title: "Static Pressure Calculator",
+    description: "Total TESP and compare to equipment max.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM Calculator",
+    description: "Target airflow per room and per ton.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="HVAC Unit Converter — Tons, BTU, kW, °F, °C, Pressure"
+    />
+    <meta
+      property="og:description"
+      content="Convert tons, BTU/h, kW, °F/°C, and in. w.c./Pa/PSI/kPa in one free HVAC tool. Instant field conversions."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="HVAC Unit Converter — Tons, BTU, kW, °F, °C, Pressure"
+    />
+    <meta
+      name="twitter:description"
+      content="Free HVAC unit converter for capacity, temperature, and pressure. Tons, BTU/h, kW, °F, °C, in. w.c., Pa, PSI, kPa — instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Unit Converter"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                ></path>
+              </svg>
+              HVAC Tools · Field Utilities · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Unit Converter <span class="text-sky-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Nameplates, gauge faces, and manufacturer charts do not always use the same units — tons vs BTU/h,
+              °F vs °C, in. w.c. vs Pa. This three-mode converter handles the conversions HVAC techs reach for
+              on every service call: cooling capacity, air and line temperature, and duct or refrigerant pressure.
+              Pick a mode, enter a value, and get every related unit instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-sky-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter value to convert
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <label for="uc-mode" class="text-sm font-semibold text-slate-800">Conversion mode</label>
+                <select
+                  id="uc-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                >
+                  <option value="capacity" selected>Capacity — tons, BTU/h, kW</option>
+                  <option value="temperature">Temperature — °F and °C</option>
+                  <option value="pressure">Pressure — in. w.c., Pa, PSI, kPa</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="uc-value" class="text-sm font-semibold text-slate-800">Value</label>
+                <input
+                  id="uc-value"
+                  type="number"
+                  step="any"
+                  value="3"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">Enter the number in the unit selected below.</p>
+              </div>
+
+              <div id="uc-capacity-fields">
+                <label for="uc-direction" class="text-sm font-semibold text-slate-800">Input unit</label>
+                <select
+                  id="uc-direction"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                >
+                  <option value="tons" selected>Tons of refrigeration</option>
+                  <option value="btu">BTU/h</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">1 ton = 12,000 BTU/h · kW = BTU/h ÷ 3,412</p>
+              </div>
+
+              <div id="uc-temp-fields" class="hidden">
+                <label for="uc-direction" class="text-sm font-semibold text-slate-800">Input unit</label>
+                <select
+                  id="uc-direction"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                >
+                  <option value="fahrenheit" selected>Fahrenheit (°F)</option>
+                  <option value="celsius">Celsius (°C)</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">For setpoints, line temps, and saturation checks.</p>
+              </div>
+
+              <div id="uc-pressure-fields" class="hidden">
+                <label for="uc-direction" class="text-sm font-semibold text-slate-800">Input unit</label>
+                <select
+                  id="uc-direction"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                >
+                  <option value="inwc" selected>Inches of water column (in. w.c.)</option>
+                  <option value="pa">Pascals (Pa)</option>
+                  <option value="psi">PSI</option>
+                  <option value="kpa">Kilopascals (kPa)</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">in. w.c. for duct static; PSI/kPa for refrigerant gauges.</p>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-sky-600 to-blue-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-sky-100">Primary result</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="uc-result-primary" class="text-5xl font-extrabold tracking-tight">3 tons</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Secondary</p>
+                  <p id="uc-result-secondary" class="mt-1 text-2xl font-bold">36,000 BTU/h</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Tertiary</p>
+                  <p id="uc-result-tertiary" class="mt-1 text-2xl font-bold">10.6 kW</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-sky-100">What this means</p>
+                <p id="uc-status" class="mt-1 text-sm font-medium leading-snug">
+                  Capacity conversion — 1 ton = 12,000 BTU/h = 3.517 kW at standard conditions.
+                </p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-sky-50">
+                  <div class="flex justify-between">
+                    <span>Your input</span><span id="uc-bd-input" class="font-semibold">3 tons</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Formula</span><span id="uc-bd-formula" class="font-bold text-right max-w-[60%]">BTU/h = tons × 12,000 · kW = BTU/h ÷ 3,412</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-sky-100 leading-relaxed">
+                Each mode converts independently — capacity, temperature, and pressure do not cross-multiply.
+                Use manufacturer charts for refrigerant-specific saturation temps and charge targets.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Common capacity conversions (tons · BTU/h · kW)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Standard HVAC capacity equivalents. kW = BTU/h ÷ 3,412 (rounded to one decimal).
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Tons</th>
+                  <th class="py-2.5 pr-4 font-semibold">BTU/h</th>
+                  <th class="py-2.5 font-semibold">kW</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">1.5</td>
+                  <td class="py-2.5 pr-4">18,000</td>
+                  <td class="py-2.5">5.3</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">2</td>
+                  <td class="py-2.5 pr-4">24,000</td>
+                  <td class="py-2.5">7.0</td>
+                </tr>
+                <tr class="border-b border-slate-100 bg-sky-50">
+                  <td class="py-2.5 pr-4 font-semibold text-sky-800">3</td>
+                  <td class="py-2.5 pr-4 font-semibold text-sky-800">36,000</td>
+                  <td class="py-2.5 font-semibold text-sky-800">10.6</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">4</td>
+                  <td class="py-2.5 pr-4">48,000</td>
+                  <td class="py-2.5">14.1</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">5</td>
+                  <td class="py-2.5 pr-4">60,000</td>
+                  <td class="py-2.5">17.6</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: ASHRAE / IAPWS unit definitions · ACCA Manual D (static pressure units) ·
+            AHRI rating conditions for capacity (12,000 BTU/h per ton).
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formulas, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three independent converters share one input box. Pick the mode that matches what is on your gauge,
+            nameplate, or chart — the tool applies the standard HVAC conversion for that quantity only.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-sky-300"># Capacity:</div>
+            <div>BTU/h&nbsp;=&nbsp;tons × 12,000</div>
+            <div>kW&nbsp;=&nbsp;BTU/h ÷ 3,412</div>
+            <div class="mt-4 text-sky-300"># Temperature:</div>
+            <div>°C&nbsp;=&nbsp;(°F − 32) × 5/9</div>
+            <div>°F&nbsp;=&nbsp;(°C × 9/5) + 32</div>
+            <div class="mt-4 text-sky-300"># Pressure:</div>
+            <div>Pa&nbsp;=&nbsp;in.w.c. × 249</div>
+            <div>kPa&nbsp;=&nbsp;PSI × 6.895</div>
+            <div class="mt-4 text-sky-300"># Example (capacity default):</div>
+            <div>
+              3 tons →{" "}
+              <span class="text-amber-300">36,000 BTU/h · 10.6 kW</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Tons and BTU/h</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Equipment nameplates often show BTU in the model number (036 = 36,000 BTU = 3 tons). Converting
+                quickly prevents ordering the wrong capacity or mismatching a coil to a condenser.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">kW for specs and customers</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Heat pumps and mini-splits sometimes list kW on import specs. Divide BTU/h by 3,412 to compare
+                apples-to-apples with tonnage-rated US equipment.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">°F and °C on line temps</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Superheat, subcooling, and saturation tables may use either scale. Convert before comparing a
+                clamp reading to a chart — a 5°F error is enough to misdiagnose charge.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Air-side vs refrigerant-side pressure</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Duct static pressure uses in. w.c. or Pa; manifold gauges read PSI or kPa. Keep the modes separate —
+                TESP in PSI is not a field reading you will see on a residential job.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three field conversions techs use every week — capacity from a nameplate, a dry-bulb temp for a metric
+          chart, and duct static pressure in SI units.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">3 tons → BTU/h and kW</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              BTU/h = 3 × 12,000 = <span class="font-bold text-sky-700">36,000 BTU/h</span><br />
+              kW = 36,000 ÷ 3,412 = <span class="font-bold text-sky-700">10.6 kW</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 3-ton condenser matched to a 36,000 BTU/h
+              coil — the default in this calculator. Model number <strong>036</strong> on the data plate confirms the
+              same capacity.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">75°F → Celsius</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              °C = (75 − 32) × 5/9 = 43 × 5/9 = <span class="font-bold text-sky-700">23.9°C</span> (≈ 24°C)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> typical summer return-air dry-bulb — switch
+              to Temperature mode, enter 75 with °F selected, and read 24°C for a metric superheat chart or
+              customer-facing report.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">0.5 in. w.c. → Pascals</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Pa = 0.5 × 249 = <span class="font-bold text-sky-700">125 Pa</span><br />
+              PSI ≈ 0.018 · kPa ≈ 0.12
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a common residential TESP ceiling — 0.5 in.
+              w.c. is the max on many air handlers. Switch to Pressure mode to express the same reading in Pa for a
+              spec sheet or compare with the <a href="/calculators/hvac/hvac-static-pressure-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Static Pressure Calculator</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about tons, BTU/h, temperature, and pressure conversions in HVAC work."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="sky" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacUnitConverter } from "@/scripts/calculators/hvac-unit-converter";
+    initHvacUnitConverter();
+  </script>
+</Layout>

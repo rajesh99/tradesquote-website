@@ -1,0 +1,430 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Replacement Cost Calculator — Free Price Estimator | TradesQuote";
+const description = "Free HVAC replacement cost calculator. Estimate the installed price of a new AC, furnace, heat pump, or full system — adjusted for size, efficiency tier, ductwork, and your local market.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-replacement-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "HVAC Replacement Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Replacement Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Free online HVAC replacement cost calculator that estimates the installed price range of a new central AC, furnace, heat pump, mini-split, or full system based on size, efficiency tier, ductwork condition, and regional labor market.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to replace a full HVAC system?",
+    answer:
+      "A full system replacement — central AC plus gas furnace — typically runs <strong>$8,000 to $15,000 installed</strong>, with about $10,500 as a national mid-point for a 3-ton, standard-efficiency setup. Size, efficiency tier, ductwork condition, and local labor rates move the number up or down.",
+  },
+  {
+    question: "How much does it cost to replace just the AC unit?",
+    answer:
+      "Replacing the central air conditioner — condenser and evaporator coil — typically costs <strong>$4,000 to $8,000 installed</strong>, around $5,500 for a 3-ton standard-efficiency unit. The indoor coil must match the new condenser, which is why an AC swap costs more than the outdoor unit alone.",
+  },
+  {
+    question: "Why does replacing ductwork add so much to the price?",
+    answer:
+      "Full duct replacement typically adds <strong>$2,500 to $6,000</strong> because it's labor-intensive work in attics and crawl spaces: tearing out old runs, sizing and sealing new ones, and balancing airflow. Minor sealing and repairs are far cheaper — usually $500 to $2,000.",
+  },
+  {
+    question: "Is a heat pump cheaper than an AC plus furnace?",
+    answer:
+      "Often, yes. One heat pump handles both heating and cooling — typically <strong>$6,000 to $12,000 installed</strong> versus $8,000 to $15,000 for an AC-plus-furnace combination. Federal tax credits and utility rebates can widen the gap further, though very cold climates may still favor a furnace or dual-fuel setup.",
+  },
+  {
+    question: "What should be included in an HVAC replacement quote?",
+    answer:
+      "A complete quote covers <strong>equipment, labor, refrigerant lines, electrical hookup, permits, haul-away of the old unit, and startup testing</strong>. Watch for exclusions like electrical-panel upgrades, duct modifications, or thermostat replacement — line-item quotes make those gaps easy to spot.",
+  },
+  {
+    question: "Is high-efficiency equipment worth the extra cost?",
+    answer:
+      'High-efficiency models typically cost <strong>15–30% more up front</strong> and pay it back through lower bills — fastest in climates with long cooling or heating seasons. Run your exact numbers with the <a href="/calculators/hvac/hvac-seer-savings-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">SEER Savings Calculator</a> before deciding.',
+  },
+  {
+    question: "Why do HVAC quotes vary so much between contractors?",
+    answer:
+      "Brand tier, equipment efficiency, warranty length, company overhead, and what's actually in scope all differ. A quote $3,000 below the others often <strong>excludes ductwork, permits, or disposal</strong>. Always compare line-item quotes so you're comparing the same job — not just the bottom line.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Contractors: turn ballparks into line-item quotes.";
+const ctaDescription =
+  "This page gives homeowners a budget — TradesQuote gives you the winning quote. Describe the replacement or upload photos, and our AI builds the full line-item estimate: equipment, labor, materials, permits, and disposal, with quantities and unit prices validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (Cooling)",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Heating size by climate zone and AFUE efficiency.",
+  },
+  {
+    href: "/calculators/hvac/hvac-seer-savings-calculator",
+    title: "SEER Savings Calculator",
+    description: "Compare efficiency ratings and energy costs.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Replacement Cost Calculator — Free Price Estimator" />
+    <meta property="og:description" content="Estimate the installed cost of a new AC, furnace, heat pump, or full HVAC system — adjusted for size, efficiency, ductwork, and region." />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Replacement Cost Calculator — Free Price Estimator" />
+    <meta name="twitter:description" content="Estimate the installed cost of a new AC, furnace, heat pump, or full HVAC system. Free, no sign-up." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+          <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+      
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Replacement Cost Calculator" />
+      
+              <div class="max-w-3xl">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  HVAC Tools · Cost · Free
+                </span>
+                <!-- (1) H1 -->
+                <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+                  HVAC Replacement Cost Calculator <span class="text-violet-600">— Free Online Calculator</span>
+                </h1>
+                <!-- (2) What this calculates — 2 sentences -->
+                <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+                  This HVAC replacement cost calculator estimates the installed price range of a new central AC,
+                  gas furnace, heat pump, mini-split, or full system — adjusted for system size, efficiency tier,
+                  ductwork condition, and your local labor market. Use it to set a realistic budget before you
+                  collect quotes, or to sanity-check the quotes you already have.
+                </p>
+      
+                <!-- Differentiator / internal links (avoids cannibalization) -->
+                <div class="mt-6 flex items-start gap-3 rounded-xl border border-violet-100 bg-violet-50 p-4">
+                  <svg class="h-5 w-5 shrink-0 text-violet-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <p class="text-sm text-slate-600">
+                    <span class="font-semibold text-slate-900">Not sure what size you need yet?</span>
+                    Get the load from the
+                    <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">BTU Calculator</a>,
+                    convert it with the
+                    <a href="/calculators/hvac/hvac-tonnage-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">Tonnage Calculator</a>,
+                    then come back here to price it.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+      
+          <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+          <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+            <div class="grid lg:grid-cols-5 gap-6">
+      
+              <!-- Inputs -->
+              <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  Describe the replacement job
+                </h2>
+      
+                <div class="mt-6 space-y-5">
+                  <!-- System type -->
+                  <div>
+                    <label for="sysType" class="text-sm font-semibold text-slate-800">What's being replaced?</label>
+                    <select id="sysType"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
+                      <option value="5500">Central AC only (condenser + coil)</option>
+                      <option value="5000">Gas furnace only</option>
+                      <option value="10500" selected>Full system — AC + furnace</option>
+                      <option value="9000">Heat pump (heating + cooling)</option>
+                      <option value="4000">Ductless mini-split (single zone)</option>
+                    </select>
+                  </div>
+      
+                  <div class="grid sm:grid-cols-2 gap-5">
+                    <!-- Size -->
+                    <div>
+                      <label for="sysSize" class="text-sm font-semibold text-slate-800">System size</label>
+                      <select id="sysSize"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
+                        <option value="1.5">1.5 tons (18,000 BTU)</option>
+                        <option value="2">2 tons (24,000 BTU)</option>
+                        <option value="2.5">2.5 tons (30,000 BTU)</option>
+                        <option value="3" selected>3 tons (36,000 BTU)</option>
+                        <option value="3.5">3.5 tons (42,000 BTU)</option>
+                        <option value="4">4 tons (48,000 BTU)</option>
+                        <option value="5">5 tons (60,000 BTU)</option>
+                      </select>
+                    </div>
+      
+                    <!-- Efficiency tier -->
+                    <div>
+                      <label for="sysEff" class="text-sm font-semibold text-slate-800">Efficiency tier</label>
+                      <select id="sysEff"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
+                        <option value="1.0" selected>Standard — meets minimum code</option>
+                        <option value="1.12">Mid-tier — better SEER2 / AFUE (+12%)</option>
+                        <option value="1.25">High-efficiency — top SEER2 / condensing (+25%)</option>
+                      </select>
+                    </div>
+      
+                    <!-- Ductwork -->
+                    <div>
+                      <label for="sysDuct" class="text-sm font-semibold text-slate-800">Ductwork condition</label>
+                      <select id="sysDuct"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
+                        <option value="0" selected>Existing ducts in good shape</option>
+                        <option value="1000">Minor repairs & sealing (+$1,000)</option>
+                        <option value="4000">Full duct replacement (+$4,000)</option>
+                      </select>
+                    </div>
+      
+                    <!-- Labor market -->
+                    <div>
+                      <label for="sysMarket" class="text-sm font-semibold text-slate-800">Local labor market</label>
+                      <select id="sysMarket"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
+                        <option value="0.9">Low-cost area (×0.9)</option>
+                        <option value="1.0" selected>National average (×1.0)</option>
+                        <option value="1.2">High-cost metro (×1.2)</option>
+                      </select>
+                    </div>
+                  </div>
+      
+                  <button id="resetBtn"
+                    class="text-sm font-medium text-slate-500 hover:text-violet-600 transition flex items-center gap-1.5">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset to defaults
+                  </button>
+                </div>
+              </div>
+      
+              <!-- Results -->
+              <div class="lg:col-span-2">
+                <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 p-6 sm:p-8 text-white shadow-lg">
+                  <p class="text-sm font-medium text-violet-100">Estimated installed cost</p>
+                  <div class="mt-2">
+                    <span id="rangeResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">$8,900 – $12,100</span>
+                  </div>
+      
+                  <div class="mt-6 grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p class="text-xs text-violet-100">Typical mid-point</p>
+                      <p id="midResult" class="mt-1 text-2xl font-bold">$10,500</p>
+                    </div>
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p class="text-xs text-violet-100">Per ton of capacity</p>
+                      <p id="perTonResult" class="mt-1 text-2xl font-bold">$3,500</p>
+                    </div>
+                  </div>
+      
+                  <!-- Breakdown -->
+                  <details class="group mt-5 rounded-xl bg-white/10">
+                    <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                      See the breakdown
+                      <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-4 pb-4 text-sm space-y-1.5 text-violet-50">
+                      <div class="flex justify-between"><span>Base price (system type)</span><span id="bd-base" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Size adjustment</span><span id="bd-size" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Efficiency tier</span><span id="bd-eff" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Ductwork</span><span id="bd-duct" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Labor market</span><span id="bd-market" class="font-semibold">—</span></div>
+                      <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"><span class="font-bold">Mid-point estimate</span><span id="bd-total" class="font-bold">—</span></div>
+                    </div>
+                  </details>
+      
+                  <p class="mt-4 text-xs text-violet-100 leading-relaxed">
+                    National 2026 ballparks for budgeting — equipment, labor, permit, and disposal included.
+                    Your local line-item quotes are the real number; use this to sanity-check them.
+                  </p>
+                </div>
+              </div>
+            </div>
+      
+            <!-- Reference table -->
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+              <h2 class="text-xl font-bold text-slate-900">Typical HVAC replacement costs (quick reference)</h2>
+              <p class="mt-2 text-sm text-slate-500">National installed-price ranges for standard-efficiency equipment, existing ductwork in good shape. High-efficiency tiers add roughly 15–30%.</p>
+              <div class="mt-5 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-slate-500">
+                      <th class="py-2.5 pr-4 font-semibold">Replacement job</th>
+                      <th class="py-2.5 pr-4 font-semibold">Low</th>
+                      <th class="py-2.5 pr-4 font-semibold">Typical</th>
+                      <th class="py-2.5 font-semibold">High</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-700">
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Central AC only</td><td class="py-2.5 pr-4">$4,000</td><td class="py-2.5 pr-4">$5,500</td><td class="py-2.5">$8,000</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Gas furnace only</td><td class="py-2.5 pr-4">$3,500</td><td class="py-2.5 pr-4">$5,000</td><td class="py-2.5">$7,500</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Full system (AC + furnace)</td><td class="py-2.5 pr-4">$8,000</td><td class="py-2.5 pr-4">$10,500</td><td class="py-2.5">$15,000</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Heat pump</td><td class="py-2.5 pr-4">$6,000</td><td class="py-2.5 pr-4">$9,000</td><td class="py-2.5">$12,500</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Mini-split (single zone)</td><td class="py-2.5 pr-4">$3,000</td><td class="py-2.5 pr-4">$4,000</td><td class="py-2.5">$5,500</td></tr>
+                    <tr><td class="py-2.5 pr-4 font-semibold">Ductwork replacement (add-on)</td><td class="py-2.5 pr-4">+$2,500</td><td class="py-2.5 pr-4">+$4,000</td><td class="py-2.5">+$6,000</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="mt-4 text-xs text-slate-500">Ranges reflect typical 2026 national pricing for residential jobs and vary by brand, region, and site conditions. Always compare multiple line-item quotes.</p>
+            </div>
+          </section>
+      
+          <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+          <section class="bg-slate-50 border-y border-slate-200">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+              <p class="mt-4 text-slate-600 leading-relaxed">
+                Replacement pricing isn't mysterious — it's a base price for the type of job, scaled by the four
+                things that genuinely change the work: size, efficiency, ductwork, and local labor rates.
+              </p>
+      
+              <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+                <div class="text-violet-300"># Step 1 — Start from the job's base price</div>
+                <div>base&nbsp;=&nbsp;AC <span class="text-amber-300">$5,500</span> · furnace <span class="text-amber-300">$5,000</span> · full system <span class="text-amber-300">$10,500</span> · heat pump <span class="text-amber-300">$9,000</span></div>
+                <div class="mt-4 text-violet-300"># Step 2 — Scale for size and efficiency</div>
+                <div>cost&nbsp;=&nbsp;base × size factor (<span class="text-amber-300">0.85–1.25</span>) × efficiency (<span class="text-amber-300">1.0–1.25</span>)</div>
+                <div class="mt-4 text-violet-300"># Step 3 — Add ductwork, then adjust for your market</div>
+                <div>total&nbsp;=&nbsp;(cost + ductwork) × labor market (<span class="text-amber-300">0.9–1.2</span>)</div>
+                <div class="mt-4 text-violet-300"># Step 4 — Show it as a range, not a fake-precise number</div>
+                <div>range&nbsp;=&nbsp;total × <span class="text-amber-300">0.85</span> … total × <span class="text-amber-300">1.15</span></div>
+              </div>
+      
+              <div class="mt-8 grid sm:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why size moves the price less than you'd think</h3>
+                  <p class="mt-2 text-sm text-slate-600">Going from 3 to 5 tons raises equipment cost, but the labor — the biggest line — stays similar. That's why the size factor spans only 0.85–1.25.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why efficiency adds 12–25%</h3>
+                  <p class="mt-2 text-sm text-slate-600">Higher SEER2 and condensing AFUE equipment costs more to build (two-stage compressors, secondary heat exchangers) — but earns it back in bills over time.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Ductwork is the wildcard</h3>
+                  <p class="mt-2 text-sm text-slate-600">Good existing ducts add nothing. Full replacement adds thousands of dollars of attic and crawl-space labor — it's the single biggest surprise in real quotes.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why a ±15% range?</h3>
+                  <p class="mt-2 text-sm text-slate-600">Brand tier, warranty, access difficulty, and code extras (pads, disconnects, line sets) genuinely vary between jobs. A range is honest; a single number isn't.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+      
+          <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+          <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+            <p class="mt-4 text-slate-600">Three common replacement scenarios, priced step by step.</p>
+      
+            <div class="mt-8 space-y-6">
+              <!-- Example 1 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">1</span>
+                  <h3 class="text-lg font-bold text-slate-900">The typical job — full system, 3 tons, standard efficiency</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">AC + furnace · existing ducts in good shape · national-average labor.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  $10,500 × 1.00 × 1.00 + $0 = $10,500<br>
+                  × 1.0 market = $10,500<br>
+                  range = <span class="font-bold text-violet-700">$8,900 – $12,100</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> budget around $10,500 — the most common single number in American HVAC replacement, which is why quotes clustering near it are a good sign.</p>
+              </div>
+      
+              <!-- Example 2 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">2</span>
+                  <h3 class="text-lg font-bold text-slate-900">AC swap in an expensive city — 2 tons, high-efficiency, small duct fixes</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">Central AC only · high-efficiency tier · minor duct repairs · high-cost metro (×1.2).</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  $5,500 × 0.90 = $4,950 → × 1.25 = $6,188<br>
+                  + $1,000 ducts = $7,188 → × 1.2 market = $8,625<br>
+                  range = <span class="font-bold text-violet-700">$7,300 – $9,900</span> (mid ≈ $8,600)
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> a small unit still lands near $8,600 once you add the efficiency premium and big-city labor — size isn't the main cost driver, the market is.</p>
+              </div>
+      
+              <!-- Example 3 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">3</span>
+                  <h3 class="text-lg font-bold text-slate-900">The big job — 4-ton heat pump with all-new ductwork</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">Heat pump · mid-tier efficiency · full duct replacement · low-cost area (×0.9).</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  $9,000 × 1.15 = $10,350 → × 1.12 = $11,592<br>
+                  + $4,000 ducts = $15,592 → × 0.9 market = $14,033<br>
+                  range = <span class="font-bold text-violet-700">$11,900 – $16,100</span> (mid ≈ $14,000)
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> about $14,000 — and notice the ductwork alone is the difference between this and a ~$10,000 job. Before committing, check federal heat-pump tax credits and utility rebates, which can claw back thousands.</p>
+              </div>
+            </div>
+          </section>
+      
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="violet"
+            subtitle="Common questions about HVAC replacement pricing."
+          />
+
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+          <HvacRelatedCalculators calculators={relatedCalculators} accent="violet" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacReplacementCostCalculator } from "@/scripts/calculators/hvac-replacement-cost-calculator";
+    initHvacReplacementCostCalculator();
+  </script>
+</Layout>

@@ -1,0 +1,486 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Operating Cost Calculator — Cost to Run AC, Heat Pump & Furnace | TradesQuote";
+const description = "Free HVAC operating cost calculator. See what it actually costs to run a central AC, heat pump, gas furnace, or electric furnace — per hour, per day, and per year — from its efficiency, runtime, and your energy price. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-operating-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "HVAC Operating Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Operating Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Free online HVAC operating cost calculator that estimates the cost to run a central AC, heat pump, gas furnace, or electric furnace per hour, per day, and per year based on capacity, efficiency rating, runtime, and energy price.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to run an air conditioner per hour?",
+    answer:
+      "For a typical 3-ton, SEER 15 central AC at the U.S. average $0.17/kWh, about <strong>$0.41 per hour</strong> (2.4 kWh). Bigger or less efficient units cost more; the calculator above runs your exact numbers.",
+  },
+  {
+    question: "How much does it cost to run an AC per day / per month?",
+    answer:
+      "At ~$0.41/hr, running 8 hours a day is about <strong>$3.26/day</strong>, or roughly $98 a month. Hot-climate homes running 12+ hours a day pay proportionally more.",
+  },
+  {
+    question: "What's the formula for HVAC running cost?",
+    answer:
+      "For AC/heat pumps: <strong>kWh/hr = capacity BTU ÷ efficiency (SEER or HSPF) ÷ 1,000</strong>, then × your $/kWh. For gas: therms/hr = BTU ÷ (AFUE ÷ 100) ÷ 100,000, then × $/therm.",
+  },
+  {
+    question: "Is it cheaper to heat with a gas furnace or a heat pump?",
+    answer:
+      "It depends on local gas and electricity prices, but a heat pump delivers <strong>2–4 units of heat per unit of electricity</strong>, so it usually beats electric resistance heat outright and is competitive with gas — especially in milder weather above its balance point.",
+  },
+  {
+    question: "Why is electric (resistance) furnace heat so expensive?",
+    answer:
+      "Resistance heat has a <strong>COP of 1.0</strong>: every BTU of heat needs a full BTU of electricity. A heat pump moves heat instead of making it, delivering several BTU per BTU of power, which is why it costs a fraction as much to run.",
+  },
+  {
+    question: "Does a higher SEER or HSPF really lower my bill?",
+    answer:
+      'Yes — operating cost is <strong>inversely proportional to the efficiency number</strong>. Going from SEER 14 to 20 cuts cooling energy about 30%. Compare two specific units with our <a href="/calculators/hvac/hvac-seer-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">SEER Savings</a> and <a href="/calculators/hvac/hvac-afue-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">AFUE Savings</a> calculators.',
+  },
+  {
+    question: "Why doesn't this match my utility bill exactly?",
+    answer:
+      "It assumes rated efficiency and steady runtime. Real bills vary with weather, thermostat settings, duct leakage, cycling losses, tiered rates, and fixed charges. Use this to <strong>compare equipment</strong>, not to predict a bill to the penny.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Show the savings — then send the quote.";
+const ctaDescription =
+  "Energy savings win the conversation — a fast, professional estimate wins the job. TradesQuote turns the full replacement into a line-item quote: equipment, labor, materials, and disposal, with quantities, unit prices, and totals validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-seer-savings-calculator",
+    title: "SEER Savings Calculator",
+    description: "Compare two AC efficiency ratings.",
+  },
+  {
+    href: "/calculators/hvac/hvac-afue-savings-calculator",
+    title: "AFUE Savings Calculator",
+    description: "Compare two furnace efficiencies.",
+  },
+  {
+    href: "/calculators/hvac/hvac-replacement-cost-calculator",
+    title: "Replacement Cost Calculator",
+    description: "Installed price of a new system.",
+  },
+  {
+    href: "/calculators/hvac/hvac-heat-pump-calculator",
+    title: "Heat Pump Sizing Calculator",
+    description: "Size heating + cooling correctly.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Operating Cost Calculator — Cost to Run AC, Heat Pump & Furnace" />
+    <meta property="og:description" content="See what it actually costs to run a central AC, heat pump, or furnace — per hour, per day, and per year. Free and instant." />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Operating Cost Calculator — Cost to Run AC, Heat Pump & Furnace" />
+    <meta name="twitter:description" content="See what it actually costs to run your AC, heat pump, or furnace. Free, no sign-up." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+          <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Operating Cost Calculator" />
+
+              <div class="max-w-3xl">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  HVAC Tools · Running Cost · Free
+                </span>
+                <!-- (1) H1 -->
+                <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+                  HVAC Operating Cost Calculator <span class="text-red-600">— Free Online Calculator</span>
+                </h1>
+                <!-- (2) What this calculates — 2 sentences -->
+                <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+                  Every heating and cooling system turns energy into comfort at a price set by three things — its
+                  capacity, its efficiency rating, and your local energy cost. This tool converts those into the real
+                  cost to run your AC, heat pump, or furnace per hour, per day, and per year, so you can compare
+                  equipment honestly.
+                </p>
+
+                <!-- Differentiator / internal links (avoids cannibalization) -->
+                <div class="mt-6 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4">
+                  <svg class="h-5 w-5 shrink-0 text-red-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <p class="text-sm text-slate-600">
+                    <span class="font-semibold text-slate-900">Comparing two specific units?</span>
+                    Use the
+                    <a href="/calculators/hvac/hvac-seer-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">SEER Savings Calculator</a>
+                    for cooling efficiency, or the
+                    <a href="/calculators/hvac/hvac-afue-savings-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">AFUE Savings Calculator</a> to pit two furnaces against each other.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+          <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+            <div class="grid lg:grid-cols-5 gap-6">
+
+              <!-- Inputs -->
+              <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  Enter your system details
+                </h2>
+
+                <div class="mt-6 space-y-6">
+                  <div class="grid sm:grid-cols-2 gap-5">
+                    <!-- System type -->
+                    <div class="sm:col-span-2">
+                      <label for="oc-type" class="text-sm font-semibold text-slate-800">System type</label>
+                      <select id="oc-type"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none">
+                        <option value="ac" selected>Central AC (cooling) — SEER</option>
+                        <option value="hp">Heat pump (heating) — HSPF</option>
+                        <option value="gas">Gas furnace — AFUE</option>
+                        <option value="elec">Electric furnace / strip heat</option>
+                      </select>
+                    </div>
+
+                    <!-- Capacity -->
+                    <div>
+                      <label for="oc-btu" class="text-sm font-semibold text-slate-800">Capacity (BTU/hr)</label>
+                      <input id="oc-btu" type="number" min="5000" max="200000" step="1000" value="36000"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none">
+                      <p id="oc-btu-hint" class="mt-1.5 text-xs text-slate-500">= 3.0 tons</p>
+                    </div>
+
+                    <!-- Efficiency -->
+                    <div>
+                      <label for="oc-eff" class="text-sm font-semibold text-slate-800">Efficiency (<span id="oc-eff-label">SEER</span>)</label>
+                      <input id="oc-eff" type="number" min="1" max="200" step="0.5" value="15"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none disabled:bg-slate-100 disabled:text-slate-400">
+                      <p class="mt-1.5 text-xs text-slate-500">SEER/HSPF for AC & heat pumps · AFUE % for gas.</p>
+                    </div>
+
+                    <!-- Hours per day -->
+                    <div class="sm:col-span-2">
+                      <div class="flex items-center justify-between">
+                        <label for="oc-hours" class="text-sm font-semibold text-slate-800">Hours per day</label>
+                        <div class="flex items-center gap-1">
+                          <input id="oc-hours" type="number" min="0" max="24" value="8"
+                            class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none">
+                          <span class="text-sm text-slate-500">hrs</span>
+                        </div>
+                      </div>
+                      <input id="oc-hours-range" type="range" min="0" max="24" step="1" value="8"
+                        class="oc-range mt-3 w-full bg-slate-200 accent-red-600">
+                      <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <span>0</span><span>24 hrs/day</span>
+                      </div>
+                    </div>
+
+                    <!-- Days of use per year -->
+                    <div>
+                      <label for="oc-days" class="text-sm font-semibold text-slate-800">Days of use per year</label>
+                      <input id="oc-days" type="number" min="1" max="365" value="120"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none">
+                      <p class="mt-1.5 text-xs text-slate-500">Cooling season ≈ 90–150 · heating ≈ 120–180.</p>
+                    </div>
+
+                    <!-- Electricity rate -->
+                    <div id="oc-elec-wrap">
+                      <label for="oc-elec" class="text-sm font-semibold text-slate-800">Electricity rate</label>
+                      <div class="mt-2 flex items-center gap-1">
+                        <span class="text-sm text-slate-500">$</span>
+                        <input id="oc-elec" type="number" min="0.05" max="0.60" step="0.01" value="0.17"
+                          class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none">
+                        <span class="text-sm text-slate-500">/kWh</span>
+                      </div>
+                      <p class="mt-1.5 text-xs text-slate-500">U.S. average ≈ $0.17/kWh</p>
+                    </div>
+
+                    <!-- Gas rate -->
+                    <div id="oc-gas-wrap" class="hidden">
+                      <label for="oc-gas" class="text-sm font-semibold text-slate-800">Gas rate</label>
+                      <div class="mt-2 flex items-center gap-1">
+                        <span class="text-sm text-slate-500">$</span>
+                        <input id="oc-gas" type="number" min="0.40" max="5.00" step="0.05" value="1.50"
+                          class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none">
+                        <span class="text-sm text-slate-500">/therm</span>
+                      </div>
+                      <p class="mt-1.5 text-xs text-slate-500">U.S. residential average ≈ $1.50–1.60/therm</p>
+                    </div>
+                  </div>
+
+                  <button id="resetBtn"
+                    class="text-sm font-medium text-slate-500 hover:text-red-600 transition flex items-center gap-1.5">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset to defaults
+                  </button>
+                </div>
+              </div>
+
+              <!-- Results -->
+              <div class="lg:col-span-2">
+                <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-red-600 to-orange-500 p-6 sm:p-8 text-white shadow-lg">
+                  <p class="text-sm font-medium text-red-100">Costs you to run</p>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="oc-year" class="text-5xl font-extrabold tracking-tight">$392/year</span>
+                  </div>
+
+                  <div class="mt-6 grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p class="text-xs text-red-100">Per hour</p>
+                      <p id="oc-hour" class="mt-1 text-2xl font-bold">$0.41</p>
+                    </div>
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p class="text-xs text-red-100">Per day</p>
+                      <p id="oc-day" class="mt-1 text-2xl font-bold">$3.26</p>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 rounded-xl bg-white/15 p-4">
+                    <p class="text-xs text-red-100">Energy used per year</p>
+                    <p id="oc-energy" class="mt-1 text-base font-semibold leading-snug">2,304 kWh</p>
+                  </div>
+
+                  <!-- Breakdown -->
+                  <details class="group mt-5 rounded-xl bg-white/10">
+                    <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                      See the breakdown
+                      <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-4 pb-4 text-sm space-y-1.5 text-red-50">
+                      <div class="flex justify-between"><span>Energy per hour</span><span id="oc-bd-perhr" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Annual run hours</span><span id="oc-bd-hours" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Energy price</span><span id="oc-bd-rate" class="font-semibold">—</span></div>
+                      <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"><span class="font-bold">Annual energy</span><span id="oc-bd-energy" class="font-bold">—</span></div>
+                    </div>
+                  </details>
+
+                  <p class="mt-4 text-xs text-red-100 leading-relaxed">
+                    Estimates assume the unit runs at rated efficiency; real bills vary with weather, thermostat
+                    habits, duct condition, and cycling.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reference table -->
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+              <h2 class="text-xl font-bold text-slate-900">What common systems cost to run</h2>
+              <p class="mt-2 text-sm text-slate-500">At the U.S. averages of $0.17/kWh and $1.50/therm. 3-ton (36,000 BTU) cooling/heat-pump, 80,000 BTU furnace, 10 kW electric. Per-day shown at 8 run-hours.</p>
+              <div class="mt-5 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-slate-500">
+                      <th class="py-2.5 pr-4 font-semibold">System</th>
+                      <th class="py-2.5 pr-4 font-semibold">Efficiency</th>
+                      <th class="py-2.5 pr-4 font-semibold">Energy use</th>
+                      <th class="py-2.5 pr-4 font-semibold">Cost / hour</th>
+                      <th class="py-2.5 font-semibold">Cost / day (8 hr)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-700">
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Central AC (cooling)</td><td class="py-2.5 pr-4">SEER 14</td><td class="py-2.5 pr-4">2.57 kWh/hr</td><td class="py-2.5 pr-4">$0.44</td><td class="py-2.5">$3.50</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Central AC (cooling)</td><td class="py-2.5 pr-4">SEER 16</td><td class="py-2.5 pr-4">2.25 kWh/hr</td><td class="py-2.5 pr-4">$0.38</td><td class="py-2.5">$3.06</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Central AC (cooling)</td><td class="py-2.5 pr-4">SEER 20</td><td class="py-2.5 pr-4">1.80 kWh/hr</td><td class="py-2.5 pr-4">$0.31</td><td class="py-2.5">$2.45</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Heat pump (heating)</td><td class="py-2.5 pr-4">HSPF 8.5</td><td class="py-2.5 pr-4">4.24 kWh/hr</td><td class="py-2.5 pr-4">$0.72</td><td class="py-2.5">$5.76</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Heat pump (heating)</td><td class="py-2.5 pr-4">HSPF 10</td><td class="py-2.5 pr-4">3.60 kWh/hr</td><td class="py-2.5 pr-4">$0.61</td><td class="py-2.5">$4.90</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Gas furnace</td><td class="py-2.5 pr-4">80% AFUE</td><td class="py-2.5 pr-4">1.00 therm/hr</td><td class="py-2.5 pr-4">$1.50</td><td class="py-2.5">$12.00</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Gas furnace</td><td class="py-2.5 pr-4">95% AFUE</td><td class="py-2.5 pr-4">0.84 therm/hr</td><td class="py-2.5 pr-4">$1.26</td><td class="py-2.5">$10.11</td></tr>
+                    <tr><td class="py-2.5 pr-4 font-semibold">Electric furnace</td><td class="py-2.5 pr-4">10 kW</td><td class="py-2.5 pr-4">10.0 kWh/hr</td><td class="py-2.5 pr-4">$1.70</td><td class="py-2.5">$13.60</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="mt-4 text-xs text-slate-500">Estimates for comparison only. Actual usage varies with weather, home condition, and how you run your thermostat.</p>
+              <p class="mt-3 text-xs text-slate-500">
+                <span class="font-semibold">Sources &amp; standards:</span>
+                <a class="underline hover:text-red-600" target="_blank" rel="noopener" href="https://www.eia.gov/electricity/sales_revenue_price/">U.S. EIA — Average residential electricity price (≈16.8¢/kWh, 2025)</a>;
+                <a class="underline hover:text-red-600" target="_blank" rel="noopener" href="https://www.eia.gov/dnav/ng/hist/n3010us3m.htm">U.S. EIA — Residential natural gas prices (≈$16.25 per thousand cubic feet ≈ $1.55/therm)</a>;
+                <a class="underline hover:text-red-600" target="_blank" rel="noopener" href="https://www.energy.gov/energysaver/furnaces-and-boilers">U.S. DOE Energy Saver — Furnaces &amp; Heat Pumps (efficiency basics)</a>.
+              </p>
+            </div>
+          </section>
+
+          <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+          <section class="bg-slate-50 border-y border-slate-200">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+              <p class="mt-4 text-slate-600 leading-relaxed">
+                Operating cost is just "energy used per hour × what that energy costs." How you get the energy per
+                hour depends on whether the system burns gas or runs on electricity — here is exactly what this
+                calculator does.
+              </p>
+
+              <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+                <div class="text-red-300"># Cooling AC / Heat pump</div>
+                <div>kWh/hr&nbsp;=&nbsp;capacity BTU ÷ (SEER or HSPF) ÷ <span class="text-amber-300">1,000</span>&nbsp;&nbsp;→&nbsp;&nbsp;cost = kWh × $/kWh</div>
+                <div class="mt-4 text-red-300"># Electric furnace</div>
+                <div>kWh/hr&nbsp;=&nbsp;capacity BTU ÷ <span class="text-amber-300">3,412</span>&nbsp;&nbsp;<span class="text-slate-400">// resistance heat is ~100% but expensive</span></div>
+                <div class="mt-4 text-red-300"># Gas furnace</div>
+                <div>therms/hr&nbsp;=&nbsp;capacity BTU ÷ (AFUE ÷ 100) ÷ <span class="text-amber-300">100,000</span>&nbsp;&nbsp;→&nbsp;&nbsp;cost = therms × $/therm</div>
+                <div class="mt-4 text-red-300"># Annual</div>
+                <div>cost/year&nbsp;=&nbsp;cost/hour × hours per day × days per year</div>
+              </div>
+
+              <div class="mt-8 grid sm:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Higher SEER/HSPF = lower cost</h3>
+                  <p class="mt-2 text-sm text-slate-600">Operating cost is inversely proportional to the efficiency number — double the SEER and you roughly halve the energy (and the bill) for the same cooling.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why electric resistance is pricey</h3>
+                  <p class="mt-2 text-sm text-slate-600">Resistance heat has a COP of 1.0 — every BTU costs a full BTU of electricity. A heat pump delivers 2–4 BTU of heat per BTU of electricity, so it runs for a fraction of the cost.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Gas vs electric</h3>
+                  <p class="mt-2 text-sm text-slate-600">Compare $/therm to $/kWh on a per-BTU basis. Gas heat is usually cheaper per hour than electric resistance heat, though a heat pump can close or beat that gap.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Runtime is everything</h3>
+                  <p class="mt-2 text-sm text-slate-600">A cheap-per-hour furnace run all winter can cost more than a pricier-per-hour AC run in short bursts. Hours per day × days per year drive the annual number.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+          <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+            <p class="mt-4 text-slate-600">Three common scenarios — cooling, two ways to heat, and a furnace efficiency upgrade.</p>
+
+            <div class="mt-8 space-y-6">
+              <!-- Example 1 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">1</span>
+                  <h3 class="text-lg font-bold text-slate-900">Running a 3-ton AC in summer — SEER 15</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">36,000 BTU · 8 hr/day · 120 days · $0.17/kWh.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  36,000 ÷ 15 ÷ 1,000 = 2.4 kWh/hr<br>
+                  × $0.17 = $0.41/hr<br>
+                  at 8 hr/day × 120 days = 960 hr → <span class="font-bold text-red-700">$392/year</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> about $0.41 an hour, $3.26 a day, and roughly $392 over a typical cooling season.</p>
+              </div>
+
+              <!-- Example 2 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">2</span>
+                  <h3 class="text-lg font-bold text-slate-900">Heat pump vs electric furnace heating</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">Same 36,000 BTU of heat · $0.17/kWh.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  heat pump (HSPF 9): 36,000 ÷ 9 ÷ 1,000 = 4.0 kWh/hr → $0.68/hr<br>
+                  electric strip (3,412): 36,000 ÷ 3,412 = 10.55 kWh/hr → $1.79/hr<br>
+                  → <span class="font-bold text-red-700">the heat pump heats for ~38% of the cost</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> resistance heat costs nearly 3× as much per hour because every BTU needs a full BTU of electricity.</p>
+              </div>
+
+              <!-- Example 3 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">3</span>
+                  <h3 class="text-lg font-bold text-slate-900">80,000 BTU gas furnace — 80% vs 95% AFUE</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">80,000 BTU · $1.50/therm · ~1,000-hour heating season.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  80%: 80,000 ÷ 0.80 ÷ 100,000 = 1.0 therm/hr → $1.50/hr<br>
+                  95%: 0.84 therm/hr → $1.26/hr<br>
+                  over 1,000 hr: $1,500 vs $1,263 → <span class="font-bold text-red-700">about $237 saved a year</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> the higher-AFUE furnace burns ~16% less gas for the same heat — meaningful savings over a full heating season.</p>
+              </div>
+            </div>
+          </section>
+
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="red"
+            subtitle="Common questions about what it costs to run heating and cooling equipment."
+          />
+
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+          <HvacRelatedCalculators calculators={relatedCalculators} accent="red" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacOperatingCostCalculator } from "@/scripts/calculators/hvac-operating-cost-calculator";
+    initHvacOperatingCostCalculator();
+  </script>
+</Layout>
+<style>
+  .oc-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .oc-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #dc2626;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .oc-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #dc2626;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

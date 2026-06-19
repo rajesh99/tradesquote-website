@@ -1,0 +1,562 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Dew Point Calculator — RH & Condensation Risk | TradesQuote";
+const description =
+  "Free HVAC dew point calculator. Find dew point from dry-bulb temperature and relative humidity, or solve RH from dew point. Optional surface-temperature check flags condensation risk on ducts and cold surfaces. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-dew-point-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Dew Point Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Dew Point Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC dew point calculator using the Magnus psychrometric approximation. Compute dew point from dry-bulb and relative humidity, or solve RH from dew point, with optional condensation-risk checks for ducts and cold surfaces.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is dew point in HVAC?",
+    answer:
+      "Dew point is the <strong>temperature at which water vapor in the air condenses into liquid</strong>. In HVAC work it tells you when cool surfaces — supply ducts in a hot attic, chilled beams, or windows — will sweat. If a surface is at or below the air's dew point, moisture forms on it.",
+  },
+  {
+    question: "What is the dew point at 75°F and 55% RH?",
+    answer:
+      "At <strong>75°F dry-bulb and 55% relative humidity</strong>, the dew point is about <strong>58°F</strong> using the standard Magnus approximation. That means any surface cooler than 58°F in that air mass will be at risk of condensation.",
+  },
+  {
+    question: "What indoor humidity level is comfortable?",
+    answer:
+      "ASHRAE comfort guidance targets <strong>30–50% RH</strong> in occupied spaces. Below 30% feels dry; above 60% feels clammy and drives higher latent load on the coil. Dew point is often a better condensation metric than RH alone because it stays tied to the actual moisture content.",
+  },
+  {
+    question: "Why do supply ducts sweat in summer?",
+    answer:
+      "Cold supply air lowers the <strong>duct surface temperature</strong>. If that surface drops to or below the surrounding air's dew point — common on uninsulated flex in a vented attic — water condenses on the duct. Fix with proper insulation, vapor barrier, and sealing, not just more airflow.",
+  },
+  {
+    question: "How does dew point relate to superheat and subcooling?",
+    answer:
+      "They measure different things. <strong>Dew point is an air-moisture property</strong> (psychrometrics); superheat and subcooling are refrigerant-side charge checks. High indoor humidity raises latent load on the coil, which can widen the cooling temperature split — pair dew point with the <a href=\"/calculators/hvac/hvac-delta-t-calculator\" class=\"font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600\">Delta T Calculator</a> when diagnosing comfort complaints.",
+  },
+  {
+    question: "Is the Magnus formula accurate enough for field work?",
+    answer:
+      "Yes for typical HVAC conditions. The <strong>Magnus (August–Roche–Magnus) approximation</strong> is accurate to within about ±1°F dew point for dry-bulb temperatures between roughly 32°F and 122°F and RH between 5% and 95%. For lab-grade psychrometrics, use ASHRAE reference tables — for duct sweating and comfort checks, Magnus is standard field practice.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Know the moisture load? Quote the job in seconds.";
+const ctaDescription =
+  "Dew point tells you how hard the coil must work and whether ducts will sweat — TradesQuote turns dehumidification upgrades, duct insulation, and ventilation fixes into a detailed, line-item estimate in seconds. Describe the job or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description: "Temperature split flags airflow and charge problems from another angle.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM Calculator",
+    description: "Target airflow per room and per ton.",
+  },
+  {
+    href: "/calculators/hvac/hvac-sensible-latent-heat-calculator",
+    title: "Sensible & Latent Heat Calculator",
+    description: "Split total coil load into sensible and latent BTU.",
+  },
+  {
+    href: "/calculators/hvac/hvac-humidity-control-calculator",
+    title: "Humidity Control Calculator",
+    description: "Size humidifier or dehumidifier from RH targets.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Dew Point Calculator — RH & Condensation Risk" />
+    <meta
+      property="og:description"
+      content="Dew point from dry-bulb and RH, or RH from dew point. Optional surface check for duct sweating. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Dew Point Calculator — RH & Condensation Risk" />
+    <meta
+      name="twitter:description"
+      content="Find dew point from dry-bulb and RH, solve RH from dew point, and check condensation risk on cold surfaces. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Dew Point Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                ></path>
+              </svg>
+              HVAC Tools · Psychrometrics · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Dew Point Calculator <span class="text-cyan-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Dew point tells you when moisture in the air will condense on a cool surface — the key number for
+              diagnosing duct sweating, window fogging, and latent load on the coil. Enter dry-bulb and relative
+              humidity to get dew point (or work backward from a measured dew point to find RH), then optionally
+              check a surface temperature for condensation risk.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-cyan-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter your air conditions
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <label for="dp-mode" class="text-sm font-semibold text-slate-800">Mode</label>
+                <select
+                  id="dp-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                >
+                  <option value="dewpoint" selected>Dew point from dry-bulb + RH</option>
+                  <option value="rh">RH from dry-bulb + dew point</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="dp-drybulb" class="text-sm font-semibold text-slate-800"
+                    >Dry-bulb temperature (°F)</label
+                  >
+                  <input
+                    id="dp-drybulb"
+                    type="number"
+                    min="-40"
+                    max="150"
+                    step="1"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Air temperature measured with a standard dry-bulb thermometer.</p>
+                </div>
+
+                <div>
+                  <label for="dp-rh" class="text-sm font-semibold text-slate-800"
+                    >Relative humidity (%)</label
+                  >
+                  <input
+                    id="dp-rh"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="55"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">From a hygrometer or psychrometer reading.</p>
+                </div>
+
+                <div class="hidden">
+                  <label for="dp-dewpoint-in" class="text-sm font-semibold text-slate-800"
+                    >Dew point (°F)</label
+                  >
+                  <input
+                    id="dp-dewpoint-in"
+                    type="number"
+                    min="-40"
+                    max="150"
+                    step="1"
+                    value="58"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Measured or calculated dew point temperature.</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="dp-surface" class="text-sm font-semibold text-slate-800"
+                    >Surface temperature (°F) — optional</label
+                  >
+                  <input
+                    id="dp-surface"
+                    type="number"
+                    min="-40"
+                    max="150"
+                    step="1"
+                    placeholder="e.g. 52"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Duct, window, or wall surface — flags condensation if at or below dew point.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-cyan-600 to-sky-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p id="dp-result-label" class="text-sm font-medium text-cyan-100">Dew point</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="dp-result" class="text-5xl font-extrabold tracking-tight">58°F</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p id="dp-secondary-label" class="text-xs text-cyan-100">Relative humidity</p>
+                  <p id="dp-secondary" class="mt-1 text-2xl font-bold">55% RH</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-cyan-100">Comfort band</p>
+                  <p id="dp-status" class="mt-1 text-2xl font-bold">Comfortable</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-cyan-100">Condensation check</p>
+                <p id="dp-condensation" class="mt-1 text-sm font-medium leading-snug">
+                  Enter a surface temperature to check for condensation risk.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-cyan-50">
+                  <div class="flex justify-between">
+                    <span>Dry-bulb</span><span id="dp-bd-drybulb" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Calculated value</span><span id="dp-bd-value" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Surface temp</span><span id="dp-bd-surface" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Note</span><span id="dp-bd-note" class="font-bold text-right max-w-[60%]">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-cyan-100 leading-relaxed">
+                Dew point is a psychrometric property — pair with sensible/latent heat when sizing dehumidification
+                or diagnosing coil load. Insulate ducts when surface temp drops near dew point.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Common dry-bulb / RH → dew point</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Magnus approximation at typical indoor conditions. Use the calculator above for other values.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Dry-bulb (°F)</th>
+                  <th class="py-2.5 pr-4 font-semibold">RH (%)</th>
+                  <th class="py-2.5 pr-4 font-semibold">Dew point (°F)</th>
+                  <th class="py-2.5 font-semibold">Typical context</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">68°F</td>
+                  <td class="py-2.5 pr-4">45%</td>
+                  <td class="py-2.5 pr-4 text-cyan-700 font-semibold">46°F</td>
+                  <td class="py-2.5">Cool-season indoor — low latent load</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">72°F</td>
+                  <td class="py-2.5 pr-4">50%</td>
+                  <td class="py-2.5 pr-4 text-cyan-700 font-semibold">52°F</td>
+                  <td class="py-2.5">ASHRAE comfort midpoint</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">75°F</td>
+                  <td class="py-2.5 pr-4">55%</td>
+                  <td class="py-2.5 pr-4 text-cyan-700 font-semibold">58°F</td>
+                  <td class="py-2.5">Typical summer return air</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">80°F</td>
+                  <td class="py-2.5 pr-4">60%</td>
+                  <td class="py-2.5 pr-4 text-cyan-700 font-semibold">65°F</td>
+                  <td class="py-2.5">Humid climate — elevated latent load</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">85°F</td>
+                  <td class="py-2.5 pr-4">70%</td>
+                  <td class="py-2.5 pr-4 text-cyan-700 font-semibold">74°F</td>
+                  <td class="py-2.5">Deep South return — duct sweating risk in attics</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: ASHRAE Fundamentals (psychrometric properties) · ACCA Manual J (moisture
+            load) · ENERGY STAR HVAC Quality Installation (comfort verification).
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Dew point comes from the relationship between dry-bulb temperature, relative humidity, and the
+            saturation vapor pressure of water. The Magnus approximation is accurate enough for field psychrometrics
+            and is the same relation inverted to solve for RH when you know dew point.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Convert °F ↔ °C:</div>
+            <div>Tc&nbsp;=&nbsp;(Tf − 32) × 5/9&nbsp;&nbsp;·&nbsp;&nbsp;Tf&nbsp;=&nbsp;Tc × 9/5 + 32</div>
+            <div class="mt-4 text-cyan-300"># Dew point from dry-bulb + RH (Magnus, water):</div>
+            <div>α&nbsp;=&nbsp;ln(RH/100) + (17.62 × Tc) / (243.12 + Tc)</div>
+            <div>dew point °C&nbsp;=&nbsp;(243.12 × α) / (17.62 − α)&nbsp;&nbsp;→ convert to °F</div>
+            <div class="mt-4 text-cyan-300"># RH from dry-bulb + dew point (inverse):</div>
+            <div>α<sub>dew</sub>&nbsp;=&nbsp;(17.62 × dew°C) / (243.12 + dew°C)</div>
+            <div>RH&nbsp;=&nbsp;100 × exp(α<sub>dew</sub> − (17.62 × Tc) / (243.12 + Tc))</div>
+            <div class="mt-4 text-cyan-300"># Condensation rule:</div>
+            <div>
+              surface temp ≤ dew point → <span class="text-amber-300">condensation risk</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why dew point beats RH alone</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Two rooms at 50% RH but different temperatures have different dew points. Dew point tracks the
+                actual moisture content — the number that matters when a 55°F supply duct runs through a 95°F attic.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Latent load on the coil</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Higher dew point means more water vapor to remove. Use the Sensible &amp; Latent Heat Calculator
+                to split total coil BTU when return air is humid.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Duct insulation target</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Insulation keeps the duct surface above ambient dew point. If the outer jacket of flex in an attic
+                drops below the surrounding air's dew point, it sweats regardless of charge.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Pair with Delta T</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                High humidity widens the latent share of coil capacity and can change the sensible temperature
+                split. Check both psychrometrics and airflow before adjusting refrigerant charge.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three scenarios: typical comfort conditions, a humid return-air sample, and a duct-sweat check with a
+          surface temperature.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Comfortable indoor — 75°F DB, 55% RH</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              α = ln(0.55) + (17.62 × 23.9) / (243.12 + 23.9) → dew point ={" "}
+              <span class="font-bold text-cyan-700">58°F · Comfortable</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> typical summer return air — latent load
+              is moderate and RH sits in the ASHRAE comfort band.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Humid climate — 80°F DB, 60% RH</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              dew point = <span class="font-bold text-cyan-700">65°F · Humid</span> — coil runs longer on latent
+              removal
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> elevated moisture load. Consider 350 CFM/ton
+              airflow and verify the coil is not short-cycling on sensible load alone.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Duct sweat check — 75°F DB, 55% RH, 52°F duct surface</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              dew point 58°F &gt; surface 52°F →{" "}
+              <span class="font-bold text-cyan-700">Condensation risk on uninsulated duct</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the duct jacket is below dew point — add
+              R-8 insulation and a vapor barrier, or relocate duct into conditioned space.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about dew point, relative humidity, and condensation on HVAC surfaces."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="cyan" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacDewPointCalculator } from "@/scripts/calculators/hvac-dew-point-calculator";
+    initHvacDewPointCalculator();
+  </script>
+</Layout>

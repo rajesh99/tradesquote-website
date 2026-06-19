@@ -1,0 +1,547 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "HVAC Tonnage Calculator — Free BTU to Tons Converter | TradesQuote";
+const description =
+  "Free HVAC tonnage calculator. Instantly convert BTU to tons (and back) and estimate the AC tonnage you need by square footage. Includes a sq ft-to-tons sizing chart.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-tonnage-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "HVAC Tonnage Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Tonnage Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC tonnage calculator that converts BTU to tons and back, and estimates the air conditioner tonnage needed for a space by square footage.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many tons of AC do I need per square foot?",
+    answer:
+      "A common rule of thumb is <strong>one ton for every 500–600 square feet</strong>, which comes from the 20 BTU/sq ft guideline (12,000 BTU = one ton). A 1,500 sq ft home usually needs about 2.5–3 tons, before adjusting for climate, sun, and insulation.",
+  },
+  {
+    question: "How many BTU is a 2-ton or 3-ton AC unit?",
+    answer:
+      "Since one ton equals 12,000 BTU/hr, a <strong>2-ton unit is 24,000 BTU</strong> and a <strong>3-ton unit is 36,000 BTU</strong>. To convert any tonnage to BTU, multiply by 12,000; to go from BTU to tons, divide by 12,000.",
+  },
+  {
+    question: 'What does "tonnage" mean in HVAC?',
+    answer:
+      "Tonnage measures an air conditioner's <strong>cooling capacity, not its weight</strong>. One ton equals 12,000 BTU/hr — the heat needed to melt one ton of ice in 24 hours. Residential systems typically range from 1.5 to 5 tons.",
+  },
+  {
+    question: "How do I find the tonnage of my existing AC unit?",
+    answer:
+      "Check the model number on the outdoor unit's data plate and look for a 2–3 digit number such as <strong>018, 024, 030, 036, 042, 048, or 060</strong>. That's the capacity in BTU (036 = 36,000 BTU). Divide by 12,000 for tons — so 036 = 3 tons.",
+  },
+  {
+    question: "What size AC (in tons) do I need for a 2,000 square foot house?",
+    answer:
+      "Using 20 BTU/sq ft, 2,000 sq ft is about <strong>40,000 BTU, or roughly 3.5 tons</strong>, as a starting point. The exact size depends on climate, sun, insulation, and ceiling height, which can move it between 3 and 4 tons.",
+  },
+  {
+    question: "Can I size my air conditioner by square footage alone?",
+    answer:
+      "Square footage gives a solid starting estimate, but it isn't a substitute for a full <strong>ACCA Manual J</strong> load calculation. Manual J also accounts for windows, orientation, insulation, duct losses, and air infiltration, and is required for permits and equipment warranties.",
+  },
+  {
+    question: "Is a higher-tonnage air conditioner always better?",
+    answer:
+      "No. An oversized unit cools quickly but <strong>short-cycles</strong>, so it never runs long enough to remove humidity — wasting energy and shortening compressor life. Matching tonnage to the actual load gives the best comfort, efficiency, and lifespan.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Know the tonnage? Turn it into a winning quote.";
+const ctaDescription =
+  "Sizing is just the start. TradesQuote turns the whole job — equipment, materials, and labor — into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Size ductwork and required airflow per room.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Estimate heating capacity for your climate.",
+  },
+  {
+    href: "/calculators/hvac/hvac-unit-converter",
+    title: "HVAC Unit Converter",
+    description: "Convert tons, BTU/h, kW, and pressure units.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Tonnage Calculator — Free BTU to Tons Converter" />
+    <meta
+      property="og:description"
+      content="Convert BTU to tons instantly and estimate AC tonnage by square footage. Free, with a sizing chart."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Tonnage Calculator — Free BTU to Tons Converter" />
+    <meta
+      name="twitter:description"
+      content="Convert BTU to tons instantly and estimate AC tonnage by square footage. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC Tonnage Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M10 1a1 1 0 011 1v1.07A7.002 7.002 0 0116.93 9H18a1 1 0 110 2h-1.07A7.002 7.002 0 0111 16.93V18a1 1 0 11-2 0v-1.07A7.002 7.002 0 013.07 11H2a1 1 0 110-2h1.07A7.002 7.002 0 019 3.07V2a1 1 0 011-1z"
+                ></path>
+              </svg>
+              HVAC Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              HVAC Tonnage Calculator <span class="text-blue-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This HVAC tonnage calculator converts cooling capacity between BTU and tons in both directions,
+              and estimates the air-conditioner tonnage a space needs based on its square footage.
+              Use it to size a system, decode a unit's tonnage, or sanity-check a contractor's quote in seconds.
+            </p>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+              <svg
+                class="h-5 w-5 shrink-0 text-blue-600 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900">Need a full cooling load instead?</span>
+                This page focuses on converting and sizing in <em>tons</em>. To factor in sun, insulation, ceiling height, and
+                occupancy, use the
+                <a
+                  href="/calculators/hvac/hvac-btu-calculator"
+                  class="font-semibold text-blue-600 underline decoration-blue-300 hover:decoration-blue-600"
+                  >HVAC BTU Calculator</a
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+              Convert BTU ⟷ Tons
+            </h2>
+            <p class="mt-2 text-sm text-slate-500">Type in either box — the other updates instantly.</p>
+
+            <div class="mt-6 space-y-4">
+              <div>
+                <label for="conv-btu" class="text-sm font-semibold text-slate-800">Cooling capacity (BTU/hr)</label>
+                <input
+                  id="conv-btu"
+                  type="number"
+                  min="0"
+                  value="24000"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+
+              <div class="flex items-center justify-center">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold"
+                  >=</span
+                >
+              </div>
+
+              <div>
+                <label for="conv-tons" class="text-sm font-semibold text-slate-800">Tonnage (tons)</label>
+                <input
+                  id="conv-tons"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value="2"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 p-5 text-white">
+              <p class="text-sm text-blue-100">Result</p>
+              <p id="conv-result" class="mt-1 text-2xl font-extrabold">24,000 BTU/hr = 2 tons</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+              </svg>
+              Estimate tonnage by square footage
+            </h2>
+            <p class="mt-2 text-sm text-slate-500">A quick starting size using the 20 BTU/sq ft rule.</p>
+
+            <div class="mt-6 space-y-5">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="est-sqft" class="text-sm font-semibold text-slate-800">Area</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="est-sqft"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      value="1500"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">sq ft</span>
+                  </div>
+                </div>
+                <input
+                  id="est-range"
+                  type="range"
+                  min="100"
+                  max="5000"
+                  step="50"
+                  value="1500"
+                  class="tonnage-range mt-3 w-full bg-slate-200 accent-blue-600"
+                />
+              </div>
+
+              <div>
+                <label for="est-climate" class="text-sm font-semibold text-slate-800">Climate zone</label>
+                <select
+                  id="est-climate"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                >
+                  <option value="0.9">Cool (Northern US / Canada)</option>
+                  <option value="1.0" selected>Moderate (Midwest / Mid-Atlantic)</option>
+                  <option value="1.1">Warm (Southern US)</option>
+                  <option value="1.2">Hot (Desert / Deep South)</option>
+                </select>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-5">
+                <div class="flex items-baseline gap-2">
+                  <span id="est-tons" class="text-4xl font-extrabold text-slate-900">2.5 tons</span>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span class="text-slate-500">Cooling load</span>
+                    <p id="est-btu" class="font-semibold text-slate-900">30,000 BTU/hr</p>
+                  </div>
+                  <div>
+                    <span class="text-slate-500">Suggested system</span>
+                    <p id="est-system" class="font-semibold text-slate-900">2.5-ton system</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">AC tonnage by square footage (quick reference)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Based on the 20 BTU/sq ft rule with 8-ft ceilings in a moderate climate. Treat these as starting points, not final sizes.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Area (sq ft)</th>
+                  <th class="py-2.5 pr-4 font-semibold">Approx. cooling load</th>
+                  <th class="py-2.5 font-semibold">System size</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Up to 600</td><td class="py-2.5 pr-4">12,000 BTU</td><td
+                    class="py-2.5 font-semibold">1 ton</td
+                  >
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">600 – 900</td><td class="py-2.5 pr-4">18,000 BTU</td><td
+                    class="py-2.5 font-semibold">1.5 tons</td
+                  >
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">900 – 1,200</td><td class="py-2.5 pr-4">24,000 BTU</td><td
+                    class="py-2.5 font-semibold">2 tons</td
+                  >
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">1,200 – 1,500</td><td class="py-2.5 pr-4">30,000 BTU</td><td
+                    class="py-2.5 font-semibold">2.5 tons</td
+                  >
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">1,500 – 1,800</td><td class="py-2.5 pr-4">36,000 BTU</td><td
+                    class="py-2.5 font-semibold">3 tons</td
+                  >
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">1,800 – 2,100</td><td class="py-2.5 pr-4">42,000 BTU</td><td
+                    class="py-2.5 font-semibold">3.5 tons</td
+                  >
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">2,100 – 2,400</td><td class="py-2.5 pr-4">48,000 BTU</td><td
+                    class="py-2.5 font-semibold">4 tons</td
+                  >
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4">2,400 – 3,000</td><td class="py-2.5 pr-4">60,000 BTU</td><td
+                    class="py-2.5 font-semibold">5 tons</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Figures shown are planning estimates. Confirm final sizing with a full ACCA Manual J load calculation before purchasing or installing equipment.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            HVAC "tonnage" has nothing to do with weight — it's a measure of cooling power. The whole calculation
+            rests on one fixed conversion plus a simple square-footage rule of thumb.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># The core conversion (1 ton = 12,000 BTU/hr)</div>
+            <div>tons&nbsp;=&nbsp;BTU ÷ <span class="text-amber-300">12,000</span></div>
+            <div>BTU&nbsp;&nbsp;=&nbsp;tons × <span class="text-amber-300">12,000</span></div>
+            <div class="mt-4 text-cyan-300"># Estimate tonnage from floor area</div>
+            <div>BTU&nbsp;&nbsp;=&nbsp;area (sq ft) × <span class="text-amber-300">20</span> × climate factor</div>
+            <div>tons&nbsp;=&nbsp;BTU ÷ <span class="text-amber-300">12,000</span> → round up to nearest 0.5</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 12,000 BTU = 1 ton?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It dates back to ice cooling: one ton of AC removes the same heat as melting one ton of ice over 24 hours — about 12,000 BTU per hour.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The square-footage rule</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Roughly 20 BTU per square foot — about one ton per 500–600 sq ft — gives a fast first estimate for an average home.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why round up?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Systems are sold in half-ton steps (1.5, 2, 2.5…). Rounding up to the nearest standard size avoids undersizing, though a contractor may fine-tune.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Reading a model number</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Outdoor-unit model numbers embed the capacity: a code like <span class="font-mono">036</span> means 36,000 BTU. Divide by 12,000 for tons (036 → 3 tons).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">Three of the most common tonnage questions, solved step by step.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">"My quote says 36,000 BTU — how many tons is that?"</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              tons = 36,000 ÷ 12,000<br />
+              <span class="font-bold text-blue-700">= 3 tons</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Answer:</span> a 36,000 BTU system is a 3-ton unit — a typical size for a 1,500–1,800 sq ft home.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">"I have a 2.5-ton system — what's its BTU rating?"</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              BTU = 2.5 × 12,000<br />
+              <span class="font-bold text-blue-700">= 30,000 BTU/hr</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Answer:</span> 30,000 BTU/hr. On the data plate, look for the code <span
+                class="font-mono">030</span
+              > in the model number.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">"What tonnage for a 1,600 sq ft home in a warm climate?"</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              1,600 × 20 × 1.1 = 35,200 BTU<br />
+              35,200 ÷ 12,000 = 2.93 tons<br />
+              <span class="font-bold text-blue-700">round up → 3-ton system</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Answer:</span> about 2.9 tons of load, so a 3-ton system is the right install size. For a precise number, run the full
+              <a
+                href="/calculators/hvac/hvac-btu-calculator"
+                class="font-semibold text-blue-600 underline decoration-blue-300 hover:decoration-blue-600"
+                >BTU load calculation</a
+              >.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about AC tonnage and BTU conversion."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="sky" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacTonnageCalculator } from "@/scripts/calculators/hvac-tonnage-calculator";
+    initHvacTonnageCalculator();
+  </script>
+</Layout>
+
+<style>
+  .tonnage-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .tonnage-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .tonnage-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

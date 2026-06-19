@@ -1,0 +1,427 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+
+const title = "HVAC Formula Reference — Every Formula Explained | TradesQuote";
+const description =
+  "Complete HVAC formula reference: BTU load, CFM, static pressure, superheat, subcooling, SEER2, AFUE savings, fan laws, dew point, and more. Each formula includes variable definitions, normal ranges, and a link to the free calculator.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/formulas";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Formula Reference", item: pageUrl },
+  ],
+};
+
+const sections = [
+  {
+    title: "Sizing",
+    color: "blue",
+    formulas: [
+      {
+        name: "BTU Cooling Load (rule of thumb)",
+        formula: "BTU/h = sqft × 20 × ceiling_factor × climate_factor × sun_factor × insulation_factor",
+        vars: [
+          { sym: "sqft", desc: "Conditioned floor area" },
+          { sym: "ceiling_factor", desc: "Ceiling height ÷ 8 (e.g. 10 ft ceilings → 1.25)" },
+          { sym: "climate_factor", desc: "0.85 (cool) · 1.0 (moderate) · 1.15 (hot/humid)" },
+          { sym: "sun_factor", desc: "0.95 (shaded) · 1.0 (average) · 1.10 (sunny, large windows)" },
+          { sym: "insulation_factor", desc: "0.90 (well insulated) · 1.0 (average) · 1.15 (poor)" },
+        ],
+        normal: "~20 BTU/sqft moderate climate; ranges from 14 to 25+ BTU/sqft",
+        calc: { href: "/calculators/hvac/hvac-btu-calculator", label: "BTU Calculator" },
+      },
+      {
+        name: "Tons of Cooling",
+        formula: "Tons = BTU/h ÷ 12,000",
+        vars: [
+          { sym: "BTU/h", desc: "Calculated cooling load or equipment capacity" },
+          { sym: "12,000", desc: "BTU/h per ton (heat absorbed melting 1 ton of ice in 24 h)" },
+        ],
+        normal: "Residential: 1.5–5 tons; commercial: 5–hundreds of tons",
+        calc: { href: "/calculators/hvac/hvac-tonnage-calculator", label: "Tonnage Calculator" },
+      },
+      {
+        name: "Furnace Input BTU",
+        formula: "Input BTU/h = Output BTU/h ÷ AFUE",
+        vars: [
+          { sym: "Output BTU/h", desc: "Heat delivered to the building (from load calculation)" },
+          { sym: "AFUE", desc: "Annual Fuel Utilization Efficiency as a decimal (e.g. 0.95)" },
+        ],
+        normal: "80% AFUE furnace requires 25% more input than output",
+        calc: { href: "/calculators/hvac/hvac-furnace-btu-calculator", label: "Furnace BTU Calculator" },
+      },
+      {
+        name: "Heat Loss (simplified Manual J)",
+        formula: "BTU/h = sqft × BTU/sqft/zone × insulation_factor × window_factor",
+        vars: [
+          { sym: "BTU/sqft/zone", desc: "Zone 1: 25 · Zone 2: 35 · Zone 3: 45 · Zone 4: 55 · Zone 5: 70 · Zone 6: 85 · Zone 7: 100" },
+          { sym: "insulation_factor", desc: "0.75 (well insulated) · 1.0 (average) · 1.3 (poor)" },
+          { sym: "window_factor", desc: "0.9 (few windows) · 1.0 (average) · 1.15 (many windows)" },
+        ],
+        normal: "Zone 4 home: ~55 BTU/h per sqft at design conditions",
+        calc: { href: "/calculators/hvac/hvac-heat-loss-calculator", label: "Heat Loss Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Airflow & Ductwork",
+    color: "teal",
+    formulas: [
+      {
+        name: "CFM from Room Volume",
+        formula: "CFM = Volume (cu ft) × ACH ÷ 60",
+        vars: [
+          { sym: "Volume", desc: "Length × width × ceiling height in cubic feet" },
+          { sym: "ACH", desc: "Required air changes per hour (2–6 for residences, 8–12 for kitchens)" },
+          { sym: "60", desc: "Minutes per hour" },
+        ],
+        normal: "~400 CFM per ton of cooling for a split system",
+        calc: { href: "/calculators/hvac/hvac-cfm-calculator", label: "CFM Calculator" },
+      },
+      {
+        name: "Duct Friction Rate",
+        formula: "FR = ASP × 100 ÷ TEL",
+        vars: [
+          { sym: "FR", desc: "Friction rate in in.w.c. per 100 ft" },
+          { sym: "ASP", desc: "Available static pressure = equipment rated ESP − component losses" },
+          { sym: "TEL", desc: "Total equivalent length of the duct run (ft of straight duct + fitting equivalents)" },
+        ],
+        normal: "0.05–0.10 in.w.c./100 ft residential; 0.08–0.12 commercial",
+        calc: { href: "/calculators/hvac/hvac-duct-friction-rate-calculator", label: "Duct Friction Rate Calculator" },
+      },
+      {
+        name: "Fan Laws",
+        formula: "CFM₂/CFM₁ = N₂/N₁   |   SP₂/SP₁ = (N₂/N₁)²   |   BHP₂/BHP₁ = (N₂/N₁)³",
+        vars: [
+          { sym: "N", desc: "Fan speed in RPM" },
+          { sym: "CFM", desc: "Airflow" },
+          { sym: "SP", desc: "Static pressure" },
+          { sym: "BHP", desc: "Brake horsepower (shaft power)" },
+        ],
+        normal: "Doubling fan speed doubles CFM, quadruples SP, and requires 8× the power",
+        calc: { href: "/calculators/hvac/hvac-fan-laws-calculator", label: "Fan Laws Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Diagnostics & Refrigerant",
+    color: "violet",
+    formulas: [
+      {
+        name: "Delta T (Cooling)",
+        formula: "ΔT = T_return − T_supply",
+        vars: [
+          { sym: "T_return", desc: "Return air dry-bulb temperature at the air handler (°F)" },
+          { sym: "T_supply", desc: "Supply air dry-bulb temperature at the supply plenum (°F)" },
+        ],
+        normal: "16–22°F at proper charge, airflow, and load. <14°F → low airflow or overcharge. >22°F → low charge or low airflow",
+        calc: { href: "/calculators/hvac/hvac-delta-t-calculator", label: "Delta T Calculator" },
+      },
+      {
+        name: "Total External Static Pressure",
+        formula: "TESP = SP_supply + |SP_return|",
+        vars: [
+          { sym: "SP_supply", desc: "Positive pressure in supply plenum (in.w.c.)" },
+          { sym: "SP_return", desc: "Negative pressure in return plenum (in.w.c., taken as absolute value)" },
+        ],
+        normal: "Equipment rated at 0.5 in.w.c.; above 0.8 in.w.c. degrades airflow significantly",
+        calc: { href: "/calculators/hvac/hvac-static-pressure-calculator", label: "Static Pressure Calculator" },
+      },
+      {
+        name: "Superheat (Suction Side)",
+        formula: "Superheat = T_suction_line − T_saturation_suction",
+        vars: [
+          { sym: "T_suction_line", desc: "Suction line temperature measured 6 in. from compressor (°F)" },
+          { sym: "T_saturation_suction", desc: "Saturation temperature from PT chart at suction pressure (°F)" },
+        ],
+        normal: "TXV system: 8–12°F. Fixed orifice: use target superheat formula",
+        calc: { href: "/calculators/hvac/hvac-superheat-calculator", label: "Superheat Calculator" },
+      },
+      {
+        name: "Target Superheat (Fixed Orifice)",
+        formula: "Target SH = ((3 × WB_indoor) − 80 − DB_outdoor) ÷ 2",
+        vars: [
+          { sym: "WB_indoor", desc: "Indoor wet-bulb temperature at the return (°F)" },
+          { sym: "DB_outdoor", desc: "Outdoor dry-bulb temperature (°F)" },
+        ],
+        normal: "Typically 5–30°F depending on conditions",
+        calc: { href: "/calculators/hvac/hvac-target-superheat-calculator", label: "Target Superheat Calculator" },
+      },
+      {
+        name: "Subcooling (Liquid Line)",
+        formula: "Subcooling = T_saturation_liquid − T_liquid_line",
+        vars: [
+          { sym: "T_saturation_liquid", desc: "Saturation temperature from PT chart at high-side pressure (°F)" },
+          { sym: "T_liquid_line", desc: "Liquid line temperature measured at the service valve (°F)" },
+        ],
+        normal: "TXV system: 10–20°F. Fixed orifice: 5–10°F",
+        calc: { href: "/calculators/hvac/hvac-subcooling-calculator", label: "Subcooling Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Psychrometrics & IAQ",
+    color: "cyan",
+    formulas: [
+      {
+        name: "Dew Point (Magnus Approximation)",
+        formula: "T_dp ≈ T − (100 − RH) / 5   (simplified)\nFull: T_dp = 243.04 × [ln(RH/100) + (17.625T)/(243.04+T)] ÷ [17.625 − ln(RH/100) − (17.625T)/(243.04+T)]",
+        vars: [
+          { sym: "T", desc: "Air temperature (°C for full formula; °F for simplified)" },
+          { sym: "RH", desc: "Relative humidity (%)" },
+        ],
+        normal: "At 75°F / 50% RH, dew point ≈ 55°F",
+        calc: { href: "/calculators/hvac/hvac-dew-point-calculator", label: "Dew Point Calculator" },
+      },
+      {
+        name: "Sensible Heat",
+        formula: "Q_s = 1.08 × CFM × ΔT",
+        vars: [
+          { sym: "1.08", desc: "0.075 lb/ft³ (air density) × 0.24 BTU/(lb·°F) (specific heat) × 60 min/h" },
+          { sym: "CFM", desc: "Airflow rate" },
+          { sym: "ΔT", desc: "Temperature difference across coil or duct (°F)" },
+        ],
+        normal: "~1,000 BTU/h per 100 CFM per °F",
+        calc: { href: "/calculators/hvac/hvac-sensible-latent-heat-calculator", label: "Sensible & Latent Heat Calculator" },
+      },
+      {
+        name: "Latent Heat",
+        formula: "Q_l = 0.68 × CFM × Δgrains",
+        vars: [
+          { sym: "0.68", desc: "0.075 lb/ft³ × 1,061 BTU/lb (latent heat of vaporization) × 60 min/h ÷ 7,000 grains/lb" },
+          { sym: "Δgrains", desc: "Difference in humidity ratio (grains of water per pound of dry air)" },
+        ],
+        normal: "Moisture removal is typically 20–30% of total cooling load in humid climates",
+        calc: { href: "/calculators/hvac/hvac-sensible-latent-heat-calculator", label: "Sensible & Latent Heat Calculator" },
+      },
+      {
+        name: "Mixed Air Temperature",
+        formula: "T_mixed = (CFM_OA × T_OA + CFM_RA × T_RA) ÷ (CFM_OA + CFM_RA)",
+        vars: [
+          { sym: "CFM_OA / T_OA", desc: "Outdoor air flow and temperature" },
+          { sym: "CFM_RA / T_RA", desc: "Return air flow and temperature" },
+        ],
+        normal: "With 20% OA at 95°F and 80% RA at 75°F → MAT = 79°F",
+        calc: { href: "/calculators/hvac/hvac-mixed-air-temperature-calculator", label: "Mixed Air Temperature Calculator" },
+      },
+      {
+        name: "ASHRAE 62.2 Ventilation Rate",
+        formula: "CFM_ventilation = 0.03 × floor_area + 7.5 × (bedrooms + 1)",
+        vars: [
+          { sym: "floor_area", desc: "Conditioned floor area in square feet" },
+          { sym: "bedrooms + 1", desc: "Estimated occupancy from number of bedrooms" },
+        ],
+        normal: "Typical 2,000 sqft 3-bedroom: 60 + 30 = 90 CFM continuous ventilation",
+        calc: { href: "/calculators/hvac/hvac-ventilation-calculator", label: "Ventilation Calculator" },
+      },
+      {
+        name: "HRV/ERV Sensible Effectiveness",
+        formula: "ε_sensible = (T_supply_out − T_supply_in) ÷ (T_exhaust_in − T_supply_in)",
+        vars: [
+          { sym: "T_supply_out", desc: "Temperature of fresh air leaving the core (after heat exchange)" },
+          { sym: "T_supply_in", desc: "Outdoor fresh air temperature entering the core" },
+          { sym: "T_exhaust_in", desc: "Indoor exhaust air temperature entering the core" },
+        ],
+        normal: "Good HRV/ERV: 70–85% sensible effectiveness; premium units 80–90%",
+        calc: { href: "/calculators/hvac/hvac-hrv-erv-effectiveness-calculator", label: "HRV/ERV Effectiveness Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Efficiency & Cost",
+    color: "emerald",
+    formulas: [
+      {
+        name: "SEER / SEER2 Conversion",
+        formula: "SEER2 = SEER × 0.9524\nSEER  = SEER2 ÷ 0.9524",
+        vars: [
+          { sym: "0.9524", desc: "Official DOE M1→M2 conversion factor for split-system AC and heat pumps" },
+        ],
+        normal: "Federal minimums (2023): South 14 SEER2, North 13.4 SEER2, heat pumps 14.3 SEER2",
+        calc: { href: "/calculators/hvac/hvac-seer2-converter", label: "SEER / SEER2 Converter" },
+      },
+      {
+        name: "SEER Savings (Annual)",
+        formula: "Annual savings = BTU/season × (1/SEER_old − 1/SEER_new) ÷ 1,000 × kWh_rate",
+        vars: [
+          { sym: "BTU/season", desc: "Estimated seasonal cooling BTU = tons × 12,000 × cooling_hours" },
+          { sym: "SEER_old / SEER_new", desc: "Efficiency ratings of existing and replacement units" },
+          { sym: "kWh_rate", desc: "Local electricity cost ($/kWh)" },
+        ],
+        normal: "Going from SEER 14 to SEER 20 saves ~30% on cooling electricity",
+        calc: { href: "/calculators/hvac/hvac-seer-savings-calculator", label: "SEER Savings Calculator" },
+      },
+      {
+        name: "AFUE Savings (Annual)",
+        formula: "Savings = heating_cost_old × (1 − AFUE_old/AFUE_new)",
+        vars: [
+          { sym: "heating_cost_old", desc: "Current annual fuel cost for heating ($)" },
+          { sym: "AFUE_old / AFUE_new", desc: "Efficiency of existing and replacement furnace as decimals" },
+        ],
+        normal: "Upgrading 80% to 96% AFUE saves ~16.7% on gas bills",
+        calc: { href: "/calculators/hvac/hvac-afue-savings-calculator", label: "AFUE Savings Calculator" },
+      },
+      {
+        name: "Operating Cost",
+        formula: "Annual cost = BTU/h × hours × kWh_rate ÷ (EER × 1,000)",
+        vars: [
+          { sym: "BTU/h", desc: "Equipment cooling capacity" },
+          { sym: "hours", desc: "Annual run hours (1,000–2,500 for most climates)" },
+          { sym: "EER", desc: "Energy efficiency ratio (SEER2 × 0.875 approximation)" },
+          { sym: "kWh_rate", desc: "Local electricity rate ($/kWh)" },
+        ],
+        normal: "3-ton 16 SEER2 system, 1,500 hours, $0.13/kWh: ~$390/year",
+        calc: { href: "/calculators/hvac/hvac-operating-cost-calculator", label: "Operating Cost Calculator" },
+      },
+    ],
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Formula Reference | TradesQuote" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Formula Reference | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- HERO -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Formula Reference" />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
+              HVAC Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              HVAC Formula Reference
+            </h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every formula used in HVAC field work and system design — organized by workflow.
+              Each entry includes the formula, variable definitions, typical values, and a link to
+              the free calculator that does the arithmetic for you.
+            </p>
+          </div>
+
+          <!-- Section jump nav -->
+          <div class="mt-8 flex flex-wrap gap-3">
+            {sections.map(s => (
+              <a
+                href={`#section-${s.title.toLowerCase().replace(/[^a-z]+/g, '-')}`}
+                class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition"
+              >
+                {s.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- FORMULA SECTIONS -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14 space-y-20">
+        {sections.map(section => (
+          <div id={`section-${section.title.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+            <div class={`inline-block rounded-lg px-4 py-1.5 text-sm font-bold mb-4
+              ${section.color === 'blue' ? 'bg-blue-100 text-blue-700' : ''}
+              ${section.color === 'teal' ? 'bg-teal-100 text-teal-700' : ''}
+              ${section.color === 'violet' ? 'bg-violet-100 text-violet-700' : ''}
+              ${section.color === 'cyan' ? 'bg-cyan-100 text-cyan-700' : ''}
+              ${section.color === 'emerald' ? 'bg-emerald-100 text-emerald-700' : ''}
+            `}>
+              {section.title}
+            </div>
+
+            <div class="space-y-8">
+              {section.formulas.map(f => (
+                <div class={`rounded-2xl border-l-4 border bg-white p-6 shadow-sm
+                  ${section.color === 'blue' ? 'border-l-blue-500 border-blue-100' : ''}
+                  ${section.color === 'teal' ? 'border-l-teal-500 border-teal-100' : ''}
+                  ${section.color === 'violet' ? 'border-l-violet-500 border-violet-100' : ''}
+                  ${section.color === 'cyan' ? 'border-l-cyan-500 border-cyan-100' : ''}
+                  ${section.color === 'emerald' ? 'border-l-emerald-500 border-emerald-100' : ''}
+                `}>
+                  <h3 class="text-lg font-bold text-slate-900">{f.name}</h3>
+
+                  <div class="mt-3 rounded-xl bg-slate-900 px-5 py-4 font-mono text-sm text-slate-100 whitespace-pre-wrap overflow-x-auto">
+                    {f.formula}
+                  </div>
+
+                  <div class="mt-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Variables</p>
+                    <dl class="space-y-1">
+                      {f.vars.map(v => (
+                        <div class="flex gap-2 text-sm">
+                          <dt class="font-mono font-bold text-slate-700 shrink-0">{v.sym}</dt>
+                          <dd class="text-slate-600">— {v.desc}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+
+                  <div class="mt-4 rounded-lg bg-slate-50 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Normal range / typical values</p>
+                    <p class="text-sm text-slate-600">{f.normal}</p>
+                  </div>
+
+                  {f.calc && (
+                    <div class="mt-4">
+                      <a
+                        href={f.calc.href}
+                        class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        {f.calc.label} →
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <!-- CTA -->
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Let the calculator do the arithmetic</h2>
+          <p class="mt-3 text-slate-600">
+            Every formula on this page has a free interactive calculator on TradesQuote.
+          </p>
+          <a
+            href="/calculators/hvac"
+            class="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 transition"
+          >
+            Browse all HVAC calculators →
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

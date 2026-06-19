@@ -1,0 +1,509 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Superheat Calculator — HVAC Refrigerant Charge Check | TradesQuote";
+const description =
+  "Free HVAC superheat calculator. Measure superheat from suction line temperature and saturation temperature at suction pressure, with TXV and fixed-orifice target guidance. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-superheat-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Superheat Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Superheat Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC superheat calculator that computes measured superheat from suction line and saturation temperatures, compares it to TXV or fixed-orifice targets, and explains likely causes when the reading is off.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What should superheat be on my AC?",
+    answer:
+      "For a <strong>TXV system, target 8–12°F</strong> of superheat at the suction line. For a <strong>fixed-orifice (piston) meter</strong>, the band is broader — typically <strong>5–15°F</strong> — and should be matched to the manufacturer target superheat chart for your indoor wet-bulb and outdoor dry-bulb temperatures.",
+  },
+  {
+    question: "How do I calculate superheat?",
+    answer:
+      "Clamp a pipe thermometer on the suction line a few inches from the service valve, read the suction pressure and convert it to saturation temperature on a PT chart, then subtract: <strong>superheat = suction line temp − saturation temp</strong>.",
+  },
+  {
+    question: "What does low superheat mean?",
+    answer:
+      "Low superheat means the suction line is too close to saturation — often from <strong>overcharge, a TXV stuck open, or excessive airflow</strong>. Very low readings risk liquid slugging the compressor.",
+  },
+  {
+    question: "What does high superheat mean?",
+    answer:
+      "High superheat means the suction gas is too hot above saturation — usually <strong>undercharge, a restricted metering device, or low indoor airflow</strong> starving the evaporator. Prolonged high superheat overheats the compressor.",
+  },
+  {
+    question: "Do I use superheat or subcooling to charge?",
+    answer:
+      "Use <strong>superheat for fixed-orifice systems</strong> and <strong>subcooling for TXV systems</strong> as the primary charging method. Many techs still check both as a cross-check once the system is stable.",
+  },
+  {
+    question: "When should I take a superheat reading?",
+    answer:
+      "Take readings after the system has run in cooling for <strong>10–15 minutes</strong> with stable indoor and outdoor conditions. Avoid charging during startup, defrost, or when the filter is dirty — airflow skews the result.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Charge verified? Quote the service call in seconds.";
+const ctaDescription =
+  "A superheat number confirms the diagnosis — TradesQuote turns the whole job into a detailed, line-item estimate in seconds. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description: "Screen airflow and capacity with a temperature split.",
+  },
+  {
+    href: "/calculators/hvac/hvac-target-superheat-calculator",
+    title: "Target Superheat Calculator",
+    description: "Chart target superheat for fixed-orifice systems.",
+  },
+  {
+    href: "/calculators/hvac/hvac-subcooling-calculator",
+    title: "Subcooling Calculator",
+    description: "Verify liquid-side charge on TXV systems.",
+  },
+  {
+    href: "/calculators/hvac/hvac-refrigerant-charge-calculator",
+    title: "Refrigerant Charge Calculator",
+    description: "Line-set add-on charge beyond factory allowance.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Superheat Calculator — HVAC Refrigerant Charge Check" />
+    <meta
+      property="og:description"
+      content="Calculate measured superheat and compare to TXV or fixed-orifice targets. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Superheat Calculator — HVAC Refrigerant Charge Check" />
+    <meta
+      name="twitter:description"
+      content="Calculate measured superheat from suction line and saturation temps. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Superheat Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                ></path>
+              </svg>
+              HVAC Tools · Diagnostics · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Superheat Calculator <span class="text-orange-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Superheat tells you how much the suction gas has warmed above its saturation temperature — the
+              primary charge check on fixed-orifice systems and a useful cross-check on TXV systems. Enter the
+              saturation temperature at suction pressure and the suction line temperature, and this tool gives
+              your measured superheat, whether it's in the healthy band, and the most likely causes when it isn't.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-orange-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter suction-side temperatures
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <label for="sh-meter" class="text-sm font-semibold text-slate-800">Metering device</label>
+                <select
+                  id="sh-meter"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                >
+                  <option value="txv" selected>TXV (expansion valve) — target 8–12°F</option>
+                  <option value="fixed">Fixed orifice (piston) — target 5–15°F</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="sh-sat" class="text-sm font-semibold text-slate-800"
+                    >Saturation temp at suction pressure (°F)</label
+                  >
+                  <input
+                    id="sh-sat"
+                    type="number"
+                    min="-40"
+                    max="120"
+                    value="45"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">From suction gauge converted on a PT chart</p>
+                </div>
+
+                <div>
+                  <label for="sh-suction" class="text-sm font-semibold text-slate-800"
+                    >Suction line temp (°F)</label
+                  >
+                  <input
+                    id="sh-suction"
+                    type="number"
+                    min="-40"
+                    max="200"
+                    value="55"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Pipe clamp thermometer on the suction line</p>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-orange-600 to-amber-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-orange-100">Measured superheat</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sh-result" class="text-5xl font-extrabold tracking-tight">10°F</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-orange-100">Reading</p>
+                  <p id="sh-status" class="mt-1 text-2xl font-bold">Healthy</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-orange-100">Ideal target</p>
+                  <p id="sh-target" class="mt-1 text-2xl font-bold">8–12°F</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-orange-100">Likely causes</p>
+                <p id="sh-causes" class="mt-1 text-sm font-medium leading-snug">
+                  Superheat in the TXV charging band — the evaporator is fully fed without flooding the suction
+                  line.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-orange-50">
+                  <div class="flex justify-between">
+                    <span>Saturation temp</span><span id="sh-bd-sat" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Suction line temp</span><span id="sh-bd-suction" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Superheat</span><span id="sh-bd-sh" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">Healthy range</span><span id="sh-bd-target" class="font-bold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-orange-100 leading-relaxed">
+                Fixed-orifice systems need the target superheat chart for your wet-bulb and outdoor temps — this
+                calculator uses a general band. Always follow the manufacturer charging method.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">What your reading means (TXV systems)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Measured superheat at the suction line. Fixed-orifice targets are broader — use the target superheat
+            chart for piston meters.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Superheat</th>
+                  <th class="py-2.5 pr-4 font-semibold">Reading</th>
+                  <th class="py-2.5 font-semibold">Most likely cause</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Under 4°F</td>
+                  <td class="py-2.5 pr-4">Very low</td>
+                  <td class="py-2.5">Overcharge, TXV stuck open, or non-condensables</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">4–8°F</td>
+                  <td class="py-2.5 pr-4">Low</td>
+                  <td class="py-2.5">Overcharge, restricted airflow, or TXV feeding too much</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">8–12°F</td>
+                  <td class="py-2.5 pr-4 text-orange-700 font-semibold">Healthy</td>
+                  <td class="py-2.5">Proper TXV charge and airflow</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">12–18°F</td>
+                  <td class="py-2.5 pr-4">High</td>
+                  <td class="py-2.5">Undercharge, restricted metering, or low indoor airflow</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">Over 18°F</td>
+                  <td class="py-2.5 pr-4">Very high</td>
+                  <td class="py-2.5">Severe undercharge — compressor overheating risk</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: HVAC School —
+            <a
+              href="https://hvacrschool.com/superheat/"
+              class="underline hover:text-orange-600"
+              target="_blank"
+              rel="noopener">Superheat charging fundamentals</a
+            >
+            · EPA Section 608 — refrigerant handling · Manufacturer charging procedures (TXV vs fixed orifice).
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Superheat is how many degrees the suction gas has warmed past the boiling point at that pressure. It
+            confirms the evaporator is fed without sending liquid to the compressor.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-orange-300"># Measured superheat:</div>
+            <div>superheat&nbsp;=&nbsp;suction line temp − saturation temp at suction pressure</div>
+            <div class="mt-4 text-orange-300"># TXV target:</div>
+            <div>healthy band&nbsp;=&nbsp;<span class="text-amber-300">8–12°F</span></div>
+            <div class="mt-4 text-orange-300"># Fixed orifice (general band):</div>
+            <div>healthy band&nbsp;=&nbsp;<span class="text-amber-300">5–15°F</span>&nbsp;&nbsp;(use manufacturer target chart)</div>
+            <div class="mt-4 text-orange-300"># Read it:</div>
+            <div>too LOW = overcharge/flooding risk · too HIGH = undercharge or restricted coil</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What superheat tells you</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Whether the evaporator is receiving the right amount of refrigerant — enough to boil fully, not so
+                much that liquid reaches the compressor.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Where to measure</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Suction line a few inches from the service valve with a pipe clamp thermometer. Saturation temp
+                comes from the suction gauge on a PT chart for your refrigerant.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">TXV vs fixed orifice</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                TXV systems hold a tighter 8–12°F band because the valve adjusts flow. Piston meters need the
+                target superheat chart for your indoor wet-bulb and outdoor dry-bulb.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Pair with subcooling</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                On TXV systems, subcooling is the primary charge method — superheat confirms the evaporator side.
+                On fixed orifice, superheat is primary and subcooling is the cross-check.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three readings showing healthy TXV superheat, a low-superheat overcharge, and high superheat from
+          undercharge.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Healthy TXV — 45°F sat, 55°F suction line</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              55 − 45 = <span class="font-bold text-orange-700">10°F → Healthy</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 10°F sits in the 8–12°F TXV band — charge
+              and airflow are well matched.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Overcharge — 42°F sat, 44°F suction line</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              44 − 42 = <span class="font-bold text-orange-700">2°F → Very low</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> nearly no superheat — liquid slugging risk.
+              Recover excess refrigerant before returning to service.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Undercharge — 38°F sat, 58°F suction line</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              58 − 38 = <span class="font-bold text-orange-700">20°F → Very high</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the evaporator is starved — check for leaks
+              and charge to manufacturer spec after confirming airflow.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about measuring and interpreting HVAC superheat."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="orange" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacSuperheatCalculator } from "@/scripts/calculators/hvac-superheat-calculator";
+    initHvacSuperheatCalculator();
+  </script>
+</Layout>

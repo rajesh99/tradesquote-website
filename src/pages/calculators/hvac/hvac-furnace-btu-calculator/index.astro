@@ -1,0 +1,453 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Furnace BTU Calculator — Free Furnace Sizing Tool | TradesQuote";
+const description = "Free furnace BTU calculator. Find what size furnace you need by square footage, climate zone, and insulation — including AFUE efficiency and the furnace input size to buy.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-furnace-btu-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Furnace BTU Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Furnace BTU Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Free online furnace BTU calculator that estimates the heating load for a home by square footage, climate zone, and insulation, then converts it to the furnace input size to buy using AFUE efficiency.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many BTUs of heat do I need per square foot?",
+    answer:
+      "Heating needs run from about <strong>30 to 60 BTU per square foot</strong> depending on climate. Hot southern climates need roughly 30–35, moderate climates 40–45, and very cold northern climates 50–60. Insulation quality moves the number up or down about 10%.",
+  },
+  {
+    question: "What size furnace do I need for a 2,000 square foot house?",
+    answer:
+      "In a moderate climate at 45 BTU/sq ft, a 2,000 sq ft home needs about <strong>90,000 BTU of heat output</strong>. With a 95% AFUE furnace that means roughly 95,000 BTU of input — so a <strong>100,000 BTU furnace</strong>. In warm climates an 80,000 BTU unit often suffices.",
+  },
+  {
+    question: "What's the difference between furnace input and output BTU?",
+    answer:
+      "<strong>Input</strong> is the fuel energy a furnace burns; <strong>output</strong> is the heat it actually delivers. Output = input × AFUE. An 80,000 BTU input furnace at 95% AFUE delivers 76,000 BTU of heat. Furnaces are sold by input rating, which is why this calculator converts for you.",
+  },
+  {
+    question: "What does AFUE mean on a furnace?",
+    answer:
+      "AFUE stands for <strong>Annual Fuel Utilization Efficiency</strong> — the percentage of fuel converted into usable heat over a season. A standard furnace is about 80% AFUE; high-efficiency condensing furnaces reach 95–97%. Higher AFUE means you can buy a smaller input rating for the same delivered heat.",
+  },
+  {
+    question: "Is a bigger furnace always better?",
+    answer:
+      "No. An oversized furnace heats the air fast and shuts off — a pattern called <strong>short-cycling</strong> that causes uneven temperatures, wasted fuel, and extra wear on the heat exchanger and blower. A right-sized furnace runs longer, steadier, more comfortable cycles.",
+  },
+  {
+    question: "What furnace sizes are available?",
+    answer:
+      "Residential gas furnaces are typically sold in input ratings of <strong>40,000, 60,000, 80,000, 100,000, and 120,000 BTU</strong>, with some brands offering 45,000, 70,000, or 140,000 BTU models. Calculate your required input, then round up to the nearest size your brand offers.",
+  },
+  {
+    question: "How accurate is this vs. a Manual J load calculation?",
+    answer:
+      "This tool gives a fast planning estimate from the factors that matter most: area, climate, insulation, and efficiency. A full <strong>ACCA Manual J</strong> calculation also accounts for windows, orientation, air infiltration, and duct losses — and is required for permits and equipment warranties. Use this to plan and a Manual J to install.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Furnace sized? Quote the whole install in seconds.";
+const ctaDescription =
+  "A furnace size is one line of the job. TradesQuote turns the full replacement — equipment, venting, ductwork, labor, and disposal — into a detailed, line-item estimate. Describe the work or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (Cooling)",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Size ductwork and required airflow per room.",
+  },
+  {
+    href: "/calculators/hvac/hvac-seer-savings-calculator",
+    title: "SEER Savings Calculator",
+    description: "Compare efficiency ratings and energy costs.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Furnace BTU Calculator — Free Furnace Sizing Tool" />
+    <meta property="og:description" content="Find what size furnace you need by square footage and climate zone — heating load, AFUE efficiency, and furnace input size in seconds." />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Furnace BTU Calculator — Free Furnace Sizing Tool" />
+    <meta name="twitter:description" content="Find what size furnace you need by square footage and climate zone. Free, instant, no sign-up." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+          <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+      
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Furnace BTU Calculator" />
+      
+              <div class="max-w-3xl">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>
+                  HVAC Tools · Heating · Free
+                </span>
+                <!-- (1) H1 -->
+                <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+                  Furnace BTU Calculator <span class="text-orange-600">— Free Online Calculator</span>
+                </h1>
+                <!-- (2) What this calculates — 2 sentences -->
+                <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+                  This furnace BTU calculator estimates the heating output your home needs based on square footage,
+                  climate zone, and insulation — then converts it into the furnace <em>input</em> rating to shop for
+                  using the unit's AFUE efficiency. Use it to size a new furnace, check a replacement quote, or see
+                  how a high-efficiency model changes the size you need.
+                </p>
+      
+                <!-- Differentiator / internal link to cooling calc (avoids cannibalization) -->
+                <div class="mt-6 flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50 p-4">
+                  <svg class="h-5 w-5 shrink-0 text-orange-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <p class="text-sm text-slate-600">
+                    <span class="font-semibold text-slate-900">Sizing air conditioning instead?</span>
+                    This page sizes <em>heating</em>. For cooling capacity, use the
+                    <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-orange-700 underline decoration-orange-300 hover:decoration-orange-600">HVAC BTU Calculator</a>
+                    — or convert an existing rating with the
+                    <a href="/calculators/hvac/hvac-tonnage-calculator" class="font-semibold text-orange-700 underline decoration-orange-300 hover:decoration-orange-600">Tonnage Calculator</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+      
+          <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+          <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+            <div class="grid lg:grid-cols-5 gap-6">
+      
+              <!-- Inputs -->
+              <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  Enter your home details
+                </h2>
+      
+                <div class="mt-6 space-y-6">
+                  <!-- Square footage -->
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <label for="area" class="text-sm font-semibold text-slate-800">Heated area</label>
+                      <div class="flex items-center gap-1">
+                        <input id="area" type="number" min="0" max="10000" value="1500"
+                          class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none">
+                        <span class="text-sm text-slate-500">sq ft</span>
+                      </div>
+                    </div>
+                    <input id="areaRange" type="range" min="200" max="5000" step="50" value="1500"
+                      class="furnace-range mt-3 w-full bg-slate-200 accent-orange-600">
+                    <div class="flex justify-between text-xs text-slate-400 mt-1">
+                      <span>200</span><span>5,000 sq ft</span>
+                    </div>
+                  </div>
+      
+                  <div class="grid sm:grid-cols-2 gap-5">
+                    <!-- Climate zone -->
+                    <div>
+                      <label for="climate" class="text-sm font-semibold text-slate-800">Climate zone (heating)</label>
+                      <select id="climate"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none">
+                        <option value="35">Hot — Deep South / Southwest (35 BTU/sq ft)</option>
+                        <option value="40">Warm — Southern US (40 BTU/sq ft)</option>
+                        <option value="45" selected>Moderate — Mid-Atlantic / lower Midwest (45)</option>
+                        <option value="50">Cold — Northern US / New England (50)</option>
+                        <option value="55">Very cold — Upper Midwest / Canada (55)</option>
+                      </select>
+                    </div>
+      
+                    <!-- Insulation -->
+                    <div>
+                      <label for="insulation" class="text-sm font-semibold text-slate-800">Insulation quality</label>
+                      <select id="insulation"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none">
+                        <option value="1.1">Poor (older, drafty home)</option>
+                        <option value="1.0" selected>Average</option>
+                        <option value="0.9">Excellent (new / well-sealed)</option>
+                      </select>
+                    </div>
+      
+                    <!-- AFUE -->
+                    <div class="sm:col-span-2">
+                      <label for="afue" class="text-sm font-semibold text-slate-800">Furnace efficiency (AFUE)</label>
+                      <select id="afue"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none">
+                        <option value="0.80">80% — standard efficiency</option>
+                        <option value="0.90">90% — mid efficiency</option>
+                        <option value="0.95" selected>95% — high-efficiency condensing</option>
+                        <option value="0.97">97%+ — top-tier condensing</option>
+                      </select>
+                      <p class="mt-2 text-xs text-slate-500">Higher AFUE = more of the fuel becomes heat, so you can buy a smaller input rating for the same output.</p>
+                    </div>
+                  </div>
+      
+                  <button id="resetBtn"
+                    class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset to defaults
+                  </button>
+                </div>
+              </div>
+      
+              <!-- Results -->
+              <div class="lg:col-span-2">
+                <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-orange-600 to-amber-500 p-6 sm:p-8 text-white shadow-lg">
+                  <p class="text-sm font-medium text-orange-100">Heating output your home needs</p>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="loadResult" class="text-5xl font-extrabold tracking-tight">67,500</span>
+                    <span class="text-lg font-semibold text-orange-100">BTU/hr</span>
+                  </div>
+      
+                  <div class="mt-6 grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p class="text-xs text-orange-100">Required furnace input</p>
+                      <p id="inputResult" class="mt-1 text-2xl font-bold">71,000 BTU</p>
+                    </div>
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p class="text-xs text-orange-100">Per square foot</p>
+                      <p id="perSqftResult" class="mt-1 text-2xl font-bold">45 BTU</p>
+                    </div>
+                  </div>
+      
+                  <div class="mt-3 rounded-xl bg-white/15 p-4">
+                    <p class="text-xs text-orange-100">Suggested furnace size</p>
+                    <p id="unitResult" class="mt-1 text-base font-semibold leading-snug">80,000 BTU input furnace</p>
+                  </div>
+      
+                  <!-- Breakdown -->
+                  <details class="group mt-5 rounded-xl bg-white/10">
+                    <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                      See the breakdown
+                      <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-4 pb-4 text-sm space-y-1.5 text-orange-50">
+                      <div class="flex justify-between"><span>Base load (area × climate factor)</span><span id="bd-base" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Insulation adjustment</span><span id="bd-insulation" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Heating output needed</span><span id="bd-load" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>÷ AFUE efficiency</span><span id="bd-afue" class="font-semibold">—</span></div>
+                      <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"><span class="font-bold">Required input</span><span id="bd-input" class="font-bold">—</span></div>
+                    </div>
+                  </details>
+      
+                  <p class="mt-4 text-xs text-orange-100 leading-relaxed">
+                    This is a planning estimate. For permits, equipment warranties, and final installation,
+                    confirm with a full ACCA Manual J load calculation.
+                  </p>
+                </div>
+              </div>
+            </div>
+      
+            <!-- Reference table -->
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+              <h2 class="text-xl font-bold text-slate-900">Furnace size by square footage (quick reference)</h2>
+              <p class="mt-2 text-sm text-slate-500">Moderate climate (45 BTU/sq ft), average insulation, 95% AFUE furnace. Cold climates typically move you up one size.</p>
+              <div class="mt-5 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-slate-500">
+                      <th class="py-2.5 pr-4 font-semibold">Home size (sq ft)</th>
+                      <th class="py-2.5 pr-4 font-semibold">Heating output needed</th>
+                      <th class="py-2.5 font-semibold">Furnace size (input)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-700">
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4">Up to 800</td><td class="py-2.5 pr-4">36,000 BTU</td><td class="py-2.5 font-semibold">40,000 BTU</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4">800 – 1,200</td><td class="py-2.5 pr-4">54,000 BTU</td><td class="py-2.5 font-semibold">60,000 BTU</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4">1,200 – 1,600</td><td class="py-2.5 pr-4">72,000 BTU</td><td class="py-2.5 font-semibold">80,000 BTU</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4">1,600 – 2,000</td><td class="py-2.5 pr-4">90,000 BTU</td><td class="py-2.5 font-semibold">100,000 BTU</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4">2,000 – 2,500</td><td class="py-2.5 pr-4">112,500 BTU</td><td class="py-2.5 font-semibold">120,000 BTU</td></tr>
+                    <tr><td class="py-2.5 pr-4">2,500 – 3,000</td><td class="py-2.5 pr-4">135,000 BTU</td><td class="py-2.5 font-semibold">140,000 BTU or two-stage</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="mt-4 text-xs text-slate-500">Figures shown are planning estimates. Confirm final sizing with a full ACCA Manual J load calculation before purchasing or installing equipment.</p>
+            </div>
+          </section>
+      
+          <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+          <section class="bg-slate-50 border-y border-slate-200">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+              <p class="mt-4 text-slate-600 leading-relaxed">
+                Furnace sizing is two short steps: figure out how much heat the house loses on a cold day
+                (the heating load), then figure out which furnace can deliver that heat after its efficiency
+                losses. Here is exactly what this calculator does.
+              </p>
+      
+              <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+                <div class="text-orange-300"># Step 1 — Heating load (output needed)</div>
+                <div>load&nbsp;=&nbsp;area (sq ft) × climate factor (<span class="text-amber-300">30–60 BTU</span>) × insulation</div>
+                <div class="mt-4 text-orange-300"># Step 2 — Convert output to furnace input</div>
+                <div>input&nbsp;=&nbsp;load ÷ <span class="text-amber-300">AFUE</span>&nbsp;&nbsp;(0.80 standard · 0.95 high-efficiency)</div>
+                <div class="mt-4 text-orange-300"># Step 3 — Round up to a standard size</div>
+                <div>furnace&nbsp;=&nbsp;next of <span class="text-amber-300">40k · 60k · 80k · 100k · 120k</span> ≥ input</div>
+              </div>
+      
+              <div class="mt-8 grid sm:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why 30–60 BTU per square foot?</h3>
+                  <p class="mt-2 text-sm text-slate-600">Heating need scales with how cold your winters get. A Georgia home may need 35 BTU/sq ft on a design day; a Minnesota home can need 55 or more.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why divide by AFUE?</h3>
+                  <p class="mt-2 text-sm text-slate-600">Furnaces are sold by <em>input</em> (fuel burned), but your house needs <em>output</em> (heat delivered). Dividing the load by AFUE bridges the two.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Input vs. output in practice</h3>
+                  <p class="mt-2 text-sm text-slate-600">An 80,000 BTU input furnace at 80% AFUE delivers 64,000 BTU; the same input at 95% AFUE delivers 76,000 BTU — nearly a size class more heat.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why round up, not down?</h3>
+                  <p class="mt-2 text-sm text-slate-600">Furnaces come in fixed steps (usually 20,000 BTU apart). Rounding up covers design-day cold snaps; rounding down risks a furnace that never keeps up.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+      
+          <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+          <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+            <p class="mt-4 text-slate-600">Three real-world scenarios — including how a high-efficiency furnace changes the size you buy.</p>
+      
+            <div class="mt-8 space-y-6">
+              <!-- Example 1 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">1</span>
+                  <h3 class="text-lg font-bold text-slate-900">Typical home — 1,500 sq ft, moderate climate</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">Moderate zone (45 BTU/sq ft) · average insulation · 95% AFUE furnace.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  1,500 × 45 × 1.0 = 67,500 BTU output needed<br>
+                  67,500 ÷ 0.95 = <span class="font-bold text-orange-700">≈ 71,000 BTU input</span><br>
+                  round up → <span class="font-bold text-orange-700">80,000 BTU furnace</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> an 80,000 BTU input, 95% AFUE furnace — the most common size class installed in mid-size American homes.</p>
+              </div>
+      
+              <!-- Example 2 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">2</span>
+                  <h3 class="text-lg font-bold text-slate-900">Small, well-built home — 1,000 sq ft, warm climate</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">Warm zone (40 BTU/sq ft) · excellent insulation (×0.9) · 95% AFUE furnace.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  1,000 × 40 × 0.9 = 36,000 BTU output needed<br>
+                  36,000 ÷ 0.95 = <span class="font-bold text-orange-700">≈ 38,000 BTU input</span><br>
+                  round up → <span class="font-bold text-orange-700">40,000 BTU furnace</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> the smallest standard furnace (40,000 BTU) is plenty — a common surprise for owners of tight, newer construction.</p>
+              </div>
+      
+              <!-- Example 3 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">3</span>
+                  <h3 class="text-lg font-bold text-slate-900">Cold-climate home — 2,200 sq ft: 80% vs. 95% AFUE</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">Cold zone (50 BTU/sq ft) · average insulation · comparing furnace efficiencies.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  2,200 × 50 × 1.0 = 110,000 BTU output needed<br>
+                  at 80% AFUE: 110,000 ÷ 0.80 = 137,500 → <span class="font-bold text-orange-700">140,000 BTU furnace</span><br>
+                  at 95% AFUE: 110,000 ÷ 0.95 = 116,000 → <span class="font-bold text-orange-700">120,000 BTU furnace</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> the high-efficiency model needs a full size class less input for the same heat — smaller equipment, lower fuel bills, same comfort.</p>
+              </div>
+            </div>
+          </section>
+      
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="orange"
+            subtitle="Common questions about furnace sizing, BTUs, and AFUE."
+          />
+
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+          <HvacRelatedCalculators calculators={relatedCalculators} accent="orange" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacFurnaceBtuCalculator } from "@/scripts/calculators/hvac-furnace-btu-calculator";
+    initHvacFurnaceBtuCalculator();
+  </script>
+</Layout>
+<style>
+  .furnace-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .furnace-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .furnace-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

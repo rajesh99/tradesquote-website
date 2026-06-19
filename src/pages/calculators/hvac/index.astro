@@ -1,0 +1,390 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorToolCard from "@/components/CalculatorToolCard.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema } from "@/lib/calculatorFaq";
+import { calculatorCategories } from "@/config/calculatorCategories";
+import { getSinglePage } from "@/lib/contentParser.astro";
+import taxonomyFilter from "@/lib/utils/taxonomyFilter";
+import {
+  hvacCalculators,
+  hvacCalculatorGroups,
+  hvacCalculatorGuide,
+  hvacFaqs,
+  hvacAccentStyles,
+} from "@/config/hvacCalculators";
+
+const title = "Free HVAC Calculators & Formulas | TradesQuote";
+const description =
+  "Thirty-two free HVAC calculators — BTU sizing, tonnage, unit converter, heat pump and mini-split sizing, furnace sizing, CFM airflow, duct size, Delta T, static pressure, superheat and subcooling, refrigerant charge, dew point, sensible and latent heat, fan laws, ventilation, humidity control, SEER and HSPF savings, operating cost, replacement cost, job pricing, combustion efficiency, HRV/ERV effectiveness, duct friction rate, hydronic boiler EDR sizing, cooling tower tonnage, ACH ventilation, and psychrometric properties. Plus every formula explained in plain English.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac";
+
+const comingSoonCategories = calculatorCategories.filter((c) => c.status === "coming-soon");
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: pageUrl },
+  ],
+};
+
+const itemListData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Free HVAC Calculators",
+  description:
+    "Free online HVAC calculators for sizing, airflow, diagnostics, psychrometrics, ventilation, humidity control, efficiency, and cost: BTU cooling load, AC tonnage, unit converter, heat pump and mini-split sizing, furnace BTU with AFUE, CFM airflow, duct size, Delta T and static pressure, superheat and subcooling, refrigerant line-set charge, dew point and sensible/latent heat, fan laws, ASHRAE ventilation, humidity control sizing, SEER and HSPF savings, operating cost, replacement cost, and contractor job pricing.",
+  itemListElement: hvacCalculators.map((calc, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: calc.title,
+    url: `${pageUrl}/${calc.slug}`,
+  })),
+};
+
+const faqData = buildFaqPageSchema(hvacFaqs);
+
+const allPosts = await getSinglePage("posts");
+const recentHvacPosts = taxonomyFilter(allPosts, "categories", "hvac")
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
+
+const ctaHeading = "Calculators size the equipment. TradesQuote prices the job.";
+const ctaDescription =
+  "Once you know the BTUs, tons, and CFM, the real work is the quote. Describe the job or upload photos, and TradesQuote's AI builds a detailed line-item estimate — quantities, unit prices, and totals — validated by a built-in quality control agent and ready for your client to sign online.";
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Free HVAC Calculators & Formulas" />
+    <meta
+      property="og:description"
+      content="BTU, tonnage, unit converter, heat pump, mini-split, furnace, CFM, duct, Delta T, static pressure, superheat, refrigerant charge, dew point, fan laws, ventilation, humidity control, SEER &amp; HSPF savings, operating and replacement cost, combustion efficiency, HRV/ERV effectiveness, duct friction rate, hydronic boiler EDR, cooling tower tonnage, ACH ventilation, and psychrometrics — thirty-two free tools plus every formula explained."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Free HVAC Calculators & Formulas" />
+    <meta
+      name="twitter:description"
+      content="Thirty-two free HVAC sizing, diagnostic, psychrometric, ventilation, combustion, hydronic, and cost tools, plus every formula explained in plain English."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(itemListData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- Hero -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg
+                class="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              HVAC Tools · 32 Free Calculators
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Free HVAC Calculators <span class="text-blue-600">— Sizing, Airflow, Efficiency & Cost</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every sizing, efficiency, and cost calculation an HVAC job needs, in one place — cooling load in
+              BTU, system size in tons, heat pump and ductless mini-split sizing, furnace size with AFUE
+              efficiency, airflow in CFM, duct diameters, the savings of a higher SEER or AFUE rating, what it
+              costs to run and to replace a system, and how to price the whole job. Each tool is free, instant,
+              and explains its formula in plain English with worked examples.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Start here quick-nav -->
+      <section class="border-b border-slate-100 bg-slate-50">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Start here</p>
+          <div class="flex flex-wrap gap-3">
+            <a
+              href="/calculators/hvac/hvac-btu-calculator"
+              class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+              Size new equipment
+            </a>
+            <a
+              href="/calculators/hvac/hvac-delta-t-calculator"
+              class="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-4 py-2.5 text-sm font-medium text-violet-700 shadow-sm hover:bg-violet-50 hover:border-violet-300 transition-colors"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+              Diagnose a running system
+            </a>
+            <a
+              href="/calculators/hvac/hvac-operating-cost-calculator"
+              class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-medium text-emerald-700 shadow-sm hover:bg-emerald-50 hover:border-emerald-300 transition-colors"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Calculate cost
+            </a>
+            <a
+              href="/calculators/hvac/hvac-seer-savings-calculator"
+              class="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm font-medium text-orange-700 shadow-sm hover:bg-orange-50 hover:border-orange-300 transition-colors"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Compare efficiency ratings
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calculator directory — grouped by workflow -->
+      <section id="calculators" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
+        {
+          hvacCalculatorGroups.map((group) => (
+            <div class="mb-14">
+              <div class="mb-5">
+                <h2 class="text-xl font-bold text-slate-900">{group.label}</h2>
+                <p class="mt-1 text-sm text-slate-500">{group.description}</p>
+              </div>
+              <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {group.slugs.map((slug) => {
+                  const calculator = hvacCalculators.find((c) => c.slug === slug);
+                  return calculator ? <CalculatorToolCard {calculator} /> : null;
+                })}
+              </div>
+            </div>
+          ))
+        }
+
+        <!-- Coming soon card -->
+        <div class="flex flex-col rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 max-w-lg">
+          <div class="flex items-center gap-3">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-200 text-slate-500">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m6-6h-6m-6 0h6" />
+              </svg>
+            </span>
+            <h2 class="text-lg font-bold text-slate-700">More trades on the way</h2>
+          </div>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            HVAC is the first set. Calculators for the other trades TradesQuote supports are coming next:
+          </p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            {
+              comingSoonCategories.map((category) => (
+                <span class="rounded-full bg-white border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600">
+                  {category.name}
+                </span>
+              ))
+            }
+          </div>
+          <p class="mt-auto pt-4 text-xs text-slate-500">Coming soon</p>
+        </div>
+      </section>
+
+      <!-- Which calculator do I need? -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Which calculator do I need?</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Match your question to the right tool. For a full cooling install, the natural order is:
+            <span class="font-semibold text-slate-900">BTU → Tonnage → CFM</span> — get the load, pick the
+            system size, then set the airflow targets.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">You're asking…</th>
+                  <th class="py-3 px-5 font-semibold">Use this tool</th>
+                  <th class="py-3 px-5 font-semibold">The rule it's built on</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  hvacCalculatorGuide.map((row, index) => {
+                    const linkColor = hvacAccentStyles[row.accent].linkColor;
+                    const isLast = index === hvacCalculatorGuide.length - 1;
+                    return (
+                      <tr class={isLast ? "" : "border-b border-slate-100"}>
+                        <td class="py-3 px-5">{row.question}</td>
+                        <td class="py-3 px-5">
+                          <a
+                            href={`/calculators/hvac/${row.slug}`}
+                            class={`font-semibold ${linkColor} hover:underline`}
+                          >
+                            {row.tool}
+                          </a>
+                        </td>
+                        <td class="py-3 px-5">{row.rule}</td>
+                      </tr>
+                    );
+                  })
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Formulas -->
+      <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Every HVAC formula on one page</h2>
+        <p class="mt-4 text-slate-600 leading-relaxed">
+          Every rule of thumb behind these tools, on one page. Each calculator's page walks through its
+          formula in plain English with worked examples — this is the cheat sheet.
+        </p>
+
+        <div
+          class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+        >
+          <div class="text-blue-300"># Cooling load (BTU calculator)</div>
+          <div>BTU&nbsp;=&nbsp;sq ft × <span class="text-amber-300">20</span> × ceiling ÷ 8 × climate × sun × insulation</div>
+          <div class="mt-4 text-sky-300"># Tonnage conversion (tonnage calculator)</div>
+          <div>tons&nbsp;=&nbsp;BTU ÷ <span class="text-amber-300">12,000</span></div>
+          <div class="mt-4 text-indigo-300"># Heat pump sizing (heat pump calculator)</div>
+          <div>cooling tons&nbsp;=&nbsp;BTU ÷ <span class="text-amber-300">12,000</span>&nbsp;&nbsp;·&nbsp;&nbsp;heating BTU&nbsp;=&nbsp;sq ft × <span class="text-amber-300">20–40</span> (by zone)</div>
+          <div class="mt-4 text-yellow-300"># Mini-split sizing (mini-split calculator)</div>
+          <div>head BTU&nbsp;=&nbsp;room sq ft × <span class="text-amber-300">20–30</span> × ceiling × climate × sun (+ kitchen)</div>
+          <div class="mt-4 text-orange-300"># Furnace sizing (furnace calculator)</div>
+          <div>input BTU&nbsp;=&nbsp;sq ft × <span class="text-amber-300">30–60</span> (by climate) × insulation ÷ AFUE</div>
+          <div class="mt-4 text-cyan-300"># Airflow (CFM calculator)</div>
+          <div>room CFM&nbsp;=&nbsp;volume × ACH ÷ <span class="text-amber-300">60</span>&nbsp;&nbsp;·&nbsp;&nbsp;system CFM&nbsp;=&nbsp;tons × <span class="text-amber-300">400</span></div>
+          <div class="mt-4 text-teal-300"># Duct size (duct calculator)</div>
+          <div>size&nbsp;=&nbsp;smallest diameter with capacity ≥ CFM&nbsp;&nbsp;(flex × <span class="text-amber-300">0.75</span> · velocity ≤ <span class="text-amber-300">900</span> fpm)</div>
+          <div class="mt-4 text-violet-300"># Delta T (temperature split / rise)</div>
+          <div>cooling ΔT&nbsp;=&nbsp;return − supply (<span class="text-amber-300">16–22°F</span>)&nbsp;&nbsp;·&nbsp;&nbsp;heating rise&nbsp;=&nbsp;supply − return (<span class="text-amber-300">40–70°F</span>)</div>
+          <div class="mt-4 text-red-300"># Static pressure (TESP)</div>
+          <div>TESP&nbsp;=&nbsp;supply static + |return static|&nbsp;&nbsp;≤ equipment nameplate max</div>
+          <div class="mt-4 text-orange-300"># Superheat & subcooling (charge check)</div>
+          <div>superheat&nbsp;=&nbsp;suction line temp − sat temp&nbsp;&nbsp;·&nbsp;&nbsp;subcooling&nbsp;=&nbsp;sat temp − liquid line temp</div>
+          <div class="mt-4 text-amber-300"># Target superheat (fixed orifice)</div>
+          <div>target SH&nbsp;=&nbsp;((3 × indoor WB) − 80 − outdoor DB) ÷ <span class="text-amber-300">2</span></div>
+          <div class="mt-4 text-cyan-300"># Dew point (psychrometrics)</div>
+          <div>dew point&nbsp;=&nbsp;Magnus formula from dry-bulb + RH&nbsp;&nbsp;·&nbsp;&nbsp;condensation if surface &lt; dew point</div>
+          <div class="mt-4 text-emerald-300"># Sensible & latent heat (coil load)</div>
+          <div>Qs&nbsp;=&nbsp;<span class="text-amber-300">1.08</span>×CFM×ΔT&nbsp;&nbsp;·&nbsp;&nbsp;Ql&nbsp;=&nbsp;<span class="text-amber-300">0.68</span>×CFM×Δgrains&nbsp;&nbsp;·&nbsp;&nbsp;SHR&nbsp;=&nbsp;Qs÷Qt</div>
+          <div class="mt-4 text-blue-300"># Fan laws (blower speed change)</div>
+          <div>CFM₂/CFM₁&nbsp;=&nbsp;N₂/N₁&nbsp;&nbsp;·&nbsp;&nbsp;SP₂/SP₁&nbsp;=&nbsp;(N₂/N₁)²&nbsp;&nbsp;·&nbsp;&nbsp;BHP₂/BHP₁&nbsp;=&nbsp;(N₂/N₁)³</div>
+          <div class="mt-4 text-teal-300"># Ventilation (ASHRAE 62.2 / 62.1)</div>
+          <div>residential CFM&nbsp;=&nbsp;<span class="text-amber-300">0.03</span>×sq ft + <span class="text-amber-300">7.5</span>×(bedrooms+1)&nbsp;&nbsp;·&nbsp;&nbsp;commercial CFM&nbsp;=&nbsp;occ×cfm/person + area×cfm/sqft</div>
+          <div class="mt-4 text-rose-300"># Humidity control (latent load)</div>
+          <div>Ql&nbsp;=&nbsp;<span class="text-amber-300">0.68</span>×CFM×Δgrains&nbsp;&nbsp;·&nbsp;&nbsp;pints/day&nbsp;=&nbsp;Ql×24÷<span class="text-amber-300">12,000</span></div>
+          <div class="mt-4 text-orange-300"># Refrigerant line-set add-on charge</div>
+          <div>add-on oz&nbsp;=&nbsp;(total length − factory allowance) × oz/ft by line diameter</div>
+          <div class="mt-4 text-sky-300"># Unit converter</div>
+          <div>BTU/h&nbsp;=&nbsp;tons × <span class="text-amber-300">12,000</span>&nbsp;&nbsp;·&nbsp;&nbsp;kW&nbsp;=&nbsp;BTU/h ÷ <span class="text-amber-300">3,412</span>&nbsp;&nbsp;·&nbsp;&nbsp;Pa&nbsp;=&nbsp;in.w.c. × <span class="text-amber-300">249</span></div>
+          <div class="mt-4 text-emerald-300"># Cooling efficiency savings (SEER calculator)</div>
+          <div>% saved&nbsp;=&nbsp;1 − (old SEER ÷ new SEER)</div>
+          <div class="mt-4 text-indigo-300"># Heat pump heating savings (HSPF calculator)</div>
+          <div>% saved&nbsp;=&nbsp;1 − (old HSPF ÷ new HSPF)</div>
+          <div class="mt-4 text-orange-300"># Heating efficiency savings (AFUE calculator)</div>
+          <div>% saved&nbsp;=&nbsp;1 − (old AFUE ÷ new AFUE)</div>
+          <div class="mt-4 text-red-300"># Operating cost (operating cost calculator)</div>
+          <div>cost/hr&nbsp;=&nbsp;BTU ÷ (SEER or HSPF) ÷ <span class="text-amber-300">1,000</span> × $/kWh&nbsp;&nbsp;·&nbsp;&nbsp;gas: BTU ÷ AFUE ÷ <span class="text-amber-300">100k</span> × $/therm</div>
+          <div class="mt-4 text-violet-300"># Replacement cost (cost calculator)</div>
+          <div>cost&nbsp;=&nbsp;(base × size × efficiency + ductwork) × regional rate, ±<span class="text-amber-300">15%</span></div>
+          <div class="mt-4 text-rose-300"># Job price (estimate calculator)</div>
+          <div>price&nbsp;=&nbsp;(labor + equipment + materials + overhead) ÷ (1 − <span class="text-amber-300">margin</span>)</div>
+        </div>
+
+        <p class="mt-6 text-sm text-slate-500">
+          All of these are planning rules. Final equipment selection should be confirmed with ACCA Manual J
+          (loads) and Manual D (ducts) — every calculator says so, because right-sizing beats guessing in
+          comfort, efficiency, and equipment life.
+        </p>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={hvacFaqs}
+        accent="blue"
+        subtitle="About the calculators, their accuracy, and what's next."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      {
+        recentHvacPosts.length > 0 && (
+          <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
+            <div class="flex items-end justify-between mb-8">
+              <div>
+                <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">From the Blog</h2>
+                <p class="mt-2 text-slate-600">
+                  Guides and deep-dives on HVAC sizing, diagnostics, efficiency, and cost.
+                </p>
+              </div>
+              <a
+                href="/blog/categories/hvac"
+                class="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800"
+              >
+                All HVAC articles
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+              {recentHvacPosts.map((post) => (
+                <a
+                  href={`/blog/${post.id}`}
+                  class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 hover:border-blue-300 hover:shadow-md transition-all"
+                >
+                  <p class="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-2">HVAC</p>
+                  <h3 class="text-base font-bold text-slate-900 group-hover:text-blue-600 leading-snug">
+                    {post.data.title}
+                  </h3>
+                  {post.data.description && (
+                    <p class="mt-2 text-sm text-slate-500 leading-relaxed line-clamp-2">
+                      {post.data.description}
+                    </p>
+                  )}
+                  <span class="mt-auto pt-4 text-sm font-semibold text-blue-600 group-hover:underline">
+                    Read article →
+                  </span>
+                </a>
+              ))}
+            </div>
+            <div class="mt-6 sm:hidden">
+              <a href="/blog/categories/hvac" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                View all HVAC articles →
+              </a>
+            </div>
+          </section>
+        )
+      }
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

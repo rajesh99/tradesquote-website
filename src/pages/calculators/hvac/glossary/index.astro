@@ -1,0 +1,304 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+
+const title = "HVAC Glossary — 60+ Terms Defined | TradesQuote";
+const description =
+  "Plain-English definitions for over 60 HVAC terms. ACH, AFUE, BTU, CFM, delta T, EER, HSPF, Manual J, SEER2, subcooling, superheat, and more — each linked to the relevant free calculator.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/glossary";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "HVAC Glossary", item: pageUrl },
+  ],
+};
+
+const terms = [
+  // A
+  {
+    letter: "A",
+    items: [
+      { term: "ACH (Air Changes per Hour)", def: "The number of times the total air volume in a space is replaced in one hour. Calculated as CFM × 60 ÷ room volume (cu ft). Building codes specify minimum ACH for ventilation; too few air changes leads to poor indoor air quality.", calc: { href: "/calculators/hvac/hvac-ach-ventilation-calculator", label: "ACH Calculator" } },
+      { term: "AFUE (Annual Fuel Utilization Efficiency)", def: "The percentage of fuel converted to heat over a full heating season, accounting for on/off cycling losses. A 95% AFUE furnace converts 95 cents of every dollar of gas into usable heat. Federal minimum is 80% AFUE for most climates.", calc: { href: "/calculators/hvac/hvac-afue-savings-calculator", label: "AFUE Savings Calculator" } },
+      { term: "Air Handler (AHU)", def: "The indoor unit of a split HVAC system that contains the evaporator coil, blower motor, and filter. In commercial systems, the air-handling unit also contains the mixing box, dampers, heating coil, and controls." },
+    ],
+  },
+  // B
+  {
+    letter: "B",
+    items: [
+      { term: "Balance Point", def: "The outdoor temperature at which a heat pump's heating output exactly equals the building's heat loss. Below the balance point, supplemental heat is needed. Typically 25–35°F for standard heat pumps; -13°F or lower for cold-climate units.", calc: { href: "/calculators/hvac/hvac-heat-pump-calculator", label: "Heat Pump Calculator" } },
+      { term: "BTU (British Thermal Unit)", def: "The amount of energy needed to raise one pound of water by 1°F. Used to rate heating and cooling capacity. Cooling loads are expressed in BTU/h; 12,000 BTU/h = 1 ton of cooling.", calc: { href: "/calculators/hvac/hvac-btu-calculator", label: "BTU Calculator" } },
+    ],
+  },
+  // C
+  {
+    letter: "C",
+    items: [
+      { term: "CFM (Cubic Feet per Minute)", def: "The volumetric flow rate of air. Used to specify supply registers, return grilles, duct sizing, and equipment airflow. A standard residential system moves approximately 400 CFM per ton of cooling.", calc: { href: "/calculators/hvac/hvac-cfm-calculator", label: "CFM Calculator" } },
+      { term: "COP (Coefficient of Performance)", def: "Ratio of heat delivered to electrical energy consumed. A heat pump with COP 3.0 delivers 3 watts of heat for every 1 watt of electricity consumed. COP > 1 is possible because heat pumps move heat rather than generate it. EER and SEER are derived from COP." },
+      { term: "Compressor", def: "The heart of a refrigeration system. Increases refrigerant pressure from suction pressure (low side) to discharge pressure (high side), enabling heat transfer. Types include scroll, reciprocating, rotary, and inverter-drive variable-speed." },
+      { term: "Condenser", def: "The outdoor coil in a cooling system (or indoor coil in a heat pump in heating mode). The refrigerant releases heat to the outdoor air as it condenses from vapor to liquid." },
+      { term: "Cooling Tower Tonnage", def: "The heat rejection capacity of a cooling tower in tons. One cooling tower ton rejects 15,000 BTU/h (vs. 12,000 BTU/h for a refrigeration ton), because it accounts for both the building load and the compressor heat added to the refrigerant.", calc: { href: "/calculators/hvac/hvac-cooling-tower-tonnage-calculator", label: "Cooling Tower Calculator" } },
+    ],
+  },
+  // D
+  {
+    letter: "D",
+    items: [
+      { term: "Delta T (ΔT)", def: "Temperature difference across a coil, heat exchanger, or pipe. The supply/return delta T of a residential cooling system is normally 16–22°F. A ΔT outside this range indicates airflow, charge, or equipment issues.", calc: { href: "/calculators/hvac/hvac-delta-t-calculator", label: "Delta T Calculator" } },
+      { term: "Dew Point", def: "The temperature at which air becomes saturated and water vapor begins to condense. Air-conditioning systems condense moisture on the evaporator coil when the coil surface falls below the dew point of the entering air. Important for condensation risk on cold surfaces.", calc: { href: "/calculators/hvac/hvac-dew-point-calculator", label: "Dew Point Calculator" } },
+      { term: "Duct", def: "Sheet-metal, flex, or fiberboard channels that distribute conditioned air from the air handler to each room and return it back. Duct leakage, insulation, and sizing have a large impact on system efficiency and comfort." },
+    ],
+  },
+  // E
+  {
+    letter: "E",
+    items: [
+      { term: "EDR (Equivalent Direct Radiation)", def: "A measure of steam or hot-water radiator output used in older hydronic systems. One EDR = 240 BTU/h for steam, 150 BTU/h for hot water. Used to size boilers and radiators.", calc: { href: "/calculators/hvac/hvac-boiler-sizing-edr-calculator", label: "Boiler EDR Calculator" } },
+      { term: "EER (Energy Efficiency Ratio)", def: "Cooling output (BTU/h) divided by electrical input (watts) at a single standard test condition (95°F outdoor, 80°F/67°F indoor). A steady-state metric used to size electrical circuits and compare equipment at peak conditions. EER ≈ SEER2 × 0.875." },
+      { term: "Enthalpy", def: "Total heat content of moist air — the sum of sensible heat (temperature) and latent heat (moisture). Measured in BTU/lb or kJ/kg. Enthalpy-based economizer controls use enthalpy comparison to determine when free cooling is beneficial." },
+      { term: "ERV (Energy Recovery Ventilator)", def: "A mechanical ventilation device that transfers both sensible heat and moisture (latent energy) between incoming and outgoing airstreams. Better suited to humid climates than an HRV, which transfers only sensible heat.", calc: { href: "/calculators/hvac/hvac-hrv-erv-effectiveness-calculator", label: "HRV/ERV Effectiveness Calculator" } },
+      { term: "ESP (External Static Pressure)", def: "The resistance a blower must overcome from all external components — ductwork, coils, filters, registers, and fittings. Measured in inches of water column (in.w.c. or IWC). Equipment is rated at 0.5 in.w.c.; higher ESP reduces airflow.", calc: { href: "/calculators/hvac/hvac-static-pressure-calculator", label: "Static Pressure Calculator" } },
+    ],
+  },
+  // F
+  {
+    letter: "F",
+    items: [
+      { term: "Fan Laws", def: "Three relationships governing centrifugal fan performance: airflow (CFM) is proportional to fan speed (RPM), static pressure is proportional to RPM², and power (BHP) is proportional to RPM³. Doubling fan speed requires 8× the power.", calc: { href: "/calculators/hvac/hvac-fan-laws-calculator", label: "Fan Laws Calculator" } },
+      { term: "Friction Rate (FR)", def: "The pressure drop per 100 feet of duct run used in Manual D duct sizing. Calculated as FR = available static pressure × 100 ÷ total equivalent length. Typical residential FR is 0.05–0.10 in.w.c./100 ft.", calc: { href: "/calculators/hvac/hvac-duct-friction-rate-calculator", label: "Duct Friction Rate Calculator" } },
+    ],
+  },
+  // G
+  {
+    letter: "G",
+    items: [
+      { term: "GPM (Gallons Per Minute)", def: "Volumetric flow rate for hydronic systems (chilled water, hot water, condenser water). Used to size pipes, pumps, and coils. The relationship between GPM, ΔT, and BTU/h: BTU/h = GPM × 500 × ΔT (for water)." },
+    ],
+  },
+  // H
+  {
+    letter: "H",
+    items: [
+      { term: "Heat Exchanger", def: "A device that transfers heat between two fluids without mixing them. In furnaces, the heat exchanger separates combustion gases from supply air. A cracked heat exchanger is a serious safety hazard — it can allow CO to enter the airstream." },
+      { term: "Heat Pump", def: "A refrigeration system that can reverse the refrigerant cycle to provide both heating and cooling. Moves heat from outdoors to indoors in winter (or indoors to outdoors in summer). More efficient than resistance heating at temperatures above the balance point.", calc: { href: "/calculators/hvac/hvac-heat-pump-calculator", label: "Heat Pump Sizing Calculator" } },
+      { term: "HSPF (Heating Seasonal Performance Factor)", def: "Total heating BTU delivered over a heating season divided by total watt-hours consumed. Higher HSPF = more efficient heating. The new standard is HSPF2, converted from HSPF via: HSPF2 = HSPF × 0.851.", calc: { href: "/calculators/hvac/hvac-hspf-savings-calculator", label: "HSPF Savings Calculator" } },
+      { term: "HSPF2", def: "The updated heating efficiency metric for heat pumps, measured under the M2 test procedure (same test update that produced SEER2). Federal minimum is 7.5 HSPF2 for single-phase units, effective January 2023." },
+      { term: "Humidity Ratio", def: "Mass of water vapor per unit mass of dry air (lb water / lb dry air, or grains/lb). Used in psychrometric calculations. At 75°F / 50% RH, humidity ratio ≈ 65 grains/lb. Latent heat = 0.68 × CFM × Δgrains." },
+      { term: "HRV (Heat Recovery Ventilator)", def: "A mechanical ventilation device that transfers sensible heat between incoming and outgoing airstreams, pre-tempering fresh air. Ideal for cold, dry climates. Recovers 70–85% of heat that would otherwise be exhausted.", calc: { href: "/calculators/hvac/hvac-hrv-erv-effectiveness-calculator", label: "HRV/ERV Effectiveness Calculator" } },
+    ],
+  },
+  // I
+  {
+    letter: "I",
+    items: [
+      { term: "IAQ (Indoor Air Quality)", def: "The quality of the air inside a building with respect to health and comfort. IAQ is affected by ventilation rate, filtration, humidity, CO₂ levels, VOCs, and particulates. ASHRAE 62.1/62.2 defines minimum ventilation rates for commercial and residential buildings." },
+      { term: "IWC (Inches of Water Column)", def: "The unit for measuring low pressures in HVAC systems — duct static pressure, gas appliance manifold pressure, and combustion draft. 1 in.w.c. = 0.0361 psi. Also written as in.w.g. (water gauge) or INWG." },
+    ],
+  },
+  // L
+  {
+    letter: "L",
+    items: [
+      { term: "Latent Heat", def: "Heat associated with a change of state (moisture) rather than temperature. In HVAC, latent cooling removes moisture from the air. Latent load (BTU/h) = 0.68 × CFM × Δgrains of moisture removed.", calc: { href: "/calculators/hvac/hvac-sensible-latent-heat-calculator", label: "Sensible & Latent Heat Calculator" } },
+    ],
+  },
+  // M
+  {
+    letter: "M",
+    items: [
+      { term: "Manual D", def: "ACCA standard for residential duct system design. Uses friction rate, equivalent lengths, and velocity limits to size each duct run. Often required by code for new HVAC installations alongside Manual J." },
+      { term: "Manual J", def: "ACCA/ANSI standard for residential load calculations. The industry-required method for calculating cooling and heating loads from wall U-values, window area and orientation, infiltration, internal gains, and climate data.", calc: { href: "/calculators/hvac/hvac-btu-calculator", label: "BTU Calculator (simplified)" } },
+      { term: "MAT (Mixed Air Temperature)", def: "The temperature of the air at the AHU mixing box, after outdoor air and return air are blended. Determines the entering condition at the cooling or heating coil.", calc: { href: "/calculators/hvac/hvac-mixed-air-temperature-calculator", label: "Mixed Air Temperature Calculator" } },
+      { term: "MCA (Minimum Circuit Ampacity)", def: "The minimum ampacity rating required for the conductors from the disconnect to the HVAC unit. Calculated per NEC 440.32 as 125% of the largest motor FLA plus all other loads. Always on the unit nameplate.", calc: { href: "/calculators/hvac/hvac-amp-draw-calculator", label: "Amp Draw Calculator" } },
+      { term: "Modulating", def: "Variable-capacity operation where a compressor or burner can run at multiple output levels (or infinitely variable) rather than on/off. Modulating equipment improves comfort, efficiency, and humidity control by running at lower outputs for longer periods." },
+      { term: "MOP / MOCP (Maximum Overcurrent Protection)", def: "The maximum fuse or circuit breaker rating allowed for HVAC equipment circuit protection per NEC 440.22. Calculated as 225% of compressor RLA, rounded up to the next standard device. Listed on the unit nameplate.", calc: { href: "/calculators/hvac/hvac-amp-draw-calculator", label: "Amp Draw Calculator" } },
+    ],
+  },
+  // N
+  {
+    letter: "N",
+    items: [
+      { term: "Noncondensables", def: "Gases (typically air or nitrogen) trapped in the refrigerant circuit that do not condense at normal operating conditions. Noncondensables raise head pressure, reduce capacity, and can cause compressor damage. Indicate a leak or improper evacuation." },
+    ],
+  },
+  // P
+  {
+    letter: "P",
+    items: [
+      { term: "Pressure Drop", def: "Reduction in fluid pressure as it flows through a pipe, duct, coil, or fitting due to friction and turbulence. Excessive pressure drop reduces airflow (ductwork) or refrigerant flow, degrading system performance." },
+      { term: "Psychrometric Chart", def: "A graphical representation of the thermodynamic properties of moist air: dry-bulb temperature, wet-bulb temperature, dew point, relative humidity, humidity ratio, and enthalpy. Used to plot state points and air processes (cooling, heating, humidification, mixing).", calc: { href: "/calculators/hvac/hvac-psychrometric-calculator", label: "Psychrometric Calculator" } },
+      { term: "PT Chart (Pressure-Temperature Chart)", def: "A lookup table showing the saturation pressure of a refrigerant at a given temperature (or vice versa). Technicians use PT charts with gauge readings to determine saturation temperature and calculate superheat or subcooling.", calc: { href: "/calculators/hvac/hvac-refrigerant-pt-chart", label: "Refrigerant PT Chart" } },
+    ],
+  },
+  // R
+  {
+    letter: "R",
+    items: [
+      { term: "Refrigerant", def: "The working fluid in a refrigeration cycle that absorbs and releases heat as it changes between liquid and vapor states. Common refrigerants: R-410A (most existing residential), R-32 and R-454B (new high-efficiency equipment), R-22 (legacy, phased out).", calc: { href: "/calculators/hvac/hvac-refrigerant-pt-chart", label: "Refrigerant PT Chart" } },
+      { term: "RH (Relative Humidity)", def: "The ratio of actual water vapor in the air to the maximum it can hold at that temperature, expressed as a percentage. ASHRAE recommends 30–60% RH for comfort and IAQ. Below 30% causes static electricity and dry air complaints; above 60% promotes mold growth." },
+      { term: "RLA (Rated Load Amps)", def: "The full-load amperage of a hermetic compressor motor at rated conditions. Listed on the compressor nameplate. Used to calculate MCA and MOP per NEC 440. Estimated by the amp draw calculator from BTU/h and SEER2.", calc: { href: "/calculators/hvac/hvac-amp-draw-calculator", label: "Amp Draw Calculator" } },
+    ],
+  },
+  // S
+  {
+    letter: "S",
+    items: [
+      { term: "Saturated Temperature", def: "The temperature at which a refrigerant boils (evaporates) or condenses at a given pressure. Equal to the suction saturation temperature on the low side and the discharge saturation temperature on the high side. Read from a PT chart." },
+      { term: "SEER (Seasonal Energy Efficiency Ratio)", def: "Cooling output (BTU) over a cooling season divided by electrical energy input (Wh). The legacy efficiency metric, measured under the M1 test procedure. Superseded by SEER2 for equipment sold after January 1, 2023.", calc: { href: "/calculators/hvac/hvac-seer-savings-calculator", label: "SEER Savings Calculator" } },
+      { term: "SEER2", def: "Updated seasonal efficiency metric using the M2 test procedure (0.5 in.w.c. external static pressure). SEER2 = SEER × 0.9524. Federal minimums: 14 SEER2 (South), 13.4 SEER2 (North), 14.3 SEER2 (heat pumps, all regions).", calc: { href: "/calculators/hvac/hvac-seer2-converter", label: "SEER / SEER2 Converter" } },
+      { term: "Sensible Heat", def: "Heat that changes temperature without changing state. Sensible cooling lowers air temperature. Sensible heat (BTU/h) = 1.08 × CFM × ΔT (°F).", calc: { href: "/calculators/hvac/hvac-sensible-latent-heat-calculator", label: "Sensible & Latent Heat Calculator" } },
+      { term: "SHR (Sensible Heat Ratio)", def: "The fraction of total cooling that is sensible (temperature reduction) vs. latent (dehumidification). SHR = sensible BTU/h ÷ total BTU/h. Lower SHR means more dehumidification. Typical cooling coils: 0.70–0.80 SHR." },
+      { term: "Static Pressure", def: "Pressure exerted uniformly in all directions by a fluid at rest, perpendicular to any surface it contacts. In ductwork, static pressure drives airflow. Total External Static Pressure (TESP) = supply static + |return static|.", calc: { href: "/calculators/hvac/hvac-static-pressure-calculator", label: "Static Pressure Calculator" } },
+      { term: "Subcooling", def: "How many degrees below the condensing saturation temperature the liquid refrigerant is cooled before the expansion device. Measured on the liquid line. Normal range: 10–20°F. Low subcooling → flash gas before the metering device → reduced capacity.", calc: { href: "/calculators/hvac/hvac-subcooling-calculator", label: "Subcooling Calculator" } },
+      { term: "Superheat", def: "How many degrees above the evaporating saturation temperature the suction vapor is heated before reaching the compressor. Measured on the suction line. Normal range varies by system; TXV systems target 8–12°F, fixed orifice systems use target superheat formula.", calc: { href: "/calculators/hvac/hvac-superheat-calculator", label: "Superheat Calculator" } },
+    ],
+  },
+  // T
+  {
+    letter: "T",
+    items: [
+      { term: "Target Superheat", def: "The ideal suction superheat for a fixed-orifice (piston/cap tube) system, calculated from outdoor dry-bulb and indoor wet-bulb temperatures. Formula: Target SH = ((3 × indoor WB) − 80 − outdoor DB) ÷ 2.", calc: { href: "/calculators/hvac/hvac-target-superheat-calculator", label: "Target Superheat Calculator" } },
+      { term: "TESP (Total External Static Pressure)", def: "The sum of supply duct static pressure and return duct static pressure, measured at the air handler. TESP = supply static + |return static|. Equipment is rated at 0.5 in.w.c.; exceeding this reduces airflow below design.", calc: { href: "/calculators/hvac/hvac-static-pressure-calculator", label: "Static Pressure Calculator" } },
+      { term: "Tons (of Refrigeration)", def: "Unit of cooling capacity. 1 ton = 12,000 BTU/h. Derived from the heat absorbed by melting one ton of ice in 24 hours. Residential systems range from 1.5 to 5 tons; commercial from 5 to hundreds of tons.", calc: { href: "/calculators/hvac/hvac-tonnage-calculator", label: "AC Tonnage Calculator" } },
+      { term: "TXV (Thermostatic Expansion Valve)", def: "A metering device that modulates refrigerant flow to maintain constant suction superheat (typically 8–12°F). More precise than a fixed orifice. A TXV system uses superheat to diagnose charge; not target superheat." },
+    ],
+  },
+  // U
+  {
+    letter: "U",
+    items: [
+      { term: "U-Value", def: "Thermal transmittance of a building assembly (wall, window, roof) in BTU/(h·ft²·°F). The inverse of R-value. Lower U-value = better insulation. Used in Manual J to calculate heat flow through each component." },
+    ],
+  },
+  // V
+  {
+    letter: "V",
+    items: [
+      { term: "Vapor Pressure", def: "The partial pressure exerted by water vapor in moist air. Condensation occurs when vapor pressure at a surface equals the saturation pressure at the surface temperature (i.e., the surface is at or below the dew point)." },
+    ],
+  },
+  // W
+  {
+    letter: "W",
+    items: [
+      { term: "Wet Bulb Temperature", def: "The temperature measured by a thermometer wrapped in a wet wick. As water evaporates, it cools the thermometer. Wet bulb accounts for both heat and humidity — it is used to calculate enthalpy and determine the target superheat in fixed-orifice systems.", calc: { href: "/calculators/hvac/hvac-target-superheat-calculator", label: "Target Superheat Calculator" } },
+    ],
+  },
+];
+
+const letters = terms.map(g => g.letter);
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HVAC Glossary — 60+ Terms Defined | TradesQuote" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HVAC Glossary | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- HERO -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Glossary" />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
+              HVAC Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              HVAC Glossary
+            </h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Plain-English definitions for over 60 HVAC terms — from ACH and AFUE to wet bulb temperature and TXV.
+              Each entry links to the relevant free calculator when one exists.
+            </p>
+          </div>
+
+          <!-- Alphabetical jump nav -->
+          <div class="mt-8 flex flex-wrap gap-2">
+            {letters.map(l => (
+              <a
+                href={`#letter-${l}`}
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition"
+              >
+                {l}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- TERMS -->
+      <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14 space-y-16">
+        {terms.map(group => (
+          <div id={`letter-${group.letter}`}>
+            <h2 class="text-3xl font-extrabold text-slate-900 border-b-2 border-slate-200 pb-2 mb-8">
+              {group.letter}
+            </h2>
+            <dl class="space-y-8">
+              {group.items.map(item => (
+                <div class="rounded-xl border border-slate-100 bg-slate-50 p-5">
+                  <dt class="text-base font-bold text-slate-900">{item.term}</dt>
+                  <dd class="mt-2 text-sm text-slate-600 leading-relaxed">{item.def}</dd>
+                  {item.calc && (
+                    <div class="mt-3">
+                      <a
+                        href={item.calc.href}
+                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition"
+                      >
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        {item.calc.label} →
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </dl>
+          </div>
+        ))}
+      </section>
+
+      <!-- CTA to calculators -->
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Put the terms to work</h2>
+          <p class="mt-3 text-slate-600">
+            Every term in this glossary has a free calculator on TradesQuote. Browse all 38 HVAC tools.
+          </p>
+          <a
+            href="/calculators/hvac"
+            class="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 transition"
+          >
+            Browse all HVAC calculators →
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

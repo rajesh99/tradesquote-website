@@ -1,0 +1,363 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Mixed Air Temperature Calculator — AHU Mixing Box | TradesQuote";
+const description =
+  "Free mixed air temperature calculator. Find MAT, outdoor air fraction, and pre-cooling sensible load from OA and RA CFM values. For economizer design, AHU commissioning, and ASHRAE 62.1 verification.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-mixed-air-temperature-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Mixed Air Temperature Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Mixed Air Temperature Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online mixed air temperature calculator for AHU mixing boxes. Calculates MAT, outdoor air fraction, and pre-cooling sensible load from OA and RA CFM and temperatures.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is mixed air temperature?",
+    answer:
+      "Mixed air temperature (MAT) is the temperature of the air entering the cooling or heating coil after outdoor air and return air have been blended in the mixing box. It determines the load on the coil and whether economizer cooling is feasible.",
+  },
+  {
+    question: "What is the economizer high-limit temperature?",
+    answer:
+      "Most economizer controls use a dry-bulb high-limit of 75°F — when the outdoor air temperature exceeds this, the damper closes to the minimum OA position. Some controls use enthalpy instead of dry-bulb, which accounts for humidity.",
+  },
+  {
+    question: "What outdoor air fraction is required by ASHRAE 62.1?",
+    answer:
+      "For commercial buildings, ASHRAE 62.1 calculates the required OA fraction based on occupancy (cfm/person) and floor area (cfm/sqft) for each zone. A system-level multizone calculation (Ez or Ev) is required for VAV systems. Minimum OA fractions typically range from 10–30%.",
+  },
+  {
+    question: "Why does the mixed air temperature matter for coil sizing?",
+    answer:
+      "The cooling coil must reduce air from MAT down to supply air temperature (typically 55°F). A higher MAT requires more cooling capacity. Economizer operation lowers MAT when OA is cool, reducing compressor load.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-sensible-latent-heat-calculator",
+    title: "Sensible & Latent Heat Calculator",
+    description: "Calculate full coil load from MAT to supply temperature.",
+  },
+  {
+    href: "/calculators/hvac/hvac-ventilation-calculator",
+    title: "Ventilation Calculator",
+    description: "Size the required OA CFM per ASHRAE 62.1/62.2.",
+  },
+  {
+    href: "/calculators/hvac/hvac-psychrometric-calculator",
+    title: "Psychrometric Calculator",
+    description: "Full moist-air properties for the mixed air condition.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mixed Air Temperature Calculator | TradesQuote" />
+    <meta
+      property="og:description"
+      content="Calculate MAT, outdoor air fraction, and pre-cooling sensible load from OA and RA CFM. Free, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mixed Air Temperature Calculator | TradesQuote" />
+    <meta
+      name="twitter:description"
+      content="AHU mixing box MAT calculator — outdoor air fraction, pre-cooling sensible load, economizer check. Free, instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- HERO -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Mixed Air Temperature Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-600"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+              </svg>
+              HVAC Tools · Psychrometrics · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Mixed Air Temperature Calculator <span class="text-teal-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Calculate the mixed air temperature (MAT) and outdoor air fraction when outdoor air mixes
+              with return air in an air-handling unit. Use this for economizer design, minimum OA
+              verification, AHU commissioning, and pre-cooling load estimation.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALCULATOR -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              Enter airflow and temperatures
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ma-oa-cfm" class="text-sm font-semibold text-slate-800">Outdoor air CFM</label>
+                  <input
+                    id="ma-oa-cfm"
+                    type="number"
+                    min="0"
+                    max="50000"
+                    step="50"
+                    value="400"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-400">From OA damper / min OA calculation</p>
+                </div>
+
+                <div>
+                  <label for="ma-ra-cfm" class="text-sm font-semibold text-slate-800">Return air CFM</label>
+                  <input
+                    id="ma-ra-cfm"
+                    type="number"
+                    min="0"
+                    max="50000"
+                    step="50"
+                    value="1600"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-400">From return duct measurement or AHU schedule</p>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ma-oa-temp" class="text-sm font-semibold text-slate-800">Outdoor air temperature (°F)</label>
+                  <input
+                    id="ma-oa-temp"
+                    type="number"
+                    min="-20"
+                    max="120"
+                    step="1"
+                    value="95"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label for="ma-ra-temp" class="text-sm font-semibold text-slate-800">Return air temperature (°F)</label>
+                  <input
+                    id="ma-ra-temp"
+                    type="number"
+                    min="40"
+                    max="90"
+                    step="1"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                id="ma-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-500 p-6 sm:p-8 text-white shadow-lg">
+              <p class="text-sm font-medium text-teal-100">Mixed Air Temperature</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ma-result-mat" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span class="text-xl font-semibold text-teal-200">°F</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-teal-100">Outdoor air fraction</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="ma-result-oa-pct">—</span>
+                    <span class="text-base font-semibold text-teal-200"> %</span>
+                  </p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-teal-100">Total supply CFM</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="ma-result-sa-cfm">—</span>
+                    <span class="text-base font-semibold text-teal-200"> CFM</span>
+                  </p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4 col-span-2">
+                  <p class="text-xs text-teal-100">Pre-cooling sensible load (to 55°F SA)</p>
+                  <p class="mt-1 text-2xl font-bold">
+                    <span id="ma-result-sensible">—</span>
+                    <span class="text-base font-semibold text-teal-200"> BTU/h</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Warning: low OA fraction -->
+              <div id="ma-warning" class="hidden mt-4 rounded-xl bg-yellow-400/20 border border-yellow-300/40 p-4">
+                <p class="text-xs font-bold text-yellow-200 uppercase tracking-wide mb-1">Low OA Fraction</p>
+                <p class="text-sm font-medium text-yellow-100 leading-snug">
+                  Outdoor air fraction is below 10%. Verify this meets your minimum OA requirement per
+                  ASHRAE 62.1 or local code.
+                </p>
+              </div>
+
+              <p class="mt-4 text-xs text-teal-100 leading-relaxed">
+                Pre-cooling load assumes 55°F supply air temperature. Adjust for your actual supply air setpoint.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FORMULA -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How the Mixed Air Temperature Calculator Works
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Mixed air temperature is a simple energy balance — the enthalpy of the mixed stream equals
+            the sum of the OA and RA enthalpy contributions. For dry-bulb temperature only (ignoring
+            latent heat), this simplifies to a weighted average by CFM.
+          </p>
+
+          <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+            <div class="text-teal-300"># Mixed air temperature:</div>
+            <div>T_mixed = (CFM_OA &times; T_OA + CFM_RA &times; T_RA) &divide; (CFM_OA + CFM_RA)</div>
+            <div class="mt-4 text-teal-300"># Outdoor air fraction:</div>
+            <div>OA% = CFM_OA &divide; (CFM_OA + CFM_RA) &times; 100</div>
+            <div class="mt-4 text-teal-300"># Pre-cooling sensible load (to 55°F supply air):</div>
+            <div>Q_sensible = 1.08 &times; CFM_total &times; (T_mixed &minus; 55)</div>
+            <div class="mt-2 text-slate-400">1.08 = 0.075 lb/ft&sup3; &times; 0.24 BTU/(lb&middot;&deg;F) &times; 60 min/h</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Economizer high-limit</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Economizer controls typically use a 75°F dry-bulb high-limit. When OA exceeds 75°F,
+                the OA damper closes to minimum. When OA is below 75°F and the MAT can meet supply
+                air setpoint, the economizer can provide free cooling without mechanical refrigeration.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">ASHRAE 62.1 minimum OA</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                For commercial buildings, ASHRAE 62.1 requires a minimum OA CFM calculated from
+                occupancy and floor area. Common minimums range from 10–25% of supply airflow.
+                The OA fraction shown here must meet or exceed the 62.1 minimum.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKED EXAMPLE -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked example</h2>
+        <p class="mt-4 text-slate-600">
+          A 2,000 CFM AHU with 400 CFM OA on a 95°F summer design day. Return air is at 75°F.
+        </p>
+
+        <div class="mt-8">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-600 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">400 CFM OA at 95°F + 1,600 CFM RA at 75°F</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 leading-relaxed">
+              <div>MAT = (400 &times; 95 + 1,600 &times; 75) &divide; 2,000 = <span class="font-bold text-teal-600">79°F</span></div>
+              <div class="mt-1">OA fraction = 400 &divide; 2,000 = <span class="font-bold text-teal-600">20%</span></div>
+              <div class="mt-1">Pre-cooling load = 1.08 &times; 2,000 &times; (79 &minus; 55) = <span class="font-bold text-teal-600">51,840 BTU/h</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> The coil enters at 79°F and must deliver
+              51,840 BTU/h of sensible cooling to reach 55°F supply air. OA fraction of 20% likely meets
+              ASHRAE 62.1 minimum for most occupancy types.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about mixed air temperature, economizers, and AHU commissioning."
+      />
+
+      <CalculatorTradesQuoteCta
+        heading="AHU commissioning done. Now quote the job."
+        description="TradesQuote turns your load calculations into a detailed, line-item estimate in seconds. Describe the job or upload photos, and our AI builds quantities, unit prices, and totals — validated by a built-in quality control agent."
+      />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="teal" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacMixedAirTemperatureCalculator } from "@/scripts/calculators/hvac-mixed-air-temperature-calculator";
+    initHvacMixedAirTemperatureCalculator();
+  </script>
+</Layout>

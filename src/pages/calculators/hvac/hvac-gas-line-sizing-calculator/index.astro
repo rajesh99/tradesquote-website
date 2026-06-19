@@ -1,0 +1,555 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Gas Line Sizing Calculator | TradesQuote";
+const description =
+  "Free gas line sizing calculator using IFGC Table 402.4. Enter appliance BTU/h load and pipe run length to get the minimum Schedule 40 IPS pipe size for natural gas or LP. No sign-up required.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-gas-line-sizing-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Gas Line Sizing Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Gas Line Sizing Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online gas line sizing calculator using IFGC Table 402.4 (Schedule 40 iron pipe). Determines minimum pipe size for natural gas or LP appliance loads at a given pipe run length with interpolation between standard table lengths.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What IFGC table does this use?",
+    answer:
+      "This calculator uses IFGC Table 402.4 (Schedule 40 metallic pipe) for natural gas at 0.5 in.w.c. pressure drop and 0.60 specific gravity. The same table appears in NFPA 54 Appendix C. Always verify with the authority having jurisdiction (AHJ) — local codes may require a different table or pressure drop value.",
+  },
+  {
+    question: "Does pipe length include fittings?",
+    answer:
+      "IFGC uses total equivalent length (TEL) — straight pipe plus the equivalent length of all fittings. A standard elbow adds 1–2 ft equivalent, a tee adds 3–5 ft. Add 20–30% to measured straight length to account for fittings, or use the fitting equivalent table in IFGC Appendix C.",
+  },
+  {
+    question: "Should I size for just the furnace or all appliances?",
+    answer:
+      "Size each branch for the appliances it serves. Size the main trunk for the total connected load of all simultaneously operating appliances (typically all appliances). The longest most-demanding run is the critical path — size the full pipe tree from the meter to each appliance.",
+  },
+  {
+    question: "Can I use copper or CSST for gas lines?",
+    answer:
+      "IFGC Tables 402.5 (copper) and 402.9 (CSST) give capacities for those materials — capacities differ from iron pipe. This calculator uses Schedule 40 iron pipe (IPS) values only. CSST generally has higher capacity than iron pipe of the same nominal size due to lower resistance per foot.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Gas line sized. Now quote the rough-in.";
+const ctaDescription =
+  "A correct pipe size is the first step — TradesQuote turns the full gas rough-in scope into a detailed, line-item estimate in seconds. Describe the job or upload photos, and our AI builds materials, labour, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Get the BTU/h input for this calculator.",
+  },
+  {
+    href: "/calculators/hvac/hvac-combustion-efficiency-calculator",
+    title: "Combustion Efficiency Calculator",
+    description: "Verify the installed burner is operating correctly.",
+  },
+  {
+    href: "/calculators/hvac/hvac-amp-draw-calculator",
+    title: "Amp Draw Calculator",
+    description: "Size the electrical service alongside the gas line.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Gas Line Sizing Calculator — IFGC Table 402.4 | TradesQuote" />
+    <meta
+      property="og:description"
+      content="Free gas line sizing calculator. Enter BTU/h load and pipe run length to get the minimum Schedule 40 IPS pipe size for natural gas or LP. Instant, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Gas Line Sizing Calculator — IFGC Table 402.4 | TradesQuote" />
+    <meta
+      name="twitter:description"
+      content="Free gas line sizing calculator using IFGC Table 402.4. Natural gas or LP, Schedule 40 IPS pipe. Instant result, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Gas Line Sizing Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-600"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"
+                ></path>
+              </svg>
+              HVAC Tools · Gas · Free
+            </span>
+
+            <!-- H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Gas Line Sizing Calculator <span class="text-amber-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- Intro paragraph -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The IFGC Table 402.4 method selects the minimum Schedule 40 iron pipe size (IPS) that delivers enough
+              gas capacity to your appliance without exceeding the 0.5 in.w.c. allowable pressure drop. Enter the
+              total appliance BTU/h input rating and the total equivalent pipe run length to get the correct pipe
+              size for natural gas or LP at low or medium supply pressure.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-amber-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter gas line parameters
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div>
+                <label for="gl-load" class="text-sm font-semibold text-slate-800">Total appliance load (BTU/h)</label>
+                <input
+                  id="gl-load"
+                  type="number"
+                  min="0"
+                  value="200000"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                />
+                <p class="mt-1 text-xs text-slate-500">Use the appliance nameplate input BTU/h rating. For multiple appliances on one run, add all loads.</p>
+              </div>
+
+              <div>
+                <label for="gl-length" class="text-sm font-semibold text-slate-800">Pipe run length (ft)</label>
+                <input
+                  id="gl-length"
+                  type="number"
+                  min="1"
+                  value="50"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                />
+                <p class="mt-1 text-xs text-slate-500">Use total equivalent length (TEL) — straight pipe plus equivalent length of fittings. Add ~25% to straight-pipe measurement for typical residential piping.</p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="gl-gas" class="text-sm font-semibold text-slate-800">Gas type</label>
+                  <select
+                    id="gl-gas"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    <option value="ng" selected>Natural Gas (0.60 SG)</option>
+                    <option value="lp">LP / Propane (1.53 SG)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="gl-pressure" class="text-sm font-semibold text-slate-800">Supply pressure</label>
+                  <select
+                    id="gl-pressure"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    <option value="low" selected>Low pressure (0.5 in.w.c. drop — IFGC Table 402.4)</option>
+                    <option value="med">Medium pressure (3 in.w.c. — approx. 2× capacity)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="gl-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-amber-100">Minimum pipe size (IPS)</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="gl-result-size" class="text-5xl font-extrabold tracking-tight">—</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-amber-100">Capacity at selected size (BTU/h)</p>
+                  <p id="gl-result-capacity" class="mt-1 text-xl font-bold">—</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-amber-100">Approx. gas velocity (ft/min)</p>
+                  <p id="gl-result-velocity" class="mt-1 text-xl font-bold">—</p>
+                </div>
+              </div>
+
+              <!-- Warning box -->
+              <div
+                id="gl-warning"
+                class="hidden mt-4 rounded-xl bg-yellow-400/20 border border-yellow-300/40 p-4"
+              >
+                <p class="text-xs font-bold text-yellow-200 uppercase tracking-wide mb-1">Engineering review required</p>
+                <p class="text-sm font-medium text-yellow-100 leading-snug">
+                  The required load exceeds the capacity of 2&quot; Schedule 40 pipe at this run length. A pipe larger
+                  than 2&quot; or a pressure regulator upgrade is needed — consult a licensed gas engineer.
+                </p>
+              </div>
+
+              <p class="mt-4 text-xs text-amber-100 leading-relaxed">
+                Results based on IFGC Table 402.4 (Schedule 40 iron pipe, natural gas, 0.5 in.w.c. drop, 0.60 SG)
+                with linear interpolation between table lengths. LP capacity adjusted by factor 0.634.
+                Always verify with the AHJ and a licensed gas fitter.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">IFGC Table 402.4 — Natural gas capacity (1,000 BTU/h)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Schedule 40 metallic pipe, 0.5 in.w.c. pressure drop, natural gas SG = 0.60. Source: IFGC Table 402.4 / NFPA 54 Appendix C.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Length</th>
+                  <th class="py-2.5 pr-3 font-semibold">1/2&quot;</th>
+                  <th class="py-2.5 pr-3 font-semibold">3/4&quot;</th>
+                  <th class="py-2.5 pr-3 font-semibold">1&quot;</th>
+                  <th class="py-2.5 pr-3 font-semibold">1-1/4&quot;</th>
+                  <th class="py-2.5 pr-3 font-semibold">1-1/2&quot;</th>
+                  <th class="py-2.5 font-semibold">2&quot;</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">10 ft</td>
+                  <td class="py-2 pr-3">103</td>
+                  <td class="py-2 pr-3">199</td>
+                  <td class="py-2 pr-3">372</td>
+                  <td class="py-2 pr-3">673</td>
+                  <td class="py-2 pr-3">1,000</td>
+                  <td class="py-2">1,902</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">20 ft</td>
+                  <td class="py-2 pr-3">72</td>
+                  <td class="py-2 pr-3">138</td>
+                  <td class="py-2 pr-3">258</td>
+                  <td class="py-2 pr-3">468</td>
+                  <td class="py-2 pr-3">693</td>
+                  <td class="py-2">1,319</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">30 ft</td>
+                  <td class="py-2 pr-3">58</td>
+                  <td class="py-2 pr-3">112</td>
+                  <td class="py-2 pr-3">209</td>
+                  <td class="py-2 pr-3">379</td>
+                  <td class="py-2 pr-3">562</td>
+                  <td class="py-2">1,070</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">50 ft</td>
+                  <td class="py-2 pr-3">44</td>
+                  <td class="py-2 pr-3">85</td>
+                  <td class="py-2 pr-3">159</td>
+                  <td class="py-2 pr-3">289</td>
+                  <td class="py-2 pr-3">428</td>
+                  <td class="py-2">815</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">75 ft</td>
+                  <td class="py-2 pr-3">36</td>
+                  <td class="py-2 pr-3">69</td>
+                  <td class="py-2 pr-3">129</td>
+                  <td class="py-2 pr-3">235</td>
+                  <td class="py-2 pr-3">348</td>
+                  <td class="py-2">662</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">100 ft</td>
+                  <td class="py-2 pr-3">31</td>
+                  <td class="py-2 pr-3">59</td>
+                  <td class="py-2 pr-3">111</td>
+                  <td class="py-2 pr-3">202</td>
+                  <td class="py-2 pr-3">300</td>
+                  <td class="py-2">571</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2 pr-4 font-semibold">150 ft</td>
+                  <td class="py-2 pr-3">25</td>
+                  <td class="py-2 pr-3">48</td>
+                  <td class="py-2 pr-3">90</td>
+                  <td class="py-2 pr-3">163</td>
+                  <td class="py-2 pr-3">242</td>
+                  <td class="py-2">461</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4 font-semibold">200 ft</td>
+                  <td class="py-2 pr-3">21</td>
+                  <td class="py-2 pr-3">41</td>
+                  <td class="py-2 pr-3">77</td>
+                  <td class="py-2 pr-3">140</td>
+                  <td class="py-2 pr-3">208</td>
+                  <td class="py-2">396</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Capacities are in thousands of BTU per hour. LP gas capacity = natural gas capacity × 0.634.
+            Medium pressure (3 in.w.c.) capacity ≈ natural gas capacity × 2.0.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How the Gas Line Sizing Calculator Works
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The IFGC table method selects the smallest pipe size whose listed capacity at the given run length
+            equals or exceeds the required appliance load. The table is based on the Spitzglass formula for gas
+            flow through pipes with a 0.5 in.w.c. allowable pressure drop. Capacities are interpolated linearly
+            between the standard table lengths (10, 20, 30, 50, 75, 100, 150, 200 ft). LP and medium-pressure
+            adjustments are applied as multipliers to the base natural gas table values.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-amber-300"># Source: IFGC Table 402.4 / NFPA 54 Appendix C</div>
+            <div class="text-slate-400"># Natural Gas, 0.5 in.w.c. drop, 0.60 SG, Schedule 40 IPS</div>
+            <div class="mt-3">Pipe capacities (1000 BTU/h) at standard lengths:</div>
+            <div class="mt-2 text-slate-300">Length  | 1/2&quot; | 3/4&quot; | 1&quot;   | 1-1/4&quot; | 1-1/2&quot; | 2&quot;</div>
+            <div class="text-slate-300">10 ft   | 103  | 199  | 372  | 673    | 1,000  | 1,902</div>
+            <div class="text-slate-300">20 ft   |  72  | 138  | 258  | 468    |   693  | 1,319</div>
+            <div class="text-slate-300">30 ft   |  58  | 112  | 209  | 379    |   562  | 1,070</div>
+            <div class="text-slate-300">50 ft   |  44  |  85  | 159  | 289    |   428  |   815</div>
+            <div class="text-slate-300">75 ft   |  36  |  69  | 129  | 235    |   348  |   662</div>
+            <div class="text-slate-300">100 ft  |  31  |  59  | 111  | 202    |   300  |   571</div>
+            <div class="text-slate-300">150 ft  |  25  |  48  |  90  | 163    |   242  |   461</div>
+            <div class="text-slate-300">200 ft  |  21  |  41  |  77  | 140    |   208  |   396</div>
+            <div class="mt-4 text-amber-300"># Gas type adjustment:</div>
+            <div>LP gas capacity &asymp; Natural gas capacity &times; <span class="text-amber-300">0.634</span></div>
+            <div class="text-slate-400">&nbsp;&nbsp;(same pipe, same table, lower SG increases capacity)</div>
+            <div class="mt-3 text-amber-300"># Pressure adjustment:</div>
+            <div>Medium pressure tables allow smaller pipe &mdash; capacity roughly doubles at 3 in.w.c.</div>
+            <div>Medium pressure capacity &asymp; Natural gas capacity &times; <span class="text-amber-300">2.0</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Total equivalent length (TEL)</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                IFGC requires using total equivalent length, not just straight pipe footage. Each fitting adds
+                resistance equivalent to several feet of straight pipe. A 90° elbow in 3/4&quot; pipe adds roughly
+                1.5 ft equivalent. Add 20–30% to your measured straight length for a typical residential installation
+                to account for fittings without performing a full fitting count.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Critical path sizing</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                When multiple appliances share a trunk, the critical path is the run to the appliance farthest from
+                the meter with the highest simultaneous demand. Size the trunk for total connected load at the
+                longest run. Each branch is sized for the load it serves at its own TEL from the last tee.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">LP gas sizing</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                LP (propane) has a specific gravity of approximately 1.53 vs. 0.60 for natural gas. The heavier gas
+                flows more slowly through the same pipe at the same pressure drop, resulting in lower BTU/h capacity
+                per pipe size. The IFGC adjustment factor is 0.634 &times; the natural gas table value for the same
+                pipe size and length.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Medium vs. low pressure</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Low-pressure systems (under 0.5 psi) use the 0.5 in.w.c. drop tables. Medium-pressure systems
+                (0.5–2 psi) can use a larger allowable pressure drop, significantly increasing pipe capacity and
+                allowing smaller pipe sizes. A dedicated pressure regulator at the appliance is required when
+                dropping from medium to low pressure at the appliance connection.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLE ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked example</h2>
+        <p class="mt-4 text-slate-600">
+          A single-family home has a 100,000 BTU/h furnace and an 80,000 BTU/h water heater on the same gas
+          trunk. The meter is 40 ft from the furnace (the farthest appliance). The plumber estimates 10 ft of
+          equivalent fitting length for elbows and tees, making TEL = 50 ft.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-600 font-bold"
+                >1</span
+              >
+            </div>
+            <h3 class="mt-3 text-lg font-bold text-slate-900">Total load and TEL</h3>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Total load = 100,000 + 80,000 = <span class="font-bold text-amber-600">180,000 BTU/h</span><br />
+              Straight run = 40 ft; fittings equivalent = 10 ft<br />
+              TEL = 40 + 10 = <span class="font-bold text-amber-600">50 ft</span>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-600 font-bold"
+                >2</span
+              >
+            </div>
+            <h3 class="mt-3 text-lg font-bold text-slate-900">Look up pipe size at 50 ft</h3>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              IFGC Table 402.4 at 50 ft:<br />
+              1&quot; pipe &rarr; 159,000 BTU/h — <span class="text-red-600 font-bold">insufficient</span> (need 180,000)<br />
+              1-1/4&quot; pipe &rarr; 289,000 BTU/h — <span class="text-amber-600 font-bold">sufficient</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Use
+              <span class="font-semibold text-amber-600">1-1/4&quot; Schedule 40 IPS</span> for the main trunk. The
+              1-1/4&quot; pipe has 289,000 BTU/h capacity at 50 ft, giving a 61% safety margin above the
+              180,000 BTU/h demand.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-600 font-bold"
+                >3</span
+              >
+            </div>
+            <h3 class="mt-3 text-lg font-bold text-slate-900">Branch sizing — water heater</h3>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Water heater load = 80,000 BTU/h<br />
+              Branch TEL from last tee = 15 ft<br />
+              IFGC at 10–20 ft interpolation for 3/4&quot;: 170,000 BTU/h at 15 ft — <span class="text-amber-600 font-bold">sufficient</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Water heater branch uses
+              <span class="font-semibold text-amber-600">3/4&quot; Schedule 40 IPS</span>. The trunk is 1-1/4&quot;
+              from the meter to the first tee, then branches reduce as loads decrease toward the appliances.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about gas line sizing, IFGC tables, and pipe selection."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="amber" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacGasLineSizingCalculator } from "@/scripts/calculators/hvac-gas-line-sizing-calculator";
+    initHvacGasLineSizingCalculator();
+  </script>
+</Layout>

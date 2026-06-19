@@ -1,0 +1,463 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "SEER Savings Calculator — AC Efficiency Cost Comparison | TradesQuote";
+const description = "Free SEER savings calculator. Compare two SEER ratings and see the annual electricity cost, dollar savings, and 15-year payoff of a higher-efficiency air conditioner. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-seer-savings-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "SEER Savings Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "SEER Savings Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Free online SEER savings calculator that compares two air conditioner SEER ratings and estimates annual electricity use, cost, dollar savings, and 15-year savings based on system size, cooling hours, and electricity rate.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is a SEER rating?",
+    answer:
+      "SEER — <strong>Seasonal Energy Efficiency Ratio</strong> — measures how much cooling an air conditioner delivers per unit of electricity over a typical season: cooling output in BTU divided by energy used in watt-hours. A higher SEER means the same cooling for less electricity.",
+  },
+  {
+    question: "How much does upgrading from SEER 10 to SEER 16 save?",
+    answer:
+      "Moving from SEER 10 to 16 cuts cooling electricity use by <strong>37.5%</strong>, since consumption scales with the ratio of the ratings. For a 3-ton system running 1,200 hours a year at $0.17/kWh, that's roughly <strong>$275 per year</strong>, or about $4,100 over a 15-year lifespan.",
+  },
+  {
+    question: "What's the formula for SEER savings?",
+    answer:
+      "Percent savings = <strong>1 − (old SEER ÷ new SEER)</strong>. For dollars: annual kWh = cooling BTU/hr × yearly cooling hours ÷ (SEER × 1,000), multiply each by your electricity rate, and subtract. The calculator above runs all of it instantly.",
+  },
+  {
+    question: "What is SEER2 and how is it different from SEER?",
+    answer:
+      "SEER2 is the same efficiency concept measured under a tougher 2023 test that uses higher external static pressure to mimic real ductwork. SEER2 values run about <strong>4.5% lower</strong> than the old SEER number for the same unit. When comparing two systems, use the same scale for both.",
+  },
+  {
+    question: "What SEER rating should I buy?",
+    answer:
+      "Since 2023, new central ACs must meet at least <strong>13.4 SEER2 (≈14 SEER) in northern states and 14.3 SEER2 (≈15 SEER) in the South and Southwest</strong>. The sweet spot for most homes is 15–17 SEER2; going higher pays off mainly in hot climates with long cooling seasons.",
+  },
+  {
+    question: "Is a higher SEER air conditioner worth the extra cost?",
+    answer:
+      "It depends on how much you cool. Savings scale with cooling hours and electricity rates, so an upgrade that returns $150/yr in a mild climate can return <strong>$400+ in Phoenix or Florida</strong>. Compare the price premium against the 10–15 year savings this calculator shows — and check local utility rebates.",
+  },
+  {
+    question: "Does SEER affect heating costs too?",
+    answer:
+      'SEER only measures <strong>cooling</strong> efficiency. Heat pump heating is rated separately as HSPF/HSPF2 — use our <a href="/calculators/hvac/hvac-hspf-savings-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">HSPF Savings Calculator</a> for that. Gas furnace efficiency is rated as AFUE; see the <a href="/calculators/hvac/hvac-afue-savings-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">AFUE Savings Calculator</a>.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Selling the upgrade? Quote it in seconds.";
+const ctaDescription =
+  "Energy savings win the conversation — a fast, professional estimate wins the job. TradesQuote turns the full replacement into a line-item quote: equipment, labor, materials, and disposal, with quantities, unit prices, and totals validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (Cooling)",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Heating size by climate zone and AFUE efficiency.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Room airflow by air changes and CFM per ton.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SEER Savings Calculator — AC Efficiency Cost Comparison" />
+    <meta property="og:description" content="Compare two SEER ratings and see annual electricity costs, dollar savings, and the 15-year payoff. Free and instant." />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SEER Savings Calculator — AC Efficiency Cost Comparison" />
+    <meta name="twitter:description" content="Compare two SEER ratings and see annual electricity costs and savings. Free, no sign-up." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+          <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+      
+              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="SEER Savings Calculator" />
+      
+              <div class="max-w-3xl">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  HVAC Tools · Efficiency · Free
+                </span>
+                <!-- (1) H1 -->
+                <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+                  SEER Savings Calculator <span class="text-emerald-600">— Free Online Calculator</span>
+                </h1>
+                <!-- (2) What this calculates — 2 sentences -->
+                <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+                  This SEER savings calculator compares two air-conditioner efficiency ratings and shows the annual
+                  electricity use, yearly cost, and dollar savings of the higher-SEER unit — plus what that adds up to
+                  over a 15-year lifespan. Use it to decide whether a more efficient system is worth the price premium
+                  before you buy or quote.
+                </p>
+      
+                <!-- Differentiator / internal links (avoids cannibalization) -->
+                <div class="mt-6 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                  <svg class="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <p class="text-sm text-slate-600">
+                    <span class="font-semibold text-slate-900">Don't know your system size in tons?</span>
+                    Find it with the
+                    <a href="/calculators/hvac/hvac-tonnage-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Tonnage Calculator</a>
+                    — or estimate the full cooling load with the
+                    <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">BTU Calculator</a> first.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+      
+          <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+          <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+            <div class="grid lg:grid-cols-5 gap-6">
+      
+              <!-- Inputs -->
+              <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  Compare two SEER ratings
+                </h2>
+      
+                <div class="mt-6 space-y-6">
+                  <div class="grid sm:grid-cols-2 gap-5">
+                    <!-- Old SEER -->
+                    <div>
+                      <label for="seer-old" class="text-sm font-semibold text-slate-800">Current / lower SEER</label>
+                      <input id="seer-old" type="number" min="6" max="30" step="0.5" value="10"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                      <p class="mt-1.5 text-xs text-slate-500">Older units: ~8–10 · 2006–2015 installs: ~13</p>
+                    </div>
+      
+                    <!-- New SEER -->
+                    <div>
+                      <label for="seer-new" class="text-sm font-semibold text-slate-800">New / higher SEER</label>
+                      <input id="seer-new" type="number" min="6" max="30" step="0.5" value="16"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                      <p class="mt-1.5 text-xs text-slate-500">Use the same scale (SEER or SEER2) for both.</p>
+                    </div>
+      
+                    <!-- Tons -->
+                    <div>
+                      <label for="seer-tons" class="text-sm font-semibold text-slate-800">System size</label>
+                      <select id="seer-tons"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                        <option value="1.5">1.5 tons (18,000 BTU)</option>
+                        <option value="2">2 tons (24,000 BTU)</option>
+                        <option value="2.5">2.5 tons (30,000 BTU)</option>
+                        <option value="3" selected>3 tons (36,000 BTU)</option>
+                        <option value="3.5">3.5 tons (42,000 BTU)</option>
+                        <option value="4">4 tons (48,000 BTU)</option>
+                        <option value="5">5 tons (60,000 BTU)</option>
+                      </select>
+                    </div>
+      
+                    <!-- Cooling hours -->
+                    <div>
+                      <label for="seer-hours" class="text-sm font-semibold text-slate-800">Cooling season (climate)</label>
+                      <select id="seer-hours"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                        <option value="600">Mild — short summers (600 hrs/yr)</option>
+                        <option value="1200" selected>Moderate — typical US (1,200 hrs/yr)</option>
+                        <option value="1800">Warm — long summers (1,800 hrs/yr)</option>
+                        <option value="2800">Hot — Phoenix / Florida (2,800 hrs/yr)</option>
+                      </select>
+                    </div>
+      
+                    <!-- Electricity rate -->
+                    <div class="sm:col-span-2">
+                      <div class="flex items-center justify-between">
+                        <label for="seer-rate" class="text-sm font-semibold text-slate-800">Electricity rate</label>
+                        <div class="flex items-center gap-1">
+                          <span class="text-sm text-slate-500">$</span>
+                          <input id="seer-rate" type="number" min="0.05" max="0.60" step="0.01" value="0.17"
+                            class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
+                          <span class="text-sm text-slate-500">/kWh</span>
+                        </div>
+                      </div>
+                      <input id="seer-rate-range" type="range" min="0.08" max="0.40" step="0.01" value="0.17"
+                        class="seer-range mt-3 w-full bg-slate-200 accent-emerald-600">
+                      <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <span>$0.08</span><span>US average ≈ $0.17</span><span>$0.40</span>
+                      </div>
+                    </div>
+                  </div>
+      
+                  <button id="resetBtn"
+                    class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset to defaults
+                  </button>
+                </div>
+              </div>
+      
+              <!-- Results -->
+              <div class="lg:col-span-2">
+                <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-emerald-600 to-green-500 p-6 sm:p-8 text-white shadow-lg">
+                  <p class="text-sm font-medium text-emerald-100">You'd save every year</p>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span id="savingsResult" class="text-5xl font-extrabold tracking-tight">$275</span>
+                    <span class="text-lg font-semibold text-emerald-100">/year</span>
+                  </div>
+      
+                  <div class="mt-6 grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p id="oldLabel" class="text-xs text-emerald-100">At SEER 10</p>
+                      <p id="oldCost" class="mt-1 text-2xl font-bold">$734/yr</p>
+                    </div>
+                    <div class="rounded-xl bg-white/15 p-4">
+                      <p id="newLabel" class="text-xs text-emerald-100">At SEER 16</p>
+                      <p id="newCost" class="mt-1 text-2xl font-bold">$459/yr</p>
+                    </div>
+                  </div>
+      
+                  <div class="mt-3 rounded-xl bg-white/15 p-4">
+                    <p class="text-xs text-emerald-100">Over a 15-year lifespan</p>
+                    <p id="lifetimeResult" class="mt-1 text-base font-semibold leading-snug">$4,131 saved · 37.5% less electricity</p>
+                  </div>
+      
+                  <!-- Breakdown -->
+                  <details class="group mt-5 rounded-xl bg-white/10">
+                    <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                      See the breakdown
+                      <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-4 pb-4 text-sm space-y-1.5 text-emerald-50">
+                      <div class="flex justify-between"><span>Cooling capacity</span><span id="bd-btu" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>kWh/yr at lower SEER</span><span id="bd-kwh-old" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>kWh/yr at higher SEER</span><span id="bd-kwh-new" class="font-semibold">—</span></div>
+                      <div class="flex justify-between"><span>Electricity saved</span><span id="bd-kwh-saved" class="font-semibold">—</span></div>
+                      <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"><span class="font-bold">10-year savings</span><span id="bd-tenyr" class="font-bold">—</span></div>
+                    </div>
+                  </details>
+      
+                  <p class="mt-4 text-xs text-emerald-100 leading-relaxed">
+                    Estimates assume the unit runs at rated efficiency. Real bills vary with weather, thermostat
+                    habits, duct condition, and rate changes.
+                  </p>
+                </div>
+              </div>
+            </div>
+      
+            <!-- Reference table -->
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+              <h2 class="text-xl font-bold text-slate-900">Annual cooling cost by SEER rating (quick reference)</h2>
+              <p class="mt-2 text-sm text-slate-500">3-ton system · 1,200 cooling hours per year · $0.17/kWh. Your numbers scale with size, hours, and rate.</p>
+              <div class="mt-5 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-slate-500">
+                      <th class="py-2.5 pr-4 font-semibold">SEER rating</th>
+                      <th class="py-2.5 pr-4 font-semibold">Electricity used</th>
+                      <th class="py-2.5 pr-4 font-semibold">Annual cost</th>
+                      <th class="py-2.5 font-semibold">vs. SEER 10</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-slate-700">
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">SEER 10 (old unit)</td><td class="py-2.5 pr-4">4,320 kWh</td><td class="py-2.5 pr-4">$734</td><td class="py-2.5">—</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">SEER 13</td><td class="py-2.5 pr-4">3,323 kWh</td><td class="py-2.5 pr-4">$565</td><td class="py-2.5 text-emerald-700 font-semibold">save $169/yr</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">SEER 14</td><td class="py-2.5 pr-4">3,086 kWh</td><td class="py-2.5 pr-4">$525</td><td class="py-2.5 text-emerald-700 font-semibold">save $209/yr</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">SEER 15</td><td class="py-2.5 pr-4">2,880 kWh</td><td class="py-2.5 pr-4">$490</td><td class="py-2.5 text-emerald-700 font-semibold">save $244/yr</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">SEER 16</td><td class="py-2.5 pr-4">2,700 kWh</td><td class="py-2.5 pr-4">$459</td><td class="py-2.5 text-emerald-700 font-semibold">save $275/yr</td></tr>
+                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">SEER 18</td><td class="py-2.5 pr-4">2,400 kWh</td><td class="py-2.5 pr-4">$408</td><td class="py-2.5 text-emerald-700 font-semibold">save $326/yr</td></tr>
+                    <tr><td class="py-2.5 pr-4 font-semibold">SEER 20</td><td class="py-2.5 pr-4">2,160 kWh</td><td class="py-2.5 pr-4">$367</td><td class="py-2.5 text-emerald-700 font-semibold">save $367/yr</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="mt-4 text-xs text-slate-500">Estimates for comparison only. Actual usage varies with weather, home condition, and how you run your thermostat.</p>
+            </div>
+          </section>
+      
+          <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+          <section class="bg-slate-50 border-y border-slate-200">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+              <p class="mt-4 text-slate-600 leading-relaxed">
+                SEER is just "cooling delivered per electricity used." Once you know that, the savings math is
+                three short steps — and one elegant shortcut.
+              </p>
+      
+              <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+                <div class="text-emerald-300"># Step 1 — Electricity used per year (for each SEER)</div>
+                <div>kWh&nbsp;=&nbsp;(tons × <span class="text-amber-300">12,000</span> BTU) × cooling hours ÷ (SEER × <span class="text-amber-300">1,000</span>)</div>
+                <div class="mt-4 text-emerald-300"># Step 2 — Annual cost</div>
+                <div>cost&nbsp;=&nbsp;kWh × electricity rate ($/kWh)</div>
+                <div class="mt-4 text-emerald-300"># Step 3 — Savings</div>
+                <div>savings&nbsp;=&nbsp;cost<sub>old</sub> − cost<sub>new</sub></div>
+                <div class="mt-4 text-emerald-300"># The shortcut — % saved needs only the two ratings</div>
+                <div>% saved&nbsp;=&nbsp;1 − (old SEER ÷ new SEER)&nbsp;&nbsp;<span class="text-slate-400">// 10→16 = 37.5%</span></div>
+              </div>
+      
+              <div class="mt-8 grid sm:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">What SEER actually is</h3>
+                  <p class="mt-2 text-sm text-slate-600">Seasonal BTU of cooling divided by watt-hours of electricity. A SEER 16 unit delivers 16 BTU of cooling for every watt-hour it consumes.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Why ÷ (SEER × 1,000)?</h3>
+                  <p class="mt-2 text-sm text-slate-600">Dividing BTU by SEER gives watt-hours; the extra 1,000 converts watt-hours to kilowatt-hours — the unit on your power bill.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">Cooling hours drive everything</h3>
+                  <p class="mt-2 text-sm text-slate-600">A Phoenix summer runs the AC 2,800+ hours; a northern one closer to 600. The same SEER upgrade saves 4–5× more money in the hot climate.</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 class="font-bold text-slate-900">SEER vs. SEER2</h3>
+                  <p class="mt-2 text-sm text-slate-600">SEER2 (2023+) is the same idea tested under realistic duct pressure; values read ~4.5% lower. Compare like with like — never SEER against SEER2.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+      
+          <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+          <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+            <p class="mt-4 text-slate-600">Three common upgrade decisions — including one where the upgrade <em>isn't</em> obviously worth it.</p>
+      
+            <div class="mt-8 space-y-6">
+              <!-- Example 1 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">1</span>
+                  <h3 class="text-lg font-bold text-slate-900">Replacing an old unit — SEER 10 → 16, 3 tons, moderate climate</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">1,200 cooling hours · $0.17/kWh.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  old: 36,000 × 1,200 ÷ (10 × 1,000) = 4,320 kWh → $734/yr<br>
+                  new: 36,000 × 1,200 ÷ (16 × 1,000) = 2,700 kWh → $459/yr<br>
+                  savings = <span class="font-bold text-emerald-700">$275/yr · 37.5% less electricity</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> about $275 per year, roughly $4,100 over 15 years — a strong tailwind on top of replacing a unit that was due anyway.</p>
+              </div>
+      
+              <!-- Example 2 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">2</span>
+                  <h3 class="text-lg font-bold text-slate-900">Hot climate, small step — SEER 14 vs. 16, 3 tons, Phoenix-style summer</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">2,800 cooling hours · $0.17/kWh.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  SEER 14: 36,000 × 2,800 ÷ 14,000 = 7,200 kWh → $1,224/yr<br>
+                  SEER 16: 36,000 × 2,800 ÷ 16,000 = 6,300 kWh → $1,071/yr<br>
+                  savings = <span class="font-bold text-emerald-700">$153/yr · 12.5% less electricity</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> even a two-point SEER step saves ~$153 a year when the cooling season is long — about $2,300 over 15 years.</p>
+              </div>
+      
+              <!-- Example 3 -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">3</span>
+                  <h3 class="text-lg font-bold text-slate-900">The honest case — SEER 12 → 16, small 2-ton system, moderate climate</h3>
+                </div>
+                <p class="mt-3 text-sm text-slate-600">1,200 cooling hours · $0.17/kWh.</p>
+                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+                  SEER 12: 24,000 × 1,200 ÷ 12,000 = 2,400 kWh → $408/yr<br>
+                  SEER 16: 24,000 × 1,200 ÷ 16,000 = 1,800 kWh → $306/yr<br>
+                  savings = <span class="font-bold text-emerald-700">$102/yr · 25% less electricity</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> about $102 a year. If the working unit would cost thousands to replace early, energy savings alone don't justify it — efficiency pays best on big systems, long summers, or units already due for replacement.</p>
+              </div>
+            </div>
+          </section>
+      
+          <CalculatorFaqSection
+            faqs={faqs}
+            accent="emerald"
+            subtitle="Common questions about SEER ratings and efficiency savings."
+          />
+
+          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+          <HvacRelatedCalculators calculators={relatedCalculators} accent="emerald" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacSeerSavingsCalculator } from "@/scripts/calculators/hvac-seer-savings-calculator";
+    initHvacSeerSavingsCalculator();
+  </script>
+</Layout>
+<style>
+  .seer-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .seer-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .seer-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -1,0 +1,578 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Sensible & Latent Heat Calculator — Coil Load & SHR | TradesQuote";
+const description =
+  "Free HVAC sensible and latent heat calculator. Split total coil load into sensible and latent BTU/h from CFM, temperature change, and humidity ratio change — plus sensible heat ratio (SHR). Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-sensible-latent-heat-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Sensible & Latent Heat Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Sensible & Latent Heat Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online HVAC calculator that splits total coil load into sensible and latent BTU/h from CFM, dry-bulb temperature change, and humidity ratio change, and computes sensible heat ratio (SHR) for cooling diagnostics.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is the difference between sensible and latent heat?",
+    answer:
+      "<strong>Sensible heat</strong> changes dry-bulb temperature — you feel it as cooler or warmer air. <strong>Latent heat</strong> removes moisture from the air without much temperature drop until condensation occurs on the coil. A cooling coil must handle both loads; total capacity is the sum.",
+  },
+  {
+    question: "What is sensible heat ratio (SHR)?",
+    answer:
+      "SHR = <strong>sensible load ÷ total load</strong> (Qs ÷ Qt). An SHR of <strong>0.75</strong> means 75% of coil capacity goes to cooling temperature and 25% to dehumidification. Lower SHR means more latent work — common in humid climates or when return air is moisture-heavy.",
+  },
+  {
+    question: "Where do the 1.08 and 0.68 factors come from?",
+    answer:
+      "They are standard psychrometric shortcuts at sea-level conditions: <strong>Qs = 1.08 × CFM × ΔT</strong> (BTU/h) and <strong>Ql = 0.68 × CFM × Δgrains</strong>. The 1.08 factor combines air density and specific heat; 0.68 converts grain depression across the coil to latent BTU/h. ASHRAE psychrometric charts use the same underlying properties.",
+  },
+  {
+    question: "How do I get humidity ratio in grains per pound?",
+    answer:
+      "Measure return and supply <strong>dry-bulb temperature and relative humidity</strong> (or wet-bulb), then look up humidity ratio on a psychrometric chart or use a <strong>dew point / RH calculator</strong>. Grains per pound (gr/lb) is humidity ratio × 7,000. Enter return minus supply grains here for latent load.",
+  },
+  {
+    question: "What is a typical SHR for residential cooling?",
+    answer:
+      "At design conditions, residential coils often run <strong>SHR 0.70–0.75</strong>. In humid weather or with high indoor moisture, SHR can drop to <strong>0.55–0.65</strong> as more capacity goes to latent removal — and the temperature split may look lower even when total BTU/h is high.",
+  },
+  {
+    question: "Why does my Delta T look low but the coil is working hard?",
+    answer:
+      "A <strong>latent-heavy load</strong> (low SHR) steals capacity from sensible cooling. The coil may be removing lots of moisture while the dry-bulb split stays modest. Split sensible and latent with this tool before blaming low charge or airflow alone.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Split the load? Quote the equipment in seconds.";
+const ctaDescription =
+  "Sensible and latent BTU/h tell you what the coil is really doing — TradesQuote turns the sizing or replacement into a detailed, line-item estimate in seconds. Describe the equipment or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM Calculator",
+    description: "Confirm airflow before splitting sensible and latent load.",
+  },
+  {
+    href: "/calculators/hvac/hvac-dew-point-calculator",
+    title: "Dew Point Calculator",
+    description: "Find humidity ratio and condensation risk from RH.",
+  },
+  {
+    href: "/calculators/hvac/hvac-delta-t-calculator",
+    title: "Delta T Calculator",
+    description: "Temperature split flags airflow and capacity issues.",
+  },
+  {
+    href: "/calculators/hvac/hvac-humidity-control-calculator",
+    title: "Humidity Control Calculator",
+    description: "Size humidifier or dehumidifier from latent load.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sensible & Latent Heat Calculator — Coil Load & SHR" />
+    <meta
+      property="og:description"
+      content="Split coil load into sensible and latent BTU/h from CFM, ΔT, and grain depression. Free SHR and total load — instant, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sensible & Latent Heat Calculator — Coil Load & SHR" />
+    <meta
+      name="twitter:description"
+      content="Calculate sensible and latent BTU/h and SHR from CFM, temperatures, and humidity ratio. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Sensible & Latent Heat Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+              </svg>
+              HVAC Tools · Diagnostics · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Sensible & Latent Heat Calculator <span class="text-emerald-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Total coil capacity is not just temperature drop — in humid conditions much of the work goes to
+              pulling moisture from the air. Enter airflow, return and supply temperatures, and humidity ratio in
+              grains per pound to split sensible and latent BTU/h, get total load, and see sensible heat ratio
+              (SHR) so you know whether the coil is fighting temperature or moisture.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-emerald-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 7h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter airflow and psychrometric readings
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                  <label for="sl-cfm" class="text-sm font-semibold text-slate-800">Airflow (CFM)</label>
+                  <input
+                    id="sl-cfm"
+                    type="number"
+                    min="0"
+                    max="10000"
+                    step="50"
+                    value="1200"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Total supply airflow through the coil — from anemometer traverse, flow hood, or manufacturer
+                    table at current static pressure.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="sl-return-t" class="text-sm font-semibold text-slate-800">Return dry-bulb (°F)</label>
+                  <input
+                    id="sl-return-t"
+                    type="number"
+                    min="50"
+                    max="100"
+                    step="0.5"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Entering air temperature at the return grille or mixed-air point.</p>
+                </div>
+
+                <div>
+                  <label for="sl-supply-t" class="text-sm font-semibold text-slate-800">Supply dry-bulb (°F)</label>
+                  <input
+                    id="sl-supply-t"
+                    type="number"
+                    min="40"
+                    max="90"
+                    step="0.5"
+                    value="55"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Leaving air temperature after the coil (cooling mode).</p>
+                </div>
+
+                <div>
+                  <label for="sl-return-grains" class="text-sm font-semibold text-slate-800"
+                    >Return humidity (gr/lb)</label
+                  >
+                  <input
+                    id="sl-return-grains"
+                    type="number"
+                    min="0"
+                    max="200"
+                    step="1"
+                    value="110"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Humidity ratio × 7,000 — from psychrometric chart or
+                    <a
+                      href="/calculators/hvac/hvac-dew-point-calculator"
+                      class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600"
+                      >Dew Point Calculator</a
+                    >.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="sl-supply-grains" class="text-sm font-semibold text-slate-800"
+                    >Supply humidity (gr/lb)</label
+                  >
+                  <input
+                    id="sl-supply-grains"
+                    type="number"
+                    min="0"
+                    max="200"
+                    step="1"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Leaving air humidity ratio after moisture removal on the coil.</p>
+                </div>
+              </div>
+
+              <button
+                id="resetBtn"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-emerald-100">Total coil load (Qt)</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sl-qt" class="text-4xl sm:text-5xl font-extrabold tracking-tight">54,480 BTU/h</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-emerald-100">Sensible (Qs)</p>
+                  <p id="sl-qs" class="mt-1 text-xl font-bold">25,920 BTU/h</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-emerald-100">Latent (Ql)</p>
+                  <p id="sl-ql" class="mt-1 text-xl font-bold">28,560 BTU/h</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-emerald-100">SHR</p>
+                  <p id="sl-shr" class="mt-1 text-2xl font-bold">0.48</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-emerald-100">Load profile</p>
+                  <p id="sl-status" class="mt-1 text-2xl font-bold">Very latent</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-emerald-100">What it means</p>
+                <p id="sl-causes" class="mt-1 text-sm font-medium leading-snug">
+                  Latent load dominates — very humid conditions, high indoor moisture, or limited sensible split.
+                  Check return humidity, ventilation loads, and that CFM is not excessive for the moisture removal
+                  needed.
+                </p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-emerald-50">
+                  <div class="flex justify-between">
+                    <span>Airflow</span><span id="sl-bd-cfm" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Temperature Δ (return − supply)</span><span id="sl-bd-dt" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Grain depression (return − supply)</span><span id="sl-bd-dgrains" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
+                    <span>Sensible load (1.08 × CFM × ΔT)</span><span id="sl-bd-qs" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Latent load (0.68 × CFM × Δgr)</span><span id="sl-bd-ql" class="font-semibold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-emerald-100 leading-relaxed">
+                Cooling mode: return should be warmer and more humid than supply. Pair with actual CFM and Delta T
+                when diagnosing comfort, charge, or equipment sizing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Sensible load reference (Qs = 1.08 × CFM × ΔT)</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Sensible BTU/h only — latent load depends on grain depression and is not included. Sea-level
+            psychrometric shortcut.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">CFM</th>
+                  <th class="py-2.5 pr-4 font-semibold">ΔT 15°F</th>
+                  <th class="py-2.5 pr-4 font-semibold">ΔT 20°F</th>
+                  <th class="py-2.5 font-semibold">ΔT 25°F</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">400 CFM</td>
+                  <td class="py-2.5 pr-4">6,480 BTU/h</td>
+                  <td class="py-2.5 pr-4">8,640 BTU/h</td>
+                  <td class="py-2.5">10,800 BTU/h</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">800 CFM</td>
+                  <td class="py-2.5 pr-4">12,960 BTU/h</td>
+                  <td class="py-2.5 pr-4">17,280 BTU/h</td>
+                  <td class="py-2.5">21,600 BTU/h</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">1,200 CFM</td>
+                  <td class="py-2.5 pr-4">19,440 BTU/h</td>
+                  <td class="py-2.5 pr-4 text-emerald-700 font-semibold">25,920 BTU/h</td>
+                  <td class="py-2.5">32,400 BTU/h</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Sources &amp; standards: ASHRAE Handbook — Fundamentals (psychrometrics, sensible and latent heat of
+            moist air) · ASHRAE Standard 62.1 (ventilation and moisture loads).
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A cooling coil removes heat two ways: lowering dry-bulb temperature (sensible) and condensing water
+            vapor (latent). Field technicians combine airflow with measured temperature and humidity changes to
+            estimate how hard the coil is working.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-emerald-300"># Sensible load (temperature change):</div>
+            <div>Qs&nbsp;=&nbsp;1.08 × CFM × (returnT − supplyT)&nbsp;&nbsp;&nbsp;[BTU/h]</div>
+            <div class="mt-4 text-emerald-300"># Latent load (moisture removal):</div>
+            <div>Ql&nbsp;=&nbsp;0.68 × CFM × (returnGrains − supplyGrains)</div>
+            <div class="mt-4 text-emerald-300"># Total and sensible heat ratio:</div>
+            <div>Qt&nbsp;=&nbsp;Qs + Ql</div>
+            <div>SHR&nbsp;=&nbsp;Qs ÷ Qt&nbsp;&nbsp;(if Qt &gt; 0)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Cooling mode sign convention</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Return air is warmer and carries more moisture than supply. ΔT and Δgrains are return minus supply
+                — both should be positive when the coil is cooling and dehumidifying properly.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Grains per pound</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Humidity ratio in grains per pound of dry air (gr/lb) = W × 7,000. Use matched return and supply
+                readings at the same barometric pressure for accurate latent load.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Reading SHR</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                SHR near 0.75 is mostly sensible; below 0.60 means latent work dominates. A low SHR with a modest
+                Delta T often explains why the space still feels humid despite “normal” temperature split.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Pair with airflow</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                These formulas scale directly with CFM — an error in airflow measurement doubles the error in both
+                sensible and latent BTU/h. Verify CFM before using load numbers for equipment selection.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three scenarios: balanced residential cooling, humid latent-heavy load, and dry mostly-sensible load.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Default — 1,200 CFM, 75→55°F, 110→75 gr/lb
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>Qs = 1.08 × 1,200 × 20 = <span class="font-bold text-emerald-700">25,920 BTU/h</span></div>
+              <div>Ql = 0.68 × 1,200 × 35 = <span class="font-bold text-emerald-700">28,560 BTU/h</span></div>
+              <div>Qt = 54,480 BTU/h · SHR = <span class="font-bold text-emerald-700">0.48 → Very latent</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> latent load exceeds sensible — typical when
+              return air is very humid. The 20°F split alone would suggest ~26k sensible, but total coil work is
+              nearly 55k BTU/h once moisture removal is included.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Balanced — 1,000 CFM, 78→58°F, 95→70 gr/lb
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>Qs = 1.08 × 1,000 × 20 = <span class="font-bold text-emerald-700">21,600 BTU/h</span></div>
+              <div>Ql = 0.68 × 1,000 × 25 = <span class="font-bold text-emerald-700">17,000 BTU/h</span></div>
+              <div>Qt = 38,600 BTU/h · SHR = <span class="font-bold text-emerald-700">0.56 → Latent-heavy</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> moderate humidity with a healthy 20°F split
+              — still more than half latent. Equipment sized on sensible load alone would be undersized for peak
+              moisture conditions.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Mostly sensible — 1,400 CFM, 80→60°F, 72→68 gr/lb
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>Qs = 1.08 × 1,400 × 20 = <span class="font-bold text-emerald-700">30,240 BTU/h</span></div>
+              <div>Ql = 0.68 × 1,400 × 4 = <span class="font-bold text-emerald-700">3,808 BTU/h</span></div>
+              <div>Qt = 34,048 BTU/h · SHR = <span class="font-bold text-emerald-700">0.89 → Mostly sensible</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> dry return air and small grain depression
+              — coil capacity goes almost entirely to temperature. Watch for short cycling or inadequate
+              dehumidification if indoor RH creeps up.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about sensible vs latent load, SHR, and psychrometric shortcuts."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="emerald" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacSensibleLatentHeatCalculator } from "@/scripts/calculators/hvac-sensible-latent-heat-calculator";
+    initHvacSensibleLatentHeatCalculator();
+  </script>
+</Layout>
