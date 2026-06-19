@@ -246,6 +246,133 @@ export const hvacCalculators: HvacCalculator[] = [
     accent: "rose",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>`,
   },
+  {
+    slug: "hvac-combustion-efficiency-calculator",
+    title: "Combustion Efficiency Calculator",
+    description: "Boiler stack loss and net combustion efficiency using the Siegert formula — from flue gas temperature, combustion air temperature, and flue oxygen percentage.",
+    question: "What is my boiler's combustion efficiency?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>`,
+  },
+  {
+    slug: "hvac-hrv-erv-effectiveness-calculator",
+    title: "HRV / ERV Effectiveness Calculator",
+    description: "Sensible heat recovery effectiveness (ASHRAE 84) from supply and exhaust airflow and temperatures — with flow imbalance and thermodynamic limit warnings.",
+    question: "What is my HRV sensible effectiveness?",
+    accent: "teal",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h9a2.5 2.5 0 10-2.5-2.5M4 12h13a2.5 2.5 0 11-2.5 2.5M4 16h7"/></svg>`,
+  },
+  {
+    slug: "hvac-duct-friction-rate-calculator",
+    title: "Duct Friction Rate Calculator",
+    description: "Manual D available static pressure and design friction rate — from equipment ESP, component losses, and total effective duct length. Flags high-velocity and oversized-ductwork conditions.",
+    question: "What is the Manual D friction rate for my system?",
+    accent: "blue",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
+  },
+  {
+    slug: "hvac-boiler-sizing-edr-calculator",
+    title: "Hydronic Boiler Sizing & EDR Calculator",
+    description: "Net and IBR gross boiler output from connected radiator EDR and supply water temperature — with temperature correction and oversizing risk warnings.",
+    question: "What boiler output do I need for my radiators?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>`,
+  },
+  {
+    slug: "hvac-cooling-tower-tonnage-calculator",
+    title: "Cooling Tower Tonnage Calculator",
+    description: "Condenser water heat rejection capacity (BTU/h and tons), approach to wet-bulb, and chiller reject load — with approach and under-capacity warnings.",
+    question: "How many tons can my cooling tower reject?",
+    accent: "cyan",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>`,
+  },
+  {
+    slug: "hvac-ach-ventilation-calculator",
+    title: "ACH Ventilation Calculator",
+    description: "Convert CFM to air changes per hour (or reverse) and check against ASHRAE 62.1, 62.2, and 170 minimum rates for offices, restrooms, healthcare, and residential spaces.",
+    question: "How many air changes per hour does this room have?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>`,
+  },
+  {
+    slug: "hvac-psychrometric-calculator",
+    title: "Psychrometric Calculator",
+    description: "All eight moist-air properties from dry-bulb temperature and relative humidity: humidity ratio, specific enthalpy, dew point, wet-bulb temperature, vapour pressure, specific volume, and air density.",
+    question: "What is the enthalpy and humidity ratio of 75°F, 50% RH air?",
+    accent: "indigo",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`,
+  },
+];
+
+export type HvacCalculatorGroup = {
+  label: string;
+  description: string;
+  slugs: string[];
+};
+
+export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
+  {
+    label: "Sizing",
+    description: "Find the right system for any space — cooling load, tonnage, heating, and heat pump balance point.",
+    slugs: [
+      "hvac-btu-calculator",
+      "hvac-tonnage-calculator",
+      "hvac-unit-converter",
+      "hvac-furnace-btu-calculator",
+      "hvac-heat-pump-calculator",
+      "hvac-mini-split-calculator",
+    ],
+  },
+  {
+    label: "Airflow & Ductwork",
+    description: "Calculate CFM requirements, select duct diameters, apply fan affinity laws, and verify Manual D friction rates.",
+    slugs: [
+      "hvac-cfm-calculator",
+      "hvac-duct-size-calculator",
+      "hvac-fan-laws-calculator",
+      "hvac-duct-friction-rate-calculator",
+    ],
+  },
+  {
+    label: "Diagnostics & Refrigerant",
+    description: "Check temperature splits, total external static pressure, refrigerant charge, and boiler combustion efficiency.",
+    slugs: [
+      "hvac-delta-t-calculator",
+      "hvac-static-pressure-calculator",
+      "hvac-superheat-calculator",
+      "hvac-subcooling-calculator",
+      "hvac-target-superheat-calculator",
+      "hvac-refrigerant-charge-calculator",
+      "hvac-combustion-efficiency-calculator",
+    ],
+  },
+  {
+    label: "Psychrometrics & Indoor Air Quality",
+    description: "Dew point, sensible and latent heat, ASHRAE ventilation, humidity sizing, HRV/ERV effectiveness, and full moist-air properties.",
+    slugs: [
+      "hvac-dew-point-calculator",
+      "hvac-sensible-latent-heat-calculator",
+      "hvac-ventilation-calculator",
+      "hvac-humidity-control-calculator",
+      "hvac-hrv-erv-effectiveness-calculator",
+      "hvac-ach-ventilation-calculator",
+      "hvac-psychrometric-calculator",
+    ],
+  },
+  {
+    label: "Efficiency & Cost",
+    description: "Compare SEER, HSPF, and AFUE ratings, calculate operating cost and replacement cost, size hydronic systems, and price contractor jobs.",
+    slugs: [
+      "hvac-seer-savings-calculator",
+      "hvac-hspf-savings-calculator",
+      "hvac-afue-savings-calculator",
+      "hvac-operating-cost-calculator",
+      "hvac-replacement-cost-calculator",
+      "hvac-estimate-calculator",
+      "hvac-boiler-sizing-edr-calculator",
+      "hvac-cooling-tower-tonnage-calculator",
+    ],
+  },
 ];
 
 export const hvacAccentStyles: Record<
@@ -525,18 +652,67 @@ export const hvacCalculatorGuide = [
     accent: "rose" as const,
     rule: "(labor + equipment + materials + overhead) ÷ (1 − margin)",
   },
+  {
+    question: "What is my boiler's combustion efficiency?",
+    slug: "hvac-combustion-efficiency-calculator",
+    tool: "Combustion Efficiency Calculator",
+    accent: "orange" as const,
+    rule: "η = 100% − qA − L_latent − 1.5% radiation (Siegert formula)",
+  },
+  {
+    question: "What is my HRV or ERV's sensible effectiveness?",
+    slug: "hvac-hrv-erv-effectiveness-calculator",
+    tool: "HRV / ERV Effectiveness Calculator",
+    accent: "teal" as const,
+    rule: "εs = Vs×(t₁−t₂) / [Vmin×(t₁−t₃)] × 100 (ASHRAE 84)",
+  },
+  {
+    question: "What friction rate should I use for Manual D duct sizing?",
+    slug: "hvac-duct-friction-rate-calculator",
+    tool: "Duct Friction Rate Calculator",
+    accent: "blue" as const,
+    rule: "FR = (ASP × 100) / TEL · target 0.06–0.18 iwc/100'",
+  },
+  {
+    question: "What boiler output does my hydronic radiator system need?",
+    slug: "hvac-boiler-sizing-edr-calculator",
+    tool: "Hydronic Boiler Sizing & EDR Calculator",
+    accent: "amber" as const,
+    rule: "Q = EDR × 170 × (ΔT/110)^1.3 · gross = net × 1.15",
+  },
+  {
+    question: "How many tons can my cooling tower reject?",
+    slug: "hvac-cooling-tower-tonnage-calculator",
+    tool: "Cooling Tower Tonnage Calculator",
+    accent: "cyan" as const,
+    rule: "Q = 500 × GPM × ΔT · approach = T_cold − WBT ≥ 5°F",
+  },
+  {
+    question: "How many air changes per hour does this space have?",
+    slug: "hvac-ach-ventilation-calculator",
+    tool: "ACH Ventilation Calculator",
+    accent: "emerald" as const,
+    rule: "ACH = (CFM × 60) / volume · check ASHRAE 62.1 / 62.2 / 170",
+  },
+  {
+    question: "What are all the psychrometric properties of this air sample?",
+    slug: "hvac-psychrometric-calculator",
+    tool: "Psychrometric Calculator",
+    accent: "indigo" as const,
+    rule: "W = 621.945×Pv/(Patm−Pv) · h = 0.240×T + (W/7000)×(1061+0.444×T)",
+  },
 ];
 
 export const hvacFaqs = [
   {
     question: "Are these HVAC calculators really free?",
     answer:
-      "Yes. All twenty-five are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. All thirty-two are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which HVAC calculator should I use first?",
     answer:
-      "For cooling installs, the natural order is BTU → Tonnage → CFM. For code ventilation, use the Ventilation Calculator after CFM targets. For field diagnostics, start with Delta T, then Static Pressure if the split is high, Superheat or Subcooling if charge is suspect, and the Refrigerant Charge Calculator for long line sets. For moisture and coil load, use Dew Point and Sensible & Latent Heat; for humidifier or dehumidifier sizing, use Humidity Control.",
+      "For cooling installs, the natural order is BTU → Tonnage → CFM. For code ventilation, use the Ventilation Calculator after CFM targets. For field diagnostics, start with Delta T, then Static Pressure if the split is high, Superheat or Subcooling if charge is suspect, and the Refrigerant Charge Calculator for long line sets. For moisture and coil load, use Dew Point and Sensible & Latent Heat; for humidifier or dehumidifier sizing, use Humidity Control. For combustion and boiler work, use Combustion Efficiency and Hydronic Boiler EDR. For air quality and ventilation compliance, use the ACH Calculator. For psychrometric analysis, use the Psychrometric Calculator.",
   },
   {
     question: "Are the results accurate enough to buy equipment?",

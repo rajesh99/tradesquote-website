@@ -1,0 +1,592 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title =
+  "Duct Friction Rate Calculator — Manual D Available Static Pressure | TradesQuote";
+const description =
+  "Free Manual D duct friction rate calculator. Enter external static pressure, component pressure losses, and total effective length to get the design friction rate in in. w.c. per 100 ft. Instant, no sign-up.";
+
+const pageUrl =
+  "https://tradesquote.ai/calculators/hvac/hvac-duct-friction-rate-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Duct Friction Rate Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Duct Friction Rate Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online Manual D duct friction rate calculator. Enter equipment external static pressure, component pressure losses, and the longest duct run's total effective length to instantly compute the design friction rate for duct sizing.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is the friction rate in Manual D?",
+    answer:
+      "The friction rate is the pressure drop per 100 feet of duct, expressed in inches of water column (in. w.c./100'). It is the single design number from which all duct diameters are read off the ACCA friction chart. A friction rate of <strong>0.10–0.15 in. w.c./100'</strong> is the target range for most residential sheet-metal systems.",
+  },
+  {
+    question: "What is available static pressure (ASP)?",
+    answer:
+      "ASP is the portion of the blower's external static pressure (ESP) left over after all known component resistances — coil, filter, grilles, and accessories — have been subtracted. It represents the pressure budget available to overcome friction in the ductwork itself. <em>ASP = ESP − CPL</em>.",
+  },
+  {
+    question: "What is Total Effective Length (TEL)?",
+    answer:
+      "TEL is the sum of all straight duct footage plus the equivalent lengths assigned to every fitting (elbows, transitions, wyes, boots) in the index run — the longest supply or return path. Fittings are converted to equivalent straight-duct feet using resistance multipliers from ACCA Manual D Appendix 2 Table 4.",
+  },
+  {
+    question: "What happens if the friction rate is too high?",
+    answer:
+      "A friction rate above <strong>0.18 in. w.c./100'</strong> means duct velocities will exceed roughly 900 FPM in supply runs, causing audible rushing or whistling at registers. It is usually corrected by reducing component losses (upgrading the filter, selecting lower-resistance grilles) or increasing the equipment's external static pressure rating.",
+  },
+  {
+    question: "What happens if the friction rate is too low?",
+    answer:
+      "A friction rate below <strong>0.06 in. w.c./100'</strong> results in oversized ducts, high material cost, and air velocities so low that temperature stratification occurs — warm air floats to the ceiling in heating and cool air pools on the floor in cooling. It also reduces the room-level throw distance from supply registers.",
+  },
+  {
+    question: "How is Manual D different from just sizing ducts by CFM?",
+    answer:
+      "Manual D is a whole-system design method, not a per-branch rule of thumb. It starts from equipment capacity, subtracts component losses, converts the remaining pressure budget to a friction rate, and sizes every duct consistently from that one number. This ensures the system meets its airflow targets without over- or under-pressurising individual zones.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the ducts. Now price the sheet metal work.";
+const ctaDescription =
+  "A correct friction rate and duct layout give you the quantities — TradesQuote turns them into a line-item estimate in seconds. Describe the ductwork scope or upload photos, and our AI builds square footage, fittings, and labour, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Room and system airflow targets before duct sizing.",
+  },
+  {
+    href: "/calculators/hvac/hvac-duct-size-calculator",
+    title: "Duct Size Calculator",
+    description: "Convert CFM to round duct diameter.",
+  },
+  {
+    href: "/calculators/hvac/hvac-static-pressure-calculator",
+    title: "Static Pressure Calculator",
+    description: "Measure total external static pressure in the field.",
+  },
+  {
+    href: "/calculators/hvac/hvac-fan-laws-calculator",
+    title: "Fan Laws Calculator",
+    description: "Predict CFM and static pressure changes with RPM.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Duct Friction Rate Calculator — Manual D Available Static Pressure"
+    />
+    <meta
+      property="og:description"
+      content="Free Manual D duct friction rate calculator. Enter ESP, component losses, and total effective length. Instant, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Duct Friction Rate Calculator — Manual D Available Static Pressure"
+    />
+    <meta
+      name="twitter:description"
+      content="Compute your Manual D design friction rate instantly. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Duct Friction Rate Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                ></path>
+              </svg>
+              HVAC Tools · Duct Design · Free
+            </span>
+
+            <!-- H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Duct Friction Rate Calculator <span class="text-blue-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- Intro -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The Manual D friction rate is the single design parameter that controls duct sizing: it is the
+              available static pressure per 100 feet of equivalent duct length. Get it right and every trunk,
+              branch, and flex run can be sized off one friction chart. Enter the system's available static
+              pressure and the longest duct run's total effective length below to get the friction rate
+              instantly, with high and low friction-rate warnings.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter system pressures and duct run lengths
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <!-- ESP -->
+              <div>
+                <label for="dfr-esp" class="text-sm font-semibold text-slate-800">
+                  Equipment external static pressure — ESP (in. w.c.)
+                </label>
+                <input
+                  id="dfr-esp"
+                  type="number"
+                  min="0.1"
+                  max="2.0"
+                  step="0.01"
+                  value="0.5"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+
+              <!-- CPL -->
+              <div>
+                <label for="dfr-cpl" class="text-sm font-semibold text-slate-800">
+                  Component pressure losses — CPL (in. w.c.)
+                </label>
+                <input
+                  id="dfr-cpl"
+                  type="number"
+                  min="0"
+                  max="1.5"
+                  step="0.01"
+                  value="0.20"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Sum of all component resistances: coil (typ. 0.10–0.20), filter (0.10–0.15), grille/diffuser
+                  (0.03–0.05 each)
+                </p>
+              </div>
+
+              <!-- Straight length -->
+              <div>
+                <label for="dfr-straight" class="text-sm font-semibold text-slate-800">
+                  Longest supply run — straight length (ft)
+                </label>
+                <input
+                  id="dfr-straight"
+                  type="number"
+                  min="1"
+                  max="500"
+                  value="60"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+
+              <!-- Fittings EL -->
+              <div>
+                <label for="dfr-fittings" class="text-sm font-semibold text-slate-800">
+                  Equivalent length of fittings (ft)
+                </label>
+                <input
+                  id="dfr-fittings"
+                  type="number"
+                  min="0"
+                  max="500"
+                  value="40"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Multiply each fitting by its equivalent length factor from ACCA Manual D Table 4 (elbow ≈
+                  10–30 ft, transition ≈ 5–15 ft)
+                </p>
+              </div>
+
+              <button
+                id="dfr-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-blue-100">Friction Rate FR</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span
+                  id="dfr-result-fr"
+                  class="text-4xl font-extrabold tracking-tight leading-tight break-all"
+                  >0.300 in. w.c./100'</span
+                >
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-blue-100">ASP</p>
+                  <p id="dfr-result-asp" class="mt-1 text-xl font-bold">0.30 in. w.c.</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-blue-100">TEL</p>
+                  <p id="dfr-result-tel" class="mt-1 text-xl font-bold">100 ft</p>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <span
+                  id="dfr-status"
+                  class="inline-flex items-center rounded-full bg-green-500/25 px-3 py-1 text-sm font-semibold text-white"
+                >
+                  Target
+                </span>
+              </div>
+
+              <!-- Warning box -->
+              <div
+                id="dfr-warning"
+                class="hidden mt-3 rounded-xl bg-amber-400/20 border border-amber-300/30 p-4"
+              >
+                <p class="text-xs font-semibold text-amber-100 uppercase tracking-wide">Warning</p>
+                <p id="dfr-warning-text" class="mt-1 text-sm text-white leading-snug"></p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-blue-50">
+                  <div class="flex justify-between">
+                    <span>ESP</span><span id="dfr-bd-esp" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>CPL</span><span id="dfr-bd-cpl" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
+                    <span class="font-bold text-white">ASP (ESP − CPL)</span
+                    ><span id="dfr-bd-asp" class="font-bold text-white">—</span>
+                  </div>
+                  <div class="flex justify-between mt-2">
+                    <span>Straight length</span><span id="dfr-bd-straight" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Fittings EL</span><span id="dfr-bd-fittings" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
+                    <span class="font-bold text-white">TEL (straight + fittings)</span
+                    ><span id="dfr-bd-tel" class="font-bold text-white">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-blue-100 leading-relaxed">
+                Friction rate per ACCA Manual D design method. Size all ducts to the calculated friction rate
+                using the Duct Friction Chart (Appendix 2, Manual D).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">
+            Friction rate design guidelines (ACCA Manual D)
+          </h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Friction Rate</th>
+                  <th class="py-2.5 pr-4 font-semibold">Status</th>
+                  <th class="py-2.5 font-semibold">Typical application</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">Under 0.06 in. w.c./100'</td>
+                  <td class="py-2.5 pr-4">Low — oversized</td>
+                  <td class="py-2.5">Low-velocity systems, very long runs</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">0.06–0.10 in. w.c./100'</td>
+                  <td class="py-2.5 pr-4">Conservative</td>
+                  <td class="py-2.5">Good for older or flex-heavy systems</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">0.10–0.15 in. w.c./100'</td>
+                  <td class="py-2.5 pr-4 text-blue-700 font-semibold">Target range</td>
+                  <td class="py-2.5">Most residential sheet-metal systems</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 font-semibold">0.15–0.18 in. w.c./100'</td>
+                  <td class="py-2.5 pr-4">Tight</td>
+                  <td class="py-2.5">Short, well-designed systems</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4 font-semibold">Above 0.18 in. w.c./100'</td>
+                  <td class="py-2.5 pr-4">High — noise risk</td>
+                  <td class="py-2.5">Excessive velocity, structural noise</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The Manual D friction rate formula
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            ACCA Manual D defines the friction rate (FR) as the ratio of available static pressure to total
+            effective duct length. Available static pressure (ASP) is the equipment's external static pressure
+            rating minus the sum of all known component pressure losses — coil, filter, grilles, and dampers.
+            Total effective length (TEL) converts fittings to equivalent straight-duct feet using resistance
+            multipliers from the Manual D fitting tables.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-blue-300"># Available Static Pressure (ASP):</div>
+            <div>ASP = ESP &minus; CPL&nbsp;&nbsp;&nbsp;[in. w.c.]</div>
+            <div class="mt-1 text-slate-400">&nbsp;&nbsp;ESP = Equipment external static pressure (in. w.c.)</div>
+            <div class="text-slate-400">&nbsp;&nbsp;CPL = Sum of component pressure losses (coil, filter, grilles, etc.)</div>
+            <div class="mt-4 text-blue-300"># Total Effective Length (TEL):</div>
+            <div>TEL = L_straight + &Sigma; L_fittings_equivalent&nbsp;&nbsp;&nbsp;[ft]</div>
+            <div class="mt-4 text-blue-300"># Design Friction Rate:</div>
+            <div>FR = (ASP &times; 100) / TEL&nbsp;&nbsp;&nbsp;[in. w.c. per 100 ft]</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What is ESP?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The equipment external static pressure is the rated available pressure printed on the blower
+                performance table — typically 0.3–0.8 in. w.c. for residential systems. Some modulating
+                equipment shows ESP at multiple speeds.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">CPL components</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Component pressure losses include: cooling coil (0.10–0.20 iwc), filter (0.10–0.20 iwc clean,
+                more when dirty), each supply grille or diffuser (0.03–0.07 iwc), zone dampers, humidifiers,
+                UV lights, and any inline accessories.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Fitting EL factors</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Manual D Appendix 2 lists equivalent length multipliers for every fitting type. A 90° mitered
+                elbow might be 55 ft equivalent length; a swept elbow 10 ft; a wye 15 ft. Oversimplifying
+                fittings is a leading cause of noisy duct systems.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Design for longest run</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The friction rate derived from the longest supply run (the 'index circuit') governs all duct
+                sizing. Shorter runs are sized to the same friction rate and balanced with dampers or by
+                downsizing branch ducts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three scenarios showing a well-designed system, a high friction-rate condition, and an
+          oversized-ductwork case.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Balanced residential design — ESP 0.50, CPL 0.20, straight 100 ft, fittings EL 150 ft
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              ASP = 0.50 &minus; 0.20 = <span class="font-bold">0.30 in. w.c.</span><br />
+              TEL = 100 + 150 = <span class="font-bold">250 ft</span><br />
+              FR = (0.30 &times; 100) / 250 = <span class="font-bold text-blue-700">0.12 in. w.c./100'</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 0.12 in. w.c./100' sits in the
+              0.10–0.15 target range — a well-proportioned system ready for friction-chart duct sizing.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                High resistance system — ESP 0.50, CPL 0.20, straight 50 ft, fittings EL 50 ft
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              ASP = 0.50 &minus; 0.20 = <span class="font-bold">0.30 in. w.c.</span><br />
+              TEL = 50 + 50 = <span class="font-bold">100 ft</span><br />
+              FR = (0.30 &times; 100) / 100 = <span class="font-bold text-red-600">0.30 in. w.c./100'</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 0.30 in. w.c./100' is well above the
+              0.18 limit — this triggers the high noise risk warning. Short runs with high ASP require
+              either reducing component losses or specifying larger duct sizes to slow velocity.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Oversized ductwork — ESP 0.50, CPL 0.30, straight 200 ft, fittings EL 150 ft
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              ASP = 0.50 &minus; 0.30 = <span class="font-bold">0.20 in. w.c.</span><br />
+              TEL = 200 + 150 = <span class="font-bold">350 ft</span><br />
+              FR = (0.20 &times; 100) / 350 = <span class="font-bold text-amber-600">0.057 in. w.c./100'</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 0.057 in. w.c./100' falls below 0.06
+              — triggering the oversized ductwork warning. Ducts sized to this friction rate will be
+              excessively large, increasing sheet-metal costs and producing low-velocity stratification at
+              supply registers.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about Manual D duct friction rate design."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="blue" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacDuctFrictionRateCalculator } from "@/scripts/calculators/hvac-duct-friction-rate-calculator";
+    initHvacDuctFrictionRateCalculator();
+  </script>
+</Layout>

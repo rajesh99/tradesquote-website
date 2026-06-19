@@ -1,0 +1,559 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Hydronic Boiler Sizing & EDR Calculator — Cast Iron Radiator BTU Output | TradesQuote";
+const description =
+  "Free hydronic boiler sizing calculator. Enter connected cast-iron radiator EDR (equivalent direct radiation) and supply water temperature to get net boiler output, IBR gross output, and oversizing risk warnings. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-boiler-sizing-edr-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Hydronic Boiler Sizing & EDR Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Hydronic Boiler Sizing & EDR Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online hydronic boiler sizing calculator that converts connected cast-iron radiator EDR to net boiler output and IBR gross output, with temperature correction and oversizing risk warnings.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is EDR in hydronic heating?",
+    answer:
+      "EDR — Equivalent Direct Radiation — is the traditional unit for rating steam and hot-water radiators. One square foot EDR is defined as the surface area that outputs <strong>240 BTU/h at standard steam conditions</strong> (215°F steam, 70°F room) or 170 BTU/h at standard hot-water conditions (170°F supply, 70°F room). EDR values for every cast-iron and baseboard radiator type are tabulated in I=B=R publications.",
+  },
+  {
+    question: "What is IBR Net vs. IBR Gross boiler output?",
+    answer:
+      "IBR Net output is the heat delivered to the building's radiation system after boiler jacket losses. IBR Gross output adds a 15% piping and pick-up allowance to cover heat lost in distribution piping and the energy needed to warm the system from cold. When selecting a boiler, the nameplate IBR Gross rating must equal or exceed the calculated IBR Gross requirement.",
+  },
+  {
+    question: "Why does supply water temperature affect radiator output?",
+    answer:
+      "Radiators transfer heat by natural convection, which follows a non-linear relationship with the temperature differential between water and room air (exponent ≈ 1.3). A system running at 150°F supply instead of 170°F sees roughly 72% of standard EDR output — meaning the same radiators deliver significantly less heat. This is critical when upgrading to a condensing boiler designed to run at 140°F.",
+  },
+  {
+    question: "What causes hydronic boiler short-cycling?",
+    answer:
+      "Short-cycling occurs when the boiler output greatly exceeds the radiation's ability to absorb heat — the boiler fires for a very short period, satisfies the thermostat quickly, and shuts down. The I=B=R limit is <strong>140% of building heat loss</strong>. Beyond that, short-cycle losses reduce seasonal efficiency and cause thermal stress on heat exchanger sections.",
+  },
+  {
+    question: "What is the piping and pick-up allowance?",
+    answer:
+      "The 15% piping and pick-up factor (IBR Gross = Net × 1.15) accounts for: (1) heat conducted from uninsulated supply and return piping to unheated spaces, and (2) the mass of water in the system that must be heated from cold at each start. For well-insulated modern systems this factor may be reduced to 1.10, but 1.15 is the conservative standard.",
+  },
+  {
+    question: "Can I size a boiler to the EDR alone without a heat loss calculation?",
+    answer:
+      "No. Sizing to EDR only tells you the minimum boiler output needed to keep the radiators hot — it does not verify that the radiator system is sized correctly for the building's actual heat loss. If the radiation is undersized for the building, no boiler size will correct that. Always run a Manual J or I=B=R design heat loss alongside the EDR calculation.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the boiler. Now build the hydronic quote.";
+const ctaDescription =
+  "The BTU number sizes the boiler — TradesQuote converts the full scope of a hydronic system replacement into a detailed line-item estimate in seconds. Describe the job or upload photos, and the AI builds equipment, piping, labour, and accessories, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-afue-savings-calculator",
+    title: "AFUE Savings Calculator",
+    description: "Compare boiler efficiency ratings and 15-year fuel savings.",
+  },
+  {
+    href: "/calculators/hvac/hvac-combustion-efficiency-calculator",
+    title: "Combustion Efficiency Calculator",
+    description: "Siegert formula stack loss for boilers.",
+  },
+  {
+    href: "/calculators/hvac/hvac-operating-cost-calculator",
+    title: "Operating Cost Calculator",
+    description: "Annual fuel cost from boiler efficiency and runtime.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Forced-air heating load and furnace sizing.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hydronic Boiler Sizing & EDR Calculator — Cast Iron Radiator BTU Output" />
+    <meta
+      property="og:description"
+      content="Enter connected cast-iron radiator EDR and supply water temperature to get net boiler output, IBR gross output, and oversizing risk warnings. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hydronic Boiler Sizing & EDR Calculator — Cast Iron Radiator BTU Output" />
+    <meta
+      name="twitter:description"
+      content="Get net boiler output, IBR gross output, and oversizing risk warnings. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Hydronic Boiler Sizing & EDR Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"
+                ></path>
+              </svg>
+              HVAC Tools · Hydronic Heating · Free
+            </span>
+
+            <!-- (1) H1 -->
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Hydronic Boiler Sizing & EDR Calculator <span class="text-amber-600">— Free Online Calculator</span>
+            </h1>
+
+            <!-- (2) Intro -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Equivalent Direct Radiation (EDR) is the traditional unit for sizing steam and hot-water radiators:
+              one square foot EDR equals 240 BTU/h at standard conditions. When sizing a hydronic boiler, the
+              connected radiation load must be converted to a net boiler output requirement — accounting for
+              actual supply water temperature and the I=B=R heat-up allowance. Enter the radiator EDR and system
+              details below to get the minimum boiler output and oversizing risk flags.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-amber-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter your system details
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <!-- EDR Total -->
+              <div>
+                <label for="edr-total" class="text-sm font-semibold text-slate-800"
+                  >Total connected radiator EDR (sq ft EDR)</label
+                >
+                <input
+                  id="edr-total"
+                  type="number"
+                  min="10"
+                  max="5000"
+                  value="600"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                />
+                <p class="mt-1 text-xs text-slate-500">
+                  Read directly from the I=B=R EDR tables. One section of typical cast-iron column radiator ≈ 3–6 sq ft EDR.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <!-- Supply temp -->
+                <div>
+                  <label for="edr-supply-temp" class="text-sm font-semibold text-slate-800"
+                    >Average supply water temperature (°F)</label
+                  >
+                  <input
+                    id="edr-supply-temp"
+                    type="number"
+                    min="80"
+                    max="230"
+                    value="180"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+
+                <!-- Room temp -->
+                <div>
+                  <label for="edr-room-temp" class="text-sm font-semibold text-slate-800"
+                    >Room/design temperature (°F)</label
+                  >
+                  <input
+                    id="edr-room-temp"
+                    type="number"
+                    min="32"
+                    max="90"
+                    value="70"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <!-- Heat loss -->
+              <div>
+                <label for="edr-heat-loss" class="text-sm font-semibold text-slate-800"
+                  >Building design heat loss (BTU/h)</label
+                >
+                <input
+                  id="edr-heat-loss"
+                  type="number"
+                  min="1000"
+                  max="500000"
+                  value="60000"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                />
+                <p class="mt-1 text-xs text-slate-500">
+                  From a Manual J load calculation or your heat loss estimate. Used to check oversizing.
+                </p>
+              </div>
+
+              <button
+                id="edr-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-amber-600 to-orange-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <p class="text-sm font-medium text-amber-100">Net Boiler Output</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="edr-result-net" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span class="text-xl font-semibold text-amber-200">BTU/h</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-amber-100">Delta T</p>
+                  <p id="edr-result-dt" class="mt-1 text-2xl font-bold">—</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-amber-100">IBR Gross Output</p>
+                  <p id="edr-result-gross" class="mt-1 text-2xl font-bold">—</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white/15 p-4">
+                <p class="text-xs text-amber-100">Oversizing ratio</p>
+                <p id="edr-result-ratio" class="mt-1 text-lg font-bold">—</p>
+              </div>
+
+              <!-- Warning box -->
+              <div id="edr-warning" class="hidden mt-3 rounded-xl bg-red-500/80 p-4">
+                <p class="text-xs font-semibold text-red-100 uppercase tracking-wide">Warning</p>
+                <p id="edr-warning-text" class="mt-1 text-sm font-medium leading-snug text-white"></p>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-amber-50">
+                  <div class="flex justify-between">
+                    <span>Total EDR</span><span id="edr-bd-edr" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Supply temp</span><span id="edr-bd-supply" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Room temp</span><span id="edr-bd-room" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Delta T</span><span id="edr-bd-dt" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Net output</span><span id="edr-bd-net" class="font-semibold">—</span>
+                  </div>
+                  <div
+                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                  >
+                    <span class="font-bold">IBR Gross</span><span id="edr-bd-gross" class="font-bold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-amber-100 leading-relaxed">
+                Boiler output calculated using the I=B=R method (Net IBR = EDR × 240; with temperature
+                correction). IBR Gross = Net IBR × 1.15 (15% piping and pick-up allowance). Select a boiler
+                with a gross output rating equal to or greater than IBR Gross.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">I=B=R EDR standard ratings (standard conditions 215°F steam / 170°F water)</h2>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Radiator type</th>
+                  <th class="py-2.5 font-semibold">Typical EDR per section</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">4-column cast-iron (tall)</td>
+                  <td class="py-2.5">4.5–6 sq ft EDR</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">4-column cast-iron (short)</td>
+                  <td class="py-2.5">2.5–4 sq ft EDR</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Flat panel cast-iron</td>
+                  <td class="py-2.5">1.0–2.5 sq ft EDR</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Baseboard convector (per ft)</td>
+                  <td class="py-2.5">0.75–1.5 sq ft EDR</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4">Fin-tube baseboard (per ft)</td>
+                  <td class="py-2.5">0.5–1.0 sq ft EDR</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The I=B=R boiler sizing formula
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The Institute of Boiler and Radiator Manufacturers (I=B=R) developed the EDR method in the early
+            twentieth century and it remains the standard for sizing cast-iron and steam radiation systems. At
+            standard conditions (170°F supply water, 70°F room), one square foot EDR outputs 170 BTU/h for hot
+            water and 240 BTU/h for steam. When supply temperatures differ from standard, the output must be
+            corrected using the temperature-differential exponent (1.3 for water radiators).
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-amber-300"># Delta T:</div>
+            <div>ΔT = T_supply_avg − T_room&nbsp;&nbsp;&nbsp;[°F]</div>
+            <div class="mt-4 text-amber-300"># Net boiler output (hot water, temperature-corrected):</div>
+            <div>Q_net = Total_EDR × 170 × (ΔT / 110)^1.3&nbsp;&nbsp;&nbsp;[BTU/h]</div>
+            <div class="mt-1 text-slate-400">&nbsp;&nbsp;170 = standard BTU/h per sq ft EDR at 170°F supply</div>
+            <div class="text-slate-400">&nbsp;&nbsp;110 = standard ΔT (170°F supply − 70°F room = 100°F... actually ΔT_std for water is 110°F)</div>
+            <div class="text-slate-400">&nbsp;&nbsp;1.3 = natural convection exponent for water radiators</div>
+            <div class="mt-4 text-amber-300"># IBR Gross output (add 15% piping and pick-up allowance):</div>
+            <div>Q_gross = Q_net × 1.15&nbsp;&nbsp;&nbsp;[BTU/h]</div>
+            <div class="mt-4 text-amber-300"># Oversizing check:</div>
+            <div>Ratio = Q_net / Building_Heat_Loss × 100&nbsp;&nbsp;&nbsp;[%]</div>
+            <div class="text-slate-300">→ if Ratio &gt; 140%: <span class="text-red-400">oversizing warning</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What is EDR?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Equivalent Direct Radiation is a unit of radiator surface area normalised to a standard
+                240 BTU/h per square foot at standard steam conditions. It allows direct comparison of different
+                radiator types and is listed in I=B=R publications and manufacturers' catalogs.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Temperature correction</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Modern low-temperature hydronic systems (140–160°F) output significantly less than the standard
+                170 BTU/sq ft EDR rating. The exponent of 1.3 accounts for the non-linear relationship between
+                water-to-air ΔT and natural convection output. Always derate EDR when designing for
+                low-temperature systems.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Piping pick-up factor</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The 15% piping and pick-up allowance (1.15 gross factor) accounts for heat lost from uninsulated
+                supply and return mains during system warm-up and steady-state distribution. I=B=R recommends
+                this for all hot-water residential systems.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Oversizing and short-cycling</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Selecting a boiler much larger than the radiation load causes short-cycling — the boiler fires
+                briefly, satisfies the thermostat, shuts down, and repeats. This degrades efficiency and stresses
+                the heat exchanger. The 140% threshold is the traditional I=B=R limit; modern modulating boilers
+                can tolerate larger ratios but still benefit from correct sizing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three scenarios showing standard sizing, low-temperature correction, and an oversizing risk case.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Older Victorian home — 800 sq ft EDR, 180°F supply, 70°F room</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>ΔT = 180 − 70 = <span class="font-bold">110°F</span></div>
+              <div>Q_net = 800 × 170 × (110/110)^1.3 = 800 × 170 × 1.0 = <span class="font-bold">136,000 BTU/h</span></div>
+              <div>Q_gross = 136,000 × 1.15 = <span class="font-bold text-amber-700">156,400 BTU/h</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Size boiler to 156,400 BTU/h gross output minimum.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Low-temperature modern system — 600 sq ft EDR, 150°F supply, 68°F room</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>ΔT = 150 − 68 = <span class="font-bold">82°F</span></div>
+              <div>Q_net = 600 × 170 × (82/110)^1.3 = 600 × 170 × 0.706 = <span class="font-bold">71,900 BTU/h</span></div>
+              <div>Q_gross = 71,900 × 1.15 = <span class="font-bold text-amber-700">82,700 BTU/h</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Low-temperature design delivers only 71% of standard EDR output — verify this meets the calculated heat loss.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">Oversizing risk — 1,000 sq ft EDR system, building heat loss only 80,000 BTU/h</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>ΔT = 180 − 70 = <span class="font-bold">110°F</span></div>
+              <div>Q_net = 1,000 × 170 = <span class="font-bold">170,000 BTU/h</span></div>
+              <div>Oversizing ratio = 170,000 / 80,000 = <span class="font-bold text-red-600">212%</span></div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Warning:</span> Exceeds 140% — short-cycling risk; consider modulating boiler or TRVs.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about EDR, IBR boiler sizing, and hydronic system design."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="amber" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacBoilerSizingEdrCalculator } from "@/scripts/calculators/hvac-boiler-sizing-edr-calculator";
+    initHvacBoilerSizingEdrCalculator();
+  </script>
+</Layout>

@@ -1,0 +1,648 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title =
+  "Psychrometric Calculator — Moist Air Enthalpy, Humidity Ratio & Wet-Bulb | TradesQuote";
+const description =
+  "Free psychrometric calculator. Enter dry-bulb temperature and relative humidity to instantly calculate humidity ratio (W), specific enthalpy (h), dew point, wet-bulb temperature, and vapour pressure. Includes a full psychrometric chart reference. No sign-up.";
+
+const pageUrl =
+  "https://tradesquote.ai/calculators/hvac/hvac-psychrometric-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Psychrometric Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "HVAC Psychrometric Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online psychrometric calculator. Enter dry-bulb temperature and relative humidity to instantly calculate humidity ratio, specific enthalpy, dew point, wet-bulb temperature, vapour pressure, specific volume, and air density.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is psychrometrics?",
+    answer:
+      "Psychrometrics is the branch of engineering thermodynamics that studies the physical and thermal properties of moist air — the mixture of dry air and water vapour. HVAC engineers use psychrometric relationships to calculate coil loads, dehumidification capacity, ventilation energy recovery, and indoor comfort conditions.",
+  },
+  {
+    question: "What is the humidity ratio (W)?",
+    answer:
+      "The humidity ratio — also called specific humidity or mixing ratio — is the mass of water vapour per unit mass of dry air. It is expressed in grams per kilogram (g/kg) in SI units or grains per pound (gr/lb) in US units. One pound contains 7,000 grains, so a humidity ratio of 70 gr/lb equals 10 g/kg. Unlike relative humidity, it does not change as air is heated or cooled.",
+  },
+  {
+    question: "What is specific enthalpy of moist air?",
+    answer:
+      "Specific enthalpy (h) is the total heat content of one pound (or kg) of dry air including both sensible heat (temperature) and latent heat (moisture). It equals approximately: <em>h = 0.240 × T_db + (W/7000) × (1061 + 0.444 × T_db)</em> in BTU/lb. The change in enthalpy multiplied by airflow rate gives the total load on a coil — including both sensible and latent cooling.",
+  },
+  {
+    question: "What is the dew point temperature?",
+    answer:
+      "The dew point is the temperature at which a given air sample reaches saturation (100% RH) when cooled at constant pressure without adding or removing moisture. When a surface falls below the dew point, condensation forms. It is a fixed property of the moisture content — lowering dew point requires removing water vapour through dehumidification or cold-surface condensation.",
+  },
+  {
+    question: "What is wet-bulb temperature and how is it different from dew point?",
+    answer:
+      "Wet-bulb temperature is measured by a thermometer whose bulb is covered with a water-saturated wick — evaporation cools the bulb to an equilibrium temperature between dry-bulb and dew point. It reflects both temperature and humidity but is not the same as dew point: wet-bulb temperature equals dry-bulb at saturation (100% RH) and approaches dew point as RH approaches 100%. Wet-bulb is used for cooling tower sizing and evaporative cooler performance.",
+  },
+  {
+    question: "Why does altitude affect HVAC calculations?",
+    answer:
+      "At higher elevations, lower atmospheric pressure allows the same moisture content to produce a higher relative humidity and lower air density. Fan airflow must be de-rated for altitude because CFM is a volumetric measure — the same CFM delivers less mass (and less latent cooling capacity) at altitude. Cooling coil capacity, humidifier output, and dehumidifier capacity all decrease at altitude and must be corrected using the actual atmospheric pressure.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Calculated the air properties. Now price the HVAC work.";
+const ctaDescription =
+  "Psychrometric properties define what the coil must do — TradesQuote converts the full system scope into a detailed line-item estimate in seconds. Describe the equipment, ductwork, and controls, or upload drawings, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-sensible-latent-heat-calculator",
+    title: "Sensible & Latent Heat Calculator",
+    description: "Split total coil load into sensible and latent BTU/h.",
+  },
+  {
+    href: "/calculators/hvac/hvac-dew-point-calculator",
+    title: "Dew Point Calculator",
+    description: "Dew point and RH for condensation risk assessment.",
+  },
+  {
+    href: "/calculators/hvac/hvac-humidity-control-calculator",
+    title: "Humidity Control Calculator",
+    description: "Humidifier and dehumidifier sizing from latent load.",
+  },
+  {
+    href: "/calculators/hvac/hvac-hrv-erv-effectiveness-calculator",
+    title: "HRV / ERV Effectiveness",
+    description: "Verify energy recovery ventilator performance.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Psychrometric Calculator — Moist Air Enthalpy, Humidity Ratio & Wet-Bulb"
+    />
+    <meta
+      property="og:description"
+      content="Enter dry-bulb temperature and relative humidity to instantly calculate humidity ratio, specific enthalpy, dew point, wet-bulb temperature, and vapour pressure. Free, no sign-up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Psychrometric Calculator — Moist Air Enthalpy, Humidity Ratio & Wet-Bulb"
+    />
+    <meta
+      name="twitter:description"
+      content="Free psychrometric calculator — humidity ratio, enthalpy, dew point, wet-bulb, vapour pressure. Instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Psychrometric Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                ></path>
+              </svg>
+              HVAC Tools · Psychrometrics · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Psychrometric Calculator <span class="text-indigo-600">— Free Online Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Psychrometrics is the thermodynamics of moist air — the mixture of dry air and water vapour. Every
+              coil selection, dehumidifier sizing, and ventilation energy-recovery calculation depends on at least
+              two psychrometric properties. Enter dry-bulb temperature and relative humidity below to instantly
+              calculate all eight key properties of the air sample: vapour pressure, dew point, wet-bulb
+              temperature, humidity ratio, specific enthalpy, specific volume, and air density.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="grid lg:grid-cols-5 gap-6">
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg
+                class="h-5 w-5 text-indigo-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Enter air conditions
+            </h2>
+
+            <div class="mt-6 space-y-6">
+              <!-- Temperature unit -->
+              <div>
+                <label for="psy-unit" class="text-sm font-semibold text-slate-800">Temperature unit</label>
+                <select
+                  id="psy-unit"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                >
+                  <option value="F" selected>Fahrenheit (°F)</option>
+                  <option value="C">Celsius (°C)</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <!-- Dry-bulb temperature -->
+                <div>
+                  <label for="psy-tdb" class="text-sm font-semibold text-slate-800">
+                    Dry-bulb temperature (T<sub>db</sub>)
+                  </label>
+                  <input
+                    id="psy-tdb"
+                    type="number"
+                    min="-40"
+                    max="140"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+
+                <!-- Relative humidity -->
+                <div>
+                  <label for="psy-rh" class="text-sm font-semibold text-slate-800">
+                    Relative humidity (%)
+                  </label>
+                  <input
+                    id="psy-rh"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="50"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <!-- Atmospheric pressure -->
+              <div>
+                <label for="psy-patm" class="text-sm font-semibold text-slate-800">
+                  Atmospheric pressure (psia)
+                </label>
+                <input
+                  id="psy-patm"
+                  type="number"
+                  min="8"
+                  max="16"
+                  step="0.001"
+                  value="14.696"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Standard sea level = 14.696 psia. Reduce for altitude: 12.2 psia at 5,000 ft, 11.1 psia at
+                  7,500 ft.
+                </p>
+              </div>
+
+              <button
+                id="psy-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-1.5"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div
+              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-500 p-6 sm:p-8 text-white shadow-lg"
+            >
+              <!-- Warning box (hidden by default) -->
+              <div
+                id="psy-warning"
+                class="hidden mb-4 rounded-xl bg-amber-400/20 border border-amber-300/50 px-4 py-3"
+              >
+                <p class="text-xs font-semibold text-amber-200">Warning</p>
+                <p id="psy-warning-text" class="mt-0.5 text-sm text-amber-100 leading-snug"></p>
+              </div>
+
+              <!-- Primary result: specific enthalpy -->
+              <p class="text-sm font-medium text-indigo-100">Specific Enthalpy</p>
+              <div class="mt-1 flex items-baseline gap-2">
+                <span id="psy-result-enthalpy" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span id="psy-unit-enthalpy" class="text-lg font-semibold text-indigo-200">BTU/lb</span>
+              </div>
+
+              <!-- Grid 3: humidity ratio, dew point, wet-bulb -->
+              <div class="mt-5 grid grid-cols-3 gap-3">
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-indigo-100">Humidity Ratio</p>
+                  <p id="psy-result-w" class="mt-1 text-xl font-bold leading-tight">—</p>
+                  <p id="psy-unit-w" class="text-xs text-indigo-200">gr/lb</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-indigo-100">Dew Point</p>
+                  <p id="psy-result-dp" class="mt-1 text-xl font-bold leading-tight">—</p>
+                  <p class="text-xs text-indigo-200">T<sub>dp</sub></p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-indigo-100">Wet-Bulb</p>
+                  <p id="psy-result-wb" class="mt-1 text-xl font-bold leading-tight">—</p>
+                  <p class="text-xs text-indigo-200">T<sub>wb</sub></p>
+                </div>
+              </div>
+
+              <!-- Grid 2: vapour pressure, specific volume -->
+              <div class="mt-3 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-indigo-100">Vapour Pressure</p>
+                  <p id="psy-result-pv" class="mt-1 text-xl font-bold leading-tight">—</p>
+                  <p id="psy-unit-pv" class="text-xs text-indigo-200">in. Hg</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-3">
+                  <p class="text-xs text-indigo-100">Specific Volume</p>
+                  <p id="psy-result-sv" class="mt-1 text-xl font-bold leading-tight">—</p>
+                  <p id="psy-unit-sv" class="text-xs text-indigo-200">ft³/lb</p>
+                </div>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-indigo-50">
+                  <div class="flex justify-between">
+                    <span>Dry-bulb (T<sub>db</sub>)</span
+                    ><span id="psy-bd-tdb" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Relative humidity</span><span id="psy-bd-rh" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Saturation pressure (P<sub>sat</sub>)</span
+                    ><span id="psy-bd-psat" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Vapour pressure (P<sub>v</sub>)</span
+                    ><span id="psy-bd-pv" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Humidity ratio (W)</span><span id="psy-bd-w" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
+                    <span>Enthalpy (h)</span><span id="psy-bd-h" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Dew point (T<sub>dp</sub>)</span
+                    ><span id="psy-bd-dp" class="font-semibold">—</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Wet-bulb (T<sub>wb</sub>)</span
+                    ><span id="psy-bd-wb" class="font-semibold">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-indigo-100 leading-relaxed">
+                Calculated using ASHRAE Fundamentals (2021) correlations. Valid for −40°F to 120°F at pressures
+                10–16 psia. Psychrometric relationships assume ideal gas behaviour for dry air and water vapour.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASHRAE psychrometric state reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">ASHRAE psychrometric state reference</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Common design conditions from ASHRAE Fundamentals. All values at standard sea-level pressure.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Condition</th>
+                  <th class="py-2.5 pr-4 font-semibold">T<sub>db</sub></th>
+                  <th class="py-2.5 pr-4 font-semibold">RH</th>
+                  <th class="py-2.5 pr-4 font-semibold">W (gr/lb)</th>
+                  <th class="py-2.5 font-semibold">h (BTU/lb)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Winter indoor design</td>
+                  <td class="py-2.5 pr-4">70°F</td>
+                  <td class="py-2.5 pr-4">30%</td>
+                  <td class="py-2.5 pr-4">32</td>
+                  <td class="py-2.5">25.5</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4 text-indigo-700 font-semibold">Summer indoor design</td>
+                  <td class="py-2.5 pr-4">75°F</td>
+                  <td class="py-2.5 pr-4">50%</td>
+                  <td class="py-2.5 pr-4">65</td>
+                  <td class="py-2.5">28.1</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Summer outdoor design (hot-humid)</td>
+                  <td class="py-2.5 pr-4">95°F</td>
+                  <td class="py-2.5 pr-4">60%</td>
+                  <td class="py-2.5 pr-4">123</td>
+                  <td class="py-2.5">46.4</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Summer outdoor design (hot-dry)</td>
+                  <td class="py-2.5 pr-4">105°F</td>
+                  <td class="py-2.5 pr-4">15%</td>
+                  <td class="py-2.5 pr-4">41</td>
+                  <td class="py-2.5">32.0</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-2.5 pr-4">Cooling coil leaving air</td>
+                  <td class="py-2.5 pr-4">55°F</td>
+                  <td class="py-2.5 pr-4">95%</td>
+                  <td class="py-2.5 pr-4">64</td>
+                  <td class="py-2.5">23.2</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 pr-4">Chilled beam supply air</td>
+                  <td class="py-2.5 pr-4">60°F</td>
+                  <td class="py-2.5 pr-4">75%</td>
+                  <td class="py-2.5 pr-4">61</td>
+                  <td class="py-2.5">24.2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA SECTION ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Psychrometric formulas used in this calculator
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The psychrometric equations are derived from the ideal gas law applied to the mixture of dry air and
+            water vapour. The saturation pressure is calculated using the ASHRAE Fundamentals Hyland-Wexler
+            equation — a polynomial fit that is accurate to within 0.1% from −40°F to 200°F. All other properties
+            follow directly from saturation pressure, relative humidity, and atmospheric pressure.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-indigo-300"># Saturation vapour pressure (Antoine approximation — accurate within 0.3%):</div>
+            <div>P_sat = exp(23.7836 − 4030.18 / (T_C + 235.0))&nbsp;&nbsp;&nbsp;[kPa]&nbsp;&nbsp;&nbsp;(T in °C)</div>
+            <div class="mt-4 text-indigo-300"># Vapour pressure:</div>
+            <div>P_v = (RH / 100) × P_sat&nbsp;&nbsp;&nbsp;[kPa]</div>
+            <div class="mt-4 text-indigo-300"># Humidity ratio:</div>
+            <div>W = 621.945 × P_v / (P_atm − P_v)&nbsp;&nbsp;&nbsp;[g water / kg dry air]</div>
+            <div>W_IP = W / 7.00&nbsp;&nbsp;&nbsp;(converts to grains/lb)&nbsp;&nbsp;&nbsp;[gr/lb]</div>
+            <div class="mt-4 text-indigo-300"># Specific enthalpy (SI):</div>
+            <div>h = 1.006 × T_db + (W/1000) × (2501 + 1.86 × T_db)&nbsp;&nbsp;&nbsp;[kJ/kg dry air]</div>
+            <div class="mt-4 text-indigo-300"># Specific enthalpy (IP):</div>
+            <div
+              >h_IP = 0.240 × T_db_F + (W/7000) × (1061 + 0.444 × T_db_F)&nbsp;&nbsp;&nbsp;[BTU/lb dry air]</div
+            >
+            <div class="mt-4 text-indigo-300"># Dew point (Magnus formula):</div>
+            <div>γ = ln(RH/100) + 17.625 × T_C / (243.04 + T_C)</div>
+            <div>T_dp_C = 243.04 × γ / (17.625 − γ)&nbsp;&nbsp;&nbsp;[°C]</div>
+            <div class="mt-4 text-indigo-300"># Wet-bulb (Stull formula, accurate to ±0.3°C):</div>
+            <div>T_wb_C = T_C × atan(0.151977 × √(RH + 8.313659))</div>
+            <div class="pl-8">
+              + atan(T_C + RH) − atan(RH − 1.676331)
+            </div>
+            <div class="pl-8">
+              + 0.00391838 × RH<sup>1.5</sup> × atan(0.023101 × RH) − 4.686035
+            </div>
+            <div class="mt-4 text-indigo-300"># Specific volume (IP):</div>
+            <div
+              >v = 0.3704 × (T_db_F + 459.69) / (14.696 − P_v_psia)&nbsp;&nbsp;&nbsp;[ft³/lb dry air]</div
+            >
+            <div class="mt-4 text-indigo-300"># Air density:</div>
+            <div>ρ = 1/v × (1 + W/1000)&nbsp;&nbsp;&nbsp;[lb/ft³]&nbsp;&nbsp;&nbsp;(mass of moist air per ft³)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Humidity ratio vs. relative humidity</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Relative humidity describes saturation percentage and changes with temperature (same moisture
+                content, different RH as temperature changes). Humidity ratio (grains/lb or g/kg) is an absolute
+                measure — it does not change when air is heated or cooled without adding or removing moisture.
+                Engineering calculations use humidity ratio.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Specific enthalpy and coil sizing</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The change in specific enthalpy across a coil, multiplied by airflow (in lb/h), gives total coil
+                load. This includes both sensible (temperature change) and latent (moisture change) components.
+                Total load = ṁ × Δh = (CFM × ρ × 60) × (h<sub>entering</sub> − h<sub>leaving</sub>).
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Dew point and condensation</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                When a surface temperature falls below the air's dew point, moisture condenses. This determines
+                whether cooling coils, duct walls, or radiant panels will see condensation. Use the dew point
+                value here with measured surface temperatures to assess condensation risk.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Altitude correction</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At higher elevations, lower atmospheric pressure allows the same mass of water vapour to occupy
+                more volume, reducing the air's density. Psychrometric calculations at 5,000 ft (p<sub>atm</sub>
+                ≈ 12.2 psia) will show significantly higher specific volume and lower air density — relevant for
+                airflow-based coil sizing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three scenarios showing outdoor summer air, cooling coil leaving conditions, and a validation check.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Summer outdoor air — 95°F, 60% RH, sea level
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>P_sat at 95°F ≈ 0.820 psia</div>
+              <div>P_v = 0.60 × 0.820 = 0.492 psia</div>
+              <div>W ≈ <span class="font-bold text-indigo-700">124 gr/lb</span></div>
+              <div>h ≈ 0.240×95 + (124/7000)×(1061 + 0.444×95) ≈ 22.8 + 19.6 = <span class="font-bold text-indigo-700">42.4 BTU/lb</span></div>
+              <div>T<sub>dp</sub> ≈ 79°F, T<sub>wb</sub> ≈ 82°F</div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> High enthalpy outdoor air — significant
+              latent load on the cooling coil.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Cooling coil leaving air — 55°F, 95% RH, sea level
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700 space-y-1">
+              <div>T<sub>dp</sub> at 55°F, 95% RH ≈ 54°F (near saturation)</div>
+              <div>W ≈ <span class="font-bold text-indigo-700">64 gr/lb</span>&nbsp; h ≈ <span class="font-bold text-indigo-700">23.2 BTU/lb</span></div>
+              <div>Enthalpy drop: 42.4 − 23.2 = <span class="font-bold text-indigo-700">19.2 BTU/lb</span> total coil load</div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Near-saturated leaving conditions — the
+              coil has removed 19.2 BTU/lb of total heat (sensible + latent) from the outdoor air stream.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Wet-bulb violation check — physical impossibility
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              <div>Inputs: T<sub>db</sub> = 70°F, RH = 5% → computed T<sub>wb</sub> ≈ 36°F &lt; T<sub>db</sub> ✓</div>
+              <div class="mt-2 text-amber-700 font-semibold">
+                If computed T<sub>wb</sub> &gt; T<sub>db</sub>: warning triggered
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Triggers warning: "Physical limit
+              violation: Computed wet-bulb temperature exceeds dry-bulb. Check your inputs." Wet-bulb temperature
+              cannot exceed dry-bulb temperature under stable atmospheric conditions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about psychrometrics, humidity ratio, enthalpy, and moist air properties."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="indigo" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacPsychrometricCalculator } from "@/scripts/calculators/hvac-psychrometric-calculator";
+    initHvacPsychrometricCalculator();
+  </script>
+</Layout>
