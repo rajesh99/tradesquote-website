@@ -2,6 +2,7 @@
 title: "How Many BTU Do I Need? AC Sizing for Every Room and Home"
 meta_title: "How Many BTU Do I Need? AC Sizing Guide | TradesQuote"
 description: "The right BTU for any room or home — the 20 BTU rule, adjustments for climate, ceiling height, sun, and insulation. Includes a quick-reference size table and worked examples."
+image: /images/posts/how-many-btu-do-i-need-hero.webp
 date: 2026-06-10T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

@@ -1,0 +1,20 @@
+---
+import { HVAC_EXTERNAL_LINK_CLASS } from "@/config/hvacExternalResources";
+
+interface Props {
+  href: string;
+  class?: string;
+  bold?: boolean;
+}
+
+const { href, class: className, bold = true } = Astro.props;
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  class:list={[bold ? HVAC_EXTERNAL_LINK_CLASS : "text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600", className]}
+>
+  <slot />
+</a>

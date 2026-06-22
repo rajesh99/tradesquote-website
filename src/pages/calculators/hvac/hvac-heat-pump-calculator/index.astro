@@ -7,21 +7,53 @@ import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
 import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
 import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
 import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import HvacExternalResources from "@/components/HvacExternalResources.astro";
+import HvacExternalLink from "@/components/HvacExternalLink.astro";
+import {
+  HEAT_PUMP_CALCULATOR_EXTERNAL_RESOURCES,
+  HVAC_AUTHORITY_URLS,
+  HVAC_EXTERNAL_LINK_CLASS,
+} from "@/config/hvacExternalResources";
 
-const title = "Heat Pump Sizing Calculator — What Size Heat Pump Do I Need? | TradesQuote";
+const ext = HVAC_EXTERNAL_LINK_CLASS;
+const u = HVAC_AUTHORITY_URLS;
+
+const title =
+  "Heat Pump Sizing Calculator — What Size Heat Pump Do I Need? | TradesQuote";
 const description =
   "Free heat pump sizing calculator. Estimate the BTU and tonnage you need for both heating and cooling — by home size, climate zone, insulation, and ceiling height — with cold-climate balance-point guidance. Instant, no sign-up.";
 
-const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-heat-pump-calculator";
+const pageUrl =
+  "https://tradesquote.ai/calculators/hvac/hvac-heat-pump-calculator";
 
 const breadcrumbData = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
-    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
-    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
-    { "@type": "ListItem", position: 4, name: "Heat Pump Sizing Calculator", item: pageUrl },
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://tradesquote.ai/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Calculators",
+      item: "https://tradesquote.ai/calculators",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "HVAC",
+      item: "https://tradesquote.ai/calculators/hvac",
+    },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "Heat Pump Sizing Calculator",
+      item: pageUrl,
+    },
   ],
 };
 
@@ -55,8 +87,7 @@ const faqs: CalculatorFaq[] = [
   },
   {
     question: "Do I need a cold-climate heat pump?",
-    answer:
-      "If your heating load is far above your cooling load (Zone 5+), yes — ENERGY STAR cold-climate models keep <strong>≥70% of rated capacity at 5°F</strong> and have <strong>HSPF2 ≥ 8.5</strong>, so they heat efficiently without leaning on resistance backup.",
+    answer: `If your heating load is far above your cooling load (Zone 5+), yes — <a href="${u.energystarColdClimateHp}" target="_blank" rel="noopener noreferrer" class="${ext}">ENERGY STAR cold-climate models</a> keep <strong>≥70% of rated capacity at 5°F</strong> and have <strong>HSPF2 ≥ 8.5</strong>, so they heat efficiently without leaning on resistance backup.`,
   },
   {
     question: "Should I oversize a heat pump for cold winters?",
@@ -65,8 +96,7 @@ const faqs: CalculatorFaq[] = [
   },
   {
     question: "How accurate is this vs. a Manual J?",
-    answer:
-      "It's a solid planning estimate using climate-zone BTU-per-sq-ft rules. A full <strong>ACCA Manual J</strong> accounts for windows, orientation, infiltration, and duct losses and is required for permits and warranties. Use this to plan, a Manual J to install.",
+    answer: `It's a solid planning estimate using climate-zone BTU-per-sq-ft rules. A full <a href="${u.accaManualJ}" target="_blank" rel="noopener noreferrer" class="${ext}">ACCA Manual J</a> accounts for windows, orientation, infiltration, and duct losses and is required for permits and warranties. Use this to plan, a Manual J to install.`,
   },
 ];
 const faqData = buildFaqPageSchema(faqs);
@@ -103,7 +133,10 @@ const relatedCalculators = [
   <Fragment slot="head">
     <link rel="canonical" href={pageUrl} />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Heat Pump Sizing Calculator — What Size Heat Pump Do I Need?" />
+    <meta
+      property="og:title"
+      content="Heat Pump Sizing Calculator — What Size Heat Pump Do I Need?"
+    />
     <meta
       property="og:description"
       content="Estimate the BTU and tonnage you need for both heating and cooling, with cold-climate balance-point guidance. Free and instant."
@@ -112,12 +145,18 @@ const relatedCalculators = [
     <meta property="og:site_name" content="TradesQuote" />
     <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Heat Pump Sizing Calculator — What Size Heat Pump Do I Need?" />
+    <meta
+      name="twitter:title"
+      content="Heat Pump Sizing Calculator — What Size Heat Pump Do I Need?"
+    />
     <meta
       name="twitter:description"
       content="Estimate heating and cooling load and tonnage for a heat pump. Free, instant, no sign-up."
     />
-    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(breadcrumbData)}
+    />
     <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
   </Fragment>
@@ -127,9 +166,15 @@ const relatedCalculators = [
 
     <main>
       <!-- ============================ HERO + H1 + INTRO ============================ -->
-      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+      <section
+        class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white"
+      >
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Heat Pump Sizing Calculator" />
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="Heat Pump Sizing Calculator"
+          />
 
           <div class="max-w-3xl">
             <span
@@ -143,46 +188,96 @@ const relatedCalculators = [
               HVAC Tools · Free
             </span>
 
-            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
-              Heat Pump Sizing Calculator <span class="text-indigo-600">— Free Online Calculator</span>
+            <h1
+              class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900"
+            >
+              Heat Pump Sizing Calculator <span class="text-indigo-600"
+                >— Free Online Calculator</span
+              >
             </h1>
 
             <p class="mt-5 text-lg text-slate-600 leading-relaxed">
-              A heat pump must handle both the summer cooling load and the winter heating load, and in most
-              US homes those two numbers are different. This tool estimates each from your home size, climate
-              zone, insulation, and ceiling height, recommends a tonnage, and flags when the heating load
-              outruns cooling so you know whether you need a cold-climate unit or backup heat.
+              A heat pump must handle both the summer cooling load and the
+              winter heating load, and in most US homes those two numbers are
+              different. This tool estimates each from your home size, climate
+              zone, insulation, and ceiling height, recommends a tonnage, and
+              flags when the heating load outruns cooling so you know whether
+              you need a cold-climate unit or backup heat.
             </p>
+
+            <div
+              class="mt-6 flex items-start gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-4"
+            >
+              <svg
+                class="h-5 w-5 shrink-0 text-indigo-600 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path></svg
+              >
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900"
+                  >Need just cooling or heating load separately?</span
+                >
+                Start with the
+                <a
+                  href="/calculators/hvac/hvac-btu-calculator"
+                  class="font-semibold text-indigo-700 underline decoration-indigo-300 hover:decoration-indigo-600"
+                  >BTU Calculator (cooling)</a
+                >
+                or the
+                <a
+                  href="/calculators/hvac/hvac-furnace-btu-calculator"
+                  class="font-semibold text-indigo-700 underline decoration-indigo-300 hover:decoration-indigo-600"
+                  >Furnace BTU Calculator</a
+                >
+                — then return here to size the heat pump.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
-      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <svg
-                class="h-5 w-5 text-indigo-600"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
-                ></path>
-              </svg>
-              Enter your home details
-            </h2>
+      <section
+        id="calculator"
+        class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12"
+      >
+        <div
+          class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm"
+        >
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg
+              class="h-5 w-5 text-indigo-600"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+              ></path>
+            </svg>
+            Size your heat pump
+          </h2>
 
-            <div class="mt-6 space-y-6">
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <!-- Inputs -->
+            <div class="space-y-6">
               <div>
                 <div class="flex items-center justify-between">
-                  <label for="hp-area" class="text-sm font-semibold text-slate-800">Home / floor area</label>
+                  <label
+                    for="hp-area"
+                    class="text-sm font-semibold text-slate-800"
+                    >Home / floor area</label
+                  >
                   <div class="flex items-center gap-1">
                     <input
                       id="hp-area"
@@ -211,21 +306,33 @@ const relatedCalculators = [
 
               <div class="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label for="hp-climate" class="text-sm font-semibold text-slate-800">Climate zone</label>
+                  <label
+                    for="hp-climate"
+                    class="text-sm font-semibold text-slate-800"
+                    >Climate zone</label
+                  >
                   <select
                     id="hp-climate"
                     class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
                   >
                     <option value="hot">Hot (IECC 1–2: FL, Gulf Coast)</option>
                     <option value="warm">Warm (Zone 3: South)</option>
-                    <option value="mixed" selected>Mixed (Zone 4: Mid-Atlantic)</option>
-                    <option value="cold">Cold (Zone 5: Midwest/Northeast)</option>
-                    <option value="verycold">Very cold (Zone 6–7: Upper Midwest)</option>
+                    <option value="mixed" selected
+                      >Mixed (Zone 4: Mid-Atlantic)</option
+                    >
+                    <option value="cold"
+                      >Cold (Zone 5: Midwest/Northeast)</option
+                    >
+                    <option value="verycold"
+                      >Very cold (Zone 6–7: Upper Midwest)</option
+                    >
                   </select>
                 </div>
 
                 <div>
-                  <label for="hp-insulation" class="text-sm font-semibold text-slate-800"
+                  <label
+                    for="hp-insulation"
+                    class="text-sm font-semibold text-slate-800"
                     >Insulation quality</label
                   >
                   <select
@@ -239,7 +346,11 @@ const relatedCalculators = [
                 </div>
 
                 <div>
-                  <label for="hp-ceiling" class="text-sm font-semibold text-slate-800">Ceiling height</label>
+                  <label
+                    for="hp-ceiling"
+                    class="text-sm font-semibold text-slate-800"
+                    >Ceiling height</label
+                  >
                   <select
                     id="hp-ceiling"
                     class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
@@ -273,86 +384,111 @@ const relatedCalculators = [
                 Reset to defaults
               </button>
             </div>
-          </div>
 
-          <!-- Results -->
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-indigo-100">Recommended heat pump size</p>
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Recommended heat pump size</p>
               <div class="mt-2 flex items-baseline gap-2">
-                <span id="hp-size" class="text-5xl font-extrabold tracking-tight">3 tons</span>
+                <span id="hp-size" class="text-5xl font-extrabold tracking-tight text-indigo-600"
+                  >3 tons</span
+                >
               </div>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-indigo-100">Cooling load</p>
-                  <p id="hp-cool" class="mt-1 text-2xl font-bold">36,000 BTU</p>
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Cooling load</p>
+                  <p id="hp-cool" class="mt-1 text-2xl font-bold text-slate-900">36,000 BTU</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-indigo-100">Heating load</p>
-                  <p id="hp-heat" class="mt-1 text-2xl font-bold">54,000 BTU</p>
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Heating load</p>
+                  <p id="hp-heat" class="mt-1 text-2xl font-bold text-slate-900">54,000 BTU</p>
                 </div>
               </div>
 
-              <div class="mt-3 rounded-xl bg-white/15 p-4">
-                <p class="text-xs text-indigo-100">Sizing guidance</p>
-                <p id="hp-note" class="mt-1 text-base font-semibold leading-snug">
-                  Heating load is moderately higher than cooling (typical in mixed climates) — size to the
-                  cooling load shown and cover the heating shortfall with a variable-speed/cold-climate unit
-                  or modest backup heat.
+              <div class="mt-3 rounded-xl border border-indigo-100 bg-white p-4">
+                <p class="text-xs text-slate-500">Sizing guidance</p>
+                <p id="hp-note" class="mt-1 text-base font-semibold leading-snug text-slate-800">
+                  Heating load is moderately higher than cooling (typical in mixed climates) — size to
+                  the cooling load shown and cover the heating shortfall with a variable-speed/cold-climate
+                  unit or modest backup heat.
                 </p>
               </div>
 
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
                     viewBox="0 0 24 24"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-indigo-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
-                    <span>Base area × climate</span><span id="hp-bd-area" class="font-semibold">—</span>
+                    <span>Base area × climate</span><span
+                      id="hp-bd-area"
+                      class="font-semibold text-slate-900">—</span
+                    >
                   </div>
                   <div class="flex justify-between">
-                    <span>Cooling BTU/sq ft</span><span id="hp-bd-coolrate" class="font-semibold">—</span>
+                    <span>Cooling BTU/sq ft</span><span
+                      id="hp-bd-coolrate"
+                      class="font-semibold text-slate-900">—</span
+                    >
                   </div>
                   <div class="flex justify-between">
-                    <span>Heating BTU/sq ft</span><span id="hp-bd-heatrate" class="font-semibold">—</span>
+                    <span>Heating BTU/sq ft</span><span
+                      id="hp-bd-heatrate"
+                      class="font-semibold text-slate-900">—</span
+                    >
                   </div>
                   <div class="flex justify-between">
-                    <span>Ceiling factor</span><span id="hp-bd-ceiling" class="font-semibold">—</span>
+                    <span>Ceiling factor</span><span
+                      id="hp-bd-ceiling"
+                      class="font-semibold text-slate-900">—</span
+                    >
                   </div>
                   <div class="flex justify-between">
-                    <span>Insulation</span><span id="hp-bd-insul" class="font-semibold">—</span>
+                    <span>Insulation</span><span
+                      id="hp-bd-insul"
+                      class="font-semibold text-slate-900">—</span
+                    >
                   </div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-indigo-100 leading-relaxed">
-                This is a planning estimate. For permits, equipment warranties, and final installation,
-                confirm with a full ACCA Manual J load calculation.
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                This is a planning estimate. For permits, equipment warranties, and final
+                installation, confirm with a full <a
+                  href={u.accaManualJ}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline hover:text-indigo-600">ACCA Manual J</a
+                > load calculation.
               </p>
             </div>
           </div>
         </div>
 
         <!-- Reference table -->
-        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <h2 class="text-xl font-bold text-slate-900">Heat pump load by climate zone</h2>
+        <div
+          class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm"
+        >
+          <h2 class="text-xl font-bold text-slate-900">
+            Heat pump load by climate zone
+          </h2>
           <p class="mt-2 text-sm text-slate-500">
-            1,800 sq ft · 8 ft ceilings · average insulation. Your numbers scale with size, insulation, and
-            ceiling height.
+            1,800 sq ft · 8 ft ceilings · average insulation. Your numbers scale
+            with size, insulation, and ceiling height.
           </p>
           <div class="mt-5 overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -405,31 +541,25 @@ const relatedCalculators = [
             </table>
           </div>
           <p class="mt-4 text-xs text-slate-500">
-            Planning estimate for comparison only. Confirm final sizing with a full ACCA Manual J load
-            calculation.
+            Planning estimate for comparison only. Confirm final sizing with a
+            full ACCA Manual J load calculation.
           </p>
           <p class="mt-2 text-xs text-slate-500">
             <span class="font-semibold">Sources &amp; standards:</span>
-            <a
-              href="https://www.energy.gov/energysaver/heat-pump-systems"
-              target="_blank"
-              rel="noopener"
-              class="underline hover:text-indigo-600">U.S. DOE Energy Saver — Heat Pump Systems</a
+            <HvacExternalLink href={u.doeAirSourceHeatPumps} bold={false}
+              >U.S. DOE Energy Saver — Air-Source Heat Pump Systems</HvacExternalLink
             > ·
-            <a
-              href="https://www.energystar.gov/products/heating_cooling/heat_pumps_air_source"
-              target="_blank"
-              rel="noopener"
-              class="underline hover:text-indigo-600"
-              >ENERGY STAR Cold Climate Heat Pump specification (capacity at 5°F, HSPF2 ≥ 8.5)</a
+            <HvacExternalLink href={u.energystarColdClimateHp} bold={false}
+              >ENERGY STAR Cold Climate Heat Pump specification (capacity at
+              5°F, HSPF2 ≥ 8.5)</HvacExternalLink
             > ·
-            <a
-              href="https://basc.pnnl.gov/resource-guides/cold-climate-heat-pump-sizing-and-selection"
-              target="_blank"
-              rel="noopener"
-              class="underline hover:text-indigo-600"
-              >PNNL Building America — Cold-Climate Heat Pump Sizing &amp; Selection</a
-            > · ACCA Manual J (load calculation standard).
+            <HvacExternalLink href={u.pnnlColdClimateHpSizing} bold={false}
+              >PNNL Building America — Cold-Climate Heat Pump Sizing &amp;
+              Selection</HvacExternalLink
+            > ·
+            <HvacExternalLink href={u.accaManualJ} bold={false}
+              >ACCA Manual J (load calculation standard)</HvacExternalLink
+            >.
           </p>
         </div>
       </section>
@@ -441,8 +571,9 @@ const relatedCalculators = [
             The formula, explained in plain English
           </h2>
           <p class="mt-4 text-slate-600 leading-relaxed">
-            A heat pump is sized in two passes — once for cooling, once for heating — and then you check
-            whether the two agree. Here is exactly what this calculator does.
+            A heat pump is sized in two passes — once for cooling, once for
+            heating — and then you check whether the two agree. Here is exactly
+            what this calculator does.
           </p>
 
           <div
@@ -450,23 +581,26 @@ const relatedCalculators = [
           >
             <div class="text-indigo-300"># Step 1 — Cooling load</div>
             <div>
-              cooling BTU&nbsp;=&nbsp;area × <span class="text-amber-300">20</span> × (ceiling ÷ 8) ×
-              insulation × climate cooling factor
+              cooling BTU&nbsp;=&nbsp;area × <span class="text-amber-300"
+                >20</span
+              > × (ceiling ÷ 8) × insulation × climate cooling factor
             </div>
             <div class="mt-4 text-indigo-300"># Step 2 — Heating load</div>
             <div>
-              heating BTU&nbsp;=&nbsp;area × (heating BTU/sq ft by zone, <span class="text-amber-300"
-                >20–40</span
+              heating BTU&nbsp;=&nbsp;area × (heating BTU/sq ft by zone, <span
+                class="text-amber-300">20–40</span
               >) × (ceiling ÷ 8) × insulation
             </div>
             <div class="mt-4 text-indigo-300"># Step 3 — Pick the size</div>
             <div>
-              tons&nbsp;=&nbsp;cooling BTU ÷ <span class="text-amber-300">12,000</span>, rounded up to a
-              standard size
+              tons&nbsp;=&nbsp;cooling BTU ÷ <span class="text-amber-300"
+                >12,000</span
+              >, rounded up to a standard size
             </div>
             <div class="mt-4 text-indigo-300"># Step 4 — Check the balance</div>
             <div>
-              if heating BTU&nbsp;≫&nbsp;cooling BTU&nbsp;→&nbsp;cold-climate unit or backup heat
+              if heating BTU&nbsp;≫&nbsp;cooling BTU&nbsp;→&nbsp;cold-climate
+              unit or backup heat
             </div>
           </div>
 
@@ -474,29 +608,35 @@ const relatedCalculators = [
             <div class="rounded-xl border border-slate-200 bg-white p-5">
               <h3 class="font-bold text-slate-900">Why size to cooling?</h3>
               <p class="mt-2 text-sm text-slate-600">
-                An oversized AC short-cycles and won't dehumidify, so the cooling load sets the compressor
-                size for most of the country.
+                An oversized AC short-cycles and won't dehumidify, so the
+                cooling load sets the compressor size for most of the country.
               </p>
             </div>
             <div class="rounded-xl border border-slate-200 bg-white p-5">
               <h3 class="font-bold text-slate-900">Where heating wins</h3>
               <p class="mt-2 text-sm text-slate-600">
-                In cold zones the heating load is far larger — that's the balance-point gap, covered by aux
-                heat or a cold-climate inverter unit.
+                In cold zones the heating load is far larger — that's the
+                balance-point gap, covered by aux heat or a cold-climate
+                inverter unit.
               </p>
             </div>
             <div class="rounded-xl border border-slate-200 bg-white p-5">
-              <h3 class="font-bold text-slate-900">Heating BTU per sq ft by zone</h3>
+              <h3 class="font-bold text-slate-900">
+                Heating BTU per sq ft by zone
+              </h3>
               <p class="mt-2 text-sm text-slate-600">
-                Roughly 20 BTU/sq ft in hot climates rising to about 40 BTU/sq ft in very cold zones — the
-                single biggest driver of the heating number.
+                Roughly 20 BTU/sq ft in hot climates rising to about 40 BTU/sq
+                ft in very cold zones — the single biggest driver of the heating
+                number.
               </p>
             </div>
             <div class="rounded-xl border border-slate-200 bg-white p-5">
               <h3 class="font-bold text-slate-900">Cold-climate heat pumps</h3>
               <p class="mt-2 text-sm text-slate-600">
-                ENERGY STAR cold-climate models hold at least 70% of rated capacity at 5°F and carry an HSPF2
-                of 8.5 or higher, so they heat efficiently in winter.
+                <HvacExternalLink href={u.energystarColdClimateHp}
+                  >ENERGY STAR cold-climate models</HvacExternalLink
+                > hold at least 70% of rated capacity at 5°F and carry an HSPF2 of
+                8.5 or higher, so they heat efficiently in winter.
               </p>
             </div>
           </div>
@@ -505,14 +645,18 @@ const relatedCalculators = [
 
       <!-- ============================ WORKED EXAMPLES ============================ -->
       <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
-        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+          Worked examples
+        </h2>
         <p class="mt-4 text-slate-600">
-          Three scenarios showing how the cooling and heating loads diverge across climates — and what that
-          means for the equipment you choose.
+          Three scenarios showing how the cooling and heating loads diverge
+          across climates — and what that means for the equipment you choose.
         </p>
 
         <div class="mt-8 space-y-6">
-          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
             <div class="flex items-center gap-3">
               <span
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
@@ -523,19 +667,24 @@ const relatedCalculators = [
               </h3>
             </div>
             <p class="mt-3 text-sm text-slate-600">
-              8 ft ceilings · hot zone (heating 20 BTU/sq ft, cooling ×1.2) · average insulation.
+              8 ft ceilings · hot zone (heating 20 BTU/sq ft, cooling ×1.2) ·
+              average insulation.
             </p>
-            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+            <div
+              class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700"
+            >
               cooling = 1,500 × 20 × 1.2 = 36,000 BTU (3 tons)<br />
               heating = 1,500 × 20 = 30,000 BTU
             </div>
             <p class="mt-3 text-sm text-slate-600">
-              <span class="font-semibold text-slate-900">Result:</span> cooling leads; a single 3-ton heat
-              pump covers both with margin.
+              <span class="font-semibold text-slate-900">Result:</span> cooling leads;
+              a single 3-ton heat pump covers both with margin.
             </p>
           </div>
 
-          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
             <div class="flex items-center gap-3">
               <span
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
@@ -546,39 +695,49 @@ const relatedCalculators = [
               </h3>
             </div>
             <p class="mt-3 text-sm text-slate-600">
-              8 ft ceilings · cold zone (heating 35 BTU/sq ft, cooling ×0.95) · average insulation.
+              8 ft ceilings · cold zone (heating 35 BTU/sq ft, cooling ×0.95) ·
+              average insulation.
             </p>
-            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+            <div
+              class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700"
+            >
               cooling = 2,000 × 20 × 0.95 = 38,000 BTU (3.5 tons)<br />
               heating = 2,000 × 35 = 70,000 BTU
             </div>
             <p class="mt-3 text-sm text-slate-600">
-              <span class="font-semibold text-slate-900">Result:</span> heating nearly doubles cooling —
-              choose a cold-climate heat pump sized toward heating, or add backup heat below the balance
-              point.
+              <span class="font-semibold text-slate-900">Result:</span> heating nearly
+              doubles cooling — choose a cold-climate heat pump sized toward heating,
+              or add backup heat below the balance point.
             </p>
           </div>
 
-          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
             <div class="flex items-center gap-3">
               <span
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
                 >3</span
               >
               <h3 class="text-lg font-bold text-slate-900">
-                Well-insulated mixed home — 1,800 sq ft, excellent insulation (×0.9)
+                Well-insulated mixed home — 1,800 sq ft, excellent insulation
+                (×0.9)
               </h3>
             </div>
             <p class="mt-3 text-sm text-slate-600">
-              8 ft ceilings · mixed zone (heating 30 BTU/sq ft, cooling ×1.0) · excellent insulation (×0.9).
+              8 ft ceilings · mixed zone (heating 30 BTU/sq ft, cooling ×1.0) ·
+              excellent insulation (×0.9).
             </p>
-            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+            <div
+              class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700"
+            >
               cooling = 1,800 × 20 × 0.9 = 32,400 BTU (3 tons)<br />
               heating = 1,800 × 30 × 0.9 = 48,600 BTU
             </div>
             <p class="mt-3 text-sm text-slate-600">
-              <span class="font-semibold text-slate-900">Result:</span> a tighter envelope trims both loads;
-              size to ~3 tons cooling and plan a modest heating supplement.
+              <span class="font-semibold text-slate-900">Result:</span> a tighter
+              envelope trims both loads; size to ~3 tons cooling and plan a modest
+              heating supplement.
             </p>
           </div>
         </div>
@@ -590,8 +749,20 @@ const relatedCalculators = [
         subtitle="Common questions about heat pump sizing, heating vs. cooling loads, and cold-climate units."
       />
 
-      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
-      <HvacRelatedCalculators calculators={relatedCalculators} accent="indigo" />
+      <CalculatorTradesQuoteCta
+        heading={ctaHeading}
+        description={ctaDescription}
+      />
+      <HvacRelatedCalculators
+        calculators={relatedCalculators}
+        accent="indigo"
+      />
+
+      <HvacExternalResources
+        heading="Trusted Heat Pump Sizing Standards"
+        subheading="The BTU-per-sq-ft targets, balance-point checks, and cold-climate criteria on this page trace back to load-calculation and equipment-selection standards. These organisations publish the specifications contractors rely on for permit-grade heat pump sizing."
+        resources={HEAT_PUMP_CALCULATOR_EXTERNAL_RESOURCES}
+      />
     </main>
 
     <Footer />

@@ -7,6 +7,7 @@ categories: ["hvac"]
 authors: ["Mark"]
 tags: ["hvac cost","replacement cost","installation","pricing"]
 draft: false
+image: /images/posts/hvac-system-cost-2025-hero.webp
 ---
 
 A new HVAC system costs $7,000 to $14,000 installed for a typical US home with a central air conditioner and gas furnace in 2025. That range covers a 2,000 sq ft home with good existing ductwork and average labor costs. Your number can fall below or above it depending on equipment tier, duct condition, and where you live.

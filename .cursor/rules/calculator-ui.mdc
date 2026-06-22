@@ -1,0 +1,63 @@
+---
+description: Merged calculator layout — inputs and results in one card with inset results panel
+globs: src/pages/calculators/**/*.astro
+alwaysApply: false
+---
+
+# Calculator UI — Merged Input + Results
+
+Reference: `src/pages/calculators/hvac/hvac-heat-pump-calculator/index.astro`
+
+When building or refactoring a single-tool calculator, use **one card** for inputs and live results. Do not use separate input/results cards, sticky gradient sidebars, or `lg:grid-cols-5 gap-6` split layouts.
+
+## Structure
+
+```html
+<section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+  <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+  <h2><!-- one heading for the whole tool, not "Enter details" only --></h2>
+  <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+    <div class="space-y-6"><!-- inputs + reset --></div>
+    <div class="mt-6 lg:mt-0 rounded-xl border border-{accent}-100 bg-{accent}-50 p-5 sm:p-6">
+      <!-- live results -->
+    </div>
+  </div>
+  </div>
+</section>
+```
+
+## Results panel (no gradient)
+
+- Use a **light inset panel**: `bg-{accent}-50 border border-{accent}-100`
+- Do **not** use `bg-gradient-to-br`, full-bleed sidebars, `lg:sticky`, or a second outer card
+- Hero value: `text-{accent}-600` + large weight (`text-5xl font-extrabold`)
+- Stat tiles: `rounded-xl border border-{accent}-100 bg-white p-4`
+- Labels: `text-slate-500` / `text-slate-600`; values: `text-slate-900`
+- Guidance + breakdown: white inset cards with same accent border
+- Disclaimer: `text-slate-500 text-xs`
+
+Replace `{accent}` with the page accent (e.g. `indigo`, `blue`, `cyan`) — match existing input focus rings and icons.
+
+## Responsive
+
+- **Desktop (lg+):** two columns inside one card
+- **Mobile:** results stack below inputs (`mt-6 lg:mt-0`) inside the same card
+
+## Refactoring rules
+
+- Keep all result element `id`s unchanged so existing scripts keep working
+- Live-update on input change; no Calculate button unless the tool truly needs it
+- Reference tables, FAQ, and content below `#calculator` stay separate
+
+## Avoid
+
+```html
+<!-- ❌ separate cards with gap -->
+<div class="grid lg:grid-cols-5 gap-6">
+  <div class="lg:col-span-3 rounded-2xl border ...">inputs</div>
+  <div class="lg:col-span-2"><div class="lg:sticky bg-gradient-to-br ...">results</div></div>
+</div>
+
+<!-- ❌ full-bleed gradient sidebar inside one card -->
+<div class="lg:flex"><div class="lg:flex-1">inputs</div><div class="bg-gradient-to-br lg:w-80">results</div></div>
+```
