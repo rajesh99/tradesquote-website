@@ -2,6 +2,7 @@
 title: "SEER vs SEER2: What Changed and Does It Actually Matter?"
 meta_title: "SEER vs SEER2 Explained: Conversion, Impact, and What to Buy | TradesQuote"
 description: "SEER2 replaced SEER as the federal efficiency standard in 2023. What changed, how to convert between them, and whether the difference matters when buying."
+image: /images/posts/seer-vs-seer2-hero.svg
 date: 2026-05-06T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

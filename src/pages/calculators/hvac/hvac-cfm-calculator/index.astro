@@ -3,13 +3,25 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import HvacExternalResources from "@/components/HvacExternalResources.astro";
+import HvacExternalLink from "@/components/HvacExternalLink.astro";
 import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
 import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
 import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import {
+  CFM_CALCULATOR_EXTERNAL_RESOURCES,
+  HVAC_AUTHORITY_URLS,
+  HVAC_EXTERNAL_LINK_CLASS,
+} from "@/config/hvacExternalResources";
 import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
-const title = "HVAC CFM Calculator — Free Airflow & Air Changes Tool | TradesQuote";
-const description = "Free HVAC CFM calculator. Find the airflow a room needs from its size and air changes per hour, or the target system CFM from AC tonnage (350–450 CFM per ton). Instant, no sign-up.";
+const ext = HVAC_EXTERNAL_LINK_CLASS;
+const u = HVAC_AUTHORITY_URLS;
+
+const title =
+  "HVAC CFM Calculator — Free Airflow & Air Changes Tool | TradesQuote";
+const description =
+  "Free HVAC CFM calculator. Find the airflow a room needs from its size and air changes per hour, or the target system CFM from AC tonnage (350–450 CFM per ton). Instant, no sign-up.";
 
 const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-cfm-calculator";
 
@@ -17,10 +29,30 @@ const breadcrumbData = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
-    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
-    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
-    { "@type": "ListItem", position: 4, name: "HVAC CFM Calculator", item: pageUrl },
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://tradesquote.ai/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Calculators",
+      item: "https://tradesquote.ai/calculators",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "HVAC",
+      item: "https://tradesquote.ai/calculators/hvac",
+    },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "HVAC CFM Calculator",
+      item: pageUrl,
+    },
   ],
 };
 
@@ -32,7 +64,8 @@ const webAppData = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Any (web-based)",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  description: "Free online HVAC CFM calculator that finds the airflow a room needs from its volume and air changes per hour, and the target system airflow from air-conditioner tonnage.",
+  description:
+    "Free online HVAC CFM calculator that finds the airflow a room needs from its volume and air changes per hour, and the target system airflow from air-conditioner tonnage.",
 };
 
 const faqs: CalculatorFaq[] = [
@@ -43,13 +76,11 @@ const faqs: CalculatorFaq[] = [
   },
   {
     question: "How many CFM per ton of air conditioning?",
-    answer:
-      "The standard design target is <strong>400 CFM per ton</strong> of cooling. In humid climates contractors drop to about 350 CFM/ton to improve moisture removal, and in hot, dry climates they raise it to about 450. A 3-ton system at the standard rate moves 1,200 CFM.",
+    answer: `The standard design target is <a href="${u.energystarHvac}" target="_blank" rel="noopener noreferrer" class="${ext}"><strong>400 CFM per ton</strong></a> of cooling. In humid climates contractors drop to about <a href="${u.energystarHvac}" target="_blank" rel="noopener noreferrer" class="${ext}">350 CFM/ton</a> to improve moisture removal, and in hot, dry climates they raise it to about 450. A 3-ton system at the standard rate moves 1,200 CFM.`,
   },
   {
     question: "What does ACH (air changes per hour) mean?",
-    answer:
-      "ACH is how many times the air in a room is completely replaced in one hour. Typical comfort targets: <strong>4–6 for bedrooms and basements, 6–8 for living rooms and offices, and 7–8 for kitchens, bathrooms, and laundry rooms</strong> where heat and moisture build up.",
+    answer: `ACH is how many times the air in a room is completely replaced in one hour. Typical comfort targets: <strong>4–6 for bedrooms and basements, 6–8 for living rooms and offices, and 7–8 for kitchens, bathrooms, and laundry rooms</strong> where heat and moisture build up — aligned with <a href="${u.ashraeVentilation}" target="_blank" rel="noopener noreferrer" class="${ext}">ASHRAE 62.1 / 62.2</a> ventilation guidance.`,
   },
   {
     question: "How many CFM do I need for a bedroom?",
@@ -58,23 +89,20 @@ const faqs: CalculatorFaq[] = [
   },
   {
     question: "What happens if my HVAC airflow is too low?",
-    answer:
-      "Low airflow makes rooms heat and cool unevenly, lets humidity linger, and can <strong>freeze the evaporator coil</strong> because too little warm air passes over it. It also forces the blower to fight high static pressure, shortening motor life. Common causes: dirty filters, undersized ducts, closed registers.",
+    answer: `Low airflow makes rooms heat and cool unevenly, lets humidity linger, and can <strong>freeze the <a href="${u.doeHeatingCooling}" target="_blank" rel="noopener noreferrer" class="${ext}">evaporator coil</a></strong> because too little warm air passes over it. It also forces the blower to fight high <a href="${u.smacna}" target="_blank" rel="noopener noreferrer" class="${ext}">static pressure</a>, shortening motor life. Common causes: dirty filters, undersized ducts, closed registers.`,
   },
   {
     question: "Can airflow be too high?",
-    answer:
-      "Yes. Air moving too fast over the evaporator coil doesn't stay in contact long enough to shed moisture, so the home cools but stays <strong>clammy</strong>. High CFM also means noisy registers and drafts — which is why humid-climate designs target 350 CFM/ton instead of 400–450.",
+    answer: `Yes. Air moving too fast over the <a href="${u.doeHeatingCooling}" target="_blank" rel="noopener noreferrer" class="${ext}">evaporator coil</a> doesn't stay in contact long enough to shed moisture, so the home cools but stays <strong>clammy</strong>. High CFM also means noisy registers and drafts — which is why humid-climate designs target 350 CFM/ton instead of 400–450.`,
   },
   {
     question: "Does this calculator size my ductwork?",
-    answer:
-      "It gives you the CFM target each room and the system need — the required first input. Actual duct diameters then come from an <strong>ACCA Manual D</strong> calculation that balances CFM against friction rate, duct length, and fittings. Use this for targets and Manual D for final duct design.",
+    answer: `It gives you the CFM target each room and the system need — the required first input. Actual duct diameters then come from an <a href="${u.accaManualD}" target="_blank" rel="noopener noreferrer" class="${ext}">ACCA Manual D</a> calculation that balances CFM against friction rate, duct length, and fittings. Use this for targets and Manual D for final duct design.`,
   },
   {
-    question: "How is this different from whole-building ventilation (ASHRAE 62.2)?",
-    answer:
-      "This tool sizes <strong>comfort airflow and AC tonnage CFM</strong> from room volume and ACH. Code-mandated whole-building ventilation (typically 30–90+ CFM continuous) is a separate calculation — use our <a href=\"/calculators/hvac/hvac-ventilation-calculator\" class=\"font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600\">Ventilation Calculator</a> for ASHRAE 62.2 residential or 62.1 commercial rates.",
+    question:
+      "How is this different from whole-building ventilation (ASHRAE 62.2)?",
+    answer: `This tool sizes <strong>comfort airflow and AC tonnage CFM</strong> from room volume and ACH. Code-mandated whole-building ventilation (typically 30–90+ CFM continuous) is a separate calculation — use our <a href="/calculators/hvac/hvac-ventilation-calculator" class="${ext}">Ventilation Calculator</a> for <a href="${u.ashraeVentilation}" target="_blank" rel="noopener noreferrer" class="${ext}">ASHRAE 62.2</a> residential or <a href="${u.ashraeVentilation}" target="_blank" rel="noopener noreferrer" class="${ext}">62.1</a> commercial rates.`,
   },
 ];
 const faqData = buildFaqPageSchema(faqs);
@@ -111,15 +139,30 @@ const relatedCalculators = [
   <Fragment slot="head">
     <link rel="canonical" href={pageUrl} />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="HVAC CFM Calculator — Free Airflow & Air Changes Tool" />
-    <meta property="og:description" content="Find the airflow a room needs by air changes per hour, or your system's target CFM by tonnage. Free and instant." />
+    <meta
+      property="og:title"
+      content="HVAC CFM Calculator — Free Airflow & Air Changes Tool"
+    />
+    <meta
+      property="og:description"
+      content="Find the airflow a room needs by air changes per hour, or your system's target CFM by tonnage. Free and instant."
+    />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:site_name" content="TradesQuote" />
     <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="HVAC CFM Calculator — Free Airflow & Air Changes Tool" />
-    <meta name="twitter:description" content="Find the airflow a room needs, or your system's target CFM by tonnage. Free, no sign-up." />
-    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <meta
+      name="twitter:title"
+      content="HVAC CFM Calculator — Free Airflow & Air Changes Tool"
+    />
+    <meta
+      name="twitter:description"
+      content="Find the airflow a room needs, or your system's target CFM by tonnage. Free, no sign-up."
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(breadcrumbData)}
+    />
     <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
   </Fragment>
@@ -129,282 +172,604 @@ const relatedCalculators = [
 
     <main>
       <!-- ============================ HERO + H1 + INTRO ============================ -->
-          <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-      
-              <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="HVAC CFM Calculator" />
-      
-              <div class="max-w-3xl">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">
-                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h9a2.5 2.5 0 10-2.5-2.5M4 12h13a2.5 2.5 0 11-2.5 2.5M4 16h7"/></svg>
-                  HVAC Tools · Airflow · Free
-                </span>
-                <!-- (1) H1 -->
-                <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
-                  HVAC CFM Calculator <span class="text-cyan-600">— Free Online Calculator</span>
-                </h1>
-                <!-- (2) What this calculates — 2 sentences -->
-                <p class="mt-5 text-lg text-slate-600 leading-relaxed">
-                  This CFM calculator finds the airflow — in cubic feet per minute — that a room needs based on its
-                  size, ceiling height, and recommended air changes per hour, plus the total airflow your system
-                  should move based on its tonnage. Use it to size fans and registers, balance rooms, or check
-                  that a system's airflow matches its cooling capacity.
-                </p>
-      
-                <!-- Differentiator / internal links (avoids cannibalization) -->
-                <div class="mt-6 flex items-start gap-3 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                  <svg class="h-5 w-5 shrink-0 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  <p class="text-sm text-slate-600">
-                    <span class="font-semibold text-slate-900">Don't know your cooling load or tonnage yet?</span>
-                    Start with the
-                    <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">HVAC BTU Calculator</a>
-                    for the load, then the
-                    <a href="/calculators/hvac/hvac-tonnage-calculator" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">Tonnage Calculator</a>
-                    to convert it — and come back here for airflow.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-      
-          <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
-          <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <div class="grid lg:grid-cols-2 gap-6">
-      
-              <!-- Tool 1: Room CFM by air changes -->
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-                  Room airflow by air changes
-                </h2>
-                <p class="mt-2 text-sm text-slate-500">How much air a single room needs, based on its volume and room type.</p>
-      
-                <div class="mt-6 space-y-5">
-                  <div>
-                    <div class="flex items-center justify-between">
-                      <label for="room-area" class="text-sm font-semibold text-slate-800">Room size</label>
-                      <div class="flex items-center gap-1">
-                        <input id="room-area" type="number" min="0" max="5000" value="150"
-                          class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none">
-                        <span class="text-sm text-slate-500">sq ft</span>
-                      </div>
-                    </div>
-                    <input id="room-range" type="range" min="40" max="1000" step="10" value="150"
-                      class="cfm-range mt-3 w-full bg-slate-200 accent-cyan-600">
-                  </div>
-      
-                  <div class="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <label for="room-ceiling" class="text-sm font-semibold text-slate-800">Ceiling height</label>
-                      <select id="room-ceiling"
-                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none">
-                        <option value="8" selected>8 ft (standard)</option>
-                        <option value="9">9 ft</option>
-                        <option value="10">10 ft</option>
-                        <option value="12">12 ft or higher</option>
-                      </select>
-                    </div>
-      
-                    <div>
-                      <label for="room-type" class="text-sm font-semibold text-slate-800">Room type (sets ACH)</label>
-                      <select id="room-type"
-                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none">
-                        <option value="5" selected>Bedroom (5 ACH)</option>
-                        <option value="6">Living room (6 ACH)</option>
-                        <option value="8">Kitchen (8 ACH)</option>
-                        <option value="8">Bathroom (8 ACH)</option>
-                        <option value="6">Home office (6 ACH)</option>
-                        <option value="4">Basement (4 ACH)</option>
-                      </select>
-                    </div>
-                  </div>
-      
-                  <div class="rounded-xl bg-gradient-to-br from-cyan-600 to-sky-500 p-5 text-white">
-                    <p class="text-sm text-cyan-100">This room needs</p>
-                    <div class="mt-1 flex items-baseline gap-2">
-                      <span id="room-cfm" class="text-4xl font-extrabold">100</span>
-                      <span class="text-base font-semibold text-cyan-100">CFM</span>
-                    </div>
-                    <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
-                      <div><span class="text-cyan-100 text-xs">Room volume</span><p id="room-vol" class="font-semibold">1,200 cu ft</p></div>
-                      <div><span class="text-cyan-100 text-xs">Per square foot</span><p id="room-persqft" class="font-semibold">0.67 CFM</p></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-      
-              <!-- Tool 2: System CFM by tonnage -->
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                  System airflow by tonnage
-                </h2>
-                <p class="mt-2 text-sm text-slate-500">The total CFM your blower and ducts should be designed to move.</p>
-      
-                <div class="mt-6 space-y-5">
-                  <div>
-                    <label for="sys-tons" class="text-sm font-semibold text-slate-800">System size</label>
-                    <select id="sys-tons"
-                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none">
-                      <option value="1.5">1.5 tons (18,000 BTU)</option>
-                      <option value="2">2 tons (24,000 BTU)</option>
-                      <option value="2.5">2.5 tons (30,000 BTU)</option>
-                      <option value="3" selected>3 tons (36,000 BTU)</option>
-                      <option value="3.5">3.5 tons (42,000 BTU)</option>
-                      <option value="4">4 tons (48,000 BTU)</option>
-                      <option value="5">5 tons (60,000 BTU)</option>
-                    </select>
-                  </div>
-      
-                  <div>
-                    <label for="sys-climate" class="text-sm font-semibold text-slate-800">Climate (sets CFM per ton)</label>
-                    <select id="sys-climate"
-                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none">
-                      <option value="350">Humid — Southeast / Gulf (350 CFM/ton)</option>
-                      <option value="400" selected>Standard — most regions (400 CFM/ton)</option>
-                      <option value="450">Hot & dry — Southwest (450 CFM/ton)</option>
-                    </select>
-                    <p class="mt-2 text-xs text-slate-500">Humid climates use less airflow per ton so the coil removes more moisture; dry climates use more.</p>
-                  </div>
-      
-                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-5">
-                    <p class="text-sm text-slate-500">Target system airflow</p>
-                    <div class="mt-1 flex items-baseline gap-2">
-                      <span id="sys-cfm" class="text-4xl font-extrabold text-slate-900">1,200</span>
-                      <span class="text-base font-semibold text-slate-500">CFM</span>
-                    </div>
-                    <p id="sys-note" class="mt-3 text-sm text-slate-600">3 tons × 400 CFM/ton</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-      
-            <!-- Reference table -->
-            <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-              <h2 class="text-xl font-bold text-slate-900">CFM per ton (quick reference)</h2>
-              <p class="mt-2 text-sm text-slate-500">Target total airflow by system size at the three standard design rates.</p>
-              <div class="mt-5 overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                  <thead>
-                    <tr class="border-b border-slate-200 text-slate-500">
-                      <th class="py-2.5 pr-4 font-semibold">System size</th>
-                      <th class="py-2.5 pr-4 font-semibold">Humid · 350/ton</th>
-                      <th class="py-2.5 pr-4 font-semibold">Standard · 400/ton</th>
-                      <th class="py-2.5 font-semibold">Dry · 450/ton</th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-slate-700">
-                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">1.5 tons</td><td class="py-2.5 pr-4">525 CFM</td><td class="py-2.5 pr-4">600 CFM</td><td class="py-2.5">675 CFM</td></tr>
-                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">2 tons</td><td class="py-2.5 pr-4">700 CFM</td><td class="py-2.5 pr-4">800 CFM</td><td class="py-2.5">900 CFM</td></tr>
-                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">2.5 tons</td><td class="py-2.5 pr-4">875 CFM</td><td class="py-2.5 pr-4">1,000 CFM</td><td class="py-2.5">1,125 CFM</td></tr>
-                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">3 tons</td><td class="py-2.5 pr-4">1,050 CFM</td><td class="py-2.5 pr-4">1,200 CFM</td><td class="py-2.5">1,350 CFM</td></tr>
-                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">3.5 tons</td><td class="py-2.5 pr-4">1,225 CFM</td><td class="py-2.5 pr-4">1,400 CFM</td><td class="py-2.5">1,575 CFM</td></tr>
-                    <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">4 tons</td><td class="py-2.5 pr-4">1,400 CFM</td><td class="py-2.5 pr-4">1,600 CFM</td><td class="py-2.5">1,800 CFM</td></tr>
-                    <tr><td class="py-2.5 pr-4 font-semibold">5 tons</td><td class="py-2.5 pr-4">1,750 CFM</td><td class="py-2.5 pr-4">2,000 CFM</td><td class="py-2.5">2,250 CFM</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="mt-4 text-xs text-slate-500">Targets assume properly sized, sealed ductwork. Final duct design should follow an ACCA Manual D calculation.</p>
-            </div>
-          </section>
-      
-          <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
-          <section class="bg-slate-50 border-y border-slate-200">
-            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
-              <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formulas, explained in plain English</h2>
-              <p class="mt-4 text-slate-600 leading-relaxed">
-                CFM — cubic feet per minute — is simply how much air moves. Both tools above rest on
-                two short formulas that every HVAC tech uses daily.
-              </p>
-      
-              <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
-                <div class="text-cyan-300"># Room airflow — from volume and air changes</div>
-                <div>volume&nbsp;=&nbsp;area (sq ft) × ceiling height (ft)</div>
-                <div>CFM&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;volume × ACH ÷ <span class="text-amber-300">60</span></div>
-                <div class="mt-4 text-cyan-300"># System airflow — from cooling capacity</div>
-                <div>CFM&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;tons × <span class="text-amber-300">400</span>&nbsp;&nbsp;(350 humid · 450 dry)</div>
-              </div>
-      
-              <div class="mt-8 grid sm:grid-cols-2 gap-4">
-                <div class="rounded-xl border border-slate-200 bg-white p-5">
-                  <h3 class="font-bold text-slate-900">Why divide by 60?</h3>
-                  <p class="mt-2 text-sm text-slate-600">ACH counts air replacements per <em>hour</em>, but CFM measures per <em>minute</em>. Dividing by 60 converts one to the other.</p>
-                </div>
-                <div class="rounded-xl border border-slate-200 bg-white p-5">
-                  <h3 class="font-bold text-slate-900">Where ACH targets come from</h3>
-                  <p class="mt-2 text-sm text-slate-600">Comfort guidelines: 4–6 changes for bedrooms and basements, 6–8 for living spaces, 7–8 for kitchens and baths where heat and moisture build up.</p>
-                </div>
-                <div class="rounded-xl border border-slate-200 bg-white p-5">
-                  <h3 class="font-bold text-slate-900">Why 400 CFM per ton?</h3>
-                  <p class="mt-2 text-sm text-slate-600">It's the design airflow that lets a standard evaporator coil deliver its rated cooling. Less airflow per ton wrings out more humidity; more suits dry heat.</p>
-                </div>
-                <div class="rounded-xl border border-slate-200 bg-white p-5">
-                  <h3 class="font-bold text-slate-900">The 1 CFM per sq ft shortcut</h3>
-                  <p class="mt-2 text-sm text-slate-600">With 8-ft ceilings and ~7.5 ACH, the room formula collapses to about 1 CFM per square foot — a handy whole-house sanity check.</p>
-                </div>
-              </div>
-            </div>
-          </section>
-      
-          <!-- ============================ (5) WORKED EXAMPLES ============================ -->
-          <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
-            <p class="mt-4 text-slate-600">Three everyday airflow questions, solved step by step.</p>
-      
-            <div class="mt-8 space-y-6">
-              <!-- Example 1 -->
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="flex items-center gap-3">
-                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">1</span>
-                  <h3 class="text-lg font-bold text-slate-900">Standard bedroom — 150 sq ft</h3>
-                </div>
-                <p class="mt-3 text-sm text-slate-600">8 ft ceiling · bedroom target of 5 air changes per hour.</p>
-                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
-                  volume = 150 × 8 = 1,200 cu ft<br>
-                  CFM = 1,200 × 5 ÷ 60 = <span class="font-bold text-cyan-700">100 CFM</span>
-                </div>
-                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> the room needs about 100 CFM — the supply register (or fan) serving it should be rated at or above that.</p>
-              </div>
-      
-              <!-- Example 2 -->
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="flex items-center gap-3">
-                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">2</span>
-                  <h3 class="text-lg font-bold text-slate-900">Kitchen — 200 sq ft with heat and moisture</h3>
-                </div>
-                <p class="mt-3 text-sm text-slate-600">8 ft ceiling · kitchen target of 8 air changes per hour.</p>
-                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
-                  volume = 200 × 8 = 1,600 cu ft<br>
-                  CFM = 1,600 × 8 ÷ 60 = <span class="font-bold text-cyan-700">≈ 213 CFM</span>
-                </div>
-                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> about 213 CFM — twice the bedroom's airflow for a room only a third larger, because cooking heat and moisture demand faster turnover.</p>
-              </div>
-      
-              <!-- Example 3 -->
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="flex items-center gap-3">
-                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">3</span>
-                  <h3 class="text-lg font-bold text-slate-900">Whole system — 3 tons in a humid climate</h3>
-                </div>
-                <p class="mt-3 text-sm text-slate-600">3-ton AC · Southeast humidity, so the design drops to 350 CFM per ton.</p>
-                <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
-                  standard: 3 × 400 = 1,200 CFM<br>
-                  humid design: 3 × 350 = <span class="font-bold text-cyan-700">1,050 CFM</span>
-                </div>
-                <p class="mt-3 text-sm text-slate-600"><span class="font-semibold text-slate-900">Result:</span> target about 1,050 CFM. The slower airflow keeps air on the coil longer, pulling out more humidity — the difference between cool-and-dry and cool-but-clammy.</p>
-              </div>
-            </div>
-          </section>
-      
-          <CalculatorFaqSection
-            faqs={faqs}
-            accent="cyan"
-            subtitle="Common questions about CFM, airflow, and air changes."
+      <section
+        class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white"
+      >
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="HVAC"
+            categoryHref="/calculators/hvac"
+            current="HVAC CFM Calculator"
           />
 
-          <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg
+                class="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 8h9a2.5 2.5 0 10-2.5-2.5M4 12h13a2.5 2.5 0 11-2.5 2.5M4 16h7"
+                ></path></svg
+              >
+              HVAC Tools · Airflow · Free
+            </span>
+            <!-- (1) H1 -->
+            <h1
+              class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900"
+            >
+              HVAC CFM Calculator <span class="text-cyan-600"
+                >— Free Online Calculator</span
+              >
+            </h1>
+            <!-- (2) What this calculates — 2 sentences -->
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This CFM calculator finds the airflow — in cubic feet per minute —
+              that a room needs based on its size, ceiling height, and
+              recommended <HvacExternalLink href={u.doeHeatingCooling}
+                >air changes per hour</HvacExternalLink
+              >, plus the total airflow your system should move based on its
+              tonnage. Use it to size fans and registers, balance rooms, or
+              check that a system's airflow matches its cooling capacity.
+            </p>
 
-          <HvacRelatedCalculators calculators={relatedCalculators} accent="cyan" />
+            <!-- Differentiator / internal links (avoids cannibalization) -->
+            <div
+              class="mt-6 flex items-start gap-3 rounded-xl border border-cyan-100 bg-cyan-50 p-4"
+            >
+              <svg
+                class="h-5 w-5 shrink-0 text-cyan-600 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path></svg
+              >
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900"
+                  >Don't know your cooling load or tonnage yet?</span
+                >
+                Start with the
+                <a
+                  href="/calculators/hvac/hvac-btu-calculator"
+                  class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600"
+                  >HVAC BTU Calculator</a
+                >
+                for the load, then the
+                <a
+                  href="/calculators/hvac/hvac-tonnage-calculator"
+                  class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600"
+                  >Tonnage Calculator</a
+                >
+                to convert it — and come back here for airflow.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
+      <section
+        id="calculator"
+        class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+      >
+        <div class="grid lg:grid-cols-2 gap-6">
+          <!-- Tool 1: Room CFM by air changes -->
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm"
+          >
+            <h2
+              class="text-xl font-bold text-slate-900 flex items-center gap-2"
+            >
+              <svg
+                class="h-5 w-5 text-cyan-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                ></path></svg
+              >
+              Room airflow by air changes
+            </h2>
+            <p class="mt-2 text-sm text-slate-500">
+              How much air a single room needs, based on its volume and room
+              type.
+            </p>
+
+            <div class="mt-6 space-y-5">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label
+                    for="room-area"
+                    class="text-sm font-semibold text-slate-800"
+                    >Room size</label
+                  >
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="room-area"
+                      type="number"
+                      min="0"
+                      max="5000"
+                      value="150"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">sq ft</span>
+                  </div>
+                </div>
+                <input
+                  id="room-range"
+                  type="range"
+                  min="40"
+                  max="1000"
+                  step="10"
+                  value="150"
+                  class="cfm-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                />
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label
+                    for="room-ceiling"
+                    class="text-sm font-semibold text-slate-800"
+                    >Ceiling height</label
+                  >
+                  <select
+                    id="room-ceiling"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="8" selected>8 ft (standard)</option>
+                    <option value="9">9 ft</option>
+                    <option value="10">10 ft</option>
+                    <option value="12">12 ft or higher</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="room-type"
+                    class="text-sm font-semibold text-slate-800"
+                    >Room type (sets ACH)</label
+                  >
+                  <select
+                    id="room-type"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="5" selected>Bedroom (5 ACH)</option>
+                    <option value="6">Living room (6 ACH)</option>
+                    <option value="8">Kitchen (8 ACH)</option>
+                    <option value="8">Bathroom (8 ACH)</option>
+                    <option value="6">Home office (6 ACH)</option>
+                    <option value="4">Basement (4 ACH)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div
+                class="rounded-xl bg-gradient-to-br from-cyan-600 to-sky-500 p-5 text-white"
+              >
+                <p class="text-sm text-cyan-100">This room needs</p>
+                <div class="mt-1 flex items-baseline gap-2">
+                  <span id="room-cfm" class="text-4xl font-extrabold">100</span>
+                  <span class="text-base font-semibold text-cyan-100">CFM</span>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span class="text-cyan-100 text-xs">Room volume</span><p
+                      id="room-vol"
+                      class="font-semibold"
+                    >
+                      1,200 cu ft
+                    </p>
+                  </div>
+                  <div>
+                    <span class="text-cyan-100 text-xs">Per square foot</span><p
+                      id="room-persqft"
+                      class="font-semibold"
+                    >
+                      0.67 CFM
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tool 2: System CFM by tonnage -->
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm"
+          >
+            <h2
+              class="text-xl font-bold text-slate-900 flex items-center gap-2"
+            >
+              <svg
+                class="h-5 w-5 text-cyan-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"
+                ></path></svg
+              >
+              System airflow by tonnage
+            </h2>
+            <p class="mt-2 text-sm text-slate-500">
+              The total CFM your blower and ducts should be designed to move.
+            </p>
+
+            <div class="mt-6 space-y-5">
+              <div>
+                <label
+                  for="sys-tons"
+                  class="text-sm font-semibold text-slate-800"
+                  >System size</label
+                >
+                <select
+                  id="sys-tons"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                >
+                  <option value="1.5">1.5 tons (18,000 BTU)</option>
+                  <option value="2">2 tons (24,000 BTU)</option>
+                  <option value="2.5">2.5 tons (30,000 BTU)</option>
+                  <option value="3" selected>3 tons (36,000 BTU)</option>
+                  <option value="3.5">3.5 tons (42,000 BTU)</option>
+                  <option value="4">4 tons (48,000 BTU)</option>
+                  <option value="5">5 tons (60,000 BTU)</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="sys-climate"
+                  class="text-sm font-semibold text-slate-800"
+                  >Climate (sets CFM per ton)</label
+                >
+                <select
+                  id="sys-climate"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                >
+                  <option value="350"
+                    >Humid — Southeast / Gulf (350 CFM/ton)</option
+                  >
+                  <option value="400" selected
+                    >Standard — most regions (400 CFM/ton)</option
+                  >
+                  <option value="450"
+                    >Hot & dry — Southwest (450 CFM/ton)</option
+                  >
+                </select>
+                <p class="mt-2 text-xs text-slate-500">
+                  Humid climates use less airflow per ton so the coil removes
+                  more moisture; dry climates use more.
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-5">
+                <p class="text-sm text-slate-500">Target system airflow</p>
+                <div class="mt-1 flex items-baseline gap-2">
+                  <span
+                    id="sys-cfm"
+                    class="text-4xl font-extrabold text-slate-900">1,200</span
+                  >
+                  <span class="text-base font-semibold text-slate-500">CFM</span
+                  >
+                </div>
+                <p id="sys-note" class="mt-3 text-sm text-slate-600">
+                  3 tons × 400 CFM/ton
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div
+          class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm"
+        >
+          <h2 class="text-xl font-bold text-slate-900">
+            CFM per ton (quick reference)
+          </h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Target total airflow by system size at the three standard design
+            rates.
+          </p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">System size</th>
+                  <th class="py-2.5 pr-4 font-semibold">Humid · 350/ton</th>
+                  <th class="py-2.5 pr-4 font-semibold">Standard · 400/ton</th>
+                  <th class="py-2.5 font-semibold">Dry · 450/ton</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">1.5 tons</td><td
+                    class="py-2.5 pr-4">525 CFM</td
+                  ><td class="py-2.5 pr-4">600 CFM</td><td class="py-2.5"
+                    >675 CFM</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">2 tons</td><td
+                    class="py-2.5 pr-4">700 CFM</td
+                  ><td class="py-2.5 pr-4">800 CFM</td><td class="py-2.5"
+                    >900 CFM</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">2.5 tons</td><td
+                    class="py-2.5 pr-4">875 CFM</td
+                  ><td class="py-2.5 pr-4">1,000 CFM</td><td class="py-2.5"
+                    >1,125 CFM</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">3 tons</td><td
+                    class="py-2.5 pr-4">1,050 CFM</td
+                  ><td class="py-2.5 pr-4">1,200 CFM</td><td class="py-2.5"
+                    >1,350 CFM</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">3.5 tons</td><td
+                    class="py-2.5 pr-4">1,225 CFM</td
+                  ><td class="py-2.5 pr-4">1,400 CFM</td><td class="py-2.5"
+                    >1,575 CFM</td
+                  ></tr
+                >
+                <tr class="border-b border-slate-100"
+                  ><td class="py-2.5 pr-4 font-semibold">4 tons</td><td
+                    class="py-2.5 pr-4">1,400 CFM</td
+                  ><td class="py-2.5 pr-4">1,600 CFM</td><td class="py-2.5"
+                    >1,800 CFM</td
+                  ></tr
+                >
+                <tr
+                  ><td class="py-2.5 pr-4 font-semibold">5 tons</td><td
+                    class="py-2.5 pr-4">1,750 CFM</td
+                  ><td class="py-2.5 pr-4">2,000 CFM</td><td class="py-2.5"
+                    >2,250 CFM</td
+                  ></tr
+                >
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">
+            Targets assume properly sized, sealed ductwork. Final duct design
+            should follow an <HvacExternalLink href={u.accaManualD} bold={false}
+              >ACCA Manual D</HvacExternalLink
+            > calculation.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================ (4) FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formulas, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            CFM — cubic feet per minute — is simply how much air moves. Both
+            tools above rest on two short formulas that every HVAC tech uses
+            daily.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300">
+              # Room airflow — from volume and air changes
+            </div>
+            <div>volume&nbsp;=&nbsp;area (sq ft) × ceiling height (ft)</div>
+            <div>
+              CFM&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;volume × ACH ÷ <span
+                class="text-amber-300">60</span>
+            </div>
+            <div class="mt-4 text-cyan-300">
+              # System airflow — from cooling capacity
+            </div>
+            <div>
+              CFM&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;tons × <span
+                class="text-amber-300">400</span
+              >&nbsp;&nbsp;(350 humid · 450 dry)
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why divide by 60?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                ACH counts air replacements per <em>hour</em>, but CFM measures
+                per <em>minute</em>. Dividing by 60 converts one to the other.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">
+                Where ACH targets come from
+              </h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Comfort guidelines: 4–6 changes for bedrooms and basements, 6–8
+                for living spaces, 7–8 for kitchens and baths where heat and
+                moisture build up — see <HvacExternalLink
+                  href={u.ashraeVentilation}
+                  >ASHRAE 62.1 / 62.2</HvacExternalLink
+                > for code ventilation minimums.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 400 CFM per ton?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It's the design airflow that lets a standard <HvacExternalLink
+                  href={u.doeHeatingCooling}>evaporator coil</HvacExternalLink
+                > deliver its rated cooling. Less airflow per ton wrings out more
+                humidity; more suits dry heat. <HvacExternalLink
+                  href={u.energystarHvac}>ENERGY STAR</HvacExternalLink
+                > certified equipment must meet verified airflow specs at rated capacity.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">
+                The 1 CFM per sq ft shortcut
+              </h3>
+              <p class="mt-2 text-sm text-slate-600">
+                With 8-ft ceilings and ~7.5 ACH, the room formula collapses to
+                about 1 CFM per square foot — a handy whole-house sanity check.
+                The <HvacExternalLink href={u.doeHeatingCooling}
+                  >U.S. DOE Energy Saver</HvacExternalLink
+                > guide covers similar sizing rules of thumb.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ (5) WORKED EXAMPLES ============================ -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+          Worked examples
+        </h2>
+        <p class="mt-4 text-slate-600">
+          Three everyday airflow questions, solved step by step.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <!-- Example 1 -->
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >1</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Standard bedroom — 150 sq ft
+              </h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              8 ft ceiling · bedroom target of 5 air changes per hour.
+            </p>
+            <div
+              class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700"
+            >
+              volume = 150 × 8 = 1,200 cu ft<br />
+              CFM = 1,200 × 5 ÷ 60 = <span class="font-bold text-cyan-700"
+                >100 CFM</span
+              >
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the room needs
+              about 100 CFM — the supply register (or fan) serving it should be rated
+              at or above that.
+            </p>
+          </div>
+
+          <!-- Example 2 -->
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >2</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Kitchen — 200 sq ft with heat and moisture
+              </h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              8 ft ceiling · kitchen target of 8 air changes per hour.
+            </p>
+            <div
+              class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700"
+            >
+              volume = 200 × 8 = 1,600 cu ft<br />
+              CFM = 1,600 × 8 ÷ 60 = <span class="font-bold text-cyan-700"
+                >≈ 213 CFM</span
+              >
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> about 213
+              CFM — twice the bedroom's airflow for a room only a third larger, because
+              cooking heat and moisture demand faster turnover.
+            </p>
+          </div>
+
+          <!-- Example 3 -->
+          <div
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold"
+                >3</span
+              >
+              <h3 class="text-lg font-bold text-slate-900">
+                Whole system — 3 tons in a humid climate
+              </h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              3-ton AC · Southeast humidity, so the design drops to 350 CFM per
+              ton.
+            </p>
+            <div
+              class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700"
+            >
+              standard: 3 × 400 = 1,200 CFM<br />
+              humid design: 3 × 350 = <span class="font-bold text-cyan-700"
+                >1,050 CFM</span
+              >
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> target about
+              1,050 CFM. The slower airflow keeps air on the coil longer, pulling
+              out more humidity — the difference between cool-and-dry and cool-but-clammy,
+              as explained in the <HvacExternalLink href={u.doeHeatingCooling}
+                >DOE heating &amp; cooling guide</HvacExternalLink
+              >.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about CFM, airflow, and air changes."
+      />
+
+      <CalculatorTradesQuoteCta
+        heading={ctaHeading}
+        description={ctaDescription}
+      />
+
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="cyan" />
+
+      <HvacExternalResources
+        heading="Trusted Airflow &amp; Duct Design Standards"
+        subheading="The CFM targets, air-change rates, and CFM-per-ton rules on this page trace back to widely adopted airflow and duct-design specifications. These organisations publish the standards contractors rely on when sizing blowers, registers, and duct runs."
+        resources={CFM_CALCULATOR_EXTERNAL_RESOURCES}
+      />
     </main>
 
     <Footer />

@@ -2,6 +2,7 @@
 title: "Mini-Split vs Central Air: Which Is Right for Your Home?"
 meta_title: "Mini-Split vs Central Air Conditioning: Pros, Cons & Costs | TradesQuote"
 description: "A direct comparison of ductless mini-splits vs central air — upfront cost, operating efficiency, installation, comfort control, and which wins in each scenario."
+image: /images/posts/mini-split-vs-central-air-hero.svg
 date: 2026-03-31T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

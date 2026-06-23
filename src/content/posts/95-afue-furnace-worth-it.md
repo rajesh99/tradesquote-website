@@ -2,6 +2,7 @@
 title: "Is a 95% AFUE Furnace Worth the Extra Cost?"
 meta_title: "Is a 95% AFUE Furnace Worth It? Payback Calculator Guide | TradesQuote"
 description: "Compare 80% vs 96% AFUE furnaces on fuel cost, payback period, and 15-year total cost. Worked examples for cold and mild climates at different gas prices."
+image: /images/posts/95-afue-furnace-worth-it-hero.svg
 date: 2026-04-29T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

@@ -2,6 +2,7 @@
 title: "Furnace Sizing Guide: What Size Furnace for My House?"
 meta_title: "Furnace Sizing Guide: How Many BTU Do I Need? | TradesQuote"
 description: "Find the right furnace BTU for your home by climate zone and insulation with AFUE adjustment, worked examples, and why oversizing is the most common mistake."
+image: /images/posts/furnace-sizing-guide-hero.webp
 date: 2026-05-27T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

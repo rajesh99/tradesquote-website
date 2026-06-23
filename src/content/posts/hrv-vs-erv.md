@@ -2,6 +2,7 @@
 title: "HRV vs ERV: Which Recovery Ventilator Does Your Home Need?"
 meta_title: "HRV vs ERV: Differences, Costs, and Which One to Choose | TradesQuote"
 description: "Heat Recovery Ventilators vs Energy Recovery Ventilators — how they work, what each recovers, which climate conditions suit each, and how to size them."
+image: /images/posts/hrv-vs-erv-hero.svg
 date: 2026-03-10T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

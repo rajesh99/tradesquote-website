@@ -6,6 +6,7 @@ date: 2026-05-13T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]
 tags: ["superheat","subcooling","refrigerant","diagnostics","hvac technician"]
+image: "/images/posts/superheat-subcooling-hero.svg"
 draft: false
 ---
 

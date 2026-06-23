@@ -6,6 +6,7 @@ date: 2026-04-08T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]
 tags: ["static pressure","tesp","diagnostics","ductwork","hvac technician"]
+image: "/images/posts/hvac-static-pressure-hero.webp"
 draft: false
 ---
 

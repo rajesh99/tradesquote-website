@@ -2,6 +2,7 @@
 title: "Markup vs Margin: How HVAC Contractors Should Price Jobs"
 meta_title: "HVAC Markup vs Margin: The Right Way to Price Jobs | TradesQuote"
 description: "The difference between markup and margin, why most HVAC contractors underprice jobs, and how to calculate the right selling price to hit your target profit."
+image: /images/posts/hvac-markup-vs-margin-hero.webp
 date: 2026-04-15T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]

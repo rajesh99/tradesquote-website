@@ -2,6 +2,7 @@
 title: "What Size Heat Pump Do I Need? A Guide for Cold Climates"
 meta_title: "What Size Heat Pump Do I Need? Cold Climate Sizing Guide | TradesQuote"
 description: "Size a heat pump for both cooling and heating with balance-point analysis for cold climates, climate zone factors, and when to add backup heat."
+image: /images/posts/heat-pump-cold-climate-hero.webp
 date: 2026-06-03T09:00:00Z
 categories: ["hvac"]
 authors: ["Mark"]
