@@ -165,121 +165,60 @@ const relatedCalculators = [
 
       <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
-        <div class="grid lg:grid-cols-5 gap-6">
-
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
               Describe the home
             </h2>
 
-            <div class="mt-6 space-y-5">
-              <!-- Conditioned area -->
-              <div>
-                <label for="mjArea" class="text-sm font-semibold text-slate-800">Conditioned area (sq ft)</label>
-                <input id="mjArea" type="number" min="100" max="10000" value="2000"
-                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none" />
-              </div>
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
 
-              <div class="grid sm:grid-cols-2 gap-5">
-                <!-- Climate zone -->
-                <div>
-                  <label for="mjClimate" class="text-sm font-semibold text-slate-800">Climate zone</label>
-                  <select id="mjClimate"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                    <option value="hot">Hot — Gulf Coast, desert SW (Zone 1–2)</option>
-                    <option value="warm">Warm — Southeast, S. California (Zone 3)</option>
-                    <option value="mixed" selected>Mixed — Mid-Atlantic, Tennessee (Zone 4)</option>
-                    <option value="cool">Cool — Northeast, Midwest (Zone 5)</option>
-                    <option value="cold">Cold — Upper Midwest, Mountain (Zone 6–7)</option>
-                  </select>
-                </div>
-
-                <!-- Insulation -->
-                <div>
-                  <label for="mjInsul" class="text-sm font-semibold text-slate-800">Insulation & sealing</label>
-                  <select id="mjInsul"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                    <option value="poor">Poor — older / leaky (+15%)</option>
-                    <option value="average" selected>Average — typical home</option>
-                    <option value="good">Good — tight / well-insulated (−12%)</option>
-                  </select>
-                </div>
-
-                <!-- Ceiling height -->
-                <div>
-                  <label for="mjCeiling" class="text-sm font-semibold text-slate-800">Ceiling height</label>
-                  <select id="mjCeiling"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                    <option value="8" selected>8 ft (standard)</option>
-                    <option value="9">9 ft (+6%)</option>
-                    <option value="10">10 ft (+12%)</option>
-                  </select>
-                </div>
-
-                <!-- Sun / windows -->
-                <div>
-                  <label for="mjSun" class="text-sm font-semibold text-slate-800">Sun exposure & windows</label>
-                  <select id="mjSun"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
-                    <option value="shaded">Mostly shaded / few windows (−10%)</option>
-                    <option value="average" selected>Average</option>
-                    <option value="sunny">Sunny / lots of glass (+15%)</option>
-                  </select>
-                </div>
-              </div>
-
-              <button id="resetBtn"
-                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                Reset to defaults
-              </button>
-            </div>
           </div>
 
           <!-- Results -->
-          <div class="lg:col-span-2">
-            <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-500 p-6 sm:p-8 text-white shadow-lg">
-              <p class="text-sm font-medium text-blue-100">Estimated cooling load</p>
+          <div class="mt-6 lg:mt-0 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Estimated cooling load</p>
               <div class="mt-2">
                 <span id="coolResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">44,000 BTU/hr</span>
               </div>
               <p id="coolTons" class="mt-1 text-sm text-blue-100">≈ 3.7 tons cooling</p>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-blue-100">Heating load</p>
-                  <p id="heatResult" class="mt-1 text-2xl font-bold">64,000 BTU/hr</p>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Heating load</p>
+                  <p id="heatResult" class="mt-1 text-2xl font-bold text-slate-900">64,000 BTU/hr</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-blue-100">Recommended size</p>
-                  <p id="sysResult" class="mt-1 text-2xl font-bold">3.5 tons</p>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Recommended size</p>
+                  <p id="sysResult" class="mt-1 text-2xl font-bold text-slate-900">3.5 tons</p>
                 </div>
               </div>
 
               <!-- Breakdown -->
-              <details class="group mt-5 rounded-xl bg-white/10">
-                <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800">
                   See the breakdown
-                  <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                  <svg class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-blue-50">
-                  <div class="flex justify-between"><span>Conditioned area</span><span id="bd-area" class="font-semibold">—</span></div>
-                  <div class="flex justify-between"><span>Climate zone</span><span id="bd-climate" class="font-semibold">—</span></div>
-                  <div class="flex justify-between"><span>Insulation</span><span id="bd-insul" class="font-semibold">—</span></div>
-                  <div class="flex justify-between"><span>Ceiling height</span><span id="bd-ceiling" class="font-semibold">—</span></div>
-                  <div class="flex justify-between"><span>Sun & windows</span><span id="bd-sun" class="font-semibold">—</span></div>
-                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5"><span>Cooling load</span><span id="bd-cool" class="font-semibold">—</span></div>
-                  <div class="flex justify-between"><span>Heating load</span><span id="bd-heat" class="font-semibold">—</span></div>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between"><span>Conditioned area</span><span id="bd-area" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Climate zone</span><span id="bd-climate" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Insulation</span><span id="bd-insul" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Ceiling height</span><span id="bd-ceiling" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Sun & windows</span><span id="bd-sun" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5"><span>Cooling load</span><span id="bd-cool" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Heating load</span><span id="bd-heat" class="font-semibold text-slate-900">—</span></div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-blue-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 A planning estimate based on whole-home factors. For permits and final equipment selection,
                 confirm with a full room-by-room ACCA Manual J.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
       </section>

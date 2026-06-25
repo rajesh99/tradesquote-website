@@ -164,129 +164,60 @@ const relatedCalculators = [
       
           <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
           <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
-            <div class="grid lg:grid-cols-5 gap-6">
-      
-              <!-- Inputs -->
-              <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
                   <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                   Describe the replacement job
                 </h2>
-      
-                <div class="mt-6 space-y-5">
-                  <!-- System type -->
-                  <div>
-                    <label for="sysType" class="text-sm font-semibold text-slate-800">What's being replaced?</label>
-                    <select id="sysType"
-                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
-                      <option value="5500">Central AC only (condenser + coil)</option>
-                      <option value="5000">Gas furnace only</option>
-                      <option value="10500" selected>Full system — AC + furnace</option>
-                      <option value="9000">Heat pump (heating + cooling)</option>
-                      <option value="4000">Ductless mini-split (single zone)</option>
-                    </select>
-                  </div>
-      
-                  <div class="grid sm:grid-cols-2 gap-5">
-                    <!-- Size -->
-                    <div>
-                      <label for="sysSize" class="text-sm font-semibold text-slate-800">System size</label>
-                      <select id="sysSize"
-                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
-                        <option value="1.5">1.5 tons (18,000 BTU)</option>
-                        <option value="2">2 tons (24,000 BTU)</option>
-                        <option value="2.5">2.5 tons (30,000 BTU)</option>
-                        <option value="3" selected>3 tons (36,000 BTU)</option>
-                        <option value="3.5">3.5 tons (42,000 BTU)</option>
-                        <option value="4">4 tons (48,000 BTU)</option>
-                        <option value="5">5 tons (60,000 BTU)</option>
-                      </select>
-                    </div>
-      
-                    <!-- Efficiency tier -->
-                    <div>
-                      <label for="sysEff" class="text-sm font-semibold text-slate-800">Efficiency tier</label>
-                      <select id="sysEff"
-                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
-                        <option value="1.0" selected>Standard — meets minimum code</option>
-                        <option value="1.12">Mid-tier — better SEER2 / AFUE (+12%)</option>
-                        <option value="1.25">High-efficiency — top SEER2 / condensing (+25%)</option>
-                      </select>
-                    </div>
-      
-                    <!-- Ductwork -->
-                    <div>
-                      <label for="sysDuct" class="text-sm font-semibold text-slate-800">Ductwork condition</label>
-                      <select id="sysDuct"
-                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
-                        <option value="0" selected>Existing ducts in good shape</option>
-                        <option value="1000">Minor repairs & sealing (+$1,000)</option>
-                        <option value="4000">Full duct replacement (+$4,000)</option>
-                      </select>
-                    </div>
-      
-                    <!-- Labor market -->
-                    <div>
-                      <label for="sysMarket" class="text-sm font-semibold text-slate-800">Local labor market</label>
-                      <select id="sysMarket"
-                        class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none">
-                        <option value="0.9">Low-cost area (×0.9)</option>
-                        <option value="1.0" selected>National average (×1.0)</option>
-                        <option value="1.2">High-cost metro (×1.2)</option>
-                      </select>
-                    </div>
-                  </div>
-      
-                  <button id="resetBtn"
-                    class="text-sm font-medium text-slate-500 hover:text-violet-600 transition flex items-center gap-1.5">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    Reset to defaults
-                  </button>
-                </div>
-              </div>
-      
-              <!-- Results -->
-              <div class="lg:col-span-2">
-                <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 p-6 sm:p-8 text-white shadow-lg">
-                  <p class="text-sm font-medium text-violet-100">Estimated installed cost</p>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+
+          </div>
+
+          <!-- Results -->
+          <div class="mt-6 lg:mt-0 rounded-xl border border-violet-100 bg-violet-50 p-5 sm:p-6">
+
+                  <p class="text-sm font-medium text-slate-600">Estimated installed cost</p>
                   <div class="mt-2">
                     <span id="rangeResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">$8,900 – $12,100</span>
                   </div>
       
                   <div class="mt-6 grid grid-cols-2 gap-3">
-                    <div class="rounded-xl bg-white/15 p-4">
-                      <p class="text-xs text-violet-100">Typical mid-point</p>
-                      <p id="midResult" class="mt-1 text-2xl font-bold">$10,500</p>
+                    <div class="rounded-xl border border-violet-100 bg-white p-4">
+                      <p class="text-xs text-slate-500">Typical mid-point</p>
+                      <p id="midResult" class="mt-1 text-2xl font-bold text-slate-900">$10,500</p>
                     </div>
-                    <div class="rounded-xl bg-white/15 p-4">
-                      <p class="text-xs text-violet-100">Per ton of capacity</p>
-                      <p id="perTonResult" class="mt-1 text-2xl font-bold">$3,500</p>
+                    <div class="rounded-xl border border-violet-100 bg-white p-4">
+                      <p class="text-xs text-slate-500">Per ton of capacity</p>
+                      <p id="perTonResult" class="mt-1 text-2xl font-bold text-slate-900">$3,500</p>
                     </div>
                   </div>
       
                   <!-- Breakdown -->
-                  <details class="group mt-5 rounded-xl bg-white/10">
-                    <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                  <details class="group mt-5 rounded-xl border border-violet-100 bg-white">
+                    <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800">
                       See the breakdown
-                      <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                      <svg class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                     </summary>
-                    <div class="px-4 pb-4 text-sm space-y-1.5 text-violet-50">
-                      <div class="flex justify-between"><span>Base price (system type)</span><span id="bd-base" class="font-semibold">—</span></div>
-                      <div class="flex justify-between"><span>Size adjustment</span><span id="bd-size" class="font-semibold">—</span></div>
-                      <div class="flex justify-between"><span>Efficiency tier</span><span id="bd-eff" class="font-semibold">—</span></div>
-                      <div class="flex justify-between"><span>Ductwork</span><span id="bd-duct" class="font-semibold">—</span></div>
-                      <div class="flex justify-between"><span>Labor market</span><span id="bd-market" class="font-semibold">—</span></div>
-                      <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"><span class="font-bold">Mid-point estimate</span><span id="bd-total" class="font-bold">—</span></div>
+                    <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                      <div class="flex justify-between"><span>Base price (system type)</span><span id="bd-base" class="font-semibold text-slate-900">—</span></div>
+                      <div class="flex justify-between"><span>Size adjustment</span><span id="bd-size" class="font-semibold text-slate-900">—</span></div>
+                      <div class="flex justify-between"><span>Efficiency tier</span><span id="bd-eff" class="font-semibold text-slate-900">—</span></div>
+                      <div class="flex justify-between"><span>Ductwork</span><span id="bd-duct" class="font-semibold text-slate-900">—</span></div>
+                      <div class="flex justify-between"><span>Labor market</span><span id="bd-market" class="font-semibold text-slate-900">—</span></div>
+                      <div class="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5 text-slate-900"><span class="font-bold text-slate-900">Mid-point estimate</span><span id="bd-total" class="font-bold text-slate-900">—</span></div>
                     </div>
                   </details>
       
-                  <p class="mt-4 text-xs text-violet-100 leading-relaxed">
+                  <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                     National 2026 ballparks for budgeting — equipment, labor, permit, and disposal included.
                     Your local line-item quotes are the real number; use this to sanity-check them.
                   </p>
-                </div>
-              </div>
-            </div>
+                
+          </div>
+          </div>
+        </div>
       
             <!-- Reference table -->
             <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">

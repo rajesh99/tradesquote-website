@@ -164,10 +164,8 @@ const relatedCalculators = [
 
       <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-emerald-600"
                 fill="none"
@@ -184,8 +182,9 @@ const relatedCalculators = [
               Enter airflow and psychrometric readings
             </h2>
 
-            <div class="mt-6 space-y-6">
-              <div class="grid sm:grid-cols-2 gap-5">
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+<div class="grid sm:grid-cols-2 gap-5">
                 <div class="sm:col-span-2">
                   <label for="sl-cfm" class="text-sm font-semibold text-slate-800">Airflow (CFM)</label>
                   <input
@@ -291,40 +290,37 @@ const relatedCalculators = [
                 </svg>
                 Reset to defaults
               </button>
-            </div>
           </div>
 
           <!-- Results -->
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-emerald-100">Total coil load (Qt)</p>
+          <div class="mt-6 lg:mt-0 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Total coil load (Qt)</p>
               <div class="mt-2 flex items-baseline gap-2">
                 <span id="sl-qt" class="text-4xl sm:text-5xl font-extrabold tracking-tight">54,480 BTU/h</span>
               </div>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-emerald-100">Sensible (Qs)</p>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Sensible (Qs)</p>
                   <p id="sl-qs" class="mt-1 text-xl font-bold">25,920 BTU/h</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-emerald-100">Latent (Ql)</p>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Latent (Ql)</p>
                   <p id="sl-ql" class="mt-1 text-xl font-bold">28,560 BTU/h</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-emerald-100">SHR</p>
-                  <p id="sl-shr" class="mt-1 text-2xl font-bold">0.48</p>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">SHR</p>
+                  <p id="sl-shr" class="mt-1 text-2xl font-bold text-slate-900">0.48</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-emerald-100">Load profile</p>
-                  <p id="sl-status" class="mt-1 text-2xl font-bold">Very latent</p>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Load profile</p>
+                  <p id="sl-status" class="mt-1 text-2xl font-bold text-slate-900">Very latent</p>
                 </div>
               </div>
 
-              <div class="mt-3 rounded-xl bg-white/15 p-4">
-                <p class="text-xs text-emerald-100">What it means</p>
+              <div class="mt-3 rounded-xl border border-emerald-100 bg-white p-4">
+                <p class="text-xs text-slate-500">What it means</p>
                 <p id="sl-causes" class="mt-1 text-sm font-medium leading-snug">
                   Latent load dominates — very humid conditions, high indoor moisture, or limited sensible split.
                   Check return humidity, ventilation loads, and that CFM is not excessive for the moisture removal
@@ -333,13 +329,13 @@ const relatedCalculators = [
               </div>
 
               <!-- Breakdown -->
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
@@ -348,30 +344,31 @@ const relatedCalculators = [
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-emerald-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
-                    <span>Airflow</span><span id="sl-bd-cfm" class="font-semibold">—</span>
+                    <span>Airflow</span><span id="sl-bd-cfm" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Temperature Δ (return − supply)</span><span id="sl-bd-dt" class="font-semibold">—</span>
+                    <span>Temperature Δ (return − supply)</span><span id="sl-bd-dt" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Grain depression (return − supply)</span><span id="sl-bd-dgrains" class="font-semibold">—</span>
+                    <span>Grain depression (return − supply)</span><span id="sl-bd-dgrains" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
-                    <span>Sensible load (1.08 × CFM × ΔT)</span><span id="sl-bd-qs" class="font-semibold">—</span>
+                    <span>Sensible load (1.08 × CFM × ΔT)</span><span id="sl-bd-qs" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Latent load (0.68 × CFM × Δgr)</span><span id="sl-bd-ql" class="font-semibold">—</span>
+                    <span>Latent load (0.68 × CFM × Δgr)</span><span id="sl-bd-ql" class="font-semibold text-slate-900">—</span>
                   </div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-emerald-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Cooling mode: return should be warmer and more humid than supply. Pair with actual CFM and Delta T
                 when diagnosing comfort, charge, or equipment sizing.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 
