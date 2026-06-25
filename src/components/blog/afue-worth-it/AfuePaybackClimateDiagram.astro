@@ -1,0 +1,45 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const zones = [
+  { label: "Zone 5–6 (cold)", bill: "$1,400–$2,000", payback: "2–3 yrs", color: C.primary, barW: 280 },
+  { label: "Zone 3–4 (moderate)", bill: "$700–$1,200", payback: "3–5 yrs", color: C.blue, barW: 180 },
+  { label: "Zone 1–2 (mild)", bill: "$300–$600", payback: "6–12 yrs", color: C.orange, barW: 100 },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>96% AFUE payback period by climate zone</title>
+  <desc>
+    Cold climates pay back a $600 premium in 2–3 years. Moderate climates in 3–5 years. Mild climates
+    take 6–12 years.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Payback on $600 premium (80% → 96% AFUE)
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    16.7% fuel savings · longer heating seasons = faster payback
+  </text>
+
+  {zones.map((z, i) => {
+    const y = 76 + i * 56;
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="11" font-weight="600">{z.label}</text>
+        <text x="24" y={y + 28} fill={C.muted} font-family={FONT} font-size="9">Heating bill: {z.bill}</text>
+        <rect x="200" y={y} width="480" height="22" rx="4" fill={C.white} stroke={C.border} />
+        <rect x="200" y={y} width={z.barW} height="22" rx="4" fill={z.color} opacity="0.85" />
+        <text x={200 + z.barW + 8} y={y + 15} fill={z.color} font-family={FONT} font-size="12" font-weight="700">
+          {z.payback}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="220" width="672" height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+  <text x="360" y="236" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10" font-weight="600">
+    Savings formula: 1 − (80 ÷ 96) = 16.7% reduction in annual heating fuel cost
+  </text>
+</svg>

@@ -1,0 +1,51 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Refrigeration loop with superheat and subcooling</title>
+  <desc>Superheat measured at evaporator outlet; subcooling measured at condenser outlet.</desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <!-- Compressor -->
+  <rect x="40" y="110" width="80" height="60" rx="6" fill={C.dark} />
+  <text x="80" y="145" text-anchor="middle" fill={C.white} font-family={FONT} font-size="10" font-weight="600">Compressor</text>
+
+  <!-- Condenser -->
+  <path d="M140 140 H200" stroke={C.orange} stroke-width="2" marker-end="url(#sh-arr-o)" />
+  <rect x="204" y="110" width="100" height="60" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="254" y="136" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Condenser</text>
+  <text x="254" y="154" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="9" font-weight="600">Subcooling here</text>
+
+  <!-- Metering device -->
+  <path d="M314 140 H374" stroke={C.primary} stroke-width="2" marker-end="url(#sh-arr-p)" />
+  <rect x="378" y="118" width="72" height="44" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="414" y="138" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="600">TXV /</text>
+  <text x="414" y="150" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="600">Piston</text>
+
+  <!-- Evaporator -->
+  <path d="M458 140 H518" stroke={C.blue} stroke-width="2" marker-end="url(#sh-arr-b)" />
+  <rect x="522" y="110" width="100" height="60" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.5" />
+  <text x="572" y="136" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Evaporator</text>
+  <text x="572" y="154" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="9" font-weight="600">Superheat here</text>
+
+  <!-- Return to compressor -->
+  <path d="M622 140 H660 V220 H80 V170" stroke={C.muted} stroke-width="2" stroke-dasharray="4 3" marker-end="url(#sh-arr-m)" />
+
+  <!-- Formula boxes -->
+  <rect x="40" y="200" width="300" height="56" rx="8" fill={C.white} stroke={C.blue} stroke-width="1.5" />
+  <text x="190" y="222" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Superheat</text>
+  <text x="190" y="242" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">Suction temp − Sat. temp @ suction P</text>
+
+  <rect x="380" y="200" width="300" height="56" rx="8" fill={C.white} stroke={C.orange} stroke-width="1.5" />
+  <text x="530" y="222" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Subcooling</text>
+  <text x="530" y="242" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">Sat. temp @ liquid P − Liquid temp</text>
+
+  <defs>
+    <marker id="sh-arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.primary} /></marker>
+    <marker id="sh-arr-o" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.orange} /></marker>
+    <marker id="sh-arr-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.blue} /></marker>
+    <marker id="sh-arr-m" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.muted} /></marker>
+  </defs>
+</svg>

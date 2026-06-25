@@ -1,0 +1,31 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+  <title>AC sizing formula with adjustment factors</title>
+  <desc>BTU equals square footage times 20 times ceiling, climate, sun, and insulation factors.</desc>
+
+  <rect x="8" y="8" width="704" height="224" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="360" y="40" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Full sizing formula</text>
+
+  <rect x="40" y="60" width="640" height="48" rx="8" fill={C.white} stroke={C.primary} stroke-width="1.5" />
+  <text x="360" y="90" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="600">
+    BTU = Sq Ft × 20 × Ceiling × Climate × Sun × Insulation
+  </text>
+
+  {[
+    { label: "Ceiling", ex: "8 ft = 1.0 · 10 ft = 1.25", x: 40 },
+    { label: "Climate", ex: "Hot 1.15 · Mod 1.0 · Cool 0.85", x: 200 },
+    { label: "Sun", ex: "Sunny 1.10 · Avg 1.0 · Shade 0.95", x: 360 },
+    { label: "Insulation", ex: "Poor 1.15 · Avg 1.0 · Good 0.90", x: 520 },
+  ].map((f) => (
+    <g>
+      <rect x={f.x} y="128" width="160" height="88" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+      <text x={f.x + 80} y="152" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{f.label}</text>
+      <text x={f.x + 80} y="174" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{f.ex.split(" · ")[0]}</text>
+      <text x={f.x + 80} y="188" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{f.ex.split(" · ")[1]}</text>
+      <text x={f.x + 80} y="202" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{f.ex.split(" · ")[2]}</text>
+    </g>
+  ))}
+</svg>

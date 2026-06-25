@@ -10,6 +10,11 @@ tags: ["heat pump","gas furnace","operating cost","efficiency","heating cost"]
 draft: false
 ---
 
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import CostPerBtuDiagram from "@/components/blog/hp-vs-gas/CostPerBtuDiagram.astro";
+import CopDeclineDiagram from "@/components/blog/hp-vs-gas/CopDeclineDiagram.astro";
+import BreakEvenPriceDiagram from "@/components/blog/hp-vs-gas/BreakEvenPriceDiagram.astro";
+
 A heat pump is cheaper to run than a gas furnace when electricity costs less than roughly $0.145/kWh — but that threshold shifts depending on your climate, the COP at your typical outdoor temperature, and your local gas price. This article works through the numbers so you can check your own situation.
 
 ## The Right Metric: Cost per BTU Delivered
@@ -26,6 +31,13 @@ Comparing "cost per unit of fuel" misleads you. A gas furnace wastes some fuel u
 
 At $0.13/kWh the heat pump and furnace are essentially tied. Below that the heat pump wins; above that the furnace wins — at 47°F outdoor temperature.
 
+<BlogInfographic
+  title="Cost per 100,000 BTU delivered"
+  caption="Compare delivered heat, not fuel cost. At COP 3.0 and 47°F, the break-even electricity rate is about $0.13/kWh."
+>
+  <CostPerBtuDiagram />
+</BlogInfographic>
+
 ## How COP Drops with Cold Temperatures
 
 Heat pump efficiency falls as outdoor temperatures drop because there is less heat in the air to extract.
@@ -41,6 +53,13 @@ Cold-climate heat pumps (sometimes called hyper-heat or cold-climate models) mai
 
 At COP 2.0 and $0.13/kWh, cost per 100,000 BTU = $1.90 — more expensive than the 96% furnace at $1.25. This is why climate matters.
 
+<BlogInfographic
+  title="COP declines in cold weather"
+  caption="Standard heat pumps drop to COP 2.0 at 17°F and 1.5 at 0°F. Cold-climate models hold ~1.8 even at −13°F."
+>
+  <CopDeclineDiagram />
+</BlogInfographic>
+
 ## Break-Even Electricity Price
 
 For a heat pump to match a 96% AFUE furnace at $1.20/therm, you need the cost-per-BTU to be equal:
@@ -52,6 +71,13 @@ At COP 2.5 and $1.20/therm gas: break-even electricity = approximately **$0.145/
 At COP 2.0 (cold outdoor temps): break-even drops to about **$0.116/kWh**.
 
 If you are in the Northeast paying $0.22/kWh and your heat pump runs many hours below 20°F, the furnace likely wins on operating cost. If you are in the Southeast paying $0.12/kWh with mild winters, the heat pump wins by a wide margin.
+
+<BlogInfographic
+  title="Break-even electricity price"
+  caption="At COP 2.5 break-even is ~$0.145/kWh. In cold weather (COP 2.0) it drops to ~$0.116/kWh — gas wins sooner."
+>
+  <BreakEvenPriceDiagram />
+</BlogInfographic>
 
 ## Electricity Rates by Region
 

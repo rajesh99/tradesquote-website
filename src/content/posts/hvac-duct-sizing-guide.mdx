@@ -10,6 +10,11 @@ tags: ["duct sizing","manual d","airflow","friction rate","ductwork"]
 draft: false
 ---
 
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import DuctSizingRulesDiagram from "@/components/blog/duct-sizing/DuctSizingRulesDiagram.astro";
+import ManualDFlowDiagram from "@/components/blog/duct-sizing/ManualDFlowDiagram.astro";
+import DuctMistakesDiagram from "@/components/blog/duct-sizing/DuctMistakesDiagram.astro";
+
 HVAC duct sizing determines how much air each room receives — get it wrong and no amount of equipment capacity fixes uneven temperatures, high static pressure, or noise complaints.
 
 There are two ways to size ducts: the Manual D engineering method and simplified rules of thumb. Rules of thumb work for straightforward residential systems. Manual D is required for load-calculated designs, any system with complex geometry, or anywhere comfort callbacks are not acceptable.
@@ -29,6 +34,13 @@ To use velocity to find duct diameter: divide CFM by velocity (fpm) to get area 
 **Example:** A branch carrying 200 CFM at 600 fpm needs 0.333 sq ft = 48 sq in = 7.8" — round up to 8".
 
 Rules of thumb produce a starting point. They do not account for fitting losses, flex duct resistance, or equipment static pressure limits. Use them to sketch a layout, then verify with friction rate math.
+
+<BlogInfographic
+  title="Duct sizing rules of thumb"
+  caption="Start with CFM, divide by target velocity, and round up to the next standard duct size."
+>
+  <DuctSizingRulesDiagram />
+</BlogInfographic>
 
 ## Manual D Method
 
@@ -72,6 +84,13 @@ This gives you in.w.c. per 100 ft — the unit used on friction charts.
 
 With your friction rate, look up each duct diameter on a friction chart (Moody-based, ACCA Manual D Appendix). Select the smallest diameter that carries the required CFM at or below your friction rate.
 
+<BlogInfographic
+  title="Manual D design flow"
+  caption="Work from available static pressure through TEL to friction rate, then select duct sizes."
+>
+  <ManualDFlowDiagram />
+</BlogInfographic>
+
 ## Worked Example: 3-Ton System
 
 **Given:**
@@ -114,6 +133,13 @@ Practical rules for flex:
 **Flex duct with too many bends.** A flex branch with three bends between the plenum and the register can easily exceed 50 equivalent feet of resistance. Use hard duct to within 6 feet of the register boot, then transition to a short flex connection.
 
 **Not accounting for fittings.** Ignoring fitting equivalents in TEL calculations produces an optimistic friction rate. The duct system arrives on-site and static pressure is 0.10 in.w.c. over budget, forcing the equipment to run at higher speed, higher noise, and shortened motor life.
+
+<BlogInfographic
+  title="Common duct sizing mistakes"
+  caption="Undersized returns, oversized trunks, flex bends, and ignored fittings are the top errors."
+>
+  <DuctMistakesDiagram />
+</BlogInfographic>
 
 ## Use the Free Calculator
 
