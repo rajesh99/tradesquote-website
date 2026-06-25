@@ -3,6 +3,7 @@ title: "ASHRAE 62.2 Ventilation Requirements: What Your Home Actually Needs"
 meta_title: "ASHRAE 62.2 Residential Ventilation Requirements Explained | TradesQuote"
 description: "The ASHRAE 62.2 whole-building ventilation formula, why tight construction requires mechanical ventilation, and how to size an HRV, ERV, or exhaust fan to meet the standard."
 date: 2026-02-10T09:00:00Z
+image: "/images/posts/ashrae-62-ventilation-hero.svg"
 categories: ["hvac"]
 authors: ["Mark"]
 tags: ["ventilation","ashrae 62.2","indoor air quality","hrv","erv","iaq"]
