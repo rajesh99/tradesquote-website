@@ -1,0 +1,385 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "AC Installation Cost Calculator — Free Central Air Install Estimator | TradesQuote";
+const description =
+  "Free AC installation cost calculator. Estimate the installed cost of a new central air conditioner, heat pump, or mini-split — by system size, efficiency, new vs. replacement, ductwork, and region. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-ac-installation-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "AC Installation Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "AC Installation Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online AC installation cost calculator that estimates the installed price of a new central air conditioner, heat pump, or ductless mini-split based on system size, efficiency tier, new-vs-replacement scope, ductwork, and regional labor market.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to install central air conditioning?",
+    answer:
+      "A new central AC installation typically runs <strong>$4,500 to $9,000</strong> for a standard-efficiency 2–3.5 ton system with existing ductwork. Adding ductwork, choosing high-efficiency equipment, or a first-time install (new line set, electrical, and pad) pushes the total higher.",
+  },
+  {
+    question: "How much does a new AC unit cost installed?",
+    answer:
+      "Installed, expect about <strong>$2,000 per ton</strong> as a rough guide — so a 3-ton central AC lands near $6,000. The equipment alone is only part of it; labor, refrigerant lines, electrical hookup, permits, and startup testing make up the rest of the installed price.",
+  },
+  {
+    question: "Does installing AC require new ductwork?",
+    answer:
+      'Only if you don\'t already have ducts, or the existing ones are wrong for the new system. A like-for-like replacement reuses good ducts. A first-time install in a home without ducts needs them added — price that separately with the <a href="/calculators/hvac/hvac-ductwork-replacement-cost-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Ductwork Cost Calculator</a> — or consider a ductless mini-split.',
+  },
+  {
+    question: "Is installing AC cheaper during a furnace replacement?",
+    answer:
+      "Yes. Doing both at once shares the labor, the crane/lift, the permit, and the startup visit, so a combined AC-plus-furnace install costs less than two separate jobs. That's why full-system quotes often look like a better value per piece of equipment.",
+  },
+  {
+    question: "What drives AC installation cost the most?",
+    answer:
+      "In order: <strong>system type and size, efficiency tier, whether ductwork is needed, and your local labor market</strong>. A new install (versus a straight replacement) also adds line set, electrical, and a pad. Equipment brand and warranty matter too, but scope and region move the number most.",
+  },
+  {
+    question: "Is a ductless mini-split cheaper to install than central air?",
+    answer:
+      "For a single zone, often yes — a mini-split skips ductwork and runs roughly <strong>$3,000 to $6,000</strong> installed. But multi-zone mini-split systems (one head per room) can match or exceed central air, so compare total installed cost for the areas you actually need to condition.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Quoting an install? Turn the ballpark into a signed quote.";
+const ctaDescription =
+  "This page gives homeowners a budget — TradesQuote gives contractors the winning quote. Describe the install or upload photos, and our AI builds the full line-item estimate: equipment, labor, line set, electrical, permits, and disposal, with quantities and unit prices validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-replacement-cost-calculator",
+    title: "Replacement Cost Calculator",
+    description: "Price a replacement AC, furnace, heat pump, or full system.",
+  },
+  {
+    href: "/calculators/hvac/hvac-ductwork-replacement-cost-calculator",
+    title: "Ductwork Cost Calculator",
+    description: "Cost to add or replace ducts for a new install.",
+  },
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (Cooling)",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AC Installation Cost Calculator — Free Central Air Install Estimator" />
+    <meta
+      property="og:description"
+      content="Estimate the installed cost of a new central AC, heat pump, or mini-split — by size, efficiency, new vs. replacement, ductwork, and region. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AC Installation Cost Calculator — Free Central Air Install Estimator" />
+    <meta
+      name="twitter:description"
+      content="Estimate the installed cost of a new central AC, heat pump, or mini-split. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="AC Installation Cost Calculator" />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              HVAC Tools · Cost · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              AC Installation Cost Calculator <span class="text-sky-600">— Free Estimator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This AC installation cost calculator estimates the installed price of a new central air conditioner,
+              heat pump, or ductless mini-split — adjusted for system size, efficiency tier, whether it's a new
+              install or a replacement, ductwork needs, and your local labor market. Use it to budget central air
+              before you collect quotes, or to sanity-check the install prices you already have.
+            </p>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl border border-sky-100 bg-sky-50 p-4">
+              <svg class="h-5 w-5 shrink-0 text-sky-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900">Replacing an existing system?</span>
+                The
+                <a href="/calculators/hvac/hvac-replacement-cost-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Replacement Cost Calculator</a>
+                is tuned for like-for-like swaps; this one adds the extras of a fresh install — line set, electrical, and pad.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+        <div class="grid lg:grid-cols-5 gap-6">
+
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              Describe the install
+            </h2>
+
+            <div class="mt-6 space-y-5">
+              <!-- System type -->
+              <div>
+                <label for="acType" class="text-sm font-semibold text-slate-800">What are you installing?</label>
+                <select id="acType"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                  <option value="6000" selected>Central AC only (condenser + coil)</option>
+                  <option value="9500">Heat pump (heating + cooling)</option>
+                  <option value="11500">Full system — AC + furnace</option>
+                  <option value="4500">Ductless mini-split (single zone)</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <!-- Size -->
+                <div>
+                  <label for="acSize" class="text-sm font-semibold text-slate-800">System size</label>
+                  <select id="acSize"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                    <option value="1.5">1.5 tons (18,000 BTU)</option>
+                    <option value="2">2 tons (24,000 BTU)</option>
+                    <option value="2.5">2.5 tons (30,000 BTU)</option>
+                    <option value="3" selected>3 tons (36,000 BTU)</option>
+                    <option value="3.5">3.5 tons (42,000 BTU)</option>
+                    <option value="4">4 tons (48,000 BTU)</option>
+                    <option value="5">5 tons (60,000 BTU)</option>
+                  </select>
+                </div>
+
+                <!-- Efficiency -->
+                <div>
+                  <label for="acEff" class="text-sm font-semibold text-slate-800">Efficiency tier</label>
+                  <select id="acEff"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                    <option value="1.0" selected>Standard — meets minimum SEER2</option>
+                    <option value="1.12">Mid-tier — better SEER2 (+12%)</option>
+                    <option value="1.25">High-efficiency — top SEER2 (+25%)</option>
+                  </select>
+                </div>
+
+                <!-- Ductwork -->
+                <div>
+                  <label for="acDuct" class="text-sm font-semibold text-slate-800">Ductwork</label>
+                  <select id="acDuct"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                    <option value="0" selected>Existing ducts (or ductless)</option>
+                    <option value="1000">Minor duct repairs (+$1,000)</option>
+                    <option value="4500">Add full new ductwork (+$4,500)</option>
+                  </select>
+                </div>
+
+                <!-- Project type -->
+                <div>
+                  <label for="acProject" class="text-sm font-semibold text-slate-800">Project type</label>
+                  <select id="acProject"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                    <option value="1.0" selected>Replacing an existing system</option>
+                    <option value="1.15">New install — first AC (+15%)</option>
+                  </select>
+                </div>
+
+                <!-- Labor market -->
+                <div>
+                  <label for="acMarket" class="text-sm font-semibold text-slate-800">Local labor market</label>
+                  <select id="acMarket"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                    <option value="0.9">Low-cost area (×0.9)</option>
+                    <option value="1.0" selected>National average (×1.0)</option>
+                    <option value="1.2">High-cost metro (×1.2)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button id="resetBtn"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-sky-600 to-blue-500 p-6 sm:p-8 text-white shadow-lg">
+              <p class="text-sm font-medium text-sky-100">Estimated installed cost</p>
+              <div class="mt-2">
+                <span id="rangeResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">$5,100 – $6,900</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Typical mid-point</p>
+                  <p id="midResult" class="mt-1 text-2xl font-bold">$6,000</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Per ton of capacity</p>
+                  <p id="perTonResult" class="mt-1 text-2xl font-bold">$2,000</p>
+                </div>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                  See the breakdown
+                  <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-sky-50">
+                  <div class="flex justify-between"><span>Base price (system type)</span><span id="bd-base" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Size adjustment</span><span id="bd-size" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Efficiency tier</span><span id="bd-eff" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Ductwork</span><span id="bd-duct" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Project type</span><span id="bd-project" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Labor market</span><span id="bd-market" class="font-semibold">—</span></div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"><span class="font-bold">Mid-point estimate</span><span id="bd-total" class="font-bold">—</span></div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-sky-100 leading-relaxed">
+                National 2026 ballparks for budgeting — equipment, labor, permit, line set, and disposal included.
+                Your local line-item quotes are the real number; use this to sanity-check them.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Typical AC installation costs (quick reference)</h2>
+          <p class="mt-2 text-sm text-slate-500">National installed-price ranges for standard-efficiency equipment with existing ductwork in good shape. High-efficiency tiers add roughly 12–25%; new ductwork adds several thousand.</p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Install</th>
+                  <th class="py-2.5 pr-4 font-semibold">Low</th>
+                  <th class="py-2.5 pr-4 font-semibold">Typical</th>
+                  <th class="py-2.5 font-semibold">High</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Central AC only</td><td class="py-2.5 pr-4">$4,500</td><td class="py-2.5 pr-4">$6,000</td><td class="py-2.5">$9,000</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Heat pump</td><td class="py-2.5 pr-4">$6,500</td><td class="py-2.5 pr-4">$9,500</td><td class="py-2.5">$13,000</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Full system (AC + furnace)</td><td class="py-2.5 pr-4">$9,000</td><td class="py-2.5 pr-4">$11,500</td><td class="py-2.5">$16,000</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">Mini-split (single zone)</td><td class="py-2.5 pr-4">$3,000</td><td class="py-2.5 pr-4">$4,500</td><td class="py-2.5">$6,000</td></tr>
+                <tr><td class="py-2.5 pr-4 font-semibold">Add new ductwork</td><td class="py-2.5 pr-4">+$2,500</td><td class="py-2.5 pr-4">+$4,500</td><td class="py-2.5">+$7,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">Ranges reflect typical 2026 national pricing for residential jobs and vary by brand, region, and site conditions. Always compare multiple line-item quotes.</p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Installation pricing is a base price for the type of system, scaled by size and efficiency, plus any
+            ductwork — then adjusted for a fresh install versus a replacement and your local labor rates.
+          </p>
+
+          <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+            <div class="text-sky-300"># Step 1 — Start from the system's base install price</div>
+            <div>base&nbsp;=&nbsp;central AC <span class="text-amber-300">$6,000</span> · heat pump <span class="text-amber-300">$9,500</span> · full system <span class="text-amber-300">$11,500</span> · mini-split <span class="text-amber-300">$4,500</span></div>
+            <div class="mt-4 text-sky-300"># Step 2 — Scale for size and efficiency</div>
+            <div>cost&nbsp;=&nbsp;base × size factor (<span class="text-amber-300">0.85–1.25</span>) × efficiency (<span class="text-amber-300">1.0–1.25</span>)</div>
+            <div class="mt-4 text-sky-300"># Step 3 — Add ductwork, then adjust for scope and market</div>
+            <div>total&nbsp;=&nbsp;(cost + ductwork) × project (<span class="text-amber-300">1.0–1.15</span>) × market (<span class="text-amber-300">0.9–1.2</span>)</div>
+            <div class="mt-4 text-sky-300"># Step 4 — Show it as a range, not a fake-precise number</div>
+            <div>range&nbsp;=&nbsp;total × <span class="text-amber-300">0.85</span> … total × <span class="text-amber-300">1.15</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why a new install costs more than a replacement</h3>
+              <p class="mt-2 text-sm text-slate-600">A first-time install adds a new refrigerant line set, electrical circuit and disconnect, and a condenser pad — work a like-for-like swap already has in place.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why ductwork is the big variable</h3>
+              <p class="mt-2 text-sm text-slate-600">If a home has no ducts, adding them can rival the cost of the AC itself — which is why ductless mini-splits are popular for additions and older homes.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why size moves price less than you'd think</h3>
+              <p class="mt-2 text-sm text-slate-600">Equipment cost rises with tonnage, but labor — the largest line — stays similar, so the size factor only spans 0.85–1.25.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Don't forget rebates</h3>
+              <p class="mt-2 text-sm text-slate-600">High-efficiency systems and heat pumps often qualify for federal tax credits and utility rebates that claw back a meaningful chunk of the install cost.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about AC installation pricing."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="sky" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacAcInstallationCostCalculator } from "@/scripts/calculators/hvac-ac-installation-cost-calculator";
+    initHvacAcInstallationCostCalculator();
+  </script>
+</Layout>

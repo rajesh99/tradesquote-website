@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const methods = [
+  {
+    x: 24,
+    title: "Flow hood",
+    sub: "balometer",
+    detail: "Capture all air at a register and read CFM directly.",
+    accent: C.primary,
+  },
+  {
+    x: 256,
+    title: "Duct traverse",
+    sub: "anemometer",
+    detail: "CFM = velocity (fpm) × duct area (sq ft).",
+    accent: C.blue,
+  },
+  {
+    x: 488,
+    title: "Blower table",
+    sub: "static pressure",
+    detail: "Measure total external static, look up CFM on the blower chart.",
+    accent: C.orange,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>How to measure CFM</title>
+  <desc>Three field methods: a flow hood at the register, an anemometer traverse in a duct, and a blower table using total external static pressure.</desc>
+
+  <text x="360" y="34" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="16" font-weight="700">How to measure CFM</text>
+
+  {methods.map((m) => (
+    <g>
+      <rect x={m.x} y="58" width="208" height="206" rx="12" fill={C.panelBg} stroke={C.border} />
+      <rect x={m.x} y="58" width="208" height="38" rx="12" fill={m.accent} />
+      <rect x={m.x} y="80" width="208" height="16" fill={m.accent} />
+      <text x={m.x + 104} y="83" text-anchor="middle" fill={C.white} font-family={FONT} font-size="14" font-weight="800">{m.title}</text>
+      <text x={m.x + 104} y="116" text-anchor="middle" fill={m.accent} font-family={FONT} font-size="10" font-weight="700">{m.sub}</text>
+    </g>
+  ))}
+
+  <!-- Flow hood icon -->
+  <path d="M70 130 L186 130 L160 168 L96 168 Z" fill={C.white} stroke={C.primary} stroke-width="1.5" />
+  <rect x="120" y="168" width="16" height="20" fill={C.primary} />
+  <text x="128" y="214" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">Capture all air at a</text>
+  <text x="128" y="228" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">register, read CFM</text>
+  <text x="128" y="242" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">directly.</text>
+
+  <!-- Duct traverse icon -->
+  <rect x="296" y="128" width="128" height="42" rx="4" fill={C.blueLight} stroke={C.blue} stroke-width="1.5" />
+  {[0, 1, 2].map((i) => (
+    <path d={`M${312 + i * 36} 134 V164`} stroke={C.blue} stroke-width="1.5" stroke-dasharray="3 3" />
+  ))}
+  <circle cx="408" cy="149" r="6" fill={C.blue} />
+  <text x="360" y="200" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">CFM = velocity</text>
+  <text x="360" y="216" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">&#215; duct area</text>
+  <text x="360" y="240" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">traverse points across duct</text>
+
+  <!-- Blower table icon -->
+  <rect x="540" y="128" width="60" height="44" rx="4" fill={C.white} stroke={C.orange} stroke-width="1.5" />
+  <path d="M560 150 H600" stroke={C.orange} stroke-width="1" />
+  <path d="M570 128 V172" stroke={C.orange} stroke-width="1" />
+  <circle cx="624" cy="138" r="14" fill={C.white} stroke={C.orange} stroke-width="1.5" />
+  <path d="M624 138 L624 128" stroke={C.orange} stroke-width="2" />
+  <path d="M624 138 L632 142" stroke={C.orange} stroke-width="2" />
+  <text x="592" y="200" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">Read total external</text>
+  <text x="592" y="216" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">static, look up CFM</text>
+  <text x="592" y="232" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">on blower chart.</text>
+
+  <text x="360" y="300" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11">Flow hood, duct traverse, or blower table — three field ways to read actual CFM.</text>
+</svg>

@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>What dew point is</title>
+  <desc>
+    Air cooled along an arrow reaches its dew point, where relative humidity hits 100% and water
+    vapor begins to condense into droplets. Dew point is an absolute moisture measure, unlike
+    relative humidity, which depends on temperature.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What dew point is</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Cool air until it reaches saturation (100% RH)</text>
+
+  <!-- Cooling arrow -->
+  <text x="40" y="100" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Cooling the air &#8594;</text>
+  <path d="M40 116 H600" stroke={C.blue} stroke-width="2" marker-end="url(#dpc-arr-b)" />
+
+  <!-- Warm unsaturated -->
+  <rect x="40" y="132" width="160" height="80" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="120" y="156" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Warm air</text>
+  <text x="120" y="176" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">e.g. 80&#176;F, 50% RH</text>
+  <text x="120" y="196" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10" font-weight="600">vapor stays invisible</text>
+
+  <!-- Approaching -->
+  <rect x="220" y="132" width="160" height="80" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1.5" />
+  <text x="300" y="156" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Cooled further</text>
+  <text x="300" y="176" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">RH climbs toward 100%</text>
+  <text x="300" y="196" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="10" font-weight="600">same moisture content</text>
+
+  <!-- Dew point reached -->
+  <rect x="400" y="132" width="180" height="80" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="490" y="156" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Dew point reached</text>
+  <text x="490" y="176" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="11" font-weight="700">100% RH &#8212; saturation</text>
+  <text x="490" y="196" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">droplets condense</text>
+
+  <!-- Droplets -->
+  <g fill={C.primary} opacity="0.85">
+    <path d="M610 150 q6 10 0 14 q-6 -4 0 -14 Z" />
+    <path d="M626 168 q5 8 0 12 q-5 -4 0 -12 Z" />
+    <path d="M606 178 q5 8 0 12 q-5 -4 0 -12 Z" />
+  </g>
+
+  <!-- Key contrast callout -->
+  <rect x="40" y="232" width="640" height="44" rx="8" fill={C.white} stroke={C.border} />
+  <text x="56" y="252" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Dew point = absolute moisture</text>
+  <text x="56" y="268" fill={C.muted} font-family={FONT} font-size="10">Two air samples at the same RH but different temperatures have different dew points.</text>
+
+  <defs>
+    <marker id="dpc-arr-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.blue} /></marker>
+  </defs>
+</svg>
