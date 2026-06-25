@@ -168,10 +168,8 @@ const relatedCalculators = [
 
       <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-orange-600"
                 fill="none"
@@ -188,8 +186,9 @@ const relatedCalculators = [
               Enter flue gas readings
             </h2>
 
-            <div class="mt-6 space-y-6">
-              <div class="grid sm:grid-cols-2 gap-5">
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+<div class="grid sm:grid-cols-2 gap-5">
                 <div>
                   <label for="ce-fuel" class="text-sm font-semibold text-slate-800">Fuel type</label>
                   <select
@@ -269,38 +268,35 @@ const relatedCalculators = [
                 </svg>
                 Reset to defaults
               </button>
-            </div>
           </div>
 
           <!-- Results -->
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-orange-600 to-red-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-orange-100">Net Efficiency</p>
+          <div class="mt-6 lg:mt-0 rounded-xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Net Efficiency</p>
               <div class="mt-2 flex items-baseline gap-2">
-                <span id="ce-result-efficiency" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span id="ce-result-efficiency" class="text-5xl font-extrabold tracking-tight text-orange-600">—</span>
               </div>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-orange-100">Stack Loss</p>
-                  <p id="ce-result-qa" class="mt-1 text-2xl font-bold">—</p>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Stack Loss</p>
+                  <p id="ce-result-qa" class="mt-1 text-2xl font-bold text-slate-900">—</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-orange-100">Excess Air</p>
-                  <p id="ce-result-excess-air" class="mt-1 text-2xl font-bold">—</p>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Excess Air</p>
+                  <p id="ce-result-excess-air" class="mt-1 text-2xl font-bold text-slate-900">—</p>
                 </div>
               </div>
 
               <!-- Breakdown -->
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-orange-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
@@ -309,21 +305,21 @@ const relatedCalculators = [
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-orange-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
-                    <span>Flue gas temp</span><span id="ce-bd-flue" class="font-semibold">—</span>
+                    <span>Flue gas temp</span><span id="ce-bd-flue" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Air temp</span><span id="ce-bd-air" class="font-semibold">—</span>
+                    <span>Air temp</span><span id="ce-bd-air" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Stack loss qA</span><span id="ce-bd-qa" class="font-semibold">—</span>
+                    <span>Stack loss qA</span><span id="ce-bd-qa" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Latent loss</span><span id="ce-bd-latent" class="font-semibold">—</span>
+                    <span>Latent loss</span><span id="ce-bd-latent" class="font-semibold text-slate-900">—</span>
                   </div>
-                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white">
-                    <span class="font-bold">Radiation loss</span><span id="ce-bd-rad" class="font-bold">—</span>
+                  <div class="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5 text-slate-900">
+                    <span class="font-bold text-slate-900">Radiation loss</span><span id="ce-bd-rad" class="font-bold text-slate-900">—</span>
                   </div>
                 </div>
               </details>
@@ -334,14 +330,15 @@ const relatedCalculators = [
                 class="hidden mt-4 rounded-xl bg-yellow-400/20 border border-yellow-300/40 p-4"
               >
                 <p class="text-xs font-bold text-yellow-200 uppercase tracking-wide mb-1">Warning</p>
-                <p id="ce-warning-text" class="text-sm font-medium text-yellow-100 leading-snug"></p>
+                <p id="ce-warning-text" class="text-sm font-medium text-slate-600 leading-snug"></p>
               </div>
 
-              <p class="mt-4 text-xs text-orange-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Results use the simplified Siegert method. Radiation and convection losses are estimated at 1.5%.
                 For certification, use a calibrated flue gas analyser per EN 15502.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 

@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="none" role="img" aria-labelledby="heroTitle heroDesc">
+  <title id="heroTitle">HVAC Duct Sizing – Manual D vs rules of thumb</title>
+  <desc id="heroDesc">Schematic of a residential duct system showing a supply plenum, main trunk duct, and branch ducts with CFM, velocity, and friction rate labels.</desc>
+
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0F9FF"/>
+      <stop offset="45%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#ECFDF5"/>
+    </linearGradient>
+    <linearGradient id="skyBlob" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="tealBlob" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#01AD9F" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#14B8A6" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#CBD5E1"/>
+      <stop offset="50%" stop-color="#94A3B8"/>
+      <stop offset="100%" stop-color="#CBD5E1"/>
+    </linearGradient>
+    <linearGradient id="branchGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#7DD3FC"/>
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#01AD9F"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#38BDF8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="500" fill="url(#bgGrad)"/>
+  <ellipse cx="760" cy="100" rx="210" ry="160" fill="url(#skyBlob)" filter="url(#softBlur)"/>
+  <ellipse cx="900" cy="380" rx="160" ry="120" fill="url(#tealBlob)" filter="url(#softBlur)"/>
+
+  <!-- Left headline card -->
+  <rect x="48" y="68" width="380" height="364" rx="24" fill="#FFFFFF" fill-opacity="0.42" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.8"/>
+  <text x="80" y="178" fill="#152035" font-family="system-ui, -apple-system, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.02em">
+    <tspan x="80" dy="0">HVAC Duct</tspan>
+    <tspan x="80" dy="44" fill="#01AD9F">Sizing</tspan>
+  </text>
+  <text x="80" y="272" fill="#64748B" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="500">Manual D vs Rules of Thumb</text>
+  <text x="80" y="296" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="13">CFM, velocity, and friction rate</text>
+  <rect x="80" y="320" width="56" height="4" rx="2" fill="url(#accentBar)"/>
+
+  <!-- AHU / Supply plenum -->
+  <g filter="url(#cardShadow)">
+    <rect x="462" y="200" width="80" height="120" rx="10" fill="#FFFFFF" stroke="#7DD3FC" stroke-width="2"/>
+    <text x="502" y="248" text-anchor="middle" fill="#0369A1" font-family="system-ui, sans-serif" font-size="10" font-weight="700" letter-spacing="0.8">AHU</text>
+    <text x="502" y="262" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="8">Supply</text>
+    <!-- Fan blades inside AHU -->
+    <circle cx="502" cy="290" r="18" fill="#EFF6FF" stroke="#BAE6FD" stroke-width="1"/>
+    <line x1="502" y1="272" x2="502" y2="308" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"/>
+    <line x1="484" y1="290" x2="520" y2="290" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"/>
+    <line x1="489" y1="277" x2="515" y2="303" stroke="#0EA5E9" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="515" y1="277" x2="489" y2="303" stroke="#0EA5E9" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Main trunk duct (horizontal) -->
+  <!-- Full section: AHU → Branch 1 -->
+  <rect x="542" y="252" width="116" height="24" rx="3" fill="url(#trunkGrad)" stroke="#94A3B8" stroke-width="1.5"/>
+  <!-- Reduced section: Branch 1 → Branch 2 -->
+  <rect x="680" y="255" width="116" height="18" rx="3" fill="url(#trunkGrad)" stroke="#94A3B8" stroke-width="1.5"/>
+  <!-- Reduced section: Branch 2 → Branch 3 -->
+  <rect x="818" y="257" width="100" height="14" rx="3" fill="url(#trunkGrad)" stroke="#94A3B8" stroke-width="1.5"/>
+
+  <!-- Trunk labels -->
+  <text x="600" y="248" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="9" font-weight="600">14×10"  400 CFM</text>
+  <text x="738" y="252" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="9">12×8"  250 CFM</text>
+  <text x="868" y="254" text-anchor="middle" fill="#475569" font-family="system-ui, sans-serif" font-size="9">10×6"  100 CFM</text>
+
+  <!-- Friction rate annotation below trunk -->
+  <rect x="548" y="288" width="200" height="22" rx="6" fill="#FFFFFF" fill-opacity="0.85" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="648" y="304" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="10">
+    <tspan fill="#0F766E" font-weight="700">FR: 0.08 in.WG/100ft</tspan>
+    <tspan fill="#94A3B8">  &#183;  700 fpm</tspan>
+  </text>
+
+  <!-- Branch 1 (at x=658) -->
+  <rect x="650" y="138" width="16" height="114" rx="3" fill="url(#branchGrad)" stroke="#7DD3FC" stroke-width="1.5"/>
+  <!-- Register symbol (circle with X) -->
+  <circle cx="658" cy="122" r="22" fill="#FFFFFF" stroke="#7DD3FC" stroke-width="2"/>
+  <line x1="644" y1="108" x2="672" y2="136" stroke="#7DD3FC" stroke-width="1.5"/>
+  <line x1="672" y1="108" x2="644" y2="136" stroke="#7DD3FC" stroke-width="1.5"/>
+  <text x="658" y="100" text-anchor="middle" fill="#0369A1" font-family="system-ui, sans-serif" font-size="9" font-weight="700">6" Rd</text>
+  <text x="658" y="88" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="9">150 CFM</text>
+
+  <!-- Branch 2 (at x=790) -->
+  <rect x="782" y="138" width="16" height="117" rx="3" fill="url(#branchGrad)" stroke="#7DD3FC" stroke-width="1.5"/>
+  <circle cx="790" cy="122" r="22" fill="#FFFFFF" stroke="#7DD3FC" stroke-width="2"/>
+  <line x1="776" y1="108" x2="804" y2="136" stroke="#7DD3FC" stroke-width="1.5"/>
+  <line x1="804" y1="108" x2="776" y2="136" stroke="#7DD3FC" stroke-width="1.5"/>
+  <text x="790" y="100" text-anchor="middle" fill="#0369A1" font-family="system-ui, sans-serif" font-size="9" font-weight="700">6" Rd</text>
+  <text x="790" y="88" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="9">150 CFM</text>
+
+  <!-- Branch 3 (at x=900) -->
+  <rect x="892" y="138" width="16" height="119" rx="3" fill="url(#branchGrad)" stroke="#7DD3FC" stroke-width="1.5"/>
+  <circle cx="900" cy="122" r="22" fill="#FFFFFF" stroke="#7DD3FC" stroke-width="2"/>
+  <line x1="886" y1="108" x2="914" y2="136" stroke="#7DD3FC" stroke-width="1.5"/>
+  <line x1="914" y1="108" x2="886" y2="136" stroke="#7DD3FC" stroke-width="1.5"/>
+  <text x="900" y="100" text-anchor="middle" fill="#0369A1" font-family="system-ui, sans-serif" font-size="9" font-weight="700">4" Rd</text>
+  <text x="900" y="88" text-anchor="middle" fill="#64748B" font-family="system-ui, sans-serif" font-size="9">100 CFM</text>
+
+  <!-- Labels at top: "SUPPLY REGISTERS" -->
+  <text x="780" y="62" text-anchor="middle" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="9" letter-spacing="1">SUPPLY REGISTERS</text>
+  <line x1="640" y1="66" x2="640" y2="72" stroke="#CBD5E1" stroke-width="1"/>
+  <line x1="780" y1="66" x2="780" y2="72" stroke="#CBD5E1" stroke-width="1"/>
+  <line x1="900" y1="66" x2="900" y2="72" stroke="#CBD5E1" stroke-width="1"/>
+  <line x1="640" y1="66" x2="900" y2="66" stroke="#CBD5E1" stroke-width="1"/>
+
+  <!-- Velocity tags on branches -->
+  <rect x="616" y="178" width="84" height="16" rx="8" fill="#EFF6FF" stroke="#BAE6FD" stroke-width="1"/>
+  <text x="658" y="190" text-anchor="middle" fill="#0369A1" font-family="system-ui, sans-serif" font-size="8" font-weight="600">600 fpm</text>
+
+  <!-- Right side: Manual D callout -->
+  <rect x="550" y="336" width="390" height="106" rx="12" fill="#FFFFFF" fill-opacity="0.88" stroke="#E2E8F0" stroke-width="1" filter="url(#cardShadow)"/>
+  <text x="569" y="358" fill="#152035" font-family="system-ui, sans-serif" font-size="11" font-weight="700">Manual D friction rate method</text>
+  <text x="569" y="376" fill="#64748B" font-family="system-ui, sans-serif" font-size="10">1. Calculate total effective length (TEL) of longest run</text>
+  <text x="569" y="392" fill="#64748B" font-family="system-ui, sans-serif" font-size="10">2. FR = Available static pressure ÷ TEL &#215; 100</text>
+  <text x="569" y="408" fill="#64748B" font-family="system-ui, sans-serif" font-size="10">3. Size each section to carry its CFM at or below FR</text>
+  <rect x="569" y="420" width="40" height="10" rx="5" fill="#DBEAFE"/>
+  <text x="589" y="429" text-anchor="middle" fill="#1D4ED8" font-family="system-ui, sans-serif" font-size="8" font-weight="600">ACCA</text>
+  <rect x="618" y="420" width="80" height="10" rx="5" fill="#D1FAE5"/>
+  <text x="658" y="429" text-anchor="middle" fill="#065F46" font-family="system-ui, sans-serif" font-size="8" font-weight="600">Manual D required</text>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="496" width="1000" height="4" fill="#01AD9F"/>
+</svg>

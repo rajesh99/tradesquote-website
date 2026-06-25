@@ -3,6 +3,7 @@ title: "HVAC Duct Sizing: Manual D vs Rules of Thumb"
 meta_title: "HVAC Duct Sizing Guide: Manual D vs Rules of Thumb | TradesQuote"
 description: "How to size HVAC ducts using the Manual D friction rate method and simplified rules of thumb, with duct velocity limits and why wrong sizing causes comfort problems."
 date: 2026-03-24T09:00:00Z
+image: "/images/posts/hvac-duct-sizing-guide-hero.svg"
 categories: ["hvac"]
 authors: ["Mark"]
 tags: ["duct sizing","manual d","airflow","friction rate","ductwork"]

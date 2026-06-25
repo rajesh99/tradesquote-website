@@ -164,10 +164,8 @@ const relatedCalculators = [
 
       <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-teal-600"
                 fill="none"
@@ -184,8 +182,9 @@ const relatedCalculators = [
               Enter airflow and temperatures
             </h2>
 
-            <div class="mt-6 space-y-6">
-              <div>
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+<div>
                 <label for="hrv-type" class="text-sm font-semibold text-slate-800">Device type</label>
                 <select
                   id="hrv-type"
@@ -278,33 +277,30 @@ const relatedCalculators = [
                 </svg>
                 Reset to defaults
               </button>
-            </div>
           </div>
 
           <!-- Results -->
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-teal-100">Sensible Effectiveness</p>
+          <div class="mt-6 lg:mt-0 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Sensible Effectiveness</p>
               <div class="mt-2 flex items-baseline gap-2">
-                <span id="hrv-result-effectiveness" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span id="hrv-result-effectiveness" class="text-5xl font-extrabold tracking-tight text-teal-600">—</span>
               </div>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-teal-100">Vmin</p>
-                  <p id="hrv-result-vmin" class="mt-1 text-2xl font-bold">—</p>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Vmin</p>
+                  <p id="hrv-result-vmin" class="mt-1 text-2xl font-bold text-slate-900">—</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-teal-100">Flow Balance</p>
-                  <p id="hrv-result-balance" class="mt-1 text-2xl font-bold">—</p>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Flow Balance</p>
+                  <p id="hrv-result-balance" class="mt-1 text-2xl font-bold text-slate-900">—</p>
                 </div>
               </div>
 
-              <div class="mt-3 rounded-xl bg-white/15 p-4">
-                <p class="text-xs text-teal-100">Rating</p>
-                <p id="hrv-status" class="mt-1 text-2xl font-bold">—</p>
+              <div class="mt-3 rounded-xl border border-teal-100 bg-white p-4">
+                <p class="text-xs text-slate-500">Rating</p>
+                <p id="hrv-status" class="mt-1 text-2xl font-bold text-slate-900">—</p>
               </div>
 
               <!-- Warning box -->
@@ -314,13 +310,13 @@ const relatedCalculators = [
               </div>
 
               <!-- Breakdown -->
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
@@ -329,32 +325,33 @@ const relatedCalculators = [
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-teal-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
-                    <span>Vs (supply CFM)</span><span id="hrv-bd-vs" class="font-semibold">—</span>
+                    <span>Vs (supply CFM)</span><span id="hrv-bd-vs" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Ve (exhaust CFM)</span><span id="hrv-bd-ve" class="font-semibold">—</span>
+                    <span>Ve (exhaust CFM)</span><span id="hrv-bd-ve" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Vmin</span><span id="hrv-bd-vmin" class="font-semibold">—</span>
+                    <span>Vmin</span><span id="hrv-bd-vmin" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
-                    <span>t&#x2081; (supply inlet)</span><span id="hrv-bd-t1" class="font-semibold">—</span>
+                    <span>t&#x2081; (supply inlet)</span><span id="hrv-bd-t1" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>t&#x2082; (supply leaving)</span><span id="hrv-bd-t2" class="font-semibold">—</span>
+                    <span>t&#x2082; (supply leaving)</span><span id="hrv-bd-t2" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>t&#x2083; (exhaust inlet)</span><span id="hrv-bd-t3" class="font-semibold">—</span>
+                    <span>t&#x2083; (exhaust inlet)</span><span id="hrv-bd-t3" class="font-semibold text-slate-900">—</span>
                   </div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-teal-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Effectiveness calculated per ASHRAE Standard 84. Balanced flow (|Vs&#x2212;Ve|/max &#x2264; 10%) is required for a valid effectiveness reading.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 
