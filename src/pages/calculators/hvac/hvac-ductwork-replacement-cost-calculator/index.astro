@@ -1,0 +1,307 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Ductwork Replacement Cost Calculator — Free Duct Price Estimator | TradesQuote";
+const description =
+  "Free ductwork replacement cost calculator. Estimate the installed cost to replace your home's ducts — by home size, duct material (flex, sheet metal, ductboard), accessibility, and region. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-ductwork-replacement-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Ductwork Replacement Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Ductwork Replacement Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online ductwork replacement cost calculator that estimates the installed price to replace residential ductwork based on home size, duct material, accessibility, scope, and regional labor market.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to replace ductwork?",
+    answer:
+      "Replacing the ductwork in a typical home runs about <strong>$3,000 to $8,000 installed</strong>, with most full-home jobs landing near $6,000. The number scales with the amount of duct (driven by home size), the material, how hard the runs are to reach, and your local labor rates.",
+  },
+  {
+    question: "How much does ductwork cost per linear foot?",
+    answer:
+      "Installed duct typically costs <strong>$20 to $45 per linear foot</strong> — flexible duct at the low end, insulated flex in the middle, and rigid sheet metal at the top. The calculator above multiplies your estimated duct length by a per-foot rate, then adjusts for access and region.",
+  },
+  {
+    question: "Why is replacing ductwork so labor-intensive?",
+    answer:
+      "Most duct lives in <strong>attics, crawl spaces, and tight chases</strong> — so the cost is mostly labor: demolishing old runs, fabricating and hanging new ones, sealing every joint, and balancing airflow. Hard-to-reach systems can add 25% or more versus an open basement install.",
+  },
+  {
+    question: "Is it worth replacing old ductwork?",
+    answer:
+      "Often, yes. Leaky, undersized, or crushed ducts can waste <strong>20–30% of the air your system moves</strong>, causing hot and cold rooms and high bills. If ducts are sound, sealing and minor repairs (a few hundred to ~$2,000) are far cheaper than full replacement — replace when the layout is wrong, the duct is damaged, or you're upsizing the system.",
+  },
+  {
+    question: "Should I replace ductwork when replacing the AC or furnace?",
+    answer:
+      'Doing both at once saves on labor and lets the installer size the ducts to the new equipment. Price the equipment with the <a href="/calculators/hvac/hvac-replacement-cost-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">HVAC Replacement Cost Calculator</a>, and confirm the new duct diameters with the <a href="/calculators/hvac/hvac-duct-size-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">Duct Size Calculator</a>.',
+  },
+  {
+    question: "What should a ductwork replacement quote include?",
+    answer:
+      "A complete quote covers <strong>removal and disposal of old duct, new duct and fittings, insulation, sealing (mastic or UL-181 tape), registers and grilles, and airflow balancing</strong>. Watch for exclusions like drywall repair, asbestos abatement on very old systems, or returns added to fix airflow — line-item quotes make those easy to spot.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Quoting a reduct job? Price it line by line in seconds.";
+const ctaDescription =
+  "This page gives homeowners a budget — TradesQuote gives contractors the winning quote. Describe the duct runs, registers, and access (or upload photos), and our AI builds a line-item estimate: materials, labor, sealing, and disposal, with quantities and unit prices validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-duct-size-calculator",
+    title: "Duct Size Calculator",
+    description: "CFM to duct diameter — an online ductulator.",
+  },
+  {
+    href: "/calculators/hvac/hvac-replacement-cost-calculator",
+    title: "Replacement Cost Calculator",
+    description: "Price a new AC, furnace, heat pump, or full system.",
+  },
+  {
+    href: "/calculators/hvac/hvac-cfm-calculator",
+    title: "CFM / Airflow Calculator",
+    description: "Room airflow by air changes and CFM per ton.",
+  },
+  {
+    href: "/calculators/hvac/hvac-estimate-calculator",
+    title: "HVAC Estimate Calculator",
+    description: "Contractor job pricing — labor, materials & margin.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ductwork Replacement Cost Calculator — Free Duct Price Estimator" />
+    <meta
+      property="og:description"
+      content="Estimate the installed cost to replace your home's ductwork — by home size, duct material, accessibility, and region. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ductwork Replacement Cost Calculator — Free Duct Price Estimator" />
+    <meta
+      name="twitter:description"
+      content="Estimate the installed cost to replace your home's ductwork. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Ductwork Replacement Cost Calculator" />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              HVAC Tools · Cost · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Ductwork Replacement Cost Calculator <span class="text-violet-600">— Free Estimator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This ductwork replacement cost calculator estimates what it costs to replace the ducts in your home —
+              based on home size, duct material (flexible, insulated flex, ductboard, or sheet metal), how accessible
+              the runs are, and your local labor market. Use it to budget a full or partial reduct before you collect
+              quotes, or to sanity-check the duct replacement prices you already have.
+            </p>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl border border-violet-100 bg-violet-50 p-4">
+              <svg class="h-5 w-5 shrink-0 text-violet-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900">Replacing the system too?</span>
+                Price the equipment with the
+                <a href="/calculators/hvac/hvac-replacement-cost-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">Replacement Cost Calculator</a>,
+                and size the new runs with the
+                <a href="/calculators/hvac/hvac-duct-size-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">Duct Size Calculator</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              Describe the ductwork job
+            </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+
+          </div>
+
+          <!-- Results -->
+          <div class="mt-6 lg:mt-0 rounded-xl border border-violet-100 bg-violet-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Estimated ductwork replacement cost</p>
+              <div class="mt-2">
+                <span id="rangeResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">$5,250 – $7,100</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Typical mid-point</p>
+                  <p id="midResult" class="mt-1 text-2xl font-bold text-slate-900">$6,150</p>
+                </div>
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Per linear foot</p>
+                  <p id="perFtResult" class="mt-1 text-2xl font-bold text-slate-900">$28</p>
+                </div>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl border border-violet-100 bg-white">
+                <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800">
+                  See the breakdown
+                  <svg class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between"><span>Duct length (after scope)</span><span id="bd-len" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Material rate</span><span id="bd-rate" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Accessibility</span><span id="bd-access" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Scope</span><span id="bd-scope" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Labor market</span><span id="bd-market" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5 text-slate-900"><span class="font-bold text-slate-900">Mid-point estimate</span><span id="bd-total" class="font-bold text-slate-900">—</span></div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                National 2026 ballparks for budgeting — duct, fittings, insulation, sealing, and labor included.
+                Your local line-item quotes are the real number; use this to sanity-check them.
+              </p>
+            
+          </div>
+          </div>
+        </div>
+
+        <!-- Reference table -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Typical ductwork replacement costs (quick reference)</h2>
+          <p class="mt-2 text-sm text-slate-500">National installed-price ranges for a full-home reduct with moderate access. Flexible duct sits at the low end; rigid sheet metal at the high end.</p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Home size</th>
+                  <th class="py-2.5 pr-4 font-semibold">Est. duct length</th>
+                  <th class="py-2.5 pr-4 font-semibold">Flex / insulated</th>
+                  <th class="py-2.5 font-semibold">Sheet metal</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">1,000 sq ft</td><td class="py-2.5 pr-4">~110 ft</td><td class="py-2.5 pr-4">$2,400 – $3,100</td><td class="py-2.5">$4,800</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">1,500 sq ft</td><td class="py-2.5 pr-4">~165 ft</td><td class="py-2.5 pr-4">$3,600 – $4,600</td><td class="py-2.5">$7,300</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">2,000 sq ft</td><td class="py-2.5 pr-4">~220 ft</td><td class="py-2.5 pr-4">$4,800 – $6,200</td><td class="py-2.5">$9,700</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">2,500 sq ft</td><td class="py-2.5 pr-4">~280 ft</td><td class="py-2.5 pr-4">$6,200 – $7,800</td><td class="py-2.5">$12,300</td></tr>
+                <tr><td class="py-2.5 pr-4 font-semibold">3,000 sq ft</td><td class="py-2.5 pr-4">~335 ft</td><td class="py-2.5 pr-4">$7,400 – $9,400</td><td class="py-2.5">$14,700</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">Ranges reflect typical 2026 national pricing for residential jobs and vary by material, access, region, and site conditions. Always compare multiple line-item quotes.</p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The formula, explained in plain English</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Ductwork pricing comes down to one thing: how many feet of duct, at what installed rate per foot — then
+            scaled for how hard the job is and what labor costs in your area.
+          </p>
+
+          <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+            <div class="text-violet-300"># Step 1 — Estimate the duct length from home size</div>
+            <div>length&nbsp;≈&nbsp;home sq ft ÷ <span class="text-amber-300">9</span> &nbsp;(a 2,000 sq ft home ≈ 220 ft)</div>
+            <div class="mt-4 text-violet-300"># Step 2 — Pick the installed rate per foot by material</div>
+            <div>rate&nbsp;=&nbsp;flex <span class="text-amber-300">$22</span> · insulated <span class="text-amber-300">$28</span> · ductboard <span class="text-amber-300">$34</span> · metal <span class="text-amber-300">$44</span></div>
+            <div class="mt-4 text-violet-300"># Step 3 — Scale for scope, access, and your market</div>
+            <div>cost&nbsp;=&nbsp;length × scope (<span class="text-amber-300">0.55–1.0</span>) × rate × access (<span class="text-amber-300">0.9–1.25</span>) × market (<span class="text-amber-300">0.9–1.2</span>)</div>
+            <div class="mt-4 text-violet-300"># Step 4 — Show it as a range, not a fake-precise number</div>
+            <div>range&nbsp;=&nbsp;cost × <span class="text-amber-300">0.85</span> … cost × <span class="text-amber-300">1.15</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why home size drives the price</h3>
+              <p class="mt-2 text-sm text-slate-600">More square footage means more supply runs, returns, and trunk line — so duct length, not equipment, is the main cost lever in a reduct.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why material matters</h3>
+              <p class="mt-2 text-sm text-slate-600">Flex is fast to install and cheapest; rigid sheet metal costs roughly double per foot in labor and fabrication, but lasts longer and cleans easier.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Access is the hidden multiplier</h3>
+              <p class="mt-2 text-sm text-slate-600">Duct buried in a tight attic or low crawlspace can add 25% in labor versus an open basement — it's the biggest surprise in real reduct quotes.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why a ±15% range?</h3>
+              <p class="mt-2 text-sm text-slate-600">Fitting count, sealing method, register quality, and drywall or insulation repairs genuinely vary between homes. A range is honest; a single number isn't.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="violet"
+        subtitle="Common questions about ductwork replacement pricing."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="violet" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacDuctworkReplacementCostCalculator } from "@/scripts/calculators/hvac-ductwork-replacement-cost-calculator";
+    initHvacDuctworkReplacementCostCalculator();
+  </script>
+</Layout>

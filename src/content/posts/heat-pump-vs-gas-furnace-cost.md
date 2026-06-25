@@ -3,6 +3,7 @@ title: "Heat Pump vs Gas Furnace: Which Is Cheaper to Run?"
 meta_title: "Heat Pump vs Gas Furnace: Running Cost Comparison | TradesQuote"
 description: "Side-by-side operating cost comparison of heat pumps and gas furnaces by climate, electricity rate, and gas price. Break-even analysis and when each wins."
 date: 2026-02-24T09:00:00Z
+image: "/images/posts/heat-pump-vs-gas-furnace-hero.svg"
 categories: ["hvac"]
 authors: ["Mark"]
 tags: ["heat pump","gas furnace","operating cost","efficiency","heating cost"]
