@@ -174,10 +174,8 @@ const relatedCalculators = [
 
       <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-indigo-600"
                 fill="none"
@@ -194,8 +192,9 @@ const relatedCalculators = [
               Enter air conditions
             </h2>
 
-            <div class="mt-6 space-y-6">
-              <!-- Temperature unit -->
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+<!-- Temperature unit -->
               <div>
                 <label for="psy-unit" class="text-sm font-semibold text-slate-800">Temperature unit</label>
                 <select
@@ -280,14 +279,11 @@ const relatedCalculators = [
                 </svg>
                 Reset to defaults
               </button>
-            </div>
           </div>
 
           <!-- Results -->
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-500 p-6 sm:p-8 text-white shadow-lg"
-            >
+          <div class="mt-6 lg:mt-0 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6">
+
               <!-- Warning box (hidden by default) -->
               <div
                 id="psy-warning"
@@ -298,26 +294,26 @@ const relatedCalculators = [
               </div>
 
               <!-- Primary result: specific enthalpy -->
-              <p class="text-sm font-medium text-indigo-100">Specific Enthalpy</p>
+              <p class="text-sm font-medium text-slate-600">Specific Enthalpy</p>
               <div class="mt-1 flex items-baseline gap-2">
-                <span id="psy-result-enthalpy" class="text-5xl font-extrabold tracking-tight">—</span>
+                <span id="psy-result-enthalpy" class="text-5xl font-extrabold tracking-tight text-indigo-600">—</span>
                 <span id="psy-unit-enthalpy" class="text-lg font-semibold text-indigo-200">BTU/lb</span>
               </div>
 
               <!-- Grid 3: humidity ratio, dew point, wet-bulb -->
               <div class="mt-5 grid grid-cols-3 gap-3">
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-indigo-100">Humidity Ratio</p>
+                  <p class="text-xs text-slate-500">Humidity Ratio</p>
                   <p id="psy-result-w" class="mt-1 text-xl font-bold leading-tight">—</p>
                   <p id="psy-unit-w" class="text-xs text-indigo-200">gr/lb</p>
                 </div>
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-indigo-100">Dew Point</p>
+                  <p class="text-xs text-slate-500">Dew Point</p>
                   <p id="psy-result-dp" class="mt-1 text-xl font-bold leading-tight">—</p>
                   <p class="text-xs text-indigo-200">T<sub>dp</sub></p>
                 </div>
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-indigo-100">Wet-Bulb</p>
+                  <p class="text-xs text-slate-500">Wet-Bulb</p>
                   <p id="psy-result-wb" class="mt-1 text-xl font-bold leading-tight">—</p>
                   <p class="text-xs text-indigo-200">T<sub>wb</sub></p>
                 </div>
@@ -326,25 +322,25 @@ const relatedCalculators = [
               <!-- Grid 2: vapour pressure, specific volume -->
               <div class="mt-3 grid grid-cols-2 gap-3">
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-indigo-100">Vapour Pressure</p>
+                  <p class="text-xs text-slate-500">Vapour Pressure</p>
                   <p id="psy-result-pv" class="mt-1 text-xl font-bold leading-tight">—</p>
                   <p id="psy-unit-pv" class="text-xs text-indigo-200">in. Hg</p>
                 </div>
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-indigo-100">Specific Volume</p>
+                  <p class="text-xs text-slate-500">Specific Volume</p>
                   <p id="psy-result-sv" class="mt-1 text-xl font-bold leading-tight">—</p>
                   <p id="psy-unit-sv" class="text-xs text-indigo-200">ft³/lb</p>
                 </div>
               </div>
 
               <!-- Breakdown -->
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
@@ -353,44 +349,45 @@ const relatedCalculators = [
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-indigo-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
                     <span>Dry-bulb (T<sub>db</sub>)</span
-                    ><span id="psy-bd-tdb" class="font-semibold">—</span>
+                    ><span id="psy-bd-tdb" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Relative humidity</span><span id="psy-bd-rh" class="font-semibold">—</span>
+                    <span>Relative humidity</span><span id="psy-bd-rh" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Saturation pressure (P<sub>sat</sub>)</span
-                    ><span id="psy-bd-psat" class="font-semibold">—</span>
+                    ><span id="psy-bd-psat" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Vapour pressure (P<sub>v</sub>)</span
-                    ><span id="psy-bd-pv" class="font-semibold">—</span>
+                    ><span id="psy-bd-pv" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Humidity ratio (W)</span><span id="psy-bd-w" class="font-semibold">—</span>
+                    <span>Humidity ratio (W)</span><span id="psy-bd-w" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5">
-                    <span>Enthalpy (h)</span><span id="psy-bd-h" class="font-semibold">—</span>
+                    <span>Enthalpy (h)</span><span id="psy-bd-h" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Dew point (T<sub>dp</sub>)</span
-                    ><span id="psy-bd-dp" class="font-semibold">—</span>
+                    ><span id="psy-bd-dp" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Wet-bulb (T<sub>wb</sub>)</span
-                    ><span id="psy-bd-wb" class="font-semibold">—</span>
+                    ><span id="psy-bd-wb" class="font-semibold text-slate-900">—</span>
                   </div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-indigo-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Calculated using ASHRAE Fundamentals (2021) correlations. Valid for −40°F to 120°F at pressures
                 10–16 psia. Psychrometric relationships assume ideal gas behaviour for dry air and water vapour.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 

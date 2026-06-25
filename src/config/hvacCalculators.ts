@@ -238,6 +238,15 @@ export const hvacCalculators: HvacCalculator[] = [
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
   },
   {
+    slug: "hvac-ductwork-replacement-cost-calculator",
+    title: "Ductwork Replacement Cost Calculator",
+    description:
+      "Estimate the installed cost to replace home ductwork — by home size, duct material, accessibility, and region, with a per-linear-foot breakdown.",
+    question: "How much does it cost to replace ductwork?",
+    accent: "violet",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
+  },
+  {
     slug: "hvac-estimate-calculator",
     title: "HVAC Estimate Calculator",
     description:
@@ -422,6 +431,7 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
       "hvac-afue-savings-calculator",
       "hvac-operating-cost-calculator",
       "hvac-replacement-cost-calculator",
+      "hvac-ductwork-replacement-cost-calculator",
       "hvac-estimate-calculator",
       "hvac-boiler-sizing-edr-calculator",
       "hvac-cooling-tower-tonnage-calculator",

@@ -1,0 +1,282 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "Manual J Load Calculation Calculator — Free HVAC Heating & Cooling Load | TradesQuote";
+const description =
+  "Free Manual J-style load calculation calculator. Estimate your home's heating and cooling load in BTU and tons from square footage, climate zone, insulation, ceiling height, and sun exposure — a fast residential HVAC load calculation. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-manual-j-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "Manual J Load Calculation Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Manual J Load Calculation Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online Manual J-style HVAC load calculation calculator that estimates a home's heating and cooling load in BTU per hour and tons from square footage, climate zone, insulation, ceiling height, and sun exposure.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is a Manual J load calculation?",
+    answer:
+      "Manual J is the <strong>ACCA standard for calculating a home's heating and cooling loads</strong> — the BTU per hour a space gains in summer and loses in winter. It accounts for square footage, climate, insulation, windows, orientation, and infiltration, and is the correct way to size equipment instead of guessing by square footage alone.",
+  },
+  {
+    question: "How is this different from a full ACCA Manual J?",
+    answer:
+      "This calculator gives a fast <strong>whole-home load estimate</strong> using the main drivers — area, climate zone, insulation, ceiling height, and sun. A full Manual J goes room by room, modeling each window, wall, and duct run. Use this to plan and sanity-check; have a certified Manual J done for permits, equipment warranties, and final sizing.",
+  },
+  {
+    question: "How many BTU per square foot do I need for heating and cooling?",
+    answer:
+      "Cooling runs roughly <strong>18–30 BTU per square foot</strong> depending on climate; heating ranges from about <strong>18 BTU/sq ft in the deep South to 50+ in cold climates</strong>. This tool applies climate-zone factors to those baselines and adjusts for insulation, ceiling height, and sun so you get a realistic load, not a flat rule of thumb.",
+  },
+  {
+    question: "How do I convert the load to equipment size?",
+    answer:
+      'Divide the cooling load by 12,000 to get tons (36,000 BTU = 3 tons), and round to the nearest half-ton — the calculator shows the recommended size. For heating, divide the load by the furnace efficiency (AFUE) to get input size. Convert and compare sizes with the <a href="/calculators/hvac/hvac-tonnage-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">Tonnage Calculator</a>.',
+  },
+  {
+    question: "Do I need a Manual J load calculation for a permit?",
+    answer:
+      "In most jurisdictions, yes — code (IRC M1401.3) requires equipment to be sized by an ACCA-approved load calculation such as Manual J, and inspectors and manufacturers often ask for it. A quick estimate like this is great for planning, but the permit-ready document comes from full Manual J software or an HVAC professional.",
+  },
+  {
+    question: "Why not just size by square footage or the old unit?",
+    answer:
+      "Square-footage rules of thumb and like-for-like replacements routinely <strong>oversize equipment</strong>, which short-cycles, controls humidity poorly, and wears out faster. A load calculation matches capacity to the actual building, which is why Manual J is the industry standard for getting it right.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load calculated? Turn the spec into a winning quote.";
+const ctaDescription =
+  "The load tells you the equipment size — TradesQuote turns the whole job into a detailed, line-item estimate in seconds. Describe the install or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (per room)",
+    description: "Single-room cooling load with sun, insulation & occupancy.",
+  },
+  {
+    href: "/calculators/hvac/hvac-heat-loss-calculator",
+    title: "Heat Loss Calculator",
+    description: "Whole-home heating load by climate and insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and find your system size.",
+  },
+  {
+    href: "/calculators/hvac/hvac-duct-friction-rate-calculator",
+    title: "Duct Friction Rate (Manual D)",
+    description: "Available static pressure and Manual D friction rate.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Manual J Load Calculation Calculator — Free HVAC Heating & Cooling Load" />
+    <meta
+      property="og:description"
+      content="Estimate your home's heating and cooling load in BTU and tons from square footage, climate, insulation, and sun. A fast Manual J-style load calculation, free."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Manual J Load Calculation Calculator — Free HVAC Load" />
+    <meta
+      name="twitter:description"
+      content="Estimate your home's heating and cooling load in BTU and tons. A fast Manual J-style load calculation, free."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="Manual J Load Calculation Calculator" />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              HVAC Tools · Sizing · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Manual J Load Calculation Calculator <span class="text-blue-600">— Free Online Tool</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This Manual J load calculation calculator estimates your home's whole-home <strong>heating and cooling
+              load</strong> — in BTU per hour and tons — from square footage, climate zone, insulation, ceiling
+              height, and sun exposure. It's a fast, free residential HVAC load calculation for sizing equipment and
+              sanity-checking a quote, built on the same drivers a full ACCA Manual J weighs first.
+            </p>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+              <svg class="h-5 w-5 shrink-0 text-blue-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900">Sizing one room, not the whole house?</span>
+                Use the
+                <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">BTU Calculator</a>
+                for a single space, or the
+                <a href="/calculators/hvac/hvac-heat-loss-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">Heat Loss Calculator</a>
+                for heating load only.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              Describe the home
+            </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+
+          </div>
+
+          <!-- Results -->
+          <div class="mt-6 lg:mt-0 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Estimated cooling load</p>
+              <div class="mt-2">
+                <span id="coolResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">44,000 BTU/hr</span>
+              </div>
+              <p id="coolTons" class="mt-1 text-sm text-blue-100">≈ 3.7 tons cooling</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Heating load</p>
+                  <p id="heatResult" class="mt-1 text-2xl font-bold text-slate-900">64,000 BTU/hr</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Recommended size</p>
+                  <p id="sysResult" class="mt-1 text-2xl font-bold text-slate-900">3.5 tons</p>
+                </div>
+              </div>
+
+              <!-- Breakdown -->
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800">
+                  See the breakdown
+                  <svg class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between"><span>Conditioned area</span><span id="bd-area" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Climate zone</span><span id="bd-climate" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Insulation</span><span id="bd-insul" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Ceiling height</span><span id="bd-ceiling" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Sun & windows</span><span id="bd-sun" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5"><span>Cooling load</span><span id="bd-cool" class="font-semibold text-slate-900">—</span></div>
+                  <div class="flex justify-between"><span>Heating load</span><span id="bd-heat" class="font-semibold text-slate-900">—</span></div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                A planning estimate based on whole-home factors. For permits and final equipment selection,
+                confirm with a full room-by-room ACCA Manual J.
+              </p>
+            
+          </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The load calculation, explained in plain English</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A Manual J load is just the building's heat gain (summer) and heat loss (winter), in BTU per hour.
+            This tool scales climate-zone baselines by the factors that move the load most.
+          </p>
+
+          <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+            <div class="text-blue-300"># Cooling load (BTU/hr)</div>
+            <div>cooling&nbsp;=&nbsp;area × <span class="text-amber-300">22</span> × climate(<span class="text-amber-300">0.78–1.30</span>) × insulation × ceiling × sun</div>
+            <div class="mt-4 text-blue-300"># Heating load (BTU/hr)</div>
+            <div>heating&nbsp;=&nbsp;area × climate heat factor (<span class="text-amber-300">18–52 BTU/ft²</span>) × insulation × ceiling</div>
+            <div class="mt-4 text-blue-300"># Equipment size</div>
+            <div>tons&nbsp;=&nbsp;cooling ÷ <span class="text-amber-300">12,000</span>, rounded to the nearest half-ton</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why climate dominates the heating load</h3>
+              <p class="mt-2 text-sm text-slate-600">A home in Minnesota loses far more heat than the same home in Georgia, so heating BTU/sq ft swings from ~18 to 50+. Cooling moves less because indoor-to-outdoor temperature differences are smaller in summer.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why a full Manual J goes further</h3>
+              <p class="mt-2 text-sm text-slate-600">Room-by-room Manual J models each window's size and orientation, wall and attic R-values, infiltration, and duct losses — essential for zoning and permits, but overkill for a first budget number.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why bigger isn't better</h3>
+              <p class="mt-2 text-sm text-slate-600">Oversized equipment short-cycles, leaving humidity behind and wearing out the compressor. Matching capacity to the calculated load is the whole point of Manual J.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Heating vs cooling size</h3>
+              <p class="mt-2 text-sm text-slate-600">In cold climates the heating load sets the furnace; in hot climates cooling sets the AC. Heat pumps are usually sized to the cooling load, with supplemental heat covering the rest.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about Manual J and HVAC load calculations."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="blue" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacManualJCalculator } from "@/scripts/calculators/hvac-manual-j-calculator";
+    initHvacManualJCalculator();
+  </script>
+</Layout>

@@ -164,10 +164,8 @@ const relatedCalculators = [
 
       <!-- ============================ (3) THE INTERACTIVE CALCULATOR ============================ -->
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <!-- Inputs -->
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-cyan-600"
                 fill="none"
@@ -184,127 +182,15 @@ const relatedCalculators = [
               Enter your cooling tower parameters
             </h2>
 
-            <div class="mt-6 space-y-5">
-              <div>
-                <label for="ct-gpm" class="text-sm font-semibold text-slate-800"
-                  >Condenser water flow rate (GPM)</label
-                >
-                <input
-                  id="ct-gpm"
-                  type="number"
-                  min="1"
-                  max="10000"
-                  value="300"
-                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
-                />
-              </div>
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
 
-              <div class="grid sm:grid-cols-2 gap-5">
-                <div>
-                  <label for="ct-hot" class="text-sm font-semibold text-slate-800"
-                    >Hot water entering tower (T_hot, °F)</label
-                  >
-                  <input
-                    id="ct-hot"
-                    type="number"
-                    min="40"
-                    max="130"
-                    value="95"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label for="ct-cold" class="text-sm font-semibold text-slate-800"
-                    >Cold water leaving tower (T_cold, °F)</label
-                  >
-                  <input
-                    id="ct-cold"
-                    type="number"
-                    min="40"
-                    max="100"
-                    value="85"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label for="ct-wbt" class="text-sm font-semibold text-slate-800"
-                  >Ambient wet-bulb temperature (WBT, °F)</label
-                >
-                <input
-                  id="ct-wbt"
-                  type="number"
-                  min="40"
-                  max="95"
-                  value="78"
-                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
-                />
-              </div>
-
-              <div>
-                <label for="ct-chiller-tons" class="text-sm font-semibold text-slate-800"
-                  >Chiller evaporator load (tons)</label
-                >
-                <input
-                  id="ct-chiller-tons"
-                  type="number"
-                  min="1"
-                  max="5000"
-                  value="200"
-                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
-                />
-                <p class="mt-1.5 text-xs text-slate-500">The chiller's rated cooling capacity at design conditions.</p>
-              </div>
-
-              <div>
-                <label for="ct-cop" class="text-sm font-semibold text-slate-800"
-                  >Chiller COP (or EER ÷ 3.412)</label
-                >
-                <input
-                  id="ct-cop"
-                  type="number"
-                  min="1"
-                  max="15"
-                  step="0.1"
-                  value="5.0"
-                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
-                />
-                <p class="mt-1.5 text-xs text-slate-500">
-                  Typical COP 4–6 for centrifugal chillers. Heat of compression = chiller load / COP.
-                </p>
-              </div>
-
-              <button
-                id="ct-reset"
-                type="button"
-                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
-              >
-                <svg
-                  class="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  ></path>
-                </svg>
-                Reset to defaults
-              </button>
-            </div>
           </div>
 
           <!-- Results -->
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-cyan-600 to-teal-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-cyan-100">Heat Rejection</p>
+          <div class="mt-6 lg:mt-0 rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Heat Rejection</p>
               <div class="mt-2 flex items-baseline gap-2">
                 <span id="ct-result-rejection" class="text-4xl font-extrabold tracking-tight">—</span>
                 <span class="text-lg font-medium text-cyan-100">BTU/h</span>
@@ -312,21 +198,21 @@ const relatedCalculators = [
 
               <div class="mt-6 grid grid-cols-3 gap-3">
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-cyan-100">Tons</p>
+                  <p class="text-xs text-slate-500">Tons</p>
                   <p id="ct-result-tons" class="mt-1 text-xl font-bold">—</p>
                 </div>
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-cyan-100">Approach</p>
+                  <p class="text-xs text-slate-500">Approach</p>
                   <p id="ct-result-approach" class="mt-1 text-xl font-bold">—</p>
                 </div>
                 <div class="rounded-xl bg-white/15 p-3">
-                  <p class="text-xs text-cyan-100">Required</p>
+                  <p class="text-xs text-slate-500">Required</p>
                   <p id="ct-result-required" class="mt-1 text-xl font-bold">—</p>
                 </div>
               </div>
 
-              <div class="mt-3 rounded-xl bg-white/15 p-4">
-                <p class="text-xs text-cyan-100">Status</p>
+              <div class="mt-3 rounded-xl border border-cyan-100 bg-white p-4">
+                <p class="text-xs text-slate-500">Status</p>
                 <p id="ct-status" class="mt-1 text-lg font-bold">—</p>
               </div>
 
@@ -340,13 +226,13 @@ const relatedCalculators = [
               </div>
 
               <!-- Breakdown -->
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
@@ -355,32 +241,33 @@ const relatedCalculators = [
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-cyan-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
-                    <span>GPM</span><span id="ct-bd-gpm" class="font-semibold">—</span>
+                    <span>GPM</span><span id="ct-bd-gpm" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Range (ΔT)</span><span id="ct-bd-range" class="font-semibold">—</span>
+                    <span>Range (ΔT)</span><span id="ct-bd-range" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Heat rejection</span><span id="ct-bd-rejection" class="font-semibold">—</span>
+                    <span>Heat rejection</span><span id="ct-bd-rejection" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Approach</span><span id="ct-bd-approach" class="font-semibold">—</span>
+                    <span>Approach</span><span id="ct-bd-approach" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div
-                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                    class="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5 text-slate-900"
                   >
-                    <span class="font-bold">Required reject</span><span id="ct-bd-required" class="font-bold">—</span>
+                    <span class="font-bold text-slate-900">Required reject</span><span id="ct-bd-required" class="font-bold text-slate-900">—</span>
                   </div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-cyan-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Heat rejection formula: Q = 500 × GPM × ΔT. Approach = leaving cold water − ambient wet-bulb.
                 Tower selection requires approach ≥ 5°F at peak wet-bulb conditions.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 

@@ -159,9 +159,8 @@ const relatedCalculators = [
       </section>
 
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-orange-600"
                 fill="none"
@@ -178,8 +177,9 @@ const relatedCalculators = [
               Enter suction-side temperatures
             </h2>
 
-            <div class="mt-6 space-y-6">
-              <div>
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+<div>
                 <label for="sh-meter" class="text-sm font-semibold text-slate-800">Metering device</label>
                 <select
                   id="sh-meter"
@@ -242,44 +242,42 @@ const relatedCalculators = [
                 </svg>
                 Reset to defaults
               </button>
-            </div>
           </div>
 
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-orange-600 to-amber-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-orange-100">Measured superheat</p>
+          <!-- Results -->
+          <div class="mt-6 lg:mt-0 rounded-xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Measured superheat</p>
               <div class="mt-2 flex items-baseline gap-2">
-                <span id="sh-result" class="text-5xl font-extrabold tracking-tight">10°F</span>
+                <span id="sh-result" class="text-5xl font-extrabold tracking-tight text-orange-600">10°F</span>
               </div>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-orange-100">Reading</p>
-                  <p id="sh-status" class="mt-1 text-2xl font-bold">Healthy</p>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Reading</p>
+                  <p id="sh-status" class="mt-1 text-2xl font-bold text-slate-900">Healthy</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-orange-100">Ideal target</p>
-                  <p id="sh-target" class="mt-1 text-2xl font-bold">8–12°F</p>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Ideal target</p>
+                  <p id="sh-target" class="mt-1 text-2xl font-bold text-slate-900">8–12°F</p>
                 </div>
               </div>
 
-              <div class="mt-3 rounded-xl bg-white/15 p-4">
-                <p class="text-xs text-orange-100">Likely causes</p>
+              <div class="mt-3 rounded-xl border border-orange-100 bg-white p-4">
+                <p class="text-xs text-slate-500">Likely causes</p>
                 <p id="sh-causes" class="mt-1 text-sm font-medium leading-snug">
                   Superheat in the TXV charging band — the evaporator is fully fed without flooding the suction
                   line.
                 </p>
               </div>
 
-              <details class="group mt-5 rounded-xl bg-white/10">
+              <details class="group mt-5 rounded-xl border border-orange-100 bg-white">
                 <summary
-                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold"
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
                 >
                   See the breakdown
                   <svg
-                    class="h-4 w-4 transition-transform group-open:rotate-180"
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
@@ -288,29 +286,30 @@ const relatedCalculators = [
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                   </svg>
                 </summary>
-                <div class="px-4 pb-4 text-sm space-y-1.5 text-orange-50">
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
                   <div class="flex justify-between">
-                    <span>Saturation temp</span><span id="sh-bd-sat" class="font-semibold">—</span>
+                    <span>Saturation temp</span><span id="sh-bd-sat" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Suction line temp</span><span id="sh-bd-suction" class="font-semibold">—</span>
+                    <span>Suction line temp</span><span id="sh-bd-suction" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>Superheat</span><span id="sh-bd-sh" class="font-semibold">—</span>
+                    <span>Superheat</span><span id="sh-bd-sh" class="font-semibold text-slate-900">—</span>
                   </div>
                   <div
-                    class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5 text-white"
+                    class="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5 text-slate-900"
                   >
-                    <span class="font-bold">Healthy range</span><span id="sh-bd-target" class="font-bold">—</span>
+                    <span class="font-bold text-slate-900">Healthy range</span><span id="sh-bd-target" class="font-bold text-slate-900">—</span>
                   </div>
                 </div>
               </details>
 
-              <p class="mt-4 text-xs text-orange-100 leading-relaxed">
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Fixed-orifice systems need the target superheat chart for your wet-bulb and outdoor temps — this
                 calculator uses a general band. Always follow the manufacturer charging method.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 

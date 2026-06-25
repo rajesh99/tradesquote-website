@@ -8,9 +8,9 @@ import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
 import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
 import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
 
-const title = "Duct Size Calculator — CFM to Duct Diameter Chart | TradesQuote";
+const title = "Duct Size Calculator & Online Ductulator — CFM to Diameter | TradesQuote";
 const description =
-  "Free duct size calculator. Enter your airflow in CFM and get the round duct diameter you need — for sheet metal or flex duct — plus velocity check and a full duct sizing chart.";
+  "Free duct size calculator and online ductulator. Enter your airflow in CFM and get the round duct diameter you need — for sheet metal or flex duct — plus a velocity check and full duct sizing chart.";
 
 const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-duct-size-calculator";
 const heroImage = "/images/calculators/hvac-duct-size-calculator-hero.svg";
@@ -74,6 +74,11 @@ const faqs: CalculatorFaq[] = [
     question: "Is this a substitute for Manual D?",
     answer:
       "No. This sizes individual runs with the standard friction-rate shortcut — reliable for single branches and simple trunks. <strong>ACCA Manual D</strong> designs the whole system: balancing every branch, fittings, total effective length, and the blower's available static pressure. Permits and warranties expect it.",
+  },
+  {
+    question: "What is a ductulator?",
+    answer:
+      "A <strong>ductulator</strong> is the classic circular slide-rule HVAC techs use to size ducts — line up the airflow (CFM) against the friction rate and read off the duct diameter. This tool is an <strong>online ductulator</strong>: it runs the same friction-rate math instantly, adds an air-velocity check, and covers both sheet-metal and flex duct — no wheel required.",
   },
 ];
 const faqData = buildFaqPageSchema(faqs);
@@ -152,14 +157,14 @@ const relatedCalculators = [
               </span>
 
               <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
-                Duct Size Calculator <span class="text-teal-600">— Free Online Calculator</span>
+                Duct Size Calculator <span class="text-teal-600">— Free Online Ductulator</span>
               </h1>
 
               <p class="mt-5 text-lg text-slate-600 leading-relaxed">
-                This duct size calculator converts airflow in CFM into the round duct diameter you need — for
-                smooth sheet metal or flex duct — using the standard residential friction rate, with an air-velocity
-                check so the run won't whistle. Use it to size a new branch, verify a trunk, or diagnose a room
-                that never gets enough air.
+                This duct size calculator — a free online ductulator — converts airflow in CFM into the round duct
+                diameter you need, for smooth sheet metal or flex duct, using the standard residential friction
+                rate, with an air-velocity check so the run won't whistle. Use it to size a new branch, verify a
+                trunk, or diagnose a room that never gets enough air.
               </p>
 
               <div class="mt-6 flex items-start gap-3 rounded-xl border border-teal-100 bg-teal-50 p-4">
@@ -204,9 +209,8 @@ const relatedCalculators = [
       </section>
 
       <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
-        <div class="grid lg:grid-cols-5 gap-6">
-          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-teal-600"
                 fill="none"
@@ -223,8 +227,9 @@ const relatedCalculators = [
               Enter your airflow
             </h2>
 
-            <div class="mt-6 space-y-6">
-              <div>
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          <div class="space-y-6">
+<div>
                 <div class="flex items-center justify-between">
                   <label for="ductCfm" class="text-sm font-semibold text-slate-800">Airflow</label>
                   <div class="flex items-center gap-1">
@@ -303,42 +308,41 @@ const relatedCalculators = [
                   >
                 </div>
               </div>
-            </div>
           </div>
 
-          <div class="lg:col-span-2">
-            <div
-              class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-500 p-6 sm:p-8 text-white shadow-lg"
-            >
-              <p class="text-sm font-medium text-teal-100">Recommended round duct</p>
+          <!-- Results -->
+          <div class="mt-6 lg:mt-0 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+
+              <p class="text-sm font-medium text-slate-600">Recommended round duct</p>
               <div class="mt-2 flex items-baseline gap-2">
-                <span id="sizeResult" class="text-5xl font-extrabold tracking-tight">10"</span>
-                <span id="sizeMaterial" class="text-lg font-semibold text-teal-100">sheet metal</span>
+                <span id="sizeResult" class="text-5xl font-extrabold tracking-tight text-teal-600">10"</span>
+                <span id="sizeMaterial" class="text-lg font-semibold text-slate-600">sheet metal</span>
               </div>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-teal-100">Air velocity</p>
-                  <p id="velResult" class="mt-1 text-2xl font-bold">733 fpm</p>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Air velocity</p>
+                  <p id="velResult" class="mt-1 text-2xl font-bold text-slate-900">733 fpm</p>
                 </div>
-                <div class="rounded-xl bg-white/15 p-4">
-                  <p class="text-xs text-teal-100">Size capacity</p>
-                  <p id="capResult" class="mt-1 text-2xl font-bold">425 CFM</p>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Size capacity</p>
+                  <p id="capResult" class="mt-1 text-2xl font-bold text-slate-900">425 CFM</p>
                 </div>
               </div>
 
-              <div class="mt-3 rounded-xl bg-white/15 p-4">
-                <p class="text-xs text-teal-100" id="altLabel">Same airflow in flex duct</p>
-                <p id="altResult" class="mt-1 text-base font-semibold leading-snug">12" flex duct</p>
+              <div class="mt-3 rounded-xl border border-teal-100 bg-white p-4">
+                <p class="text-xs text-slate-500" id="altLabel">Same airflow in flex duct</p>
+                <p id="altResult" class="mt-1 text-base font-semibold leading-snug text-slate-800">12" flex duct</p>
               </div>
 
-              <p id="velNote" class="mt-4 text-xs text-teal-100 leading-relaxed">
+              <p id="velNote" class="mt-4 text-xs text-slate-500 leading-relaxed">
                 Velocity is under the 900 fpm supply-trunk comfort threshold — this run should be quiet.
               </p>
-              <p class="mt-2 text-xs text-teal-100 leading-relaxed">
+              <p class="mt-2 text-xs text-slate-500 leading-relaxed">
                 Sized at 0.1 in. w.c./100 ft friction rate. Final whole-system duct design should follow ACCA Manual D.
               </p>
-            </div>
+            
+          </div>
           </div>
         </div>
 
