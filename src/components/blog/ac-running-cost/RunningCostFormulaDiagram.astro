@@ -1,0 +1,38 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Central AC running cost formula</title>
+  <desc>Running cost equals BTU per hour divided by SEER2 to get watts, converted to kilowatt-hours, multiplied by the electricity rate, with a worked example.</desc>
+
+  <text x="360" y="34" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="16" font-weight="700">From tonnage to dollars per hour</text>
+
+  <!-- Step chain -->
+  <rect x="40" y="58" width="190" height="58" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="135" y="82" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11" font-weight="600">Step 1 &#183; power draw</text>
+  <text x="135" y="103" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">BTU/hr &#247; SEER2 = watts</text>
+
+  <rect x="265" y="58" width="190" height="58" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1" />
+  <text x="360" y="82" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11" font-weight="600">Step 2 &#183; energy used</text>
+  <text x="360" y="103" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">kWh = kW &#215; hours</text>
+
+  <rect x="490" y="58" width="190" height="58" rx="10" fill={C.greenLight} stroke={C.green} stroke-width="1" />
+  <text x="585" y="82" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11" font-weight="600">Step 3 &#183; cost</text>
+  <text x="585" y="103" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">cost = kWh &#215; $/kWh</text>
+
+  <!-- Connectors -->
+  <text x="247" y="92" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="18" font-weight="800">&#8594;</text>
+  <text x="472" y="92" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="18" font-weight="800">&#8594;</text>
+
+  <!-- Master formula -->
+  <rect x="90" y="138" width="540" height="52" rx="8" fill={C.panelBg} stroke={C.border} />
+  <text x="360" y="170" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="15" font-weight="700">cost/hr &#8776; (BTU/hr &#247; SEER2 &#247; 1000) &#215; $/kWh</text>
+
+  <!-- Worked example -->
+  <rect x="60" y="210" width="600" height="64" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+  <text x="360" y="234" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="11" font-weight="700">Worked example: a 3-ton unit (36,000 BTU/hr), SEER2 14, rate $0.16/kWh</text>
+  <text x="360" y="258" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="800">36,000 &#247; 14 &#8776; 2,570 W = 2.57 kW &#215; $0.16 &#8776; $0.41/hr</text>
+
+  <text x="360" y="302" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11">Watts &#8776; BTU/hr &#247; SEER2. Divide by 1000 for kW, multiply by hours and your rate for the bill.</text>
+</svg>

@@ -1,0 +1,42 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>From load to equipment size</title>
+  <desc>
+    A load result in BTU per hour is divided by 12,000 BTU per ton to get equipment size in tons.
+    A worked example shows 36,000 BTU per hour equals a 3-ton system, with a warning that rounding
+    up to a bigger unit causes short cycling.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">From load to equipment size</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">The load in BTU/hr converts directly into tons of capacity</text>
+
+  <!-- Flow: load -> divide -> tons -->
+  <rect x="32" y="84" width="180" height="64" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="122" y="110" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Load result</text>
+  <text x="122" y="132" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="15" font-weight="800">36,000 BTU/hr</text>
+
+  <text x="252" y="122" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="22" font-weight="800">&#247;</text>
+
+  <rect x="288" y="84" width="180" height="64" rx="10" fill={C.panelBg} stroke={C.border} />
+  <text x="378" y="110" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Conversion</text>
+  <text x="378" y="132" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="800">12,000 BTU = 1 ton</text>
+
+  <text x="508" y="122" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="22" font-weight="800">&#8594;</text>
+
+  <rect x="540" y="84" width="148" height="64" rx="10" fill={C.greenLight} stroke={C.green} stroke-width="1.5" />
+  <text x="614" y="110" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Equipment size</text>
+  <text x="614" y="132" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="16" font-weight="800">3 tons</text>
+
+  <!-- Worked line -->
+  <rect x="80" y="170" width="560" height="44" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1" />
+  <text x="360" y="197" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="800">36,000 &#247; 12,000 = 3 tons</text>
+
+  <!-- Oversizing warning -->
+  <rect x="80" y="230" width="560" height="58" rx="10" fill={C.redLight} stroke={C.red} stroke-width="1.5" />
+  <text x="360" y="254" text-anchor="middle" fill={C.red} font-family={FONT} font-size="11.5" font-weight="700">Do not round up to the next size</text>
+  <text x="360" y="274" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5">Jumping 3 tons &#8594; 4 tons short-cycles: cold but clammy, more wear, higher bills</text>
+</svg>
