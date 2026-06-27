@@ -1,0 +1,21 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Three ventilation strategies compared</title>
+  <desc>Exhaust-only, supply-only, and balanced HRV/ERV ventilation strategies.</desc>
+
+  {[
+    { title: "Exhaust-only", pros: "Lowest cost", cons: "Depressurizes home", color: C.orange, bg: C.orangeLight, x: 24 },
+    { title: "Supply-only", pros: "Pressurizes, filters air", cons: "No energy recovery", color: C.blue, bg: C.blueLight, x: 252 },
+    { title: "Balanced HRV/ERV", pros: "70–85% energy recovery", cons: "Higher install cost", color: C.primary, bg: C.primaryLight, x: 480 },
+  ].map((s) => (
+    <g>
+      <rect x={s.x} y="16" width="216" height="228" rx="12" fill={s.bg} stroke={s.color} stroke-width="1.5" />
+      <text x={s.x + 108} y="48" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{s.title}</text>
+      <text x={s.x + 108} y="120" text-anchor="middle" fill={s.color} font-family={FONT} font-size="10" font-weight="600">✓ {s.pros}</text>
+      <text x={s.x + 108} y="180" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">✗ {s.cons}</text>
+    </g>
+  ))}
+</svg>

@@ -1,0 +1,27 @@
+---
+import { C, FONT } from "../infographicTokens";
+const zones = [
+  { z: "1–2", cities: "Miami, Houston", strategy: "Standard HP, no backup", x: 16 },
+  { z: "3–4", cities: "Charlotte, KC", strategy: "Standard HP + backup", x: 152 },
+  { z: "5", cities: "Chicago, Denver", strategy: "Cold-climate preferred", x: 288 },
+  { z: "6", cities: "Minneapolis", strategy: "Cold-climate required", x: 424 },
+  { z: "7", cities: "Fairbanks", strategy: "Cold-climate + robust backup", x: 560 },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" fill="none" aria-hidden="true">
+  <title>Heat pump strategy by climate zone</title>
+  <desc>Climate zones 1 through 7 with recommended heat pump and backup heat strategy.</desc>
+
+  <text x="360" y="24" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">Climate zone equipment strategy</text>
+
+  {zones.map((z, i) => (
+    <g>
+      <rect x={z.x} y="36" width="136" height="148" rx="8" fill={i >= 3 ? C.orangeLight : i >= 1 ? C.blueLight : C.primaryLight} stroke={i >= 3 ? C.orange : i >= 1 ? C.blue : C.primary} stroke-width="1.5" />
+      <text x={z.x + 68} y="60" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Zone {z.z}</text>
+      <text x={z.x + 68} y="82" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{z.cities}</text>
+      <text x={z.x + 68} y="120" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="8" font-weight="600">{z.strategy.split(" ")[0]}</text>
+      <text x={z.x + 68} y="132" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="8" font-weight="600">{z.strategy.split(" ").slice(1).join(" ")}</text>
+    </g>
+  ))}
+</svg>

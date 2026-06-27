@@ -1,0 +1,57 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Worked example: 800 to 1,000 RPM</title>
+  <desc>Raising blower speed from 800 to 1,000 RPM, a 1.25 ratio, raises airflow to 1,250 CFM, static pressure to 0.625 in.w.c., and power to 0.98 BHP.</desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <text x="360" y="40" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Worked example: 800 → 1,000 RPM</text>
+
+  {/* Inputs panel */}
+  <rect x="32" y="64" width="220" height="180" rx="8" fill={C.white} stroke={C.border} />
+  <text x="142" y="88" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">Inputs</text>
+  {[
+    { k: "Speed", v: "800 RPM" },
+    { k: "Airflow", v: "1,000 CFM" },
+    { k: "Static pressure", v: "0.40 in.w.c." },
+    { k: "Power", v: "0.50 BHP" },
+  ].map((r, i) => (
+    <g>
+      <text x="52" y={116 + i * 30} fill={C.muted} font-family={FONT} font-size="11">{r.k}</text>
+      <text x="232" y={116 + i * 30} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.v}</text>
+    </g>
+  ))}
+
+  {/* Ratio badge */}
+  <circle cx="360" cy="154" r="44" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="360" y="148" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">ratio</text>
+  <text x="360" y="170" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="20" font-weight="700">1.25</text>
+  <path d="M256 154 H308" stroke={C.primary} stroke-width="2" marker-end="url(#fle-arr)" />
+  <path d="M412 154 H464" stroke={C.primary} stroke-width="2" marker-end="url(#fle-arr)" />
+
+  {/* Outputs panel */}
+  <rect x="468" y="64" width="220" height="180" rx="8" fill={C.white} stroke={C.primary} stroke-width="1.5" />
+  <text x="578" y="88" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">Outputs</text>
+  {[
+    { k: "Speed", v: "1,000 RPM", c: C.dark },
+    { k: "Airflow ×1.25", v: "1,250 CFM", c: C.blue },
+    { k: "SP ×1.25²", v: "0.625 in.w.c.", c: C.orange },
+    { k: "Power ×1.25³", v: "0.98 BHP", c: C.red },
+  ].map((r, i) => (
+    <g>
+      <text x="488" y={116 + i * 30} fill={C.muted} font-family={FONT} font-size="11">{r.k}</text>
+      <text x="668" y={116 + i * 30} text-anchor="end" fill={r.c} font-family={FONT} font-size="11" font-weight="700">{r.v}</text>
+    </g>
+  ))}
+
+  <text x="360" y="272" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">25% more speed nearly doubles motor power — the cube law in action.</text>
+
+  <defs>
+    <marker id="fle-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+</svg>

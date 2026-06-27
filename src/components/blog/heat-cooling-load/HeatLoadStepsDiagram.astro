@@ -1,0 +1,37 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const steps = [
+  ["1", "Gather the inputs", "Area, ceiling height, R-values, window area, infiltration, local design temps"],
+  ["2", "Heat loss per surface", "Run Q = U × A × ΔT for each wall, ceiling, floor, and window"],
+  ["3", "Add infiltration", "Heat carried by air leaking through the envelope (ACH)"],
+  ["4", "Cooling side adds gain", "Solar through glass + people, lights, appliances + latent (moisture) load"],
+  ["5", "Total → tonnage", "Sum to BTU/hr, then divide the cooling load by 12,000 for tons"],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" fill="none" aria-hidden="true">
+  <title>How a load calculation is built, step by step</title>
+  <desc>
+    Five steps: gather inputs, calculate heat loss per surface with Q equals U times A times delta T,
+    add infiltration, add solar, internal, and latent gain on the cooling side, then total to BTU per
+    hour and divide by 12,000 to get tons.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="344" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">How a load calculation is built</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">From building inputs to a load in BTU/hr, then to equipment tonnage</text>
+
+  {steps.map((s, i) => {
+    const y = 76 + i * 54;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="46" rx="9" fill={C.white} stroke={C.border} />
+        <circle cx="52" cy={y + 23} r="14" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+        <text x="52" y={y + 28} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="14" font-weight="800">{s[0]}</text>
+        <text x="80" y={y + 20} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{s[1]}</text>
+        <text x="80" y={y + 37} fill={C.muted} font-family={FONT} font-size="10.5">{s[2]}</text>
+      </g>
+    );
+  })}
+</svg>

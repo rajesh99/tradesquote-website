@@ -1,0 +1,35 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" fill="none" aria-hidden="true">
+  <title>Eight steps to measure superheat and subcooling</title>
+  <desc>Connect gauges, stabilize, measure pressures and line temperatures, convert with PT chart.</desc>
+
+  <rect x="8" y="8" width="704" height="184" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="32" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">Field measurement flow</text>
+
+  {[
+    "Connect gauges",
+    "Stabilize 10–15 min",
+    "Read suction P → sat. temp",
+    "Probe suction line → SH",
+    "Read liquid P → sat. temp",
+    "Probe liquid line → SC",
+  ].map((label, i) => {
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    const x = 24 + col * 228;
+    const y = 48 + row * 68;
+    return (
+      <g>
+        <circle cx={x + 14} cy={y + 14} r="14" fill={C.primary} />
+        <text x={x + 14} y={y + 19} text-anchor="middle" fill={C.white} font-family={FONT} font-size="12" font-weight="700">{i + 1}</text>
+        <text x={x + 36} y={y + 18} fill={C.dark} font-family={FONT} font-size="10" font-weight="600">{label}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="168" width="672" height="20" rx="4" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+  <text x="360" y="182" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9" font-weight="600">Use correct refrigerant on PT chart — R-410A, R-22, and R-32 differ</text>
+</svg>

@@ -32,7 +32,9 @@ const latest = sortByDate(posts)
           const category = post.data.categories?.[0];
           const excerpt = post.data.description
             ? post.data.description
-            : plainify(post.body ?? "");
+            : plainify(
+                (post.body ?? "").replace(/^\s*import\s+.+$/gm, "").trim(),
+              );
 
           return (
             <article class="flex gap-4">

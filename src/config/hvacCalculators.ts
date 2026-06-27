@@ -31,11 +31,29 @@ export const hvacCalculators: HvacCalculator[] = [
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>`,
   },
   {
+    slug: "hvac-manual-j-calculator",
+    title: "Manual J Load Calculation Calculator",
+    description:
+      "Whole-home heating and cooling load in BTU and tons — from square footage, climate zone, insulation, ceiling height, and sun exposure.",
+    question: "What is my home's Manual J heating and cooling load?",
+    accent: "blue",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>`,
+  },
+  {
     slug: "hvac-tonnage-calculator",
     title: "AC Tonnage Calculator",
     description:
       "Convert BTU to tons and back instantly, estimate tonnage from square footage, and decode the size hidden in any unit's model number.",
     question: "How many tons is 36,000 BTU?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
+  },
+  {
+    slug: "hvac-ac-tonnage-per-square-foot-calculator",
+    title: "AC Tonnage per Square Foot",
+    description:
+      "How many tons of AC a home needs by square footage and climate — with a square-footage-to-tonnage chart and the tons-per-sq-ft rule.",
+    question: "How many tons of AC per square foot?",
     accent: "sky",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
   },
@@ -247,6 +265,24 @@ export const hvacCalculators: HvacCalculator[] = [
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
   },
   {
+    slug: "hvac-ac-installation-cost-calculator",
+    title: "AC Installation Cost Calculator",
+    description:
+      "Installed price of a new central AC, heat pump, or mini-split — by size, efficiency, new-vs-replacement scope, ductwork, and region.",
+    question: "How much does it cost to install central air?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
+  {
+    slug: "hvac-furnace-replacement-cost-calculator",
+    title: "Furnace Replacement Cost Calculator",
+    description:
+      "Installed cost of a new gas, electric, oil, or propane furnace — by size, AFUE efficiency, replacement-vs-new-install, and region.",
+    question: "How much does it cost to replace a furnace?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>`,
+  },
+  {
     slug: "hvac-estimate-calculator",
     title: "HVAC Estimate Calculator",
     description:
@@ -373,7 +409,9 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
     description: "Find the right system for any space — cooling load, heating load, tonnage, heat pump sizing, and electrical and gas service requirements.",
     slugs: [
       "hvac-btu-calculator",
+      "hvac-manual-j-calculator",
       "hvac-tonnage-calculator",
+      "hvac-ac-tonnage-per-square-foot-calculator",
       "hvac-unit-converter",
       "hvac-furnace-btu-calculator",
       "hvac-heat-pump-calculator",
@@ -432,6 +470,8 @@ export const hvacCalculatorGroups: HvacCalculatorGroup[] = [
       "hvac-operating-cost-calculator",
       "hvac-replacement-cost-calculator",
       "hvac-ductwork-replacement-cost-calculator",
+      "hvac-ac-installation-cost-calculator",
+      "hvac-furnace-replacement-cost-calculator",
       "hvac-estimate-calculator",
       "hvac-boiler-sizing-edr-calculator",
       "hvac-cooling-tower-tonnage-calculator",

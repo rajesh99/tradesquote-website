@@ -1,0 +1,35 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" fill="none" aria-hidden="true">
+  <title>Manual D duct design flow</title>
+  <desc>TESP minus coil and filter gives available static, divide by TEL for friction rate, select ducts.</desc>
+
+  <rect x="8" y="8" width="704" height="204" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  {[
+    { n: "1", title: "Available static", sub: "TESP − coil − filter", x: 32 },
+    { n: "2", title: "Total eff. length", sub: "Longest run + fittings", x: 200 },
+    { n: "3", title: "Friction rate", sub: "(Avail ÷ TEL) × 100", x: 368 },
+    { n: "4", title: "Select ducts", sub: "Friction chart lookup", x: 536 },
+  ].map((s, i) => (
+    <g>
+      <rect x={s.x} y="48" width="152" height="100" rx="8" fill={C.white} stroke={i === 2 ? C.primary : C.border} stroke-width={i === 2 ? 1.5 : 1} />
+      <circle cx={s.x + 20} cy="68" r="12" fill={C.primary} />
+      <text x={s.x + 20} y="72" text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="700">{s.n}</text>
+      <text x={s.x + 76} y="88" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{s.title}</text>
+      <text x={s.x + 76} y="108" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{s.sub}</text>
+      {i < 3 ? <path d={`M${s.x + 160} 98 H${s.x + 176}`} stroke={C.primary} stroke-width="2" marker-end="url(#md-arr)" /> : null}
+    </g>
+  ))}
+
+  <rect x="120" y="168" width="480" height="32" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+  <text x="360" y="188" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">3-ton example: 0.50 − 0.10 − 0.08 = 0.32 avail → FR = 0.16 in.w.c./100 ft</text>
+
+  <defs>
+    <marker id="md-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+</svg>

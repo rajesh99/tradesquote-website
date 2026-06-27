@@ -173,7 +173,61 @@ const relatedCalculators = [
 
           <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
           <div class="space-y-6">
+            <div>
+              <label for="mjArea" class="text-sm font-semibold text-slate-800">Conditioned area (sq ft)</label>
+              <input id="mjArea" type="number" min="100" max="10000" value="2000"
+                class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none" />
+            </div>
 
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="mjClimate" class="text-sm font-semibold text-slate-800">Climate zone</label>
+                <select id="mjClimate"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+                  <option value="hot">Hot — Gulf Coast, desert SW (Zone 1–2)</option>
+                  <option value="warm">Warm — Southeast, S. California (Zone 3)</option>
+                  <option value="mixed" selected>Mixed — Mid-Atlantic, Tennessee (Zone 4)</option>
+                  <option value="cool">Cool — Northeast, Midwest (Zone 5)</option>
+                  <option value="cold">Cold — Upper Midwest, Mountain (Zone 6–7)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="mjInsul" class="text-sm font-semibold text-slate-800">Insulation & sealing</label>
+                <select id="mjInsul"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+                  <option value="poor">Poor — older / leaky (+15%)</option>
+                  <option value="average" selected>Average — typical home</option>
+                  <option value="good">Good — tight / well-insulated (−12%)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="mjCeiling" class="text-sm font-semibold text-slate-800">Ceiling height</label>
+                <select id="mjCeiling"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+                  <option value="8" selected>8 ft (standard)</option>
+                  <option value="9">9 ft (+6%)</option>
+                  <option value="10">10 ft (+12%)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="mjSun" class="text-sm font-semibold text-slate-800">Sun exposure & windows</label>
+                <select id="mjSun"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+                  <option value="shaded">Mostly shaded / few windows (−10%)</option>
+                  <option value="average" selected>Average</option>
+                  <option value="sunny">Sunny / lots of glass (+15%)</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="resetBtn"
+              class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Reset to defaults
+            </button>
           </div>
 
           <!-- Results -->
@@ -183,7 +237,7 @@ const relatedCalculators = [
               <div class="mt-2">
                 <span id="coolResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">44,000 BTU/hr</span>
               </div>
-              <p id="coolTons" class="mt-1 text-sm text-blue-100">≈ 3.7 tons cooling</p>
+              <p id="coolTons" class="mt-1 text-sm text-slate-500">≈ 3.7 tons cooling</p>
 
               <div class="mt-6 grid grid-cols-2 gap-3">
                 <div class="rounded-xl border border-blue-100 bg-white p-4">

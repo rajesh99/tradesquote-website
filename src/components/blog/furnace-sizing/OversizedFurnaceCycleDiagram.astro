@@ -1,0 +1,23 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" fill="none" aria-hidden="true">
+  <title>Oversized furnace short-cycling consequences</title>
+  <desc>Oversized furnace reaches setpoint fast, creates cold spots, higher bills, and heat exchanger wear.</desc>
+
+  <rect x="280" y="8" width="160" height="36" rx="8" fill={C.dark} />
+  <text x="360" y="30" text-anchor="middle" fill={C.white} font-family={FONT} font-size="10" font-weight="600">Oversized furnace</text>
+
+  {[
+    { y: 56, text: "Reaches setpoint quickly → shuts off", color: C.orange, bg: C.orangeLight },
+    { y: 100, text: "Blower too brief → cold spots far from unit", color: C.blue, bg: C.blueLight },
+    { y: 144, text: "Frequent on/off → higher gas bills + exchanger wear", color: C.red, bg: C.redLight },
+  ].map((s, i) => (
+    <g>
+      {i > 0 ? <path d={`M360 ${s.y - 8} V${s.y}`} stroke={C.border} stroke-width="2" /> : null}
+      <rect x="160" y={s.y} width="400" height="36" rx="6" fill={s.bg} stroke={s.color} stroke-width="1.5" />
+      <text x="360" y={s.y + 22} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="600">{s.text}</text>
+    </g>
+  ))}
+</svg>
