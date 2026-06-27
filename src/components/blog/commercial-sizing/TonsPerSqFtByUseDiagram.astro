@@ -1,0 +1,37 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// sq ft per ton — LOWER means a heavier cooling load. Bar width ∝ value (capped).
+const rows = [
+  ["Server / data room", "~50–100", 60, C.red],
+  ["Restaurant", "~100–150", 110, C.orange],
+  ["Retail", "~250–350", 250, C.blue],
+  ["School / classroom", "~250–300", 240, C.blue],
+  ["Office", "~300–400", 300, C.primary],
+  ["Warehouse (conditioned)", "~500–1,000", 480, C.green],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Commercial cooling: square feet per ton by building type</title>
+  <desc>
+    Rough planning figures for square feet per ton of cooling: server rooms 50 to 100, restaurants 100
+    to 150, retail 250 to 350, schools 250 to 300, offices 300 to 400, and conditioned warehouses 500
+    to 1,000. A lower number means a heavier load.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Square feet per ton by building type</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Rough planning only — a LOWER number means a HEAVIER cooling load</text>
+
+  {rows.map((r, i) => {
+    const y = 76 + i * 38;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r[0]}</text>
+        <rect x="230" y={y + 6} width={r[2]} height="24" rx="6" fill={C.white} stroke={r[3] as string} stroke-width="1.4" />
+        <text x={238} y={y + 23} fill={r[3] as string} font-family={FONT} font-size="11.5" font-weight="800">{r[1]} sq ft/ton</text>
+      </g>
+    );
+  })}
+</svg>

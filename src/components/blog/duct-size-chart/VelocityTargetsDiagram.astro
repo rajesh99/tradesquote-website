@@ -1,0 +1,36 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const rows = [
+  ["Supply trunk", "700–900 fpm", C.blue, C.blueLight],
+  ["Supply branch", "600–700 fpm", C.blue, C.blueLight],
+  ["Return trunk", "600–700 fpm", C.primary, C.primaryLight],
+  ["Return branch", "400–600 fpm", C.primary, C.primaryLight],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Residential duct velocity targets</title>
+  <desc>
+    Recommended air velocities for quiet residential ducts: supply trunks 700 to 900 feet per minute,
+    supply branches 600 to 700, return trunks 600 to 700, and return branches 400 to 600. Returns run
+    slower, so they are sized larger than supplies for the same airflow.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Velocity targets keep ducts quiet</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Residential targets in feet per minute — push past these and ducts get noisy</text>
+
+  {rows.map((r, i) => {
+    const y = 78 + i * 44;
+    return (
+      <g>
+        <rect x="40" y={y} width="640" height="36" rx="8" fill={r[3] as string} stroke={r[2] as string} stroke-width="1.3" />
+        <text x="58" y={y + 23} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="700">{r[0]}</text>
+        <text x="660" y={y + 23} text-anchor="end" fill={r[2] as string} font-family={FONT} font-size="13" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+
+  <text x="40" y="286" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">Returns run slower, so they're sized larger than supplies for the same CFM.</text>
+</svg>

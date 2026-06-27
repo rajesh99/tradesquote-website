@@ -1,0 +1,122 @@
+---
+title: "Duct Size Chart: How to Match Duct Size to CFM"
+meta_title: "Duct Size Chart (CFM to Duct Size) + Calculator | TradesQuote"
+description: "A round duct size chart by CFM, what a ductulator actually does, the friction-rate and velocity rules behind it, how to convert round to rectangular, and how to size supply vs return ducts."
+image: /images/posts/duct-size-chart-cfm-hero.svg
+date: 2026-06-26T09:00:00Z
+categories: ["hvac"]
+authors: ["Mark"]
+tags: ["duct sizing","ductulator","cfm","ductwork","duct calculator","airflow"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import DuctSizeChartDiagram from "@/components/blog/duct-size-chart/DuctSizeChartDiagram.astro";
+import RoundToRectDiagram from "@/components/blog/duct-size-chart/RoundToRectDiagram.astro";
+import VelocityTargetsDiagram from "@/components/blog/duct-size-chart/VelocityTargetsDiagram.astro";
+
+Picking a duct size comes down to one question: how much air (CFM) does the duct need to carry? Get a quick answer from the chart below, then read on for the two rules that produce it — because a duct sized purely from a chart, without checking friction and velocity, is how you end up with noisy registers and starved rooms.
+
+A **ductulator** (the slide-rule wheel many techs carry, and the digital duct calculators that replaced it) does exactly this lookup. This guide is the chart plus the reasoning behind it. For the rigorous, whole-system method, see the **[HVAC Duct Sizing Guide](/blog/hvac-duct-sizing-guide)** on Manual D.
+
+## Round Duct Size Chart by CFM
+
+This is the at-a-glance reference for round metal duct at a typical residential friction rate of about **0.1 in.wg per 100 ft**:
+
+<BlogInfographic
+  title="Round duct size → airflow (CFM)"
+  caption="Approximate carrying capacity per round duct size at ~0.1 in.wg/100 ft. Use it as a starting point, not a final answer."
+>
+  <DuctSizeChartDiagram />
+</BlogInfographic>
+
+| Round duct | Approx. airflow |
+| --- | --- |
+| 6 in | 100 CFM |
+| 7 in | 150 CFM |
+| 8 in | 225 CFM |
+| 9 in | 350 CFM |
+| 10 in | 450 CFM |
+| 12 in | 700 CFM |
+| 14 in | 1,100 CFM |
+| 16 in | 1,700 CFM |
+
+These figures assume rigid metal duct. **Flex duct carries roughly 15–20% less** at the same diameter because its ribbed wall is rougher, and a poorly stretched flex run can carry far less still. Size flex one increment larger when in doubt.
+
+## The Two Rules Behind the Chart
+
+A duct calculator isn't magic — it balances two competing limits.
+
+**Friction rate** is how much static pressure the air loses per 100 feet of duct. Residential systems are typically designed around **0.08–0.10 in.wg/100 ft**. Too high and the blower can't push enough air; too low and the ducts are needlessly large and expensive. The proper figure comes from a Manual D calculation that divides the blower's available static pressure across the longest duct run — the chart above just assumes the common 0.1 value.
+
+**Velocity** is how fast the air moves, in feet per minute (fpm). Exceed the comfortable range and the duct whistles and rumbles. These are the residential targets:
+
+<BlogInfographic
+  title="Velocity targets keep ducts quiet"
+  caption="Stay within these feet-per-minute ranges to avoid noise. Returns run slower, so they're sized larger than supplies."
+>
+  <VelocityTargetsDiagram />
+</BlogInfographic>
+
+A correct size satisfies both rules at once: it carries the required CFM without exceeding the velocity target or the design friction rate.
+
+## Converting Round to Rectangular
+
+Sheet-metal trunks are often rectangular to fit in joist bays, but you can't just match cross-sectional area — a flatter duct has more wall surface relative to its area, so it fights more friction. Ducts are matched by **equivalent diameter** instead:
+
+<BlogInfographic
+  title="Round → rectangular equivalent"
+  caption="The equivalent-diameter formula, with common pairings. A 10-inch round trunk is about a 12×8 rectangular duct."
+>
+  <RoundToRectDiagram />
+</BlogInfographic>
+
+The formula is **De = 1.30 × (a·b)^0.625 ÷ (a+b)^0.25**, where *a* and *b* are the rectangular dimensions. In practice you let a duct calculator do this, but the takeaway is simple: a 12×8 rectangular duct moves about the same air as a 10-inch round, not as much as its larger footprint suggests.
+
+## Size CFM First, Then the Duct
+
+Every duct size starts from the airflow it must carry, so the real first step is finding the CFM:
+
+1. **System total** — figure roughly **400 CFM per ton** of cooling. A 3-ton system moves about 1,200 CFM, which sizes the main trunk.
+2. **Per room** — split that total by each room's share of the load (its heating/cooling demand), which sets each branch and register.
+3. **Look up the size** — take each CFM figure to the chart or calculator and read off the duct size that carries it within the velocity and friction limits.
+
+If you need to work out CFM in the first place, **[What Is CFM and How to Calculate It](/blog/what-is-cfm-hvac)** covers the 400-CFM-per-ton rule and per-room airflow.
+
+### Worked example
+
+A bedroom needs 150 CFM of supply air. From the chart, a **7-inch round** branch carries about 150 CFM at the target friction rate — so that's the supply run. Its return, sized to run slower and quieter, would step up to an **8-inch** or a rectangular equivalent. Repeat per room, sum the branches into trunks, and the trunk sizes follow the same chart.
+
+## Supply vs Return Sizing
+
+A common mistake is sizing returns the same as supplies. Returns are run at **lower velocity** to keep them quiet (you notice return noise more), which means a return duct is sized **larger** than a supply carrying the same CFM. Undersized returns are the single most common cause of high static pressure and a struggling blower.
+
+## Use the Free Calculators
+
+> **[Duct Size Calculator](/calculators/hvac/hvac-duct-size-calculator)** — enter CFM and friction rate, get the round and rectangular size instantly.
+
+The **[Duct Size Calculator](/calculators/hvac/hvac-duct-size-calculator)** is a digital ductulator: feed it the airflow and your design friction rate and it returns the duct size with velocity checked for you. Pair it with the **[CFM Calculator](/calculators/hvac/hvac-cfm-calculator)** to get the airflow per room first, and read the **[HVAC Duct Sizing Guide](/blog/hvac-duct-sizing-guide)** for the full Manual D method behind it.
+
+---
+
+## FAQ
+
+### How many CFM can a duct carry?
+
+At a typical 0.1 in.wg/100 ft friction rate, a 6-inch round duct carries about 100 CFM, an 8-inch about 225, a 10-inch about 450, and a 12-inch about 700 CFM. Flex duct carries roughly 15–20% less at the same diameter. These are starting figures — a Manual D calculation gives the exact number for your system.
+
+### What is a ductulator?
+
+A ductulator is a duct-sizing slide rule: you dial in the airflow (CFM) and friction rate and read off the duct size, velocity, or equivalent rectangular dimensions. Digital duct calculators do the same thing on a screen, including the round-to-rectangular conversion.
+
+### How do I convert round duct to rectangular?
+
+Match by equivalent diameter, not equal area, because rectangular ducts have more friction per unit of area. Use De = 1.30 × (a·b)^0.625 ÷ (a+b)^0.25. As a guide, a 10-inch round is about a 12×8 rectangular duct and a 12-inch round about a 14×10.
+
+### Should return ducts be bigger than supply ducts?
+
+Yes. Returns are designed for lower velocity to keep them quiet, so a return duct is sized larger than a supply carrying the same CFM. Undersized returns are a leading cause of high static pressure and poor airflow.
+
+### What friction rate should I use to size ducts?
+
+Residential systems are typically designed around 0.08–0.10 in.wg per 100 feet. The precise value comes from a Manual D calculation that spreads the blower's available static pressure across the longest run, but 0.1 is the common default the standard charts assume.

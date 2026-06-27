@@ -1,0 +1,34 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const tiers = [
+  ["Basic", "80% AFUE furnace + 14.3 SEER2 AC", "$7,000–$10,000", 230, C.blue, C.blueLight],
+  ["Mid-efficiency", "90–96% AFUE + 15–16 SEER2", "$10,000–$15,000", 360, C.primary, C.primaryLight],
+  ["High-efficiency", "96%+ AFUE + 17–20 SEER2, variable speed", "$15,000–$25,000+", 540, C.green, C.greenLight],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Combined furnace and AC replacement cost by tier</title>
+  <desc>
+    Typical installed cost to replace a furnace and air conditioner together: a basic 80% AFUE and 14.3
+    SEER2 system runs $7,000 to $10,000, a mid-efficiency system $10,000 to $15,000, and a
+    high-efficiency variable-speed system $15,000 to $25,000 or more.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Combined replacement cost by tier</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Installed, furnace + AC together — varies with size, region, and ductwork</text>
+
+  {tiers.map((t, i) => {
+    const y = 78 + i * 68;
+    return (
+      <g>
+        <text x="28" y={y + 18} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{t[0]}</text>
+        <text x="28" y={y + 36} fill={C.muted} font-family={FONT} font-size="10">{t[1]}</text>
+        <rect x="28" y={y + 44} width={t[3]} height="16" rx="5" fill={t[5] as string} stroke={t[4] as string} stroke-width="1.2" />
+        <text x={36 + (t[3] as number) + 8} y={y + 38} fill={t[4] as string} font-family={FONT} font-size="13" font-weight="800">{t[2]}</text>
+      </g>
+    );
+  })}
+</svg>

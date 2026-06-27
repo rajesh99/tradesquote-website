@@ -1,0 +1,39 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Approximate CFM at ~0.1 in.wg per 100 ft friction rate, round metal duct
+const rows = [
+  ['6"', "100 CFM", 70],
+  ['7"', "150 CFM", 100],
+  ['8"', "225 CFM", 140],
+  ['9"', "350 CFM", 185],
+  ['10"', "450 CFM", 230],
+  ['12"', "700 CFM", 320],
+  ['14"', "1,100 CFM", 430],
+  ['16"', "1,700 CFM", 540],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" fill="none" aria-hidden="true">
+  <title>Round duct size to CFM reference chart</title>
+  <desc>
+    Approximate airflow each round duct size carries at a 0.1 inch water column per 100 feet friction
+    rate: 6 inch about 100 CFM, 8 inch about 225, 10 inch about 450, 12 inch about 700, 14 inch about
+    1,100, and 16 inch about 1,700 CFM.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="344" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Round duct size → airflow (CFM)</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Approximate, at ~0.1 in.wg per 100 ft friction rate — verify with a Manual D calc</text>
+
+  {rows.map((r, i) => {
+    const y = 76 + i * 33;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{r[0]}</text>
+        <rect x="80" y={y + 6} width={r[2]} height="22" rx="5" fill={C.primaryLight} stroke={C.primary} stroke-width="1.1" />
+        <text x={88 + (r[2] as number) + 8} y={y + 22} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>
