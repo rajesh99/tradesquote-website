@@ -1,0 +1,55 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" fill="none" aria-hidden="true">
+  <title>Before you touch the charge</title>
+  <desc>Top-down flow that gates any charge adjustment behind verifying clean coils and correct airflow first.</desc>
+
+  <text x="360" y="26" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">Before you touch the charge</text>
+
+  <!-- Start -->
+  <rect x="290" y="44" width="140" height="36" rx="18" fill={C.dark} />
+  <text x="360" y="67" text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="600">Start diagnosis</text>
+  <path d="M360 80 V100" stroke={C.border} stroke-width="2" />
+
+  <!-- Airflow gate -->
+  <rect x="200" y="100" width="320" height="56" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.5" />
+  <text x="360" y="124" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Filter &amp; coils clean? Airflow ~400 CFM/ton?</text>
+  <text x="360" y="142" text-anchor="middle" fill={C.red} font-family={FONT} font-size="10" font-weight="600">Verify airflow FIRST</text>
+
+  <!-- NO branch -->
+  <path d="M520 128 H600 V200" stroke={C.red} stroke-width="2" marker-end={`url(#cdf-arrow-red)`} />
+  <text x="558" y="122" text-anchor="middle" fill={C.red} font-family={FONT} font-size="10" font-weight="700">NO</text>
+  <rect x="500" y="204" width="200" height="72" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.5" />
+  <text x="600" y="232" text-anchor="middle" fill={C.red} font-family={FONT} font-size="11" font-weight="700">Fix airflow first</text>
+  <text x="600" y="252" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">Clean filter, coils, set blower CFM.</text>
+  <text x="600" y="266" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">Do NOT add or remove charge.</text>
+
+  <!-- YES branch -->
+  <path d="M360 156 V196" stroke={C.primary} stroke-width="2" marker-end={`url(#cdf-arrow-primary)`} />
+  <text x="376" y="180" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">YES</text>
+
+  <rect x="180" y="200" width="280" height="44" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="320" y="227" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="600">Take superheat &amp; subcooling readings</text>
+  <path d="M320 244 V268" stroke={C.primary} stroke-width="2" marker-end={`url(#cdf-arrow-primary)`} />
+
+  <rect x="180" y="272" width="280" height="44" rx="8" fill={C.panelBg} stroke={C.border} />
+  <text x="320" y="299" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="600">Compare to manufacturer target</text>
+  <path d="M320 316 V340" stroke={C.primary} stroke-width="2" marker-end={`url(#cdf-arrow-primary)`} />
+
+  <rect x="180" y="344" width="280" height="44" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="320" y="371" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="11" font-weight="700">Adjust charge in small steps</text>
+
+  <rect x="180" y="400" width="360" height="16" rx="4" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+  <text x="360" y="411" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9" font-weight="600">Dirty coils and low airflow mimic charge faults &#8212; rule them out first.</text>
+
+  <defs>
+    <marker id="cdf-arrow-primary" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+    <marker id="cdf-arrow-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.red} />
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,328 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import HvacRelatedCalculators from "@/components/HvacRelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+
+const title = "AC Tonnage per Square Foot Calculator — How Many Tons for Your Home | TradesQuote";
+const description =
+  "Free AC tonnage per square foot calculator. Find how many tons of air conditioning you need by square footage and climate, with a square-footage-to-tonnage chart and the tons-per-square-foot rule. Instant, no sign-up.";
+
+const pageUrl = "https://tradesquote.ai/calculators/hvac/hvac-ac-tonnage-per-square-foot-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "HVAC", item: "https://tradesquote.ai/calculators/hvac" },
+    { "@type": "ListItem", position: 4, name: "AC Tonnage per Square Foot Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "AC Tonnage per Square Foot Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online calculator that estimates the air conditioner tonnage needed for a home from its square footage and climate zone, using BTU-per-square-foot rules of thumb, with a square-footage-to-tonnage reference chart.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many tons of AC do I need per square foot?",
+    answer:
+      "A common rule of thumb is <strong>one ton of cooling per 400–600 square feet</strong> — about 600 sq ft per ton in a mild climate and closer to 400 in a hot one. That comes from roughly 20 BTU per square foot (12,000 BTU = one ton); this calculator adjusts that baseline for your climate zone.",
+  },
+  {
+    question: "How many square feet does one ton of AC cover?",
+    answer:
+      "Roughly <strong>400 to 600 square feet per ton</strong>, depending on climate. In hot southern climates plan on about 400–450 sq ft per ton; in mixed climates around 600; and in cool northern climates up to 700–800, because the cooling load per square foot is lower.",
+  },
+  {
+    question: "What size AC do I need for a 2,000 square foot house?",
+    answer:
+      "In a mixed climate, 2,000 sq ft works out to about <strong>3 to 3.5 tons</strong> (40,000 BTU). A hot climate pushes it toward 4.5 tons and a cold climate down toward 2.5. Enter your exact square footage and climate above for a tailored number.",
+  },
+  {
+    question: "Does climate change the tons per square foot?",
+    answer:
+      "Significantly. The same house needs more cooling capacity per square foot in Phoenix than in Minneapolis, so BTU per square foot ranges from about <strong>28 in hot zones to 15 in cold ones</strong>. That's why a single national rule of thumb over- or under-sizes equipment depending on where you live.",
+  },
+  {
+    question: "Is square footage enough to size an air conditioner?",
+    answer:
+      'Square footage gives a solid starting estimate, but it ignores insulation, windows, sun, and ceiling height. For an accurate size, run a <a href="/calculators/hvac/hvac-manual-j-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Manual J load calculation</a> or the full <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">BTU Calculator</a>, which is also required for permits.',
+  },
+  {
+    question: "How do I convert square footage to AC tonnage?",
+    answer:
+      "Multiply square footage by the BTU-per-square-foot rate for your climate (15–28), then divide by 12,000 to get tons. For example, 1,800 sq ft × 20 BTU = 36,000 BTU ÷ 12,000 = <strong>3 tons</strong>. The calculator does this and rounds to the nearest half-ton.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Sized the system? Turn it into a winning quote.";
+const ctaDescription =
+  "Square footage gets you the tonnage — TradesQuote turns the whole job into a detailed, line-item estimate in seconds. Describe the install or upload photos, and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/hvac/hvac-btu-calculator",
+    title: "BTU Calculator (Cooling)",
+    description: "Full cooling load with climate, sun & insulation.",
+  },
+  {
+    href: "/calculators/hvac/hvac-tonnage-calculator",
+    title: "AC Tonnage Calculator",
+    description: "Convert BTU to tons and decode a unit's model number.",
+  },
+  {
+    href: "/calculators/hvac/hvac-manual-j-calculator",
+    title: "Manual J Load Calculation",
+    description: "Whole-home heating and cooling load, done right.",
+  },
+  {
+    href: "/calculators/hvac/hvac-furnace-btu-calculator",
+    title: "Furnace BTU Calculator",
+    description: "Heating size by climate zone and AFUE efficiency.",
+  },
+];
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AC Tonnage per Square Foot Calculator — How Many Tons for Your Home" />
+    <meta
+      property="og:description"
+      content="Find how many tons of AC you need by square footage and climate, with a square-footage-to-tonnage chart. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AC Tonnage per Square Foot Calculator" />
+    <meta
+      name="twitter:description"
+      content="How many tons of AC you need by square footage and climate, with a sizing chart. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ============================ HERO + H1 + INTRO ============================ -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="HVAC" categoryHref="/calculators/hvac" current="AC Tonnage per Square Foot Calculator" />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>
+              HVAC Tools · Sizing · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              AC Tonnage per Square Foot <span class="text-sky-600">— How Many Tons Do You Need?</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This AC tonnage per square foot calculator estimates the air-conditioner size your home needs from its
+              square footage and climate zone — using the tons-per-square-foot rule of thumb (about one ton per
+              400–600 sq ft). Enter your area below for a recommended tonnage, or use the square-footage-to-tonnage
+              chart to look it up at a glance.
+            </p>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl border border-sky-100 bg-sky-50 p-4">
+              <svg class="h-5 w-5 shrink-0 text-sky-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <p class="text-sm text-slate-600">
+                <span class="font-semibold text-slate-900">Want a precise size, not a rule of thumb?</span>
+                Run the full
+                <a href="/calculators/hvac/hvac-btu-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">BTU Calculator</a>
+                or a
+                <a href="/calculators/hvac/hvac-manual-j-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Manual J load calculation</a>
+                — they factor in insulation, windows, and sun.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ THE INTERACTIVE CALCULATOR ============================ -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 pt-4">
+        <div class="grid lg:grid-cols-5 gap-6">
+
+          <!-- Inputs -->
+          <div class="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              Enter square footage & climate
+            </h2>
+
+            <div class="mt-6 space-y-5">
+              <div>
+                <label for="acsfArea" class="text-sm font-semibold text-slate-800">Home / area size (sq ft)</label>
+                <input id="acsfArea" type="number" min="100" max="10000" value="1500"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none" />
+              </div>
+
+              <div>
+                <label for="acsfClimate" class="text-sm font-semibold text-slate-800">Climate zone</label>
+                <select id="acsfClimate"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none">
+                  <option value="hot">Hot — Gulf Coast, desert SW (28 BTU/ft²)</option>
+                  <option value="warm">Warm — Southeast, S. California (24 BTU/ft²)</option>
+                  <option value="mixed" selected>Mixed — Mid-Atlantic, Tennessee (20 BTU/ft²)</option>
+                  <option value="cool">Cool — Northeast, Midwest (17 BTU/ft²)</option>
+                  <option value="cold">Cold — Upper Midwest, Mountain (15 BTU/ft²)</option>
+                </select>
+              </div>
+
+              <button id="resetBtn"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="lg:col-span-2">
+            <div class="lg:sticky lg:top-24 rounded-2xl bg-gradient-to-br from-sky-600 to-blue-500 p-6 sm:p-8 text-white shadow-lg">
+              <p class="text-sm font-medium text-sky-100">Recommended AC size</p>
+              <div class="mt-2">
+                <span id="tonsResult" class="text-4xl sm:text-[2.6rem] leading-tight font-extrabold tracking-tight">2.5 tons</span>
+              </div>
+              <p id="tonsExact" class="mt-1 text-sm text-sky-100">≈ 2.50 tons exact</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Cooling load</p>
+                  <p id="btuResult" class="mt-1 text-2xl font-bold">30,000 BTU/hr</p>
+                </div>
+                <div class="rounded-xl bg-white/15 p-4">
+                  <p class="text-xs text-sky-100">Coverage</p>
+                  <p id="sqftPerTon" class="mt-1 text-2xl font-bold">≈ 600 sq ft / ton</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl bg-white/10">
+                <summary class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold">
+                  See the breakdown
+                  <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-sky-50">
+                  <div class="flex justify-between"><span>Area</span><span id="bd-area" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Rate (climate)</span><span id="bd-rate" class="font-semibold">—</span></div>
+                  <div class="flex justify-between"><span>Cooling load</span><span id="bd-btu" class="font-semibold">—</span></div>
+                  <div class="flex justify-between border-t border-white/20 pt-1.5 mt-1.5"><span>Exact tonnage</span><span id="bd-tons" class="font-semibold">—</span></div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-sky-100 leading-relaxed">
+                A square-footage rule of thumb for planning. Confirm with a Manual J load calculation before buying —
+                insulation, windows, and sun can shift the size by a half-ton or more.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference chart -->
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900">Square footage to AC tonnage chart</h2>
+          <p class="mt-2 text-sm text-slate-500">Approximate central-AC tonnage by home size and climate, using 28 BTU/ft² (hot), 20 (mixed), and 15 (cold). Round up when between sizes.</p>
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-4 font-semibold">Home size</th>
+                  <th class="py-2.5 pr-4 font-semibold">Hot climate</th>
+                  <th class="py-2.5 pr-4 font-semibold">Mixed climate</th>
+                  <th class="py-2.5 font-semibold">Cold climate</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">1,000 sq ft</td><td class="py-2.5 pr-4">2.5 tons</td><td class="py-2.5 pr-4">1.5 tons</td><td class="py-2.5">1.5 tons</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">1,500 sq ft</td><td class="py-2.5 pr-4">3.5 tons</td><td class="py-2.5 pr-4">2.5 tons</td><td class="py-2.5">2.0 tons</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">2,000 sq ft</td><td class="py-2.5 pr-4">4.5 tons</td><td class="py-2.5 pr-4">3.5 tons</td><td class="py-2.5">2.5 tons</td></tr>
+                <tr class="border-b border-slate-100"><td class="py-2.5 pr-4 font-semibold">2,500 sq ft</td><td class="py-2.5 pr-4">6.0 tons</td><td class="py-2.5 pr-4">4.0 tons</td><td class="py-2.5">3.0 tons</td></tr>
+                <tr><td class="py-2.5 pr-4 font-semibold">3,000 sq ft</td><td class="py-2.5 pr-4">7.0 tons</td><td class="py-2.5 pr-4">5.0 tons</td><td class="py-2.5">4.0 tons</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 text-xs text-slate-500">Rules of thumb for planning only. Above ~5 tons, homes usually use two systems or zoning. Always confirm with a Manual J load calculation.</p>
+        </div>
+      </section>
+
+      <!-- ============================ FORMULA EXPLAINED ============================ -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The rule, explained in plain English</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Tons per square foot is just a shortcut for cooling load. Pick a BTU-per-square-foot rate for your
+            climate, multiply by area, and divide by 12,000 BTU per ton.
+          </p>
+
+          <div class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto">
+            <div class="text-sky-300"># Step 1 — Pick a rate for your climate</div>
+            <div>rate&nbsp;=&nbsp;hot <span class="text-amber-300">28</span> · mixed <span class="text-amber-300">20</span> · cold <span class="text-amber-300">15</span> BTU per sq ft</div>
+            <div class="mt-4 text-sky-300"># Step 2 — Convert area to cooling load, then to tons</div>
+            <div>tons&nbsp;=&nbsp;(square feet × rate) ÷ <span class="text-amber-300">12,000</span></div>
+            <div class="mt-4 text-sky-300"># Step 3 — Round up to a standard system size</div>
+            <div>size&nbsp;=&nbsp;nearest <span class="text-amber-300">0.5 ton</span> (1.5, 2, 2.5, 3 …)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why "one ton per 600 sq ft" isn't universal</h3>
+              <p class="mt-2 text-sm text-slate-600">600 sq ft per ton fits a mixed climate. In Phoenix it's closer to 400; in Minnesota, 700+. Using a single number across climates is the most common sizing mistake.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why square footage isn't the whole story</h3>
+              <p class="mt-2 text-sm text-slate-600">Two identical-size homes can differ by a full ton based on insulation, window area, orientation, and air leakage — which is exactly what a Manual J load calculation captures.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Round up, but not too far</h3>
+              <p class="mt-2 text-sm text-slate-600">Go to the next half-ton, not the next whole ton. Oversizing makes the AC short-cycle, leaving humidity behind and wearing out the compressor.</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Tons, BTU, and square feet</h3>
+              <p class="mt-2 text-sm text-slate-600">One ton = 12,000 BTU/hr. So "20 BTU per sq ft" is the same as "600 sq ft per ton" — two ways of saying the same rule of thumb.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about sizing AC by square footage."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+      <HvacRelatedCalculators calculators={relatedCalculators} accent="sky" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initHvacAcTonnagePerSquareFootCalculator } from "@/scripts/calculators/hvac-ac-tonnage-per-square-foot-calculator";
+    initHvacAcTonnagePerSquareFootCalculator();
+  </script>
+</Layout>

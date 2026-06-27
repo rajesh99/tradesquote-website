@@ -1,0 +1,38 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// 3-ton (36,000 BTU/hr), 2,000 run hours, $0.22/kWh
+const rows = [
+  ["SEER2 13.4", 1182, 540],
+  ["SEER2 14.3", 1108, 506],
+  ["SEER2 15.2", 1042, 476],
+  ["SEER2 16.0", 990, 452],
+  ["SEER2 18.0", 880, 402],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Annual cooling cost by SEER2 rating</title>
+  <desc>
+    For a 3-ton system running 2,000 hours a year at 22 cents per kilowatt-hour, annual cooling cost
+    falls from about $1,182 at SEER2 13.4 to about $880 at SEER2 18 — roughly $300 a year between the
+    floor and a high-efficiency unit.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Annual cooling cost by SEER2 rating</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">3-ton system · 2,000 run hours/yr · $0.22/kWh</text>
+
+  {rows.map((r, i) => {
+    const y = 80 + i * 44;
+    return (
+      <g>
+        <text x="24" y={y + 24} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r[0]}</text>
+        <rect x="124" y={y + 8} width={r[2]} height="26" rx="6" fill={i === rows.length - 1 ? C.primaryLight : C.blueLight} stroke={i === rows.length - 1 ? C.primary : C.blue} stroke-width="1.2" />
+        <text x={124 + (r[2] as number) - 10} y={y + 26} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">${r[1]}/yr</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="306" fill={C.muted} font-family={FONT} font-size="10">Savings scale with run hours and electricity rate — in a mild climate the gaps shrink.</text>
+</svg>

@@ -1,0 +1,58 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const upDrivers = [
+  { label: "Duct replacement", detail: "+$2k–$6k" },
+  { label: "Difficult access", detail: "+$500–$1.5k" },
+  { label: "High-cost labor market", detail: "+25–35%" },
+  { label: "Electrical upgrade", detail: "+$500–$1.5k" },
+  { label: "Permits & inspections", detail: "+$150–$500" },
+];
+
+const downDrivers = [
+  { label: "Like-for-like swap", detail: "Lower labor hours" },
+  { label: "Good existing ducts", detail: "Removes biggest wildcard" },
+  { label: "Off-season scheduling", detail: "5–10% discount" },
+  { label: "Three competitive quotes", detail: "$1k–$2k savings" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>What drives HVAC replacement cost up or down</title>
+  <desc>
+    Cost increase factors include ductwork, access, labor market, electrical upgrades, and permits.
+    Cost decrease factors include simple swaps, good ducts, off-season timing, and competitive bids.
+  </desc>
+
+  {/* Up panel */}
+  <rect x="8" y="8" width="344" height="284" rx="12" fill={C.redLight} stroke={C.red} stroke-width="1.5" />
+  <text x="24" y="36" fill={C.red} font-family={FONT} font-size="14" font-weight="700">Drives cost up</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Biggest variables on any quote</text>
+
+  {upDrivers.map((d, i) => {
+    const y = 76 + i * 44;
+    return (
+      <g>
+        <rect x="24" y={y} width="312" height="36" rx="6" fill={C.white} stroke={C.border} />
+        <text x="36" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="600">{d.label}</text>
+        <text x="36" y={y + 30} fill={C.red} font-family={FONT} font-size="10" font-weight="600">{d.detail}</text>
+      </g>
+    );
+  })}
+
+  {/* Down panel */}
+  <rect x="368" y="8" width="344" height="284" rx="12" fill={C.greenLight} stroke={C.green} stroke-width="1.5" />
+  <text x="384" y="36" fill={C.green} font-family={FONT} font-size="14" font-weight="700">Drives cost down</text>
+  <text x="384" y="56" fill={C.muted} font-family={FONT} font-size="11">Ways to hit the lower end of ranges</text>
+
+  {downDrivers.map((d, i) => {
+    const y = 76 + i * 44;
+    return (
+      <g>
+        <rect x="384" y={y} width="312" height="36" rx="6" fill={C.white} stroke={C.border} />
+        <text x="396" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="600">{d.label}</text>
+        <text x="396" y={y + 30} fill={C.green} font-family={FONT} font-size="10" font-weight="600">{d.detail}</text>
+      </g>
+    );
+  })}
+</svg>

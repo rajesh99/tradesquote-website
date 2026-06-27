@@ -1,0 +1,43 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const ruleItems = ["Floor area (sq ft) only", "Flat ~20 BTU/sq ft", "One number for the whole house"];
+const manualJItems = [
+  "Insulation & air sealing",
+  "Window area, type & orientation",
+  "Ceiling height & sun exposure",
+  "Occupancy, kitchen & appliances",
+  "Local climate design temps",
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Rule of thumb versus Manual J</title>
+  <desc>A side-by-side comparison of square-footage rules of thumb against a Manual J load calculation, listing the factors Manual J adds and the oversizing risk of guessing.</desc>
+
+  <text x="360" y="30" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="16" font-weight="700">Rule of thumb vs. Manual J</text>
+
+  <!-- Rule of thumb panel -->
+  <rect x="40" y="50" width="300" height="210" rx="12" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="190" y="76" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="13" font-weight="800">Rule of thumb (sq ft only)</text>
+  {ruleItems.map((t, i) => (
+    <g>
+      <circle cx="62" cy={104 + i * 30} r="3" fill={C.orange} />
+      <text x="76" y={108 + i * 30} fill={C.dark} font-family={FONT} font-size="12" font-weight="600">{t}</text>
+    </g>
+  ))}
+  <text x="190" y="230" text-anchor="middle" fill={C.red} font-family={FONT} font-size="11" font-weight="700">Risk: oversizing &#8594; short-cycling,</text>
+  <text x="190" y="246" text-anchor="middle" fill={C.red} font-family={FONT} font-size="11" font-weight="700">poor dehumidification, comfort swings</text>
+
+  <!-- Manual J panel -->
+  <rect x="380" y="50" width="300" height="210" rx="12" fill={C.greenLight} stroke={C.green} stroke-width="1.5" />
+  <text x="530" y="76" text-anchor="middle" fill={C.green} font-family={FONT} font-size="13" font-weight="800">Manual J (load factors)</text>
+  {manualJItems.map((t, i) => (
+    <g>
+      <circle cx="402" cy={100 + i * 28} r="3" fill={C.green} />
+      <text x="416" y={104 + i * 28} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="600">{t}</text>
+    </g>
+  ))}
+
+  <text x="360" y="300" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11">Rules of thumb size a ballpark. Manual J adds the load factors that set the right tonnage.</text>
+</svg>

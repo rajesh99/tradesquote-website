@@ -1,0 +1,46 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Stacked build-up from base wage to billed rate (per billable hour)
+const segs = [
+  { label: "Base wage", amt: "$28", w: 150, stroke: C.blue, fill: C.blueLight },
+  { label: "+ Burden", amt: "+$10", w: 110, stroke: C.orange, fill: C.orangeLight },
+  { label: "+ Overhead", amt: "+$40", w: 230, stroke: C.muted, fill: C.panelBg },
+  { label: "+ Profit", amt: "+$27", w: 130, stroke: C.green, fill: C.greenLight },
+];
+let cursor = 40;
+const placed = segs.map((s) => {
+  const x = cursor;
+  cursor += s.w + 4;
+  return { ...s, x };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>What goes into a billable labor hour</title>
+  <desc>
+    A billed labor rate is built up from the base wage, plus labor burden (taxes, insurance, benefits),
+    plus an allocation of overhead, plus profit. A $28-an-hour wage becomes roughly a $105-an-hour
+    billed rate.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Your billed rate is not your wage</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Built up per billable hour — illustrative figures for a $28/hr tech</text>
+
+  {placed.map((s) => (
+    <g>
+      <rect x={s.x} y="92" width={s.w} height="46" rx="6" fill={s.fill} stroke={s.stroke} stroke-width="1.4" />
+      <text x={s.x + s.w / 2} y="112" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{s.label}</text>
+      <text x={s.x + s.w / 2} y="129" text-anchor="middle" fill={s.stroke} font-family={FONT} font-size="12" font-weight="800">{s.amt}</text>
+    </g>
+  ))}
+
+  <rect x="40" y="166" width="640" height="58" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="60" y="190" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">Billed labor rate</text>
+  <text x="60" y="212" fill={C.muted} font-family={FONT} font-size="10.5">What the customer pays per hour of work</text>
+  <text x="660" y="204" text-anchor="end" fill={C.primary} font-family={FONT} font-size="26" font-weight="800">≈ $105/hr</text>
+
+  <text x="40" y="252" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">Charge only the wage and every job loses money on burden, overhead, and profit.</text>
+  <text x="40" y="272" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">Overhead is the biggest hidden piece — rent, trucks, software, office staff, insurance.</text>
+</svg>

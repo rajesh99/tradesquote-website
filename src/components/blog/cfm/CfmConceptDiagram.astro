@@ -1,0 +1,48 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>What CFM measures</title>
+  <desc>A duct and register move one cubic foot of air many times per minute; about 400 CFM per ton of cooling.</desc>
+
+  <text x="360" y="34" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="16" font-weight="700">What CFM measures</text>
+
+  <!-- Duct body -->
+  <rect x="40" y="92" width="220" height="96" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="150" y="84" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Supply duct</text>
+
+  <!-- Register at duct mouth -->
+  <rect x="260" y="84" width="14" height="112" rx="3" fill={C.dark} />
+  {[0, 1, 2, 3, 4].map((i) => (
+    <line x1="261" y1={92 + i * 22} x2="273" y2={92 + i * 22} stroke={C.white} stroke-width="2" />
+  ))}
+
+  <!-- Cubic foot box -->
+  <rect x="96" y="116" width="48" height="48" rx="4" fill={C.white} stroke={C.primary} stroke-width="1.5" />
+  <text x="120" y="144" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">1 ft&#179;</text>
+
+  <!-- Airflow arrows -->
+  {[0, 1, 2].map((i) => (
+    <path d={`M${300 + i * 12} ${110 + i * 14} H${360 + i * 24}`} stroke={C.primary} stroke-width="2.5" marker-end="url(#cfmc-arrow)" />
+  ))}
+  <text x="360" y="206" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">air leaving the register</text>
+
+  <!-- Equation box -->
+  <rect x="430" y="100" width="258" height="80" rx="10" fill={C.panelBg} stroke={C.border} />
+  <text x="559" y="130" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">1 cubic foot of air</text>
+  <text x="559" y="150" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">&#215; N times per minute</text>
+  <text x="559" y="172" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="14" font-weight="800">= N CFM</text>
+
+  <!-- 400 CFM/ton anchor -->
+  <rect x="120" y="234" width="480" height="40" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1" />
+  <text x="360" y="259" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="12" font-weight="700">System anchor: ~400 CFM per ton &#8594; a 3-ton system &#8776; 1,200 CFM</text>
+
+  <text x="360" y="302" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11">CFM is the volume of air moved per minute — about 400 CFM per ton of cooling.</text>
+
+  <defs>
+    <marker id="cfmc-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+</svg>

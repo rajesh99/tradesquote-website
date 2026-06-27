@@ -1,0 +1,40 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Share of a typical combined install
+const parts = [
+  ["Equipment", "55%", 360, C.primary, C.primaryLight],
+  ["Labor", "33%", 216, C.blue, C.blueLight],
+  ["Permits & extras", "12%", 80, C.orange, C.orangeLight],
+];
+let cursor = 40;
+const placed = parts.map((p) => {
+  const x = cursor;
+  cursor += (p[2] as number) + 4;
+  return { label: p[0], pct: p[1], w: p[2] as number, stroke: p[3], fill: p[4], x };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Where the money goes on a combined system install</title>
+  <desc>
+    A combined furnace and AC install is roughly 55% equipment, 33% labor, and 12% permits, line set,
+    electrical, and disposal. Equipment efficiency tier moves the total the most.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where the money goes</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Typical split of a combined furnace + AC install</text>
+
+  {placed.map((p) => (
+    <g>
+      <rect x={p.x} y="84" width={p.w} height="50" rx="7" fill={p.fill} stroke={p.stroke} stroke-width="1.4" />
+      <text x={p.x + p.w / 2} y="106" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{p.label}</text>
+      <text x={p.x + p.w / 2} y="124" text-anchor="middle" fill={p.stroke} font-family={FONT} font-size="14" font-weight="800">{p.pct}</text>
+    </g>
+  ))}
+
+  <text x="40" y="170" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">Equipment is the biggest lever — the efficiency tier you pick moves the total more than anything else.</text>
+  <text x="40" y="192" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">"Extras" covers the line set, electrical, condensate, permits, and hauling the old units away.</text>
+  <text x="40" y="214" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">Ductwork repairs, if needed, sit on top of all of this.</text>
+</svg>

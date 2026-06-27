@@ -1,0 +1,204 @@
+---
+title: "Essential HVAC Formulas Every Tech Should Know"
+meta_title: "HVAC Formulas Cheat Sheet (Sensible, Latent, CFM, More) | TradesQuote"
+description: "The core HVAC formulas in one place: sensible and latent heat, total heat, CFM, tonnage, delta T, static pressure, SEER/EER, and the constants behind them, with worked examples."
+image: /images/posts/hvac-formulas-cheat-sheet-hero.svg
+date: 2026-06-25T09:00:00Z
+categories: ["hvac"]
+authors: ["Mark"]
+tags: ["formulas","equations","sensible heat","latent heat","cfm","reference"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import HeatFormulasDiagram from "@/components/blog/hvac-formulas/HeatFormulasDiagram.astro";
+import ConstantsDiagram from "@/components/blog/hvac-formulas/ConstantsDiagram.astro";
+import TonnageCfmDiagram from "@/components/blog/hvac-formulas/TonnageCfmDiagram.astro";
+
+Most of HVAC field work and system design comes back to a handful of formulas. Memorize these basic HVAC formulas and you can size equipment, balance airflow, diagnose a charge, and check efficiency without reaching for anything more exotic. This cheat sheet collects the common HVAC formulas in one place — each one stated clearly, with what every variable means, where the constant comes from, and a one-line worked example.
+
+If you want the interactive versions that do the arithmetic for you, the **[HVAC Formulas reference](/calculators/hvac/formulas)** page lists every equation with its own calculator. This post is the readable companion: the math and the reasoning behind it.
+
+## The Heat Formulas (Sensible, Latent, Total)
+
+Almost every HVAC calculation is a heat-transfer problem, and three formulas cover the bulk of them. All three multiply airflow (CFM) by a property change, with a constant out front that turns the units into BTU per hour.
+
+**Sensible heat — the temperature change:**
+
+**Qs = 1.08 × CFM × ΔT**
+
+- **Qs** — sensible heat, BTU/hr
+- **CFM** — airflow in cubic feet per minute
+- **ΔT** — dry-bulb temperature difference across the coil or duct (°F)
+- **1.08** — a constant for standard air (explained below)
+
+*Example:* 1,200 CFM across a coil dropping the air 20°F removes 1.08 × 1,200 × 20 = **25,920 BTU/hr** of sensible heat.
+
+**Latent heat — the moisture change:**
+
+**Ql = 0.68 × CFM × ΔGrains**
+
+- **Ql** — latent heat, BTU/hr
+- **ΔGrains** — difference in humidity ratio, in grains of water per pound of dry air
+- **0.68** — the latent-heat constant for standard air
+
+*Example:* 1,200 CFM removing 30 grains of moisture handles 0.68 × 1,200 × 30 = **24,480 BTU/hr** of latent load.
+
+**Total heat — sensible plus latent, via enthalpy:**
+
+**Qt = 4.5 × CFM × Δh**
+
+- **Qt** — total heat, BTU/hr
+- **Δh** — change in enthalpy (total heat content) of the air, BTU/lb of dry air
+- **4.5** — the total-heat constant for standard air
+
+*Example:* 1,200 CFM with a 9 BTU/lb enthalpy drop moves 4.5 × 1,200 × 9 = **48,600 BTU/hr** total — close to the sensible plus latent figures above combined.
+
+<BlogInfographic
+  title="The three heat formulas"
+  caption="Sensible tracks temperature (1.08), latent tracks moisture (0.68), total combines both through enthalpy (4.5)."
+>
+  <HeatFormulasDiagram />
+</BlogInfographic>
+
+## Where the Constants Come From
+
+The 1.08, 0.68, and 4.5 are not magic numbers — they are bundled air properties at standard conditions (sea level, roughly 70°F, air density 0.075 lb/ft³). Knowing their origin tells you when to adjust them, such as at high altitude where air is thinner.
+
+**1.08** = 0.24 × 60 × 0.075
+
+- **0.24** — specific heat of air, BTU/(lb·°F)
+- **60** — minutes per hour (CFM is per minute, BTU/hr is per hour)
+- **0.075** — density of standard air, lb/ft³
+
+**0.68** = (0.075 × 60 × 1,061) ÷ 7,000
+
+- **1,061** — latent heat of vaporization of water, BTU/lb
+- **7,000** — grains of water per pound (the unit conversion for ΔGrains)
+
+**4.5** = 60 × 0.075
+
+- The same minutes-per-hour and density terms; enthalpy already carries the BTU/lb units, so no specific-heat term is needed.
+
+All three assume standard air. At elevation, lower density drops the constants, which is why high-altitude work needs corrected values.
+
+<BlogInfographic
+  title="Where the constants come from"
+  caption="Each constant is built from air density, specific heat, latent heat, and minutes per hour at standard conditions."
+>
+  <ConstantsDiagram />
+</BlogInfographic>
+
+## Airflow and CFM
+
+The sensible-heat formula rearranges into the most-used sizing equation in the trade — solving for the airflow a given load needs:
+
+**CFM = BTU/hr ÷ (1.08 × ΔT)**
+
+*Example:* a 6,000 BTU/hr room with a 20°F supply-to-room ΔT needs 6,000 ÷ (1.08 × 20) = **278 CFM**.
+
+The same form checks a furnace using its temperature rise: an 80,000 BTU/hr furnace with a 50°F rise moves 80,000 ÷ (1.08 × 50) ≈ **1,481 CFM**. The **[CFM Calculator](/calculators/hvac/hvac-cfm-calculator)** runs both directions.
+
+Airflow also ties to duct geometry through velocity:
+
+**CFM = velocity (fpm) × area (ft²)**
+
+This is why an anemometer reading converts straight to CFM, and why it drives duct sizing. A 200 CFM branch at a 600 fpm target needs 200 ÷ 600 = 0.33 ft² of area — about an 8" round duct.
+
+## Tonnage and the Cooling Rules of Thumb
+
+Capacity in HVAC is measured in tons, and one ton is a fixed amount of heat:
+
+**1 ton = 12,000 BTU/hr** → **tons = BTU/hr ÷ 12,000**
+
+*Example:* a 36,000 BTU/hr load is 36,000 ÷ 12,000 = **3 tons**. The **[Tonnage Calculator](/calculators/hvac/hvac-tonnage-calculator)** does this with climate and area inputs.
+
+Two rules of thumb get you in the ballpark before a full Manual J:
+
+- **~400 CFM per ton** of cooling (acceptable range 350–450 CFM/ton). A 3-ton system moves about 1,200 CFM.
+- **~20 BTU/sq ft** for cooling load in a moderate climate, ranging from about 14 to 25+ BTU/sq ft depending on climate, insulation, and sun exposure.
+
+Treat both as sanity checks, not substitutes for a load calculation.
+
+<BlogInfographic
+  title="Tonnage and airflow rules"
+  caption="1 ton = 12,000 BTU/hr, about 400 CFM per ton, and CFM = velocity × duct area."
+>
+  <TonnageCfmDiagram />
+</BlogInfographic>
+
+## Diagnostic Formulas (Delta T and Static Pressure)
+
+**Delta T (evaporator):** the temperature drop across the indoor coil in cooling mode.
+
+**ΔT = T_return − T_supply**
+
+A properly charged system with correct airflow and load lands at **16–22°F**. A reading below ~14°F points to low airflow or an overcharge; above ~22°F points to low charge or restricted airflow. Verify against the system's target before condemning a charge — the **[Delta T Calculator](/calculators/hvac/hvac-delta-t-calculator)** factors in indoor wet-bulb and return dry-bulb.
+
+**Total external static pressure (TESP):** the total resistance the blower fights, measured across the air handler.
+
+**TESP = SP_supply + |SP_return|**
+
+Add the positive supply-plenum pressure to the absolute value of the negative return-plenum pressure. Most residential equipment is rated at 0.5 in.w.c.; readings above about 0.8 in.w.c. choke airflow and CFM falls off the blower table. It is the airflow equivalent of blood pressure — the first thing to measure when something feels off.
+
+## Efficiency Formulas (EER, SEER, SEER2)
+
+**EER — efficiency at a single rating point:**
+
+**EER = BTU/hr ÷ watts**
+
+*Example:* a unit delivering 24,000 BTU/hr while drawing 2,000 watts has an EER of 24,000 ÷ 2,000 = **12**. Higher is better.
+
+**SEER — seasonal efficiency:** the same idea averaged over a cooling season's range of conditions, so it is always higher than the steady-state EER for the same equipment.
+
+**SEER2 — the current test standard (M1):**
+
+**SEER2 ≈ SEER × 0.95**
+
+The 2023 DOE testing change (M1) raised external static pressure during the test, so the newer SEER2 rating runs about 5% below the old SEER number for the same equipment. The exact factor is 0.9524 for split systems. The **[HVAC Formulas reference](/calculators/hvac/formulas)** includes a SEER/SEER2 converter and a savings calculator.
+
+## Quick-Reference Table
+
+| Formula | Equation | Typical use |
+| --- | --- | --- |
+| Sensible heat | Qs = 1.08 × CFM × ΔT | Temperature-only cooling/heating load |
+| Latent heat | Ql = 0.68 × CFM × ΔGrains | Moisture-removal load |
+| Total heat | Qt = 4.5 × CFM × Δh | Combined load from enthalpy |
+| Airflow | CFM = BTU/hr ÷ (1.08 × ΔT) | Sizing airflow to a load |
+| Duct velocity | CFM = velocity × area | Converting anemometer reads, duct sizing |
+| Tonnage | tons = BTU/hr ÷ 12,000 | Capacity in tons |
+| Cooling rule | ~400 CFM/ton · ~20 BTU/sq ft | Ballpark sizing |
+| Delta T | ΔT = T_return − T_supply | Evaporator diagnosis (16–22°F) |
+| Static pressure | TESP = SP_supply + \|SP_return\| | Airflow restriction check |
+| EER | EER = BTU/hr ÷ watts | Point efficiency |
+| SEER2 | SEER2 ≈ SEER × 0.95 | Converting to current standard |
+
+## Use the Free Calculators
+
+> **[HVAC Formulas reference](/calculators/hvac/formulas)** — every formula on this page with its own interactive calculator.
+
+Skip the arithmetic: the **[Sensible & Latent Heat Calculator](/calculators/hvac/hvac-sensible-latent-heat-calculator)**, **[CFM Calculator](/calculators/hvac/hvac-cfm-calculator)**, **[Tonnage Calculator](/calculators/hvac/hvac-tonnage-calculator)**, and **[Delta T Calculator](/calculators/hvac/hvac-delta-t-calculator)** each plug straight into the equations above.
+
+---
+
+## FAQ
+
+### What is the basic HVAC heat formula?
+
+The most-used heat formula is the sensible heat equation, Qs = 1.08 × CFM × ΔT, where Qs is sensible heat in BTU/hr, CFM is airflow, and ΔT is the dry-bulb temperature difference across the coil. For a full picture you add latent heat (Ql = 0.68 × CFM × ΔGrains) for the moisture component, or use total heat (Qt = 4.5 × CFM × Δh) to capture both at once through enthalpy.
+
+### What does the 1.08 constant mean?
+
+It is three air properties multiplied together at standard conditions: 0.24 BTU/(lb·°F) specific heat × 60 minutes per hour × 0.075 lb/ft³ air density = 1.08. The constant converts CFM and a temperature difference directly into BTU/hr. It holds near sea level around 70°F; at high altitude the lower air density means the constant should be reduced.
+
+### How do you calculate tons of cooling?
+
+Divide the cooling load or equipment capacity in BTU/hr by 12,000, since one ton of cooling equals 12,000 BTU/hr. A 36,000 BTU/hr load is 36,000 ÷ 12,000 = 3 tons. As a rough check, a 3-ton system should move about 1,200 CFM at roughly 400 CFM per ton.
+
+### What is the sensible heat formula?
+
+Sensible heat is Qs = 1.08 × CFM × ΔT. It captures only the temperature change in the air, not moisture. For example, 1,200 CFM cooled by 20°F removes 1.08 × 1,200 × 20 = 25,920 BTU/hr of sensible heat. Pair it with the latent heat formula to account for dehumidification.
+
+### What is a normal evaporator delta T?
+
+A correctly charged system with proper airflow and load runs a 16–22°F temperature drop across the evaporator coil (ΔT = return temperature − supply temperature). A reading under about 14°F usually means low airflow or an overcharge, while a reading over 22°F points to low refrigerant charge or restricted airflow.

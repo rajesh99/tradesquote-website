@@ -1,0 +1,51 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Sensible effectiveness calculation</title>
+  <desc>
+    ASHRAE 84 sensible effectiveness equals supply outlet minus supply inlet divided by exhaust
+    inlet minus supply inlet. Example: (55 − 10) / (70 − 10) = 75%.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Sensible effectiveness (ASHRAE 84)</text>
+
+  <!-- Temperature flow -->
+  <rect x="32" y="60" width="120" height="56" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1.5" />
+  <text x="92" y="84" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="600">Outdoor supply in</text>
+  <text x="92" y="104" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="16" font-weight="700">10°F</text>
+  <path d="M160 88 H200" stroke={C.primary} stroke-width="2" marker-end="url(#hrv-arr-p)" />
+
+  <rect x="204" y="52" width="140" height="72" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="274" y="80" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Heat exchanger</text>
+  <text x="274" y="100" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">Transfers sensible heat</text>
+  <text x="274" y="116" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10" font-weight="600">Exhaust in: 70°F</text>
+  <path d="M352 88 H392" stroke={C.green} stroke-width="2" marker-end="url(#hrv-arr-g)" />
+
+  <rect x="396" y="60" width="120" height="56" rx="8" fill={C.greenLight} stroke={C.green} stroke-width="1.5" />
+  <text x="456" y="84" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="600">Supply out</text>
+  <text x="456" y="104" text-anchor="middle" fill={C.green} font-family={FONT} font-size="16" font-weight="700">55°F</text>
+
+  <!-- Formula -->
+  <rect x="32" y="140" width="656" height="56" rx="8" fill={C.white} stroke={C.border} />
+  <text x="360" y="166" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="600">
+    Effectiveness = (T<tspan baseline-shift="sub" font-size="9">supply out</tspan> − T<tspan baseline-shift="sub" font-size="9">supply in</tspan>) / (T<tspan baseline-shift="sub" font-size="9">exhaust in</tspan> − T<tspan baseline-shift="sub" font-size="9">supply in</tspan>)
+  </text>
+  <text x="360" y="186" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">Maximum possible temperature rise achieved</text>
+
+  <!-- Worked example -->
+  <rect x="32" y="212" width="656" height="68" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="360" y="238" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="600">
+    (55 − 10) / (70 − 10) = 45 / 60 = <tspan fill={C.primary} font-weight="700">75%</tspan>
+  </text>
+  <text x="360" y="262" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">
+    Compare ratings at −25°C (−13°F) in zone 5–7 climates — effectiveness drops as ΔT increases
+  </text>
+
+  <defs>
+    <marker id="hrv-arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.primary} /></marker>
+    <marker id="hrv-arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={C.green} /></marker>
+  </defs>
+</svg>

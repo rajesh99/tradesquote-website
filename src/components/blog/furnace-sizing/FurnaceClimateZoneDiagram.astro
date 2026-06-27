@@ -1,0 +1,22 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" fill="none" aria-hidden="true">
+  <title>Furnace BTU per square foot by climate zone</title>
+  <desc>Zones 1-2 use 30, zones 3-4 use 45, zones 5-6 use 60 BTU per square foot.</desc>
+
+  {[
+    { zone: "Zones 1–2", btu: "30", sub: "Mild — FL, S. TX", color: C.primary, bg: C.primaryLight, x: 24 },
+    { zone: "Zones 3–4", btu: "45", sub: "Moderate — VA, MO", color: C.blue, bg: C.blueLight, x: 252 },
+    { zone: "Zones 5–6", btu: "60", sub: "Cold — MN, NY", color: C.orange, bg: C.orangeLight, x: 480 },
+  ].map((z) => (
+    <g>
+      <rect x={z.x} y="16" width="216" height="168" rx="12" fill={z.bg} stroke={z.color} stroke-width="1.5" />
+      <text x={z.x + 108} y="52" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">{z.zone}</text>
+      <text x={z.x + 108} y="100" text-anchor="middle" fill={z.color} font-family={FONT} font-size="36" font-weight="700">{z.btu}</text>
+      <text x={z.x + 108} y="124" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="600">BTU / sq ft</text>
+      <text x={z.x + 108} y="160" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">{z.sub}</text>
+    </g>
+  ))}
+</svg>

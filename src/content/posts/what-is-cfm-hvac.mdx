@@ -1,0 +1,152 @@
+---
+title: "What Is CFM and How to Calculate It"
+meta_title: "What Is CFM in HVAC? How to Calculate Airflow | TradesQuote"
+description: "CFM is the volume of air your HVAC system moves per minute. What it means, the 400 CFM per ton rule, the formula to size airflow per room, and how to measure it."
+image: /images/posts/what-is-cfm-hvac-hero.svg
+date: 2026-06-13T09:00:00Z
+categories: ["hvac"]
+authors: ["Mark"]
+tags: ["cfm","airflow","ductwork","blower","ventilation"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import CfmConceptDiagram from "@/components/blog/cfm/CfmConceptDiagram.astro";
+import CfmFormulaDiagram from "@/components/blog/cfm/CfmFormulaDiagram.astro";
+import CfmMeasureDiagram from "@/components/blog/cfm/CfmMeasureDiagram.astro";
+
+CFM stands for Cubic Feet per Minute — the volume of air your HVAC system moves every minute. It is the single most important airflow number in heating and cooling, because equipment capacity only delivers comfort if the right amount of air actually reaches each room.
+
+Most comfort complaints, frozen coils, and high-static-pressure callbacks trace back to CFM that is too low or too high. Understanding where the number comes from — and how to size and measure it — lets you diagnose airflow problems instead of guessing at them.
+
+## What CFM Actually Measures
+
+CFM measures volume over time: how many cubic feet of air pass a point each minute. A register pushing 1 cubic foot of air 200 times per minute is moving 200 CFM. That is all the unit describes — not speed, not pressure, but volume per minute.
+
+At the system level, the anchor every technician memorizes is roughly **400 CFM per ton of cooling**. One ton equals 12,000 BTU/hr of cooling capacity, so a 3-ton system needs about 1,200 CFM of total airflow across the coil.
+
+That 400 figure is the middle of an acceptable range of 350–450 CFM/ton:
+
+- **350 CFM/ton** moves air more slowly across the coil, keeping it colder and removing more humidity — preferred in hot, humid climates.
+- **400–450 CFM/ton** favors sensible (temperature) cooling over dehumidification — preferred in hot, dry climates.
+
+<BlogInfographic
+  title="What CFM measures"
+  caption="CFM is the volume of air moved per minute — about 400 CFM per ton of cooling."
+>
+  <CfmConceptDiagram />
+</BlogInfographic>
+
+## Sizing Airflow From the Load
+
+The 400 CFM/ton rule sizes the whole system, but each room needs its own share based on its heating or cooling load. The formula that ties a room's BTU load to the airflow it needs is:
+
+**CFM = BTU/hr ÷ (1.08 × ΔT)**
+
+Here ΔT is the temperature difference between the supply air leaving the register and the room air. The 1.08 constant is not arbitrary — it bundles three properties of standard air:
+
+**1.08 = 0.24 (specific heat, BTU/lb·°F) × 60 (minutes per hour) × 0.075 (air density, lb/ft³)**
+
+This constant is valid at standard conditions — roughly sea level and 70°F. At high altitude, air is less dense, so the constant (and the resulting CFM) needs adjustment.
+
+A crude whole-house check is about **1 CFM per square foot** of conditioned space — a 1,800 sq ft home lands near 1,800 CFM. Treat that only as a sanity check. Real distribution comes from per-room Manual J loads feeding a Manual D duct design.
+
+<BlogInfographic
+  title="Sizing airflow from load"
+  caption="CFM = BTU/hr ÷ (1.08 × ΔT). The 1.08 constant bundles air's specific heat, density, and minutes per hour."
+>
+  <CfmFormulaDiagram />
+</BlogInfographic>
+
+## Worked Example: Sizing a Bedroom
+
+Suppose a Manual J calculation gives a bedroom a cooling load of **6,000 BTU/hr**, and the system delivers supply air about **20°F** colder than the room setpoint.
+
+**Step 1 — Plug into the formula:**
+CFM = 6,000 ÷ (1.08 × 20)
+
+**Step 2 — Work the denominator:**
+1.08 × 20 = 21.6
+
+**Step 3 — Divide:**
+6,000 ÷ 21.6 = **278 CFM**
+
+That room needs roughly 278 CFM of supply air. Sum the CFM for every room and the total should land near 400 CFM/ton for the whole system. If the per-room numbers add up to far more or less than the equipment can move, either the load calculation or the equipment selection is off.
+
+The same math runs in reverse on the heating side. To check a furnace, use:
+
+**CFM = furnace output BTU/hr ÷ (1.08 × temperature rise)**
+
+For an 80,000 BTU/hr furnace with a measured 50°F temperature rise: 80,000 ÷ (1.08 × 50) = 80,000 ÷ 54 ≈ **1,481 CFM**. Every furnace data plate lists an acceptable temperature-rise range (for example, 40–70°F). If the measured rise lands outside that band, the airflow is wrong — too low a rise means too much air, too high a rise means too little.
+
+## CFM, Velocity, and Duct Size
+
+CFM also connects directly to duct sizing through velocity:
+
+**CFM = air velocity (feet per minute, fpm) × duct cross-sectional area (square feet)**
+
+This is why an anemometer reading in a duct can be converted straight to CFM, and why CFM drives every duct-sizing decision. Divide the CFM a duct must carry by the target velocity and you get the area, which sets the diameter. A 200 CFM branch at a 600 fpm target needs 0.33 sq ft of area, which rounds up to an 8" round duct. Our **[Duct Size Calculator](/calculators/hvac/hvac-duct-size-calculator)** runs that conversion for any CFM and velocity target.
+
+## When CFM Is Wrong
+
+Airflow that drifts outside the acceptable range causes predictable problems on both ends.
+
+**Too little CFM:**
+
+- Poor cooling and heating output regardless of equipment size
+- Evaporator coil freezing in cooling mode (not enough warm air across the coil)
+- Furnace overheating and tripping the high-limit switch in heating mode
+- Comfort complaints and stuffy rooms
+
+**Too much CFM:**
+
+- Noise at registers and in ductwork
+- Drafts from high-velocity supply air
+- Poor dehumidification — air moves across the coil too fast to drop moisture
+
+The acceptable middle is the 350–450 CFM/ton band per system, with per-room CFM matched to per-room load. Drift in either direction shows up as a comfort or equipment problem.
+
+## How to Measure CFM in the Field
+
+You cannot fix airflow you have not measured. Three field methods cover most situations:
+
+1. **Flow hood (balometer).** Placed over a register or grille, it captures the full airstream and reads CFM directly. Best for verifying delivered airflow room by room.
+2. **Anemometer traverse.** A vane or hot-wire anemometer measures velocity at multiple points across a duct. Average the velocity, multiply by duct area, and you have CFM. This is the velocity × area relationship in practice.
+3. **Blower table via total external static pressure.** Measure the total external static pressure across the air handler, then look up the corresponding CFM on the manufacturer's blower performance table for the selected speed tap. A plenum-mounted device like a TrueFlow grid gives a similar total-airflow reading.
+
+<BlogInfographic
+  title="How to measure CFM"
+  caption="Flow hood, duct traverse, or blower table — three field ways to read actual CFM."
+>
+  <CfmMeasureDiagram />
+</BlogInfographic>
+
+## Use the Free Calculator
+
+> **[CFM Calculator](/calculators/hvac/hvac-cfm-calculator)** — get your exact answer in seconds.
+
+Enter your system size or a room's BTU load and supply ΔT, and the calculator returns the required CFM. To turn that airflow into duct dimensions, head to the **[Duct Size Calculator](/calculators/hvac/hvac-duct-size-calculator)**.
+
+---
+
+## FAQ
+
+### How many CFM per ton of cooling do I need?
+
+About 400 CFM per ton is the standard target, with an acceptable range of 350–450 CFM/ton. Use 350 in humid climates to maximize dehumidification and 400–450 in dry climates to favor sensible cooling. A 3-ton system at 400 CFM/ton needs roughly 1,200 CFM total.
+
+### How do I calculate CFM for a room?
+
+Use CFM = BTU/hr ÷ (1.08 × ΔT), where BTU/hr is the room's load from a Manual J calculation and ΔT is the difference between supply air and room air temperature. For a 6,000 BTU/hr room at a 20°F ΔT, that is 6,000 ÷ (1.08 × 20) = 278 CFM.
+
+### What does the 1.08 constant mean?
+
+It is the product of three properties of standard air: 0.24 BTU/lb·°F specific heat, 60 minutes per hour, and 0.075 lb/ft³ density. Multiplied together they equal 1.08. The value holds at standard conditions near sea level and about 70°F; at high altitude the lower air density means the constant should be adjusted downward.
+
+### How do I measure CFM at a register?
+
+The most direct way is a flow hood (balometer) placed over the register, which captures the full airstream and reads CFM directly. Alternatively, traverse the duct with an anemometer and multiply average velocity by duct area, or measure total external static pressure and read CFM from the equipment's blower table.
+
+### What happens if airflow CFM is too low?
+
+Too little CFM causes weak heating and cooling, frozen evaporator coils in cooling mode, and furnace high-limit trips in heating mode, along with general comfort complaints. The usual culprits are dirty filters, undersized or restricted ductwork, or a blower set to too low a speed. Measure the airflow before replacing equipment.

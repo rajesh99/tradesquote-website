@@ -1,0 +1,37 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Return ducts sized at lower velocity → larger than a supply for the same CFM
+const rows = [
+  ["100 CFM", '7" round', 100],
+  ["200 CFM", '9" round', 150],
+  ["400 CFM", '12" round', 230],
+  ["700 CFM", '14" round', 320],
+  ["1,000 CFM", '16" round', 420],
+  ["1,200 CFM", '18" round', 500],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Return air duct size by CFM</title>
+  <desc>
+    Approximate return duct sizes, run at lower velocity than supplies so they end up larger: 100 CFM
+    needs about a 7-inch round, 400 CFM a 12-inch, 700 CFM a 14-inch, 1,000 CFM a 16-inch, and 1,200
+    CFM an 18-inch return.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Return duct size by airflow</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Sized at lower velocity than supplies — roughly one size larger for the same CFM</text>
+
+  {rows.map((r, i) => {
+    const y = 76 + i * 38;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r[0]}</text>
+        <rect x="150" y={y + 6} width={r[2]} height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={158 + (r[2] as number) + 8} y={y + 23} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

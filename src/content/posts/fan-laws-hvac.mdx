@@ -1,0 +1,141 @@
+---
+title: "Fan Laws Explained: How Blower Speed Affects Airflow"
+meta_title: "HVAC Fan Laws (Affinity Laws): Airflow, Pressure & Power | TradesQuote"
+description: "The three fan affinity laws relate blower speed to airflow, static pressure, and power. Why a 10% speed increase costs 33% more power, with worked examples."
+image: /images/posts/fan-laws-hvac-hero.svg
+date: 2026-06-16T09:00:00Z
+categories: ["hvac"]
+authors: ["Mark"]
+tags: ["fan laws","affinity laws","blower","airflow","static pressure"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import ThreeFanLawsDiagram from "@/components/blog/fan-laws/ThreeFanLawsDiagram.astro";
+import SpeedPowerCurveDiagram from "@/components/blog/fan-laws/SpeedPowerCurveDiagram.astro";
+import FanLawExampleDiagram from "@/components/blog/fan-laws/FanLawExampleDiagram.astro";
+
+The fan laws — also called the affinity laws — are three simple relationships that predict what happens to airflow, static pressure, and motor power when you change the speed of a blower. They are the single most useful piece of math for anyone who tunes air handlers, swaps pulleys, or sets ECM blower taps, because they explain why a small speed change can have an outsized effect on energy use.
+
+The headline surprise is that the three quantities do not scale together. Airflow tracks speed directly, but static pressure climbs with the square of the speed change and power climbs with the cube. That is why nudging a blower 10% faster to chase a little more airflow can quietly add a third more to its power draw. Understanding this keeps you from solving an airflow problem in the most expensive way possible.
+
+## The Three Fan Affinity Laws
+
+All three laws compare a new operating point (subscript 2) to a known starting point (subscript 1) using the ratio of fan speeds in RPM. They assume the same fan in the same duct system, so the system resistance curve does not move.
+
+**Law 1 — Airflow scales with speed:**
+
+CFM₂ / CFM₁ = RPM₂ / RPM₁
+
+Double the speed and you double the airflow. This one is intuitive and linear.
+
+**Law 2 — Static pressure scales with speed squared:**
+
+SP₂ / SP₁ = (RPM₂ / RPM₁)²
+
+Pressure rises faster than airflow. A 20% speed increase raises static pressure by 1.20² = 1.44, or 44%.
+
+**Law 3 — Power scales with speed cubed:**
+
+BHP₂ / BHP₁ = (RPM₂ / RPM₁)³
+
+Brake horsepower is the steep one. The same 20% speed increase raises power by 1.20³ = 1.728, or nearly 73%.
+
+The laws also extend to fan diameter for geometrically similar fans, but in day-to-day HVAC work it is almost always speed that changes — a pulley swap, an ECM tap change, or a VFD setpoint.
+
+<BlogInfographic
+  title="The three fan affinity laws"
+  caption="Airflow scales with speed, pressure with speed squared, power with speed cubed."
+>
+  <ThreeFanLawsDiagram />
+</BlogInfographic>
+
+## Why Power Rises Fastest
+
+The cube relationship is the part that catches people out. Because power scales with the cube of speed, even a modest airflow gain carries a steep energy penalty.
+
+Take a 10% speed increase, a ratio of 1.10:
+
+- **Airflow:** 1.10 × baseline = **+10%**
+- **Static pressure:** 1.10² = 1.21 × baseline = **+21%**
+- **Power:** 1.10³ = 1.331 × baseline = **+33%**
+
+So 10% more air costs 33% more power, and the motor's amp draw climbs in step with it. The relationship runs in reverse too, which is where the savings live: slowing an oversized blower by 20% cuts airflow 20% but cuts power by roughly 49% (0.80³ = 0.512). This is exactly why variable-speed ECM blowers save energy at low demand — running at half speed uses only about an eighth of the power.
+
+<BlogInfographic
+  title="Why 10% faster costs 33% more power"
+  caption="A 10% speed bump: +10% air, +21% pressure, +33% power — power rises fastest."
+>
+  <SpeedPowerCurveDiagram />
+</BlogInfographic>
+
+## Worked Example: 800 to 1,000 RPM
+
+A belt-drive blower is running at 800 RPM and delivering 1,000 CFM at 0.40 in.w.c. of static pressure, drawing 0.50 brake horsepower (BHP). A contractor wants more airflow and changes the drive pulley so the blower turns at 1,000 RPM.
+
+**Step 1 — Find the speed ratio:**
+
+1,000 / 800 = **1.25**
+
+**Step 2 — Airflow (Law 1, direct):**
+
+1,000 CFM × 1.25 = **1,250 CFM**
+
+**Step 3 — Static pressure (Law 2, squared):**
+
+0.40 × 1.25² = 0.40 × 1.5625 = **0.625 in.w.c.**
+
+**Step 4 — Power (Law 3, cubed):**
+
+0.50 × 1.25³ = 0.50 × 1.953 = **0.977 BHP**
+
+A 25% speed bump bought 25% more airflow, but it raised static pressure by 56% and nearly **doubled** the motor's power requirement. If the original motor was a 1 HP unit with no headroom, it is now running at the edge of its rating — and the higher amp draw means more heat and a shorter service life.
+
+<BlogInfographic
+  title="Worked example: 800 to 1,000 RPM"
+  caption="25% more speed nearly doubles motor power — the cube law in action."
+>
+  <FanLawExampleDiagram />
+</BlogInfographic>
+
+## Practical Uses in the Field
+
+**Predicting a pulley change.** On belt-drive equipment, swapping the drive sheave changes blower RPM. The fan laws let you calculate the new airflow, the new static pressure, and — critically — whether the existing motor can handle the new power demand before you cut metal.
+
+**Sizing an ECM or VFD speed change.** Variable-speed motors make speed adjustment a software setting. The laws tell you exactly how much air you gain or lose and what it does to energy consumption, so you can dial in the lowest speed that meets the load.
+
+**Knowing when not to speed up the blower.** If a system is starved for airflow because static pressure is too high, the cube law says brute force is the costly fix. Speeding up the blower to push through a restriction burns power fast. Removing the restriction — larger return ducts, a cleaner filter, a clean coil, fewer flex bends — lets the blower deliver the same air at lower speed and far lower power. Verify the static problem with the **[Static Pressure Calculator](/calculators/hvac/hvac-static-pressure-calculator)** before reaching for a faster blower.
+
+**Spotting oversized motors.** Because power tracks the cube of speed, a blower run faster than the design point wastes energy out of proportion to the comfort gained. Matching blower speed to the actual load is one of the cheapest efficiency wins on a forced-air system.
+
+One caution: the laws assume the system curve does not change. They are most accurate over modest speed changes on the same installed system. Large extrapolations, or changes that alter the duct system itself, drift from the prediction.
+
+## Use the Free Calculator
+
+> **[Fan Laws Calculator](/calculators/hvac/hvac-fan-laws-calculator)** — get your exact answer in seconds.
+
+Enter your starting RPM, airflow, static pressure, and power, then the new RPM. The calculator applies all three laws and returns the new airflow, static pressure, and brake horsepower. Pair it with the **[Static Pressure Calculator](/calculators/hvac/hvac-static-pressure-calculator)** to check whether a high-static system needs a duct fix rather than a faster blower.
+
+---
+
+## FAQ
+
+### What are the three fan laws?
+
+The three fan affinity laws relate blower speed to performance. Law 1: airflow (CFM) changes in direct proportion to speed (RPM). Law 2: static pressure changes with the square of the speed ratio. Law 3: power (brake horsepower) changes with the cube of the speed ratio. Together they predict how a fan responds to any speed change in the same system.
+
+### Why does fan power increase so much with speed?
+
+Power scales with the cube of the speed ratio, so small speed increases produce large power increases. A 10% faster blower needs about 33% more power (1.10³ = 1.331), and a 25% faster blower needs nearly double the power (1.25³ ≈ 1.95). This cube relationship is also why slowing a variable-speed blower saves so much energy.
+
+### How do I calculate new airflow after a speed change?
+
+Multiply the original airflow by the ratio of new RPM to old RPM. For example, a blower delivering 1,000 CFM at 800 RPM that speeds up to 1,000 RPM has a ratio of 1.25, so the new airflow is 1,000 × 1.25 = 1,250 CFM. Static pressure uses the ratio squared and power uses the ratio cubed.
+
+### Do the fan laws apply to ECM and variable-speed blowers?
+
+Yes. The affinity laws apply to any fan whose speed changes, including ECM and VFD-driven blowers, as long as the duct system stays the same. They are exactly why variable-speed equipment is efficient at part load — running at a lower speed drops power by the cube of the speed ratio.
+
+### Can I just speed up the blower to fix low airflow?
+
+Usually not the best fix. If airflow is low because static pressure is high, speeding up the blower forces air through the same restriction and the cube law makes that expensive in power and motor wear. It is almost always cheaper to reduce the restriction — bigger return ducts, a cleaner filter and coil, fewer flex bends — so the blower delivers the needed air at a lower speed.

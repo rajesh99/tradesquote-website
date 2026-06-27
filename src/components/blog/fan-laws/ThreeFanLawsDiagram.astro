@@ -1,0 +1,31 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The three fan affinity laws</title>
+  <desc>Airflow scales linearly with speed, static pressure with the square of speed, and power with the cube of speed.</desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <text x="360" y="40" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The three fan affinity laws</text>
+
+  {[
+    { n: "1", label: "Airflow", accent: C.blue, eq: "CFM₂ / CFM₁ = RPM₂ / RPM₁", note: "scales with speed", x: 32 },
+    { n: "2", label: "Static pressure", accent: C.orange, eq: "SP₂ / SP₁ = (RPM₂ / RPM₁)²", note: "scales with speed²", x: 256 },
+    { n: "3", label: "Power", accent: C.red, eq: "BHP₂ / BHP₁ = (RPM₂ / RPM₁)³", note: "scales with speed³", x: 480 },
+  ].map((s) => (
+    <g>
+      <rect x={s.x} y="60" width="208" height="200" rx="8" fill={C.white} stroke={s.accent} stroke-width="1.5" />
+      <circle cx={s.x + 30} cy="92" r="14" fill={s.accent} />
+      <text x={s.x + 30} y="97" text-anchor="middle" fill={C.white} font-family={FONT} font-size="13" font-weight="700">{s.n}</text>
+      <text x={s.x + 56} y="90" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">Law {s.n}</text>
+      <text x={s.x + 56} y="108" fill={s.accent} font-family={FONT} font-size="11" font-weight="600">{s.label}</text>
+      <rect x={s.x + 16} y="132" width="176" height="44" rx="6" fill={C.panelBg} stroke={C.border} />
+      <text x={s.x + 104} y="159" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{s.eq}</text>
+      <text x={s.x + 104} y="208" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11">{s.note}</text>
+    </g>
+  ))}
+
+  <text x="360" y="280" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">Airflow scales with speed, pressure with speed squared, power with speed cubed.</text>
+</svg>

@@ -1,0 +1,35 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const reasons = [
+  ["Matched system", "A new AC paired with an old furnace blower loses rated efficiency — the system is only as good as both halves"],
+  ["One labor visit", "Replacing together shares the mobilization, electrical, and startup labor — cheaper than two separate jobs"],
+  ["Refrigerant & coil", "A new condenser needs a matching indoor coil; pairing it with an aging furnace often forces the swap anyway"],
+  ["Similar age", "Furnace and AC installed together tend to wear out together — fixing one when both are 15+ years old rarely pays"],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Why homeowners replace the furnace and AC together</title>
+  <desc>
+    Four reasons to replace both at once: a matched system holds its rated efficiency, a single labor
+    visit shares setup costs, a new condenser needs a matching indoor coil, and equipment of similar
+    age wears out together.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why replace both at once</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">The furnace and AC share the blower, the coil, and the install — replacing together usually wins</text>
+
+  {reasons.map((r, i) => {
+    const y = 74 + i * 58;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="50" rx="9" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="6" height="50" rx="3" fill={C.primary} />
+        <text x="44" y={y + 22} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{r[0]}</text>
+        <text x="44" y={y + 40} fill={C.muted} font-family={FONT} font-size="10.5">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>
