@@ -1,0 +1,120 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const groups = [
+  {
+    label: "Ceiling Height",
+    items: [
+      { name: "8 ft", value: "× 1.00", highlight: false },
+      { name: "9 ft", value: "× 1.13", highlight: false },
+      { name: "10 ft", value: "× 1.25", highlight: true },
+    ],
+  },
+  {
+    label: "Climate",
+    items: [
+      { name: "Hot/humid", value: "× 1.15", highlight: true },
+      { name: "Moderate", value: "× 1.00", highlight: false },
+      { name: "Cool", value: "× 0.85", highlight: false },
+    ],
+  },
+  {
+    label: "Sun Exposure",
+    items: [
+      { name: "Sunny", value: "× 1.10", highlight: true },
+      { name: "Average", value: "× 1.00", highlight: false },
+      { name: "Shaded", value: "× 0.90", highlight: false },
+    ],
+  },
+  {
+    label: "Insulation",
+    items: [
+      { name: "Poor", value: "× 1.15", highlight: true },
+      { name: "Average", value: "× 1.00", highlight: false },
+      { name: "Good", value: "× 0.90", highlight: false },
+    ],
+  },
+];
+
+const colW = 160;
+const colStart = 24;
+const colGap = 172;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>BTU calculation formula and adjustment factors</title>
+  <desc>
+    BTU equals Square Footage times 20, then multiplied by Ceiling Factor, Climate Factor,
+    Sun Factor, and Insulation Factor. Ceiling multipliers: 8 ft = 1.0, 9 ft = 1.13, 10 ft = 1.25.
+    Climate: hot/humid = 1.15, moderate = 1.0, cool = 0.85.
+    Sun: sunny = 1.10, average = 1.0, shaded = 0.90.
+    Insulation: poor = 1.15, average = 1.0, good = 0.90.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <!-- Formula chain header -->
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">BTU Calculation Formula</text>
+
+  <!-- Formula as a chain of boxes -->
+  <rect x="24" y="48" width="72" height="28" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+  <text x="60" y="67" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Sq Ft × 20</text>
+
+  <text x="104" y="66" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="13" font-weight="700">×</text>
+
+  <rect x="114" y="48" width="60" height="28" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+  <text x="144" y="67" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Ceiling</text>
+
+  <text x="181" y="66" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="13" font-weight="700">×</text>
+
+  <rect x="190" y="48" width="60" height="28" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+  <text x="220" y="67" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Climate</text>
+
+  <text x="257" y="66" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="13" font-weight="700">×</text>
+
+  <rect x="266" y="48" width="52" height="28" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+  <text x="292" y="67" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Sun</text>
+
+  <text x="325" y="66" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="13" font-weight="700">×</text>
+
+  <rect x="334" y="48" width="72" height="28" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+  <text x="370" y="67" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">Insulation</text>
+
+  <text x="414" y="66" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="13" font-weight="700">=</text>
+
+  <rect x="423" y="48" width="56" height="28" rx="6" fill={C.primary} />
+  <text x="451" y="67" text-anchor="middle" fill={C.white} font-family={FONT} font-size="10.5" font-weight="800">BTU</text>
+
+  <!-- Divider -->
+  <line x1="24" y1="90" x2="696" y2="90" stroke={C.border} stroke-width="1" />
+
+  <!-- Factor columns -->
+  {groups.map((g, gi) => {
+    const cx = colStart + gi * colGap;
+    return (
+      <g>
+        <rect x={cx} y="100" width={colW} height="26" rx="6" fill={C.primary} />
+        <text x={cx + colW / 2} y="117" text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="700">{g.label}</text>
+        {g.items.map((item, ii) => {
+          const iy = 136 + ii * 46;
+          return (
+            <g>
+              <rect
+                x={cx}
+                y={iy}
+                width={colW}
+                height="36"
+                rx="7"
+                fill={item.highlight ? C.orangeLight : C.white}
+                stroke={item.highlight ? C.orange : C.border}
+                stroke-width="1.2"
+              />
+              <text x={cx + 12} y={iy + 15} fill={C.dark} font-family={FONT} font-size="11" font-weight="600">{item.name}</text>
+              <text x={cx + 12} y={iy + 29} fill={item.highlight ? C.orange : C.primary} font-family={FONT} font-size="12" font-weight="800">{item.value}</text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,36 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const rows = [
+  ["100 – 200 sq ft", "6,000 – 9,000 BTU",  260],
+  ["200 – 350 sq ft", "9,000 – 12,000 BTU", 340],
+  ["350 – 500 sq ft", "12,000 – 18,000 BTU", 440],
+  ["500 – 700 sq ft", "18,000 – 24,000 BTU", 530],
+  ["700 – 1,000 sq ft","24,000 – 30,000 BTU", 620],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>Mini split BTU by room size</title>
+  <desc>
+    Horizontal bars showing recommended BTU ranges for mini split heads by room square footage:
+    100–200 sq ft needs 6,000–9,000 BTU; 200–350 sq ft needs 9,000–12,000 BTU;
+    350–500 sq ft needs 12,000–18,000 BTU; 500–700 sq ft needs 18,000–24,000 BTU;
+    700–1,000 sq ft needs 24,000–30,000 BTU.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Mini split BTU by room size</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">One head per zone — size each room independently</text>
+
+  {rows.map((r, i) => {
+    const y = 74 + i * 42;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r[0]}</text>
+        <rect x="172" y={y + 4} width={r[2]} height="26" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={172 + (r[2] as number) + 10} y={y + 22} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,51 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Home size → tons (post chart). Bars scaled by the midpoint of each range; labels show the full range.
+const rows = [
+  { size: "900 – 1,200", mod: "1.5 – 2.0", hot: "2.0 – 2.5", modMid: 1.75, hotMid: 2.25 },
+  { size: "1,200 – 1,600", mod: "2.0 – 2.5", hot: "2.5 – 3.0", modMid: 2.25, hotMid: 2.75 },
+  { size: "1,600 – 2,000", mod: "2.5 – 3.0", hot: "3.0 – 3.5", modMid: 2.75, hotMid: 3.25 },
+  { size: "2,000 – 2,400", mod: "3.0 – 3.5", hot: "3.5 – 4.0", modMid: 3.25, hotMid: 3.75 },
+  { size: "2,400 – 3,000", mod: "3.5 – 4.5", hot: "4.0 – 5.0", modMid: 4.0, hotMid: 4.5 },
+  { size: "3,000 – 3,500", mod: "4.5 – 5.0", hot: "5.0 – 5.5", modMid: 4.75, hotMid: 5.25 },
+];
+
+const scaleMax = 5.5;
+const barLeft = 150;
+const barArea = 300;
+const toW = (v: number) => (v / scaleMax) * barArea;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" fill="none" aria-hidden="true">
+  <title>AC tonnage by home size and climate</title>
+  <desc>
+    Horizontal bars of central AC tonnage by home square footage for moderate and hot climates, from
+    900–1,200 sq ft (1.5–2.5 tons) up to 3,000–3,500 sq ft (4.5–5.5 tons). Hot climates run about half a
+    ton higher than moderate climates at the same home size.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="344" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Tonnage by home size</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Approximate central AC tons — hot climates need more per home size</text>
+
+  {/* Legend */}
+  <rect x="470" y="26" width="12" height="12" rx="3" fill={C.primary} opacity="0.85" />
+  <text x="488" y="36" fill={C.muted} font-family={FONT} font-size="10">Moderate</text>
+  <rect x="560" y="26" width="12" height="12" rx="3" fill={C.orange} opacity="0.85" />
+  <text x="578" y="36" fill={C.muted} font-family={FONT} font-size="10">Hot / humid</text>
+
+  {rows.map((r, i) => {
+    const y = 72 + i * 46;
+    return (
+      <g>
+        <text x="24" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.size}</text>
+        <text x="24" y={y + 30} fill={C.muted} font-family={FONT} font-size="8.5">sq ft</text>
+        <rect x={barLeft} y={y + 2} width={toW(r.modMid)} height="15" rx="4" fill={C.primary} opacity="0.85" />
+        <text x={barLeft + toW(r.modMid) + 6} y={y + 14} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="600">{r.mod} ton</text>
+        <rect x={barLeft} y={y + 21} width={toW(r.hotMid)} height="15" rx="4" fill={C.orange} opacity="0.85" />
+        <text x={barLeft + toW(r.hotMid) + 6} y={y + 33} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="600">{r.hot} ton</text>
+      </g>
+    );
+  })}
+</svg>

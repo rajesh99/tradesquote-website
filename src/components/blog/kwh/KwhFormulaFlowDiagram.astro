@@ -1,0 +1,91 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const steps = [
+  { label: "Tons", sub: "system size" },
+  { label: "× 12,000", sub: "= BTU/hr" },
+  { label: "÷ SEER2", sub: "efficiency" },
+  { label: "÷ 1,000", sub: "W → kW" },
+  { label: "kWh/hr", sub: "result" },
+];
+
+// Worked example values per step for a 3-ton, SEER2 15 system
+const example = ["3", "36,000 BTU/hr", "2,400 W/hr", "2.40", "2.4 kWh/hr"];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" fill="none" aria-hidden="true">
+  <title>kWh formula flow for air conditioning</title>
+  <desc>
+    Left-to-right flow showing the formula steps: Tons times 12,000 equals BTU/hr, divided by SEER2,
+    divided by 1,000, yields kWh per hour. The worked example uses 3 tons and SEER2 15 to produce 2.4 kWh/hr.
+  </desc>
+
+  <defs>
+    <marker id="kwh-flow-arrow-primary" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="704" height="204" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">kWh formula — step by step</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Example: 3 tons, SEER2 15 → 2.4 kWh/hr at full load</text>
+
+  {steps.map((s, i) => {
+    const boxW = 108;
+    const gap = 28;
+    const totalW = steps.length * boxW + (steps.length - 1) * gap;
+    const startX = (720 - totalW) / 2;
+    const x = startX + i * (boxW + gap);
+    const isLast = i === steps.length - 1;
+    return (
+      <g>
+        {/* Step box */}
+        <rect
+          x={x}
+          y="76"
+          width={boxW}
+          height="64"
+          rx="9"
+          fill={isLast ? C.primaryLight : C.white}
+          stroke={isLast ? C.primary : C.border}
+          stroke-width="1.4"
+        />
+        <text x={x + boxW / 2} y="104" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+          {s.label}
+        </text>
+        <text x={x + boxW / 2} y="122" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">
+          {s.sub}
+        </text>
+
+        {/* Arrow to next step */}
+        {!isLast && (
+          <line
+            x1={x + boxW + 2}
+            y1="108"
+            x2={x + boxW + gap - 4}
+            y2="108"
+            stroke={C.primary}
+            stroke-width="1.6"
+            marker-end="url(#kwh-flow-arrow-primary)"
+          />
+        )}
+
+        {/* Worked example value below */}
+        <text
+          x={x + boxW / 2}
+          y="172"
+          text-anchor="middle"
+          fill={isLast ? C.primary : C.muted}
+          font-family={FONT}
+          font-size="9"
+          font-weight={isLast ? "700" : "400"}
+        >
+          {example[i]}
+        </text>
+      </g>
+    );
+  })}
+
+  {/* Example label */}
+  <text x="24" y="173" fill={C.muted} font-family={FONT} font-size="9" font-style="italic">3 tons / SEER2 15:</text>
+</svg>

@@ -1,0 +1,36 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const items = [
+  { mistake: "One tons-per-sq-ft rule nationwide", result: "Oversized North, undersized South" },
+  { mistake: "Ignoring ceiling height", result: "Undersized rooms with vaulted ceilings" },
+  { mistake: "Sq-ft-only sizing on sun-heavy rooms", result: "Undersized west-facing spaces" },
+  { mistake: "Rounding up “to be safe”", result: "Short cycling, poor dehumidification" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 256" fill="none" aria-hidden="true">
+  <title>Common AC sizing mistakes and their results</title>
+  <desc>
+    Four common square-footage sizing mistakes and what they cause: a single nationwide rule mis-sizes by
+    region, ignoring ceiling height undersizes vaulted rooms, sq-ft-only sizing undersizes sunny rooms, and
+    rounding up causes short cycling and poor dehumidification.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="240" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Common sizing mistakes</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Each shortcut leads to a predictable comfort or efficiency problem</text>
+
+  {items.map((it, i) => {
+    const y = 70 + i * 42;
+    return (
+      <g>
+        <rect x="24" y={y} width="320" height="32" rx="7" fill={C.redLight} stroke={C.red} stroke-width="1.2" />
+        <text x="38" y={y + 20} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">{it.mistake}</text>
+        <path d={`M348 ${y + 16} h 28 m -7 -4 l 7 4 l -7 4`} stroke={C.muted} stroke-width="1.6" fill="none" />
+        <rect x="382" y={y} width="312" height="32" rx="7" fill={C.white} stroke={C.border} stroke-width="1.2" />
+        <text x="396" y={y + 20} fill={C.muted} font-family={FONT} font-size="10.5">{it.result}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,50 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const rows = [
+  { label: "2 ton", low: 3800, high: 5500 },
+  { label: "2.5 ton", low: 4200, high: 6200 },
+  { label: "3 ton", low: 4600, high: 6800 },
+  { label: "3.5 ton", low: 5000, high: 7400 },
+  { label: "4 ton", low: 5400, high: 8200 },
+  { label: "5 ton", low: 6000, high: 9000 },
+];
+
+const scaleMin = 0;
+const scaleMax = 9000;
+const barLeft = 96;
+const barWidth = 470;
+const toX = (v: number) => barLeft + ((v - scaleMin) / (scaleMax - scaleMin)) * barWidth;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Installed HVAC cost by tonnage</title>
+  <desc>
+    Typical installed price ranges by cooling tonnage: 2 tons $3,800–$5,500, 2.5 tons $4,200–$6,200, 3 tons
+    $4,600–$6,800, 3.5 tons $5,000–$7,400, 4 tons $5,400–$8,200, and 5 tons $6,000–$9,000, assuming existing
+    ductwork.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Installed cost by tonnage</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Equipment + labor, existing ductwork assumed · 2026 US ranges</text>
+
+  {[0, 3000, 6000, 9000].map((v) => (
+    <g>
+      <line x1={toX(v)} y1="66" x2={toX(v)} y2="266" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+      <text x={toX(v)} y="282" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">${v / 1000}k</text>
+    </g>
+  ))}
+
+  {rows.map((r, i) => {
+    const y = 78 + i * 31;
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.label}</text>
+        <rect x={toX(r.low)} y={y} width={toX(r.high) - toX(r.low)} height="18" rx="5" fill={C.primary} opacity="0.85" />
+        <text x={toX(r.low) - 4} y={y + 13} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8.5">${(r.low / 1000).toFixed(1)}k</text>
+        <text x={toX(r.high) + 4} y={y + 13} fill={C.muted} font-family={FONT} font-size="8.5">${(r.high / 1000).toFixed(1)}k</text>
+      </g>
+    );
+  })}
+</svg>
