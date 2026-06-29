@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Cost ranges from the post's "Typical Replacement Cost Ranges (2025–2026)" table
+const systems = [
+  { label: "Central AC (std)",      low: 4000,  high: 6500,  color: C.blue },
+  { label: "Central AC (hi-eff)",   low: 6500,  high: 10000, color: C.blue },
+  { label: "Gas furnace (std)",      low: 2500,  high: 4500,  color: C.orange },
+  { label: "Gas furnace (hi-eff)",   low: 3500,  high: 6000,  color: C.orange },
+  { label: "Full AC + furnace (std)",low: 7000,  high: 11000, color: C.primary },
+  { label: "Full AC + furnace (hi)", low: 10000, high: 16000, color: C.primary },
+  { label: "Heat pump (std)",        low: 5500,  high: 9000,  color: C.green },
+  { label: "Heat pump (hi-eff)",     low: 7000,  high: 12000, color: C.green },
+];
+
+const scaleMax = 16000;
+const barLeft = 192;
+const barWidth = 496;
+const toX = (v: number) => barLeft + (v / scaleMax) * barWidth;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 350" fill="none" aria-hidden="true">
+  <title>HVAC replacement cost ranges by system type (2025–2026)</title>
+  <desc>
+    Horizontal bars showing installed replacement cost ranges for central AC, gas furnace, full AC + furnace, and heat pump — both standard and high efficiency — for a 2–3 ton system with existing usable ductwork.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="334" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Replacement cost ranges by system type (2025–2026)
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    2–3 ton system · existing usable ductwork · average US labor
+  </text>
+
+  {/* Scale gridlines */}
+  {[0, 4000, 8000, 12000, 16000].map((v) => (
+    <g>
+      <line x1={toX(v)} y1="66" x2={toX(v)} y2="310" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+      <text x={toX(v)} y="326" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">
+        ${(v / 1000).toFixed(0)}k
+      </text>
+    </g>
+  ))}
+
+  {systems.map((s, i) => {
+    const y = 74 + i * 29;
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="600">
+          {s.label}
+        </text>
+        <rect
+          x={toX(s.low)}
+          y={y}
+          width={toX(s.high) - toX(s.low)}
+          height="19"
+          rx="4"
+          fill={s.color}
+          opacity="0.82"
+        />
+        <text x={toX(s.low) - 4} y={y + 14} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8">
+          ${(s.low / 1000).toFixed(1)}k
+        </text>
+        <text x={toX(s.high) + 4} y={y + 14} fill={C.muted} font-family={FONT} font-size="8">
+          ${(s.high / 1000).toFixed(0)}k
+        </text>
+      </g>
+    );
+  })}
+</svg>

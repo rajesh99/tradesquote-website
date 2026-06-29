@@ -7,8 +7,13 @@ categories: ["hvac"]
 authors: ["Mark"]
 tags: ["cfm","airflow","duct sizing","hvac formulas"]
 draft: false
-image: /images/posts/what-is-cfm-hvac-hero.svg
+image: /images/posts/cfm-calculation-formula-hvac-hero.svg
 ---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import CfmFormulaFlowDiagram from "@/components/blog/cfm-formula/CfmFormulaFlowDiagram.astro";
+import CfmByRoomLoadDiagram from "@/components/blog/cfm-formula/CfmByRoomLoadDiagram.astro";
+import DuctVelocityChartDiagram from "@/components/blog/cfm-formula/DuctVelocityChartDiagram.astro";
 
 **CFM calculation formula in hvac** work starts with one relationship: CFM (cubic feet per minute) is how much air moves through a duct or space. Every **hvac cfm calculator**, **air duct cfm calculator**, and **calculate cfm for room** tool applies variations of the same physics.
 
@@ -32,6 +37,13 @@ CFM = Room volume (cu ft) × ACH ÷ 60
 ```
 Example: 1,200 cu ft room at 6 ACH → CFM = 1,200 × 6 ÷ 60 = 120 CFM.
 
+<BlogInfographic
+  title="Core CFM formulas side by side"
+  caption="Tonnage method (top): multiply tons by 400. BTU/ΔT method (bottom): divide load by 1.08 times the coil temperature split. Both produce the same CFM when the inputs are consistent."
+>
+  <CfmFormulaFlowDiagram />
+</BlogInfographic>
+
 ## CFM per Room
 
 To **calculate cfm for room** cooling:
@@ -46,6 +58,13 @@ To **calculate cfm for room** cooling:
 | 6,000 | 278 |
 | 8,000 | 370 |
 | 10,000 | 463 |
+
+<BlogInfographic
+  title="Room CFM at a 20°F coil ΔT"
+  caption="Each bar shows the supply CFM required for that room's cooling load. A 8,000 BTU/hr bedroom needs roughly 370 CFM; a 10,000 BTU/hr open area needs 463 CFM."
+>
+  <CfmByRoomLoadDiagram />
+</BlogInfographic>
 
 ## Duct CFM and Velocity
 
@@ -63,6 +82,13 @@ Velocity (fpm) = CFM ÷ Duct area (sq ft)
 | 12 in round | 0.785 | 550 |
 
 Keep branch velocity under ~900 fpm to avoid register noise.
+
+<BlogInfographic
+  title="Duct CFM capacity at 700 fpm"
+  caption="Bars show how much air each round duct carries at a typical 700 fpm branch velocity. A 6-inch round maxes out at 137 CFM; a 12-inch handles 550 CFM. Exceeding 900 fpm causes audible register noise."
+>
+  <DuctVelocityChartDiagram />
+</BlogInfographic>
 
 ## Measuring Actual CFM
 

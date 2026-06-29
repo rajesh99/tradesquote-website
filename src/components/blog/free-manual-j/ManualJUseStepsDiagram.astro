@@ -1,0 +1,49 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const steps = [
+  { n: "1", head: "Run the calculator",   sub: "Enter home details online" },
+  { n: "2", head: "Get BTU/hr output",    sub: "Heating + cooling loads" },
+  { n: "3", head: "Compare to quote",     sub: "Check proposed equipment size" },
+  { n: "4", head: "Query if >0.5 ton off", sub: "Ask contractor for worksheet" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 190" fill="none" aria-hidden="true">
+  <title>Four steps to use a free Manual J calculator</title>
+  <desc>
+    Run the free online calculator with your home's details, review the BTU/hr output, compare it to the
+    contractor's proposed equipment size, and ask for their Manual J worksheet if the sizes differ by more
+    than half a ton.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="174" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">How to use free results</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Four steps to validate a contractor's sizing proposal with a free calc</text>
+
+  <defs>
+    <marker id="mj-step-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+
+  {steps.map((s, i) => {
+    const x = 20 + i * 172;
+    const isLast = i === steps.length - 1;
+    return (
+      <g>
+        <rect x={x} y="70" width="154" height="90" rx="9"
+          fill={isLast ? C.primaryLight : C.white}
+          stroke={isLast ? C.primary : C.border}
+          stroke-width="1.4" />
+        <circle cx={x + 20} cy="84" r="13" fill={C.primary} />
+        <text x={x + 20} y="89" text-anchor="middle" fill={C.white} font-family={FONT} font-size="13" font-weight="700">{s.n}</text>
+        <text x={x + 77} y="110" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{s.head}</text>
+        <text x={x + 77} y="130" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{s.sub}</text>
+        {!isLast && (
+          <path d={`M${x + 154} 115 l 14 0`} stroke={C.primary} stroke-width="2" marker-end="url(#mj-step-arrow)" />
+        )}
+      </g>
+    );
+  })}
+</svg>

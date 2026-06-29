@@ -1,0 +1,55 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Accuracy data from the post's table: ±% midpoint used for bar scaling
+// "Free simplified" ±15–25% → midpoint 20% error → 80% accuracy
+// "Free detailed tier" ±10–15% → midpoint 12.5% error → 87.5% accuracy
+// "Paid (Wrightsoft/CoolCalc/Elite)" ±5% → 95% accuracy
+// "Spreadsheet" varies → shown as 70%
+const tools = [
+  { label: "Free simplified",       accuracy: "±15–25%", bestFor: "Budgeting / sanity-check", bar: 78,  color: C.muted },
+  { label: "Free detailed tier",    accuracy: "±10–15%", bestFor: "Validating contractor sizing", bar: 87, color: C.primary },
+  { label: "Spreadsheet template",  accuracy: "Varies",  bestFor: "Learning methodology",       bar: 65,  color: C.orange },
+  { label: "Wrightsoft / CoolCalc", accuracy: "±5%",     bestFor: "Permits & Manual S",          bar: 95,  color: C.blue },
+];
+
+const BAR_MAX = 500;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 278" fill="none" aria-hidden="true">
+  <title>Free vs paid Manual J accuracy comparison</title>
+  <desc>
+    Four tool types compared by accuracy: free simplified tools are within 15–25%, free detailed tiers
+    within 10–15%, spreadsheets vary, and paid software like Wrightsoft reaches ±5% — required for permits.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="262" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Free vs paid Manual J accuracy</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Free tools are fine for validation — paid software required for permits</text>
+
+  {/* Column headers */}
+  <text x="24"  y="74" fill={C.muted} font-family={FONT} font-size="9.5" font-weight="700" letter-spacing="0.4">TOOL TYPE</text>
+  <text x="224" y="74" fill={C.muted} font-family={FONT} font-size="9.5" font-weight="700" letter-spacing="0.4">ACCURACY</text>
+  <text x="310" y="74" fill={C.muted} font-family={FONT} font-size="9.5" font-weight="700" letter-spacing="0.4">RELATIVE PRECISION</text>
+  <line x1="20" y1="78" x2="700" y2="78" stroke={C.border} stroke-width="1" />
+
+  {tools.map((t, i) => {
+    const y = 90 + i * 46;
+    const barW = Math.round((t.bar / 100) * BAR_MAX);
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{t.label}</text>
+        <text x="24" y={y + 29} fill={C.muted} font-family={FONT} font-size="9.5">{t.bestFor}</text>
+
+        {/* Accuracy badge */}
+        <rect x="208" y={y + 4} width="82" height="22" rx="6" fill={t.color} fill-opacity="0.12" stroke={t.color} stroke-width="1.1" stroke-opacity="0.5" />
+        <text x="249" y={y + 19} text-anchor="middle" fill={t.color} font-family={FONT} font-size="11" font-weight="800">{t.accuracy}</text>
+
+        {/* Precision bar */}
+        <rect x="306" y={y + 8} width={BAR_MAX} height="14" rx="4" fill={C.border} fill-opacity="0.35" />
+        <rect x="306" y={y + 8} width={barW} height="14" rx="4" fill={t.color} opacity="0.75" />
+        <text x={306 + barW + 6} y={y + 20} fill={C.muted} font-family={FONT} font-size="9">{t.bar}%</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,53 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Five flex duct sizing rules from the post
+const steps = [
+  { n: "1", head: "Stretch fully extended", sub: "Compressed flex shrinks effective diameter" },
+  { n: "2", head: "Limit run length", sub: "ACCA Manual D: max 15 ft per flex run" },
+  { n: "3", head: "Upsize one increment", sub: "Rigid says 8 in → use 10 in flex" },
+  { n: "4", head: "Avoid sharp bends", sub: "Use long-sweep elbows; kinks choke airflow" },
+  { n: "5", head: "Support every 4 ft", sub: "Sagging reduces diameter and increases friction" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 210" fill="none" aria-hidden="true">
+  <title>Five flex duct sizing rules</title>
+  <desc>
+    Properly installed flex duct must be fully stretched, limited to 15-foot runs, upsized one diameter
+    from the rigid chart, free of sharp bends, and supported every four feet.
+  </desc>
+
+  <defs>
+    <marker id="fsr-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="704" height="194" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Flex duct installation rules</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Violating any one of these can cut capacity 50%+</text>
+
+  {steps.map((s, i) => {
+    const x = 24 + i * 136;
+    const isLast = i === steps.length - 1;
+    return (
+      <g>
+        <rect x={x} y="68" width="122" height="118" rx="9"
+          fill={isLast ? C.primaryLight : C.white}
+          stroke={isLast ? C.primary : C.border}
+          stroke-width="1.4" />
+        <circle cx={x + 20} cy="86" r="13" fill={C.primary} />
+        <text x={x + 20} y="91" text-anchor="middle" fill={C.white} font-family={FONT} font-size="12" font-weight="700">{s.n}</text>
+        <text x={x + 61} y="108" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{s.head}</text>
+        <text x={x + 61} y="125" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{s.sub.split(";")[0]}</text>
+        {s.sub.includes(";") && (
+          <text x={x + 61} y="139" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{s.sub.split(";")[1].trim()}</text>
+        )}
+        {!isLast && (
+          <path d={`M${x + 122} 127 l 12 0 m -6 -4 l 6 4 l -6 4`} stroke={C.muted} stroke-width="1.6" fill="none" />
+        )}
+      </g>
+    );
+  })}
+</svg>

@@ -7,8 +7,13 @@ categories: ["hvac"]
 authors: ["Mark"]
 tags: ["btu","ac sizing","cooling load","hvac calculator"]
 draft: false
-image: /images/posts/how-many-btu-do-i-need-hero.webp
+image: /images/posts/air-conditioning-btu-calculator-hero.svg
 ---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import BtuByRoomSizeDiagram from "@/components/blog/ac-btu-calc/BtuByRoomSizeDiagram.astro";
+import BtuAdjustmentFactorsDiagram from "@/components/blog/ac-btu-calc/BtuAdjustmentFactorsDiagram.astro";
+import BtuFormulaChainDiagram from "@/components/blog/ac-btu-calc/BtuFormulaChainDiagram.astro";
 
 An **air conditioning btu calculator** answers one question: how many BTU of cooling capacity does this space need? The same tool goes by **hvac btu calculator**, **btu calculator for hvac**, or **heating and cooling btu calculator** when it handles both loads — but cooling BTU is what sizes your AC.
 
@@ -22,6 +27,13 @@ BTU = Square Footage × 20 × Ceiling Factor × Climate Factor × Sun Factor × 
 
 ### Adjustment factors
 
+<BlogInfographic
+  title="BTU requirements by room size"
+  caption="At 20 BTU/sq ft baseline, a 1,000 sq ft space needs roughly 20,000 BTU (1.7 tons) in a moderate climate."
+>
+  <BtuByRoomSizeDiagram />
+</BlogInfographic>
+
 | Factor | Condition | Multiplier |
 |---|---|---|
 | Ceiling | 9 ft | 1.13 |
@@ -31,6 +43,13 @@ BTU = Square Footage × 20 × Ceiling Factor × Climate Factor × Sun Factor × 
 | Sun | Large south/west windows | 1.10 |
 | Insulation | Poor (pre-1980) | 1.15 |
 | Insulation | Good (modern) | 0.90 |
+
+<BlogInfographic
+  title="BTU adjustment factors at a glance"
+  caption="Each factor multiplies the baseline. A 10-ft ceiling, hot climate, and sunny windows together push the multiplier to about 1.58× the baseline BTU."
+>
+  <BtuAdjustmentFactorsDiagram />
+</BlogInfographic>
 
 ## BTU Quick Reference
 
@@ -53,6 +72,13 @@ A **heating and cooling btu calculator** applies different multipliers for each 
 ```
 BTU = 252 × 20 × 1.25 × 1.15 × 1.10 = 9,975 → buy 10,000 BTU unit
 ```
+
+<BlogInfographic
+  title="How the BTU formula stacks up"
+  caption="Each factor in the formula multiplies the running total — missing even one (like ceiling height) can under-size the unit by 25%."
+>
+  <BtuFormulaChainDiagram />
+</BlogInfographic>
 
 ## When the Calculator Is Not Enough
 

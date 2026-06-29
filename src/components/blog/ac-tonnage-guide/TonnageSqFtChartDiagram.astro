@@ -1,0 +1,47 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// From the post's "Sq Ft to Tons Chart" table — midpoint sq ft, midpoint tons, midpoint BTU
+const rows = [
+  { label: "900–1,200 sq ft",   tons: "1.5–2.0", btu: "18k–24k",  bar: 175 },
+  { label: "1,200–1,600 sq ft", tons: "2.0–2.5", btu: "24k–30k",  bar: 220 },
+  { label: "1,600–2,000 sq ft", tons: "2.5–3.0", btu: "30k–36k",  bar: 270 },
+  { label: "2,000–2,400 sq ft", tons: "3.0–3.5", btu: "36k–42k",  bar: 315 },
+  { label: "2,400–3,000 sq ft", tons: "3.5–4.5", btu: "42k–54k",  bar: 380 },
+  { label: "3,000–3,500 sq ft", tons: "4.5–5.0", btu: "54k–60k",  bar: 430 },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>AC tonnage by home square footage</title>
+  <desc>
+    Horizontal bars showing recommended AC tonnage and BTU per hour by home size, ranging from
+    1.5–2.0 tons for 900–1,200 sq ft up to 4.5–5.0 tons for 3,000–3,500 sq ft.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Sq ft → tons (moderate climate, 8-ft ceilings)
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    Buy the nearest standard size after load calc: 1.5, 2, 2.5, 3, 3.5, 4, or 5 tons
+  </text>
+
+  {rows.map((r, i) => {
+    const y = 70 + i * 40;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="600">
+          {r.label}
+        </text>
+        <rect x="168" y={y + 2} width={r.bar} height="22" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={168 + r.bar + 8} y={y + 17} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">
+          {r.tons} tons
+        </text>
+        <text x={168 + r.bar + 8} y={y + 30} fill={C.muted} font-family={FONT} font-size="9.5">
+          {r.btu} BTU/hr
+        </text>
+      </g>
+    );
+  })}
+</svg>

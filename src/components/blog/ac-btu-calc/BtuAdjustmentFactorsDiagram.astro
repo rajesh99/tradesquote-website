@@ -1,0 +1,46 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Adjustment factors from the post's table
+const factors: { group: string; condition: string; mult: string; color: string; light: string }[] = [
+  { group: "Ceiling",    condition: "9 ft",                     mult: "×1.13", color: C.blue,   light: C.blueLight   },
+  { group: "Ceiling",    condition: "10 ft",                    mult: "×1.25", color: C.blue,   light: C.blueLight   },
+  { group: "Climate",    condition: "Hot / humid",              mult: "×1.15", color: C.orange, light: C.orangeLight  },
+  { group: "Climate",    condition: "Cool",                     mult: "×0.85", color: C.green,  light: C.greenLight  },
+  { group: "Sun",        condition: "Large south/west windows", mult: "×1.10", color: C.orange, light: C.orangeLight  },
+  { group: "Insulation", condition: "Poor (pre-1980)",          mult: "×1.15", color: C.red,    light: C.redLight    },
+  { group: "Insulation", condition: "Good (modern)",            mult: "×0.90", color: C.green,  light: C.greenLight  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>BTU adjustment factors for AC sizing</title>
+  <desc>
+    Table of multipliers applied on top of the 20 BTU/sq ft baseline: ceiling height, climate zone,
+    sun exposure, and insulation quality each contribute a factor between 0.85 and 1.25.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">BTU adjustment factors</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Multiply together after the 20 BTU/sq ft baseline — factors stack</text>
+
+  {/* Column headers */}
+  <text x="28"  y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="700">FACTOR</text>
+  <text x="200" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="700">CONDITION</text>
+  <text x="610" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" text-anchor="middle">MULTIPLIER</text>
+
+  {factors.map(({ group, condition, mult, color, light }, i) => {
+    const y = 84 + i * 33;
+    const isIncrease = mult.startsWith("×1") && mult !== "×1.00";
+    return (
+      <g>
+        <rect x="16" y={y + 2} width="688" height="26" rx="5"
+          fill={i % 2 === 0 ? "#F5F5F5" : C.panelBg} />
+        <text x="28"  y={y + 20} fill={C.dark}  font-family={FONT} font-size="11" font-weight="700">{group}</text>
+        <text x="200" y={y + 20} fill={C.muted} font-family={FONT} font-size="11">{condition}</text>
+        <rect x="572" y={y + 5} width="76" height="20" rx="10" fill={light} />
+        <text x="610" y={y + 20} text-anchor="middle" fill={color} font-family={FONT} font-size="12" font-weight="800">{mult}</text>
+      </g>
+    );
+  })}
+</svg>

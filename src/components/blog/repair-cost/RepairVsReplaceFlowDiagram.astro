@@ -1,0 +1,79 @@
+---
+import { C, FONT } from "../infographicTokens";
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+  <title>Repair vs replace decision rule</title>
+  <desc>
+    Decision flow for the 50% rule: if repair cost exceeds 50% of replacement cost AND the unit is
+    past 75% of its expected life, replace. Otherwise, repair. Example: $1,800 compressor on a
+    14-year-old AC — borderline at 28–40% of replacement; at 16+ years, replace.
+  </desc>
+
+  <defs>
+    <marker id="rvr-arrow-primary" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#01AD9F" />
+    </marker>
+    <marker id="rvr-arrow-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#DC2626" />
+    </marker>
+    <marker id="rvr-arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#16A34A" />
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="704" height="224" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Repair vs replace decision — the 50% rule
+  </text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">
+    If BOTH conditions are true → replace. One or neither → repair may make sense.
+  </text>
+
+  {/* Start node */}
+  <rect x="30" y="80" width="148" height="52" rx="10" fill={C.white} stroke={C.border} stroke-width="1.4" />
+  <text x="104" y="101" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Repair quote</text>
+  <text x="104" y="120" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">in hand?</text>
+
+  {/* Arrow right to condition 1 */}
+  <path d="M178 106 L228 106" stroke={C.primary} stroke-width="1.8" marker-end="url(#rvr-arrow-primary)" />
+
+  {/* Condition 1 */}
+  <rect x="230" y="76" width="174" height="60" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="317" y="98" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">Repair &gt; 50%</text>
+  <text x="317" y="114" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">of replacement cost?</text>
+  <text x="317" y="130" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">e.g. repair $1,800 / replace $4,500 = 40%</text>
+
+  {/* Arrow right to condition 2 */}
+  <path d="M404 106 L454 106" stroke={C.primary} stroke-width="1.8" marker-end="url(#rvr-arrow-primary)" />
+  <text x="429" y="99" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">YES</text>
+
+  {/* Condition 2 */}
+  <rect x="456" y="76" width="174" height="60" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="543" y="98" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">Unit past 75% of</text>
+  <text x="543" y="114" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">expected life?</text>
+  <text x="543" y="130" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">AC: 15 yr life → 75% = 11+ yrs</text>
+
+  {/* Arrow down to REPLACE */}
+  <path d="M543 136 L543 168" stroke={C.red} stroke-width="1.8" marker-end="url(#rvr-arrow-red)" />
+  <text x="553" y="158" fill={C.red} font-family={FONT} font-size="9" font-weight="700">YES</text>
+
+  {/* REPLACE box */}
+  <rect x="456" y="170" width="174" height="46" rx="10" fill={C.redLight} stroke={C.red} stroke-width="1.8" />
+  <text x="543" y="196" text-anchor="middle" fill={C.red} font-family={FONT} font-size="13" font-weight="800">REPLACE</text>
+  <text x="543" y="210" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">Repair cost rarely recovers</text>
+
+  {/* NO branch from condition 1 → REPAIR */}
+  <path d="M317 136 L317 170" stroke={C.green} stroke-width="1.8" marker-end="url(#rvr-arrow-green)" />
+  <text x="327" y="158" fill={C.green} font-family={FONT} font-size="9" font-weight="700">NO</text>
+
+  {/* REPAIR box */}
+  <rect x="230" y="172" width="174" height="46" rx="10" fill={C.greenLight} stroke={C.green} stroke-width="1.8" />
+  <text x="317" y="198" text-anchor="middle" fill={C.green} font-family={FONT} font-size="13" font-weight="800">REPAIR</text>
+  <text x="317" y="212" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">Economics favour fixing it</text>
+
+  {/* NO branch from condition 2 also → REPAIR (dotted line) */}
+  <path d="M456 195 L404 195" stroke={C.green} stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#rvr-arrow-green)" />
+  <text x="434" y="190" text-anchor="middle" fill={C.green} font-family={FONT} font-size="9" font-weight="700">NO</text>
+</svg>

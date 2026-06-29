@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Duct CFM at 700 fpm from post table
+const rows: [string, number, number][] = [
+  ['6" round',  137, 137],
+  ['8" round',  244, 244],
+  ['10" round', 382, 382],
+  ['12" round', 550, 550],
+];
+
+const barLeft = 110;
+const scaleMax = 600;
+const barArea = 560;
+const toW = (v: number) => (v / scaleMax) * barArea;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 270" fill="none" aria-hidden="true">
+  <title>Duct CFM capacity at 700 fpm velocity</title>
+  <desc>
+    At 700 feet per minute: 6-inch round carries 137 CFM, 8-inch 244 CFM, 10-inch 382 CFM,
+    12-inch 550 CFM. Keep branch velocity under 900 fpm to avoid register noise.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="254" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Duct CFM capacity at 700 fpm</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Velocity = CFM ÷ duct area (sq ft) · keep branches under 900 fpm</text>
+
+  {/* Scale gridlines */}
+  {([0, 150, 300, 450, 600] as number[]).map((v) => {
+    const x = barLeft + toW(v);
+    return (
+      <g>
+        <line x1={x} y1="64" x2={x} y2="234" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+        <text x={x} y="248" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{v}</text>
+      </g>
+    );
+  })}
+  <text x={barLeft + toW(300)} y="262" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">CFM</text>
+
+  {rows.map(([label, cfm, barVal], i) => {
+    const y = 72 + i * 42;
+    return (
+      <g>
+        <text x="24" y={y + 16} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{label}</text>
+        <rect x={barLeft} y={y} width={toW(barVal)} height="26" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+        <text x={barLeft + toW(barVal) + 8} y={y + 17} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{cfm} CFM</text>
+      </g>
+    );
+  })}
+
+  {/* 900 fpm warning line — equivalent to 900/700 × the bar area reference */}
+  {/* Not drawn — post only gives 700 fpm values; noise note is in caption */}
+</svg>

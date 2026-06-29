@@ -1,0 +1,45 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Data from post table: sq ft, BTU, tons
+const rows = [
+  ["600 sq ft",   "12,000 BTU", "1.0 ton",  1.0],
+  ["900 sq ft",   "18,000 BTU", "1.5 tons", 1.5],
+  ["1,200 sq ft", "24,000 BTU", "2.0 tons", 2.0],
+  ["1,500 sq ft", "30,000 BTU", "2.5 tons", 2.5],
+  ["1,800 sq ft", "36,000 BTU", "3.0 tons", 3.0],
+  ["2,000 sq ft", "40,000 BTU", "3.3 tons", 3.3],
+  ["2,500 sq ft", "50,000 BTU", "4.2 tons", 4.2],
+  ["3,000 sq ft", "60,000 BTU", "5.0 tons", 5.0],
+];
+
+const maxTons = 5.0;
+const barLeft = 200;
+const barMaxW = 460;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" fill="none" aria-hidden="true">
+  <title>AC size by square footage</title>
+  <desc>
+    Horizontal bar chart showing estimated AC tonnage by home size: 600 sq ft needs 1 ton, 1,500 sq ft
+    needs 2.5 tons, 2,000 sq ft needs 3.3 tons, and 3,000 sq ft needs 5 tons. Assumes 8-ft ceilings,
+    average insulation, and moderate climate.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="344" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">AC size by square footage</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">8-ft ceilings · average insulation · moderate climate</text>
+
+  {rows.map((r, i) => {
+    const y = 70 + i * 34;
+    const barW = ((r[3] as number) / maxTons) * barMaxW;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r[0]}</text>
+        <rect x={barLeft} y={y + 4} width={barW} height="22" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={barLeft + barW + 8} y={y + 20} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r[2]}</text>
+        <text x={barLeft + barW + 62} y={y + 20} fill={C.muted} font-family={FONT} font-size="10">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

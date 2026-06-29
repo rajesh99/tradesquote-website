@@ -1,0 +1,55 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Round duct calculator reference from post, with flex upsize column added
+// Rigid sizes from post table; flex upsize = one increment up
+const rows = [
+  { cfm: "100 CFM",  rigid: '6"',  flex: '8"',  rigidW: 70,  flexW: 100 },
+  { cfm: "225 CFM",  rigid: '8"',  flex: '10"', rigidW: 100, flexW: 130 },
+  { cfm: "450 CFM",  rigid: '10"', flex: '12"', rigidW: 130, flexW: 165 },
+  { cfm: "700 CFM",  rigid: '12"', flex: '14"', rigidW: 165, flexW: 200 },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Round duct to flex upsize reference</title>
+  <desc>
+    When converting rigid round duct sizes to flex, always upsize one increment: 100 CFM needs 6-inch
+    rigid or 8-inch flex; 225 CFM needs 8-inch rigid or 10-inch flex; 450 CFM needs 10-inch rigid or
+    12-inch flex; 700 CFM needs 12-inch rigid or 14-inch flex.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Round duct → flex upsize reference</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Select one size larger when switching from rigid metal to flex duct</text>
+
+  {/* Column headers */}
+  <text x="28" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">AIRFLOW</text>
+  <text x="150" y="74" fill={C.blue} font-family={FONT} font-size="10" font-weight="700">RIGID METAL</text>
+  <text x="390" y="74" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">FLEX DUCT (upsize)</text>
+
+  {/* Divider */}
+  <line x1="24" y1="80" x2="696" y2="80" stroke={C.border} stroke-width="1" />
+
+  {rows.map((r, i) => {
+    const y = 90 + i * 42;
+    return (
+      <g>
+        <text x="28" y={y + 18} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r.cfm}</text>
+
+        {/* Rigid bar */}
+        <rect x="148" y={y + 4} width={r.rigidW} height="24" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+        <text x={148 + r.rigidW / 2} y={y + 21} text-anchor="middle" fill={C.blue} font-family={FONT} font-size="12" font-weight="800">{r.rigid}</text>
+
+        {/* Arrow */}
+        <path d={`M${148 + r.rigidW + 10} ${y + 16} l 18 0 m -8 -5 l 8 5 l -8 5`} stroke={C.muted} stroke-width="1.5" fill="none" />
+
+        {/* Flex bar */}
+        <rect x="390" y={y + 4} width={r.flexW} height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={390 + r.flexW / 2} y={y + 21} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="12" font-weight="800">{r.flex}</text>
+
+        <text x={390 + r.flexW + 10} y={y + 20} fill={C.muted} font-family={FONT} font-size="10">flex</text>
+      </g>
+    );
+  })}
+</svg>

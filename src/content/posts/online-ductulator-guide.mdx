@@ -7,8 +7,13 @@ categories: ["hvac"]
 authors: ["Mark"]
 tags: ["ductulator","duct sizing","cfm","duct sizer","manual d"]
 draft: false
-image: /images/posts/duct-size-chart-cfm-hero.svg
+image: /images/posts/online-ductulator-guide-hero.svg
 ---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import DuctulatorFlowDiagram from "@/components/blog/ductulator/DuctulatorFlowDiagram.astro";
+import DuctSizeByFlowDiagram from "@/components/blog/ductulator/DuctSizeByFlowDiagram.astro";
+import DuctulatorToolComparisonDiagram from "@/components/blog/ductulator/DuctulatorToolComparisonDiagram.astro";
 
 An **online ductulator** is a digital version of the slide-rule wheel techs have carried for decades. Whether you search for **duct u lator**, **ductulator calculator**, or **mcquay duct sizer**, you are looking for the same thing: given a CFM requirement and a friction rate, what duct diameter (round or rectangular) keeps airflow quiet and the blower within its static pressure budget.
 
@@ -21,6 +26,13 @@ A ductulator balances two limits:
 
 Input CFM and friction rate → output duct size. Input duct size and CFM → output friction rate. That bidirectional lookup is what separates a **duct sizer** from a simple CFM chart.
 
+<BlogInfographic
+  title="How a ductulator resolves inputs to outputs"
+  caption="Supply CFM and friction rate; the ductulator returns round duct diameter and velocity. Reverse the lookup to verify friction rate on an existing duct."
+>
+  <DuctulatorFlowDiagram />
+</BlogInfographic>
+
 ## Online Ductulator vs Physical Wheel
 
 | Tool | Pros | Cons |
@@ -32,6 +44,13 @@ Input CFM and friction rate → output duct size. Input duct size and CFM → ou
 
 Our **[HVAC Duct Size Calculator](/calculators/hvac/hvac-duct-size-calculator)** works as a **duct calculator online** for round and rectangular sizing at your chosen friction rate.
 
+<BlogInfographic
+  title="Duct sizing tool comparison"
+  caption="Physical ductulators are fastest in the field; online tools add rectangular equivalents; McQuay adds full Manual D fitting libraries for whole-system commercial design."
+>
+  <DuctulatorToolComparisonDiagram />
+</BlogInfographic>
+
 ## How to Use a Ductulator Step by Step
 
 1. **Know your CFM** — from equipment specs or a room/airflow calc
@@ -39,6 +58,13 @@ Our **[HVAC Duct Size Calculator](/calculators/hvac/hvac-duct-size-calculator)**
 3. **Look up round size** — e.g. 400 CFM → ~10 in round at 0.10
 4. **Check velocity** — if above target, go one size larger
 5. **Convert to rectangular** if needed — equal cross-sectional area (see **[Duct Size Chart](/blog/duct-size-chart-cfm)**)
+
+<BlogInfographic
+  title="Round duct size by airflow at 0.10 in.wg/100 ft"
+  caption="At the standard 0.10 friction rate, 400 CFM needs a 10-inch round — the key example the post uses. Go one size larger if velocity is above the quiet-operation limit."
+>
+  <DuctSizeByFlowDiagram />
+</BlogInfographic>
 
 ## When You Need More Than a Ductulator
 

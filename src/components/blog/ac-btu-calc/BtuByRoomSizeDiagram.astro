@@ -1,0 +1,44 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Data from the post's BTU Quick Reference table
+// [label, btu, tons, barWidth]
+const rows: [string, number, string, number][] = [
+  ["400 sq ft",   8_000,  "0.67", 107],
+  ["600 sq ft",  12_000,  "1.0",  160],
+  ["800 sq ft",  16_000,  "1.3",  214],
+  ["1,000 sq ft",20_000,  "1.7",  267],
+  ["1,500 sq ft",30_000,  "2.5",  400],
+  ["2,000 sq ft",40_000,  "3.3",  450],
+  ["2,500 sq ft",50_000,  "4.2",  500],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>AC BTU requirements by room size</title>
+  <desc>
+    Horizontal bar chart showing BTU and tonnage by square footage based on 20 BTU per sq ft baseline:
+    400 sq ft needs 8,000 BTU (0.67 tons), 1,000 sq ft needs 20,000 BTU (1.7 tons),
+    and 2,500 sq ft needs 50,000 BTU (4.2 tons).
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">BTU required by room size (moderate climate)</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Baseline: 20 BTU/sq ft · 8-ft ceilings · standard insulation</text>
+
+  {rows.map(([label, btu, tons, barW], i) => {
+    const y = 72 + i * 36;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{label}</text>
+        <rect x="148" y={y + 4} width={barW} height="22" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={148 + barW + 8} y={y + 18} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">
+          {btu.toLocaleString()} BTU
+        </text>
+        <text x={148 + barW + 8} y={y + 30} fill={C.muted} font-family={FONT} font-size="9.5">
+          {tons} tons
+        </text>
+      </g>
+    );
+  })}
+</svg>

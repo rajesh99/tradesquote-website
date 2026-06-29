@@ -7,8 +7,13 @@ categories: ["hvac"]
 authors: ["Mark"]
 tags: ["duct calculator","ductwork","cfm","duct sizing","manual d"]
 draft: false
-image: /images/posts/hvac-duct-sizing-guide-hero.svg
+image: /images/posts/hvac-duct-calculator-guide-hero.svg
 ---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import CfmRoundDuctChartDiagram from "@/components/blog/duct-calc-guide/CfmRoundDuctChartDiagram.astro";
+import DuctCalcInputsDiagram from "@/components/blog/duct-calc-guide/DuctCalcInputsDiagram.astro";
+import RoundRectEquivDiagram from "@/components/blog/duct-calc-guide/RoundRectEquivDiagram.astro";
 
 An **hvac duct calculator** matches duct diameter to airflow (CFM) at a target friction rate. Searchers use different names — **hvac ductwork calculator**, **ductwork calculator**, **duct calculator cfm**, **ductwork calculator cfm**, **air duct calculator**, **air duct size calculator**, and **air duct design calculator** — but every version answers: "What size duct carries this much air without excessive noise or static pressure?"
 
@@ -28,6 +33,13 @@ Round metal duct at ~0.10 in.wg/100 ft friction rate:
 
 These numbers come from the same math behind any **ductwork size calculator**. Flex duct needs one size larger due to higher friction from ribbed walls.
 
+<BlogInfographic
+  title="Round duct size by CFM at 0.10 in.wg/100 ft"
+  caption="Bar lengths scale to duct area. Flex duct and long runs need the next size up."
+>
+  <CfmRoundDuctChartDiagram />
+</BlogInfographic>
+
 ## The Two Rules Every Duct Calculator Uses
 
 **Friction rate:** How much static pressure the duct consumes per 100 ft. Residential design typically targets 0.08–0.10 in.wg/100 ft on branch runs.
@@ -35,6 +47,13 @@ These numbers come from the same math behind any **ductwork size calculator**. F
 **Velocity:** Air speed in feet per minute. Exceed ~900 fpm on branch runs and registers whistle. Returns run slower — size them larger than supplies for the same CFM.
 
 An **hvac duct calculator** that ignores velocity will oversize trunks and undersize branches. Always check both.
+
+<BlogInfographic
+  title="What a duct calculator needs"
+  caption="Enter CFM and friction rate, choose round or rectangular — the calculator returns the minimum duct size."
+>
+  <DuctCalcInputsDiagram />
+</BlogInfographic>
 
 ## Supply vs Return Sizing
 
@@ -53,6 +72,13 @@ Area (sq in) = π × (diameter ÷ 2)²
 ```
 
 A 10 in round duct (78.5 sq in) ≈ 8 × 10 rectangular (80 sq in). Our **[Duct Size Chart](/blog/duct-size-chart-cfm)** covers round-to-rect conversion in detail.
+
+<BlogInfographic
+  title="Round ↔ Rectangular duct equivalents"
+  caption="Match cross-sectional area to convert between round and rectangular — useful when ceiling joists limit round duct depth."
+>
+  <RoundRectEquivDiagram />
+</BlogInfographic>
 
 ## Whole-System vs Single Run
 
