@@ -1,0 +1,48 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const inputs = [
+  "Conditioned sq ft & ceiling height",
+  "Insulation R-values",
+  "Windows: area, type, orientation",
+  "Design temps (99% / 1%)",
+  "Air infiltration rate",
+  "Internal gains (people, appliances)",
+  "Duct location & losses",
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Inputs that feed an air conditioning load calculation</title>
+  <desc>
+    Seven building inputs feed a Manual J load calculation — conditioned area and ceiling height,
+    insulation R-values, window area/type/orientation, design temperatures, air infiltration, internal
+    gains, and duct losses — producing the heating and cooling load in BTU per hour and tons.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What feeds a load calculation</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Many building inputs converge into one sized result</text>
+
+  {inputs.map((label, i) => {
+    const y = 72 + i * 33;
+    return (
+      <g>
+        <rect x="24" y={y} width="252" height="26" rx="6" fill={C.white} stroke={C.border} stroke-width="1.2" />
+        <text x="36" y={y + 17} fill={C.dark} font-family={FONT} font-size="10" font-weight="600">{label}</text>
+        <path d={`M276 ${y + 13} C 300 ${y + 13}, 312 165, 336 165`} stroke={C.border} stroke-width="1" fill="none" />
+      </g>
+    );
+  })}
+
+  <rect x="336" y="132" width="168" height="66" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="420" y="160" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">Load calculation</text>
+  <text x="420" y="178" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">Manual J / Manual N</text>
+
+  <path d="M504 165 h 36 m -9 -5 l 9 5 l -9 5" stroke={C.primary} stroke-width="1.8" fill="none" />
+
+  <rect x="548" y="128" width="148" height="74" rx="10" fill={C.dark} />
+  <text x="622" y="156" text-anchor="middle" fill={C.white} font-family={FONT} font-size="11.5" font-weight="800">Heating + cooling</text>
+  <text x="622" y="174" text-anchor="middle" fill={C.white} font-family={FONT} font-size="11.5" font-weight="800">load</text>
+  <text x="622" y="190" text-anchor="middle" fill={C.primaryLight} font-family={FONT} font-size="9.5">BTU/hr · tons</text>
+</svg>

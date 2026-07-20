@@ -1,0 +1,66 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Data from post "Financing Options Compared" table
+const options = [
+  { source: "Dealer 0% promo",   apr: "0%",     term: "12–60 mo", note: "Deferred interest risk",    color: C.green,   noteBg: C.greenLight,  noteStroke: C.green  },
+  { source: "Contractor loan",   apr: "6–15%",  term: "60–120 mo", note: "Compare APR to bank",       color: C.primary, noteBg: C.primaryLight, noteStroke: C.primary },
+  { source: "Home equity/HELOC", apr: "7–10%",  term: "Flexible",  note: "Tax deduct. varies",        color: C.blue,    noteBg: C.blueLight,   noteStroke: C.blue   },
+  { source: "Personal loan",     apr: "8–18%",  term: "36–84 mo",  note: "No collateral, fast",       color: C.orange,  noteBg: C.orangeLight,  noteStroke: C.orange },
+  { source: "Utility on-bill",   apr: "Varies", term: "Varies",    note: "Efficiency upgrades only",  color: C.muted,   noteBg: C.panelBg,     noteStroke: C.border },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>HVAC financing options compared by APR and term</title>
+  <desc>
+    Five HVAC financing sources: dealer 0% promo (0%, 12–60 mo, deferred interest risk),
+    contractor loan (6–15%, 60–120 mo), home equity/HELOC (7–10%, flexible),
+    personal loan (8–18%, 36–84 mo), and utility on-bill financing (varies).
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    HVAC financing options compared
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    Source · typical APR · term · key watch-out
+  </text>
+
+  {/* Column headers */}
+  <text x="24"  y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Source</text>
+  <text x="240" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">APR</text>
+  <text x="310" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Term</text>
+  <text x="430" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Watch out for</text>
+
+  {/* Divider under headers */}
+  <line x1="24" y1="78" x2="696" y2="78" stroke={C.border} stroke-width="1" />
+
+  {options.map((o, i) => {
+    const y = 84 + i * 42;
+    return (
+      <g>
+        {/* Row stripe for even rows */}
+        {i % 2 === 0 && (
+          <rect x="16" y={y} width="688" height="38" rx="4" fill={C.white} fill-opacity="0.55" />
+        )}
+
+        {/* Color dot */}
+        <circle cx="36" cy={y + 19} r="5" fill={o.color} />
+
+        {/* Source label */}
+        <text x="50" y={y + 22} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{o.source}</text>
+
+        {/* APR badge */}
+        <rect x="228" y={y + 8} width="64" height="22" rx="6" fill={o.noteBg} stroke={o.noteStroke} stroke-width="1" />
+        <text x="260" y={y + 23} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{o.apr}</text>
+
+        {/* Term */}
+        <text x="310" y={y + 22} fill={C.muted} font-family={FONT} font-size="10.5">{o.term}</text>
+
+        {/* Note */}
+        <text x="430" y={y + 22} fill={C.muted} font-family={FONT} font-size="10" font-style="italic">{o.note}</text>
+      </g>
+    );
+  })}
+</svg>

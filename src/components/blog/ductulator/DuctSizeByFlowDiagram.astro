@@ -1,0 +1,38 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Round duct sizes at 0.10 in.wg/100 ft friction rate — matches post example (400 CFM → ~10" round)
+// Numbers are consistent with standard ductulator lookup tables
+const rows: [string, string, number][] = [
+  ["100 CFM",   '6" round',  90],
+  ["200 CFM",   '8" round', 148],
+  ["400 CFM",  '10" round', 220],
+  ["600 CFM",  '12" round', 292],
+  ["800 CFM",  '14" round', 356],
+  ["1,000 CFM",'16" round', 420],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Round duct size by CFM at 0.10 friction rate</title>
+  <desc>
+    Horizontal bars showing round duct diameter for common airflow values at 0.10 in.wg per 100 ft:
+    100 CFM needs a 6-inch round, 400 CFM a 10-inch, 800 CFM a 14-inch, and 1,000 CFM a 16-inch duct.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Round duct size by airflow (0.10 in.wg/100 ft)</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Standard residential friction rate — the default on any online ductulator</text>
+
+  {rows.map((r, i) => {
+    const y = 74 + i * 38;
+    const barW = r[2] as number;
+    return (
+      <g>
+        <text x="110" y={y + 22} text-anchor="end" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r[0]}</text>
+        <rect x="120" y={y + 6} width={barW} height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={120 + barW + 10} y={y + 23} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,96 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const left = {
+  label: "Manual J",
+  badge: "Residential",
+  badgeColor: C.blue,
+  items: [
+    "ACCA standard",
+    "Fixed family occupancy",
+    "ASHRAE 62.2 ventilation",
+    "Low internal gains",
+    "No zone diversity",
+    "Small commercial: informal use",
+  ],
+};
+
+const right = {
+  label: "Manual N / ASHRAE",
+  badge: "Commercial",
+  badgeColor: C.primary,
+  items: [
+    "ASHRAE Fundamentals based",
+    "Variable / diversified occupancy",
+    "ASHRAE 62.1 — higher CFM",
+    "Lighting, equipment, process loads",
+    "Simultaneous zone diversity",
+    "Required for permits > 5 tons",
+  ],
+};
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Manual J residential vs Manual N commercial load calculation comparison</title>
+  <desc>
+    Side-by-side comparison: Manual J (residential) uses ACCA standards, fixed occupancy, and
+    ASHRAE 62.2; Manual N / ASHRAE commercial methods add diversified occupancy, ASHRAE 62.1 higher
+    ventilation, and internal gains from lighting and equipment.
+  </desc>
+
+  <defs>
+    <marker id="cml-arrow-primary" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Manual J vs Manual N / ASHRAE
+  </text>
+  <text x="24" y="55" fill={C.muted} font-family={FONT} font-size="11">
+    Manual J is residential-only per ACCA — commercial permits require ASHRAE-based methods
+  </text>
+
+  {/* Left column — Manual J */}
+  <rect x="24" y="68" width="318" height="212" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" stroke-opacity="0.55" />
+  <rect x="40" y="80" width="90" height="22" rx="11" fill={C.blue} opacity="0.90" />
+  <text x="85" y="96" text-anchor="middle" fill={C.white} font-family={FONT} font-size="10" font-weight="700">
+    {left.badge}
+  </text>
+  <text x="150" y="96" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">
+    {left.label}
+  </text>
+  {left.items.map((item, i) => (
+    <g>
+      <circle cx="40" cy={122 + i * 26} r="3" fill={C.blue} opacity="0.70" />
+      <text x="52" y={127 + i * 26} fill={C.dark} font-family={FONT} font-size="11">
+        {item}
+      </text>
+    </g>
+  ))}
+
+  {/* VS divider */}
+  <circle cx="360" cy="174" r="18" fill={C.dark} opacity="0.08" />
+  <text x="360" y="179" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+    VS
+  </text>
+
+  {/* Right column — Manual N */}
+  <rect x="378" y="68" width="318" height="212" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" stroke-opacity="0.55" />
+  <rect x="394" y="80" width="90" height="22" rx="11" fill={C.primary} opacity="0.90" />
+  <text x="439" y="96" text-anchor="middle" fill={C.white} font-family={FONT} font-size="10" font-weight="700">
+    {right.badge}
+  </text>
+  <text x="498" y="96" fill={C.dark} font-family={FONT} font-size="13" font-weight="700">
+    {right.label}
+  </text>
+  {right.items.map((item, i) => (
+    <g>
+      <circle cx="394" cy={122 + i * 26} r="3" fill={C.primary} opacity="0.70" />
+      <text x="406" y={127 + i * 26} fill={C.dark} font-family={FONT} font-size="11">
+        {item}
+      </text>
+    </g>
+  ))}
+</svg>

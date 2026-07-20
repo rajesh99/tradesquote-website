@@ -1,0 +1,59 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const zones = [
+  { label: "Open plan",         sub: "kitchen + living",  heads: "1–2 heads",  color: C.primary,  x: 40  },
+  { label: "Bedrooms",          sub: "1 head per room",   heads: "1 head each", color: C.blue,    x: 260 },
+  { label: "Whole home 4+ rms", sub: "multi-zone outdoor", heads: "2–5 heads", color: C.green,    x: 480 },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 230" fill="none" aria-hidden="true">
+  <title>Multi-zone mini split layout guide</title>
+  <desc>
+    Schematic showing one outdoor condenser connecting to multiple indoor heads by zone:
+    open-plan areas use 1–2 heads, each bedroom gets 1 head,
+    and a whole-home setup with 4 or more rooms uses 2–5 heads on a multi-zone outdoor unit.
+  </desc>
+
+  <defs>
+    <marker id="mz-arrow-primary" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+    <marker id="mz-arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.blue} />
+    </marker>
+    <marker id="mz-arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.green} />
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="704" height="214" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Multi-zone layout: one head per zone</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Closed doors block airflow — each closed-off space needs its own head</text>
+
+  {zones.map((z, i) => {
+    const cx = z.x + 100;
+    const markerRef = i === 0 ? "url(#mz-arrow-primary)" : i === 1 ? "url(#mz-arrow-blue)" : "url(#mz-arrow-green)";
+    return (
+      <g>
+        {/* Outdoor unit box */}
+        <rect x={z.x} y="78" width="200" height="46" rx="8" fill={C.white} stroke={z.color} stroke-width="1.8" />
+        <text x={cx} y="97" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{z.label}</text>
+        <text x={cx} y="112" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{z.sub}</text>
+
+        {/* Arrow down */}
+        <line
+          x1={cx} y1="124"
+          x2={cx} y2="151"
+          stroke={z.color} stroke-width="1.8"
+          marker-end={markerRef}
+        />
+
+        {/* Heads badge */}
+        <rect x={z.x + 44} y="155" width="112" height="30" rx="15" fill={z.color} fill-opacity="0.12" stroke={z.color} stroke-width="1.4" />
+        <text x={cx} y="175" text-anchor="middle" fill={z.color} font-family={FONT} font-size="11.5" font-weight="800">{z.heads}</text>
+      </g>
+    );
+  })}
+</svg>

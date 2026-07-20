@@ -1,0 +1,55 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const steps = [
+  { n: "1", head: "System CFM", sub: "~400 CFM / ton" },
+  { n: "2", head: "Allocate CFM", sub: "Per room from Manual J" },
+  { n: "3", head: "Available static", sub: "Blower minus losses" },
+  { n: "4", head: "Longest run", sub: "Trunk + farthest branch" },
+  { n: "5", head: "Friction rate", sub: "Static ÷ run length" },
+  { n: "6", head: "Size each segment", sub: "Ductulator at friction rate" },
+  { n: "7", head: "Verify velocity", sub: "Branch <900 fpm, trunk <700" },
+  { n: "8", head: "Size returns", sub: "100–125% of supply CFM" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Manual D calculation — 8 steps</title>
+  <desc>
+    Eight-step Manual D process: determine system CFM, allocate to rooms, calculate available static,
+    find the longest run, pick friction rate, size each segment, verify velocity, then size returns.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Manual D calculation — 8 steps</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Follow in order — each step feeds the next</text>
+
+  {steps.map((s, i) => {
+    const col = i % 4;
+    const row = Math.floor(i / 4);
+    const x = 20 + col * 172;
+    const y = 72 + row * 110;
+    const isLast = i === steps.length - 1;
+    return (
+      <g>
+        <rect x={x} y={y} width="156" height="90" rx="9" fill={isLast ? C.primaryLight : C.white} stroke={isLast ? C.primary : C.border} stroke-width="1.4" />
+        <circle cx={x + 20} cy={y + 20} r="14" fill={C.primary} />
+        <text x={x + 20} y={y + 25} text-anchor="middle" fill={C.white} font-family={FONT} font-size="12" font-weight="700">{s.n}</text>
+        <text x={x + 78} y={y + 50} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{s.head}</text>
+        <text x={x + 78} y={y + 68} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{s.sub}</text>
+        {col < 3 && (
+          <path d={`M${x + 156} ${y + 45} l 14 0`} stroke={C.muted} stroke-width="1.4" fill="none" marker-end="url(#mdcs-arr)" />
+        )}
+        {col === 3 && row === 0 && (
+          <path d={`M${x + 78} ${y + 90} l 0 20`} stroke={C.muted} stroke-width="1.4" fill="none" />
+        )}
+      </g>
+    );
+  })}
+
+  <defs>
+    <marker id="mdcs-arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.muted} />
+    </marker>
+  </defs>
+</svg>

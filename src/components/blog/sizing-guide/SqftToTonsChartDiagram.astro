@@ -1,0 +1,37 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Square footage → recommended tonnage based on the post's 20 BTU/sqft moderate-climate rule
+// 1 ton = 12,000 BTU; ranges reflect climate/insulation variation noted in the post
+const rows: [string, string, number, string][] = [
+  ["1,000 sq ft",  "1.5–2 tons",   175, C.primary],
+  ["1,500 sq ft",  "2–2.5 tons",   220, C.primary],
+  ["2,000 sq ft",  "3–3.5 tons",   265, C.blue],
+  ["2,500 sq ft",  "3.5–4 tons",   310, C.blue],
+  ["3,000 sq ft",  "4–5 tons",     355, C.blue],
+  ["3,500 sq ft",  "5–6 tons",     400, C.muted],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>Square footage to AC tonnage chart</title>
+  <desc>
+    Approximate AC tonnage by home size in a moderate climate at 20 BTU per square foot:
+    1,000 sq ft needs 1.5–2 tons, 2,000 sq ft needs 3–3.5 tons, and 3,500 sq ft needs 5–6 tons.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Square footage → AC tonnage (moderate climate)</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Based on 20 BTU/sq ft rule · adjust +10–20% for hot climates, high ceilings, or poor insulation</text>
+
+  {rows.map((r, i) => {
+    const y = 74 + i * 36;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r[0]}</text>
+        <rect x="148" y={y + 4} width={r[2]} height="22" rx="6" fill={r[3]} fill-opacity="0.18" stroke={r[3]} stroke-width="1.3" />
+        <text x={148 + r[2] + 10} y={y + 20} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

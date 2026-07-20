@@ -1,0 +1,38 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Moderate-climate midpoints from the post's BTU room size chart
+const rows = [
+  ["100 – 150 sq ft", "5,000 – 6,000 BTU", 160],
+  ["150 – 250 sq ft", "6,000 – 8,000 BTU", 220],
+  ["250 – 350 sq ft", "8,000 – 10,000 BTU", 290],
+  ["350 – 450 sq ft", "10,000 – 12,000 BTU", 360],
+  ["450 – 550 sq ft", "12,000 – 14,000 BTU", 430],
+  ["550 – 700 sq ft", "14,000 – 18,000 BTU", 520],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>BTU room size chart — moderate climate</title>
+  <desc>
+    Horizontal bar chart showing recommended BTU ranges by room size in a moderate climate:
+    100–150 sq ft needs 5,000–6,000 BTU; 150–250 sq ft needs 6,000–8,000 BTU;
+    250–350 needs 8,000–10,000; 350–450 needs 10,000–12,000;
+    450–550 needs 12,000–14,000; 550–700 needs 14,000–18,000 BTU.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">BTU by room size — moderate climate</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Standard ratings: 5k · 6k · 8k · 10k · 12k · 14k · 18k BTU</text>
+
+  {rows.map((r, i) => {
+    const y = 72 + i * 40;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r[0]}</text>
+        <rect x="172" y={y + 6} width={r[2] as number} height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={172 + (r[2] as number) + 10} y={y + 23} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

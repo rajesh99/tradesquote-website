@@ -1,0 +1,47 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const rows = [
+  { size: "1,200 sq ft", btu: 24000, btuLabel: "24,000 BTU", tons: "2.0 ton" },
+  { size: "1,800 sq ft", btu: 36000, btuLabel: "36,000 BTU", tons: "3.0 ton" },
+  { size: "2,400 sq ft", btu: 48000, btuLabel: "48,000 BTU", tons: "4.0 ton" },
+  { size: "3,000 sq ft", btu: 60000, btuLabel: "60,000 BTU", tons: "5.0 ton" },
+];
+
+const scaleMax = 60000;
+const barLeft = 130;
+const barArea = 410;
+const toW = (v: number) => (v / scaleMax) * barArea;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Quick cooling-load estimate by home size</title>
+  <desc>
+    Ballpark cooling load by home size at roughly 20 BTU per square foot: 1,200 sq ft is about 24,000 BTU
+    (2 tons), 1,800 about 36,000 (3 tons), 2,400 about 48,000 (4 tons), and 3,000 about 60,000 (5 tons).
+    Sanity checks only — not a substitute for Manual J.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Quick cooling-load estimate</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Moderate climate, ~20 BTU/sq ft — a sanity check, not a Manual J substitute</text>
+
+  {[0, 15000, 30000, 45000, 60000].map((v) => (
+    <g>
+      <line x1={barLeft + toW(v)} y1="68" x2={barLeft + toW(v)} y2="214" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+      <text x={barLeft + toW(v)} y="230" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{v === 0 ? "0" : `${v / 1000}k`}</text>
+    </g>
+  ))}
+
+  {rows.map((r, i) => {
+    const y = 78 + i * 34;
+    return (
+      <g>
+        <text x="24" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.size}</text>
+        <rect x={barLeft} y={y + 2} width={toW(r.btu)} height="22" rx="5" fill={C.primary} opacity="0.85" />
+        <text x={barLeft + toW(r.btu) - 8} y={y + 17} text-anchor="end" fill={C.white} font-family={FONT} font-size="10" font-weight="700">{r.btuLabel}</text>
+        <text x={barLeft + toW(r.btu) + 8} y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.tons}</text>
+      </g>
+    );
+  })}
+</svg>

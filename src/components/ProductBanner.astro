@@ -1,0 +1,58 @@
+<section
+  id="product"
+  class="w-full py-20 sm:py-24 px-6 bg-gray-50 border-t border-gray-100"
+  aria-labelledby="product-banner-heading"
+>
+  <div class="max-w-6xl mx-auto flex flex-col items-center gap-10 sm:gap-12">
+    <div class="flex flex-col items-center gap-3 text-center max-w-2xl">
+      <h2
+        id="product-banner-heading"
+        class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight"
+      >
+        Built for modern trade businesses.
+      </h2>
+      <p class="text-gray-500 text-lg leading-relaxed">
+        Quote from the job site or the office — clear estimates your clients can trust.
+      </p>
+    </div>
+
+    <div class="product-banner-reveal w-full opacity-0 translate-y-4 transition-[opacity,transform] duration-700 ease-out">
+      <picture>
+        <source srcset="/tq_banner_2.webp" type="image/webp" />
+        <img
+          src="/tq_banner_2.png"
+          alt="TradesQuote product banner showing AI quoting tools on laptop and phone with trade equipment"
+          width="6000"
+          height="2000"
+          sizes="(min-width: 1152px) 1152px, 100vw"
+          class="block w-full h-auto object-contain object-center bg-white"
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  </div>
+</section>
+
+<script>
+  const reveal = document.querySelector(".product-banner-reveal");
+  if (reveal) {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      reveal.classList.remove("opacity-0", "translate-y-4");
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove("opacity-0", "translate-y-4");
+              observer.disconnect();
+            }
+          }
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(reveal);
+    }
+  }
+</script>

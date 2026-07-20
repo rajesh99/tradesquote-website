@@ -1,0 +1,63 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Rectangular equivalents — from "Rectangular Duct Equivalent" section
+// Formula: Area = π × (d/2)²; post example: 10 in round (78.5 sq in) ≈ 8×10 rect (80 sq in)
+const examples: [string, string, string, string][] = [
+  ["6 in round",  "28.3 sq in", "4 × 7 rect",  "28 sq in"],
+  ["8 in round",  "50.3 sq in", "5 × 10 rect", "50 sq in"],
+  ["10 in round", "78.5 sq in", "8 × 10 rect", "80 sq in"],
+  ["12 in round", "113 sq in",  "9 × 13 rect", "117 sq in"],
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>Round to rectangular duct equivalents by cross-sectional area</title>
+  <desc>
+    Conversion table matching round duct sizes to rectangular equivalents by equal cross-sectional area:
+    6-inch round (28.3 sq in) ≈ 4×7 rectangular, 8-inch round (50.3 sq in) ≈ 5×10,
+    10-inch round (78.5 sq in) ≈ 8×10, 12-inch round (113 sq in) ≈ 9×13.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Round ↔ Rectangular equivalents</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Matched by equal cross-sectional area (π × r²) — use when ceiling space limits round duct</text>
+
+  <!-- Column headers -->
+  <text x="36"  y="76" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="700">ROUND DUCT</text>
+  <text x="200" y="76" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="700">AREA</text>
+  <text x="300" y="76" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="700">≈ RECTANGULAR</text>
+  <text x="530" y="76" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="700">AREA</text>
+
+  <!-- Divider line -->
+  <line x1="24" y1="82" x2="696" y2="82" stroke={C.border} stroke-width="1" />
+
+  {examples.map(([round, roundArea, rect, rectArea], i) => {
+    const y = 92 + i * 46;
+    const isEven = i % 2 === 0;
+    return (
+      <g>
+        {isEven && <rect x="24" y={y - 2} width="672" height="40" rx="6" fill={C.primaryLight} fill-opacity="0.45" />}
+
+        <!-- Round duct pill -->
+        <rect x="30" y={y + 4} width="120" height="26" rx="13" fill={C.primaryLight} stroke={C.primary} stroke-width="1.3" />
+        <text x="90" y={y + 21} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{round}</text>
+
+        <text x="200" y={y + 21} fill={C.muted} font-family={FONT} font-size="11">{roundArea}</text>
+
+        <!-- ≈ symbol -->
+        <text x="270" y={y + 22} fill={C.primary} font-family={FONT} font-size="16" font-weight="700">≈</text>
+
+        <!-- Rect duct pill -->
+        <rect x="296" y={y + 4} width="140" height="26" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1.3" />
+        <text x="366" y={y + 21} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{rect}</text>
+
+        <text x="530" y={y + 21} fill={C.muted} font-family={FONT} font-size="11">{rectArea}</text>
+      </g>
+    );
+  })}
+
+  <!-- Formula note at bottom -->
+  <rect x="24" y="262" width="672" height="14" rx="4" fill={C.border} fill-opacity="0.3" />
+  <text x="360" y="273" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">Formula: Area = π × (diameter ÷ 2)²  — match areas to find nearest rectangular size</text>
+</svg>

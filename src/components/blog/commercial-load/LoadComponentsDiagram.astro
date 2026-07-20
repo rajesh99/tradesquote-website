@@ -1,0 +1,52 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Six commercial load components from post section "Key Commercial Load Components"
+const components = [
+  { num: "1", label: "Envelope load",     detail: "Walls, roof, windows",             color: C.blue,    bg: C.blueLight },
+  { num: "2", label: "Occupant load",     detail: "250–400 BTU/hr per person",        color: C.primary, bg: C.primaryLight },
+  { num: "3", label: "Lighting load",     detail: "1–3 W/sq ft → BTU/hr",            color: C.primary, bg: C.primaryLight },
+  { num: "4", label: "Equipment load",    detail: "Computers, kitchen, machinery",    color: C.orange,  bg: C.orangeLight },
+  { num: "5", label: "Ventilation load",  detail: "Outdoor air per ASHRAE 62.1",      color: C.blue,    bg: C.blueLight },
+  { num: "6", label: "Infiltration",      detail: "Varies by construction tightness", color: C.muted,   bg: C.panelBg },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 270" fill="none" aria-hidden="true">
+  <title>Six key commercial HVAC load components</title>
+  <desc>
+    The six components of a commercial load calculation: envelope, occupants, lighting, equipment plug
+    loads, ventilation outdoor air, and infiltration.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="254" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Six commercial load components
+  </text>
+  <text x="24" y="55" fill={C.muted} font-family={FONT} font-size="11">
+    Commercial adds internal gains and higher ventilation rates that residential Manual J ignores
+  </text>
+
+  {components.map((c, i) => {
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    const x = 24 + col * 228;
+    const y = 72 + row * 88;
+    return (
+      <g>
+        <rect x={x} y={y} width="212" height="74" rx="8" fill={c.bg} stroke={C.border} stroke-width="1.3" />
+        {/* Number circle */}
+        <circle cx={x + 20} cy={y + 20} r="12" fill={c.color} opacity="0.90" />
+        <text x={x + 20} y={y + 25} text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="800">
+          {c.num}
+        </text>
+        <text x={x + 40} y={y + 24} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">
+          {c.label}
+        </text>
+        <text x={x + 12} y={y + 54} fill={C.muted} font-family={FONT} font-size="10.5">
+          {c.detail}
+        </text>
+      </g>
+    );
+  })}
+</svg>

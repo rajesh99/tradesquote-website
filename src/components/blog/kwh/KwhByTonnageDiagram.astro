@@ -1,0 +1,126 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// kWh/hr at full load: [tons, seer13, seer15, seer18]
+const rows = [
+  [2, 1.85, 1.60, 1.33],
+  [3, 2.77, 2.40, 2.00],
+  [4, 3.69, 3.20, 2.67],
+  [5, 4.62, 4.00, 3.33],
+];
+
+const tiers = [
+  { label: "SEER2 13", color: C.orange },
+  { label: "SEER2 15", color: C.blue },
+  { label: "SEER2 18", color: C.primary },
+];
+
+const scaleMax = 5.0;
+const barLeft = 120;
+const barAreaW = 510;
+const toW = (v: number) => (v / scaleMax) * barAreaW;
+
+// Each tonnage group: 3 bars + gap between groups
+const groupH = 30;   // height per bar row
+const barH = 16;     // actual bar height
+const groupPad = 14; // extra gap between tonnage groups
+const startY = 76;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" fill="none" aria-hidden="true">
+  <title>kWh per hour by tonnage and SEER2 rating</title>
+  <desc>
+    Grouped horizontal bars showing kWh drawn per hour at full load for 2-ton through 5-ton systems
+    across SEER2 13, 15, and 18. Higher SEER2 means fewer kWh for the same cooling output.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="324" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    kWh per hour at full load — by tonnage and SEER2
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    Higher SEER2 = fewer kWh for the same BTU output
+  </text>
+
+  {/* Scale lines */}
+  {[0, 1, 2, 3, 4, 5].map((v) => (
+    <g>
+      <line
+        x1={barLeft + toW(v)}
+        y1="66"
+        x2={barLeft + toW(v)}
+        y2="306"
+        stroke={C.border}
+        stroke-width="1"
+        stroke-dasharray="3 3"
+      />
+      <text
+        x={barLeft + toW(v)}
+        y="320"
+        text-anchor="middle"
+        fill={C.muted}
+        font-family={FONT}
+        font-size="9"
+      >
+        {v}
+      </text>
+    </g>
+  ))}
+  <text x={barLeft + toW(2.5)} y="332" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">kWh/hr</text>
+
+  {rows.map((row, gi) => {
+    const groupStartY = startY + gi * (3 * groupH + groupPad);
+    return (
+      <g>
+        {/* Tonnage label */}
+        <text
+          x="24"
+          y={groupStartY + groupH + 2}
+          fill={C.dark}
+          font-family={FONT}
+          font-size="12"
+          font-weight="700"
+        >
+          {row[0]} ton
+        </text>
+
+        {tiers.map((tier, ti) => {
+          const y = groupStartY + ti * groupH;
+          const val = row[ti + 1] as number;
+          const w = toW(val);
+          return (
+            <g>
+              <rect
+                x={barLeft}
+                y={y + (groupH - barH) / 2}
+                width={w}
+                height={barH}
+                rx="5"
+                fill={tier.color}
+                opacity="0.82"
+              />
+              <text
+                x={barLeft + w + 5}
+                y={y + groupH / 2 + 4}
+                fill={C.dark}
+                font-family={FONT}
+                font-size="10"
+                font-weight="700"
+              >
+                {val.toFixed(2)}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  })}
+
+  {/* Legend */}
+  {tiers.map((tier, i) => (
+    <g>
+      <rect x={24 + i * 110} y="296" width="12" height="12" rx="3" fill={tier.color} opacity="0.85" />
+      <text x={40 + i * 110} y="307" fill={C.muted} font-family={FONT} font-size="10">{tier.label}</text>
+    </g>
+  ))}
+</svg>

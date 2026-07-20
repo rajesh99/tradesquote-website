@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const steps = [
+  { label: "Tons of AC", sub: "system capacity", color: C.blue, light: C.blueLight },
+  { label: "× 400", sub: "CFM/ton rule", color: C.primary, light: C.primaryLight },
+  { label: "= Total CFM", sub: "3-ton → 1,200 CFM", color: C.green, light: C.greenLight },
+];
+
+const altSteps = [
+  { label: "BTU/hr load", sub: "room or system", color: C.blue, light: C.blueLight },
+  { label: "÷ (1.08 × ΔT)", sub: "ΔT ≈ 18–22°F", color: C.orange, light: C.orangeLight },
+  { label: "= CFM needed", sub: "e.g. 36,000 ÷ 21.6 = 1,667", color: C.green, light: C.greenLight },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+  <title>Two core CFM formulas: tonnage method and BTU/heat method</title>
+  <desc>
+    Top row: tons times 400 equals total CFM (a 3-ton system = 1,200 CFM).
+    Bottom row: BTU/hr divided by (1.08 times delta-T) equals CFM needed.
+  </desc>
+
+  <defs>
+    <marker id="cfm-flow-arrow-primary" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.primary} />
+    </marker>
+    <marker id="cfm-flow-arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill={C.blue} />
+    </marker>
+  </defs>
+
+  <rect x="8" y="8" width="704" height="224" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Core CFM formulas</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Two paths to the same answer — use whichever input you have</text>
+
+  {/* Method label column */}
+  <text x="24" y="110" fill={C.muted} font-family={FONT} font-size="10" font-weight="700">TONNAGE</text>
+  <text x="24" y="178" fill={C.muted} font-family={FONT} font-size="10" font-weight="700">BTU/ΔT</text>
+
+  {/* Top row */}
+  {steps.map((s, i) => {
+    const x = 80 + i * 200;
+    return (
+      <g>
+        <rect x={x} y="74" width="170" height="56" rx="9" fill={s.light} stroke={s.color} stroke-width="1.4" />
+        <text x={x + 85} y="100" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{s.label}</text>
+        <text x={x + 85} y="118" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{s.sub}</text>
+        {i < steps.length - 1 && (
+          <path d={`M${x + 170} 102 l 14 0 m -6 -4 l 6 4 l -6 4`} stroke={C.primary} stroke-width="1.8" fill="none" />
+        )}
+      </g>
+    );
+  })}
+
+  {/* Bottom row */}
+  {altSteps.map((s, i) => {
+    const x = 80 + i * 200;
+    return (
+      <g>
+        <rect x={x} y="142" width="170" height="56" rx="9" fill={s.light} stroke={s.color} stroke-width="1.4" />
+        <text x={x + 85} y="168" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{s.label}</text>
+        <text x={x + 85} y="186" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{s.sub}</text>
+        {i < altSteps.length - 1 && (
+          <path d={`M${x + 170} 170 l 14 0 m -6 -4 l 6 4 l -6 4`} stroke={C.blue} stroke-width="1.8" fill="none" />
+        )}
+      </g>
+    );
+  })}
+</svg>
