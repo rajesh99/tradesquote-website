@@ -34,28 +34,6 @@ const contactCollection = defineCollection({
   }),
 });
 
-// Authors collection schema
-const authorsCollection = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/authors" }),
-  schema: z.object({
-    title: z.string(),
-    meta_title: z.string().optional(),
-    image: z.string().optional(),
-    description: z.string().optional(),
-    social: z
-      .object({
-        facebook: z.string().url().optional(),
-        x: z.string().url().optional(),
-        instagram: z.string().url().optional(),
-        linkedin: z.string().url().optional(),
-        github: z.string().url().optional(),
-        website: z.string().url().optional(),
-        youtube: z.string().url().optional(),
-      })
-      .optional(),
-  }),
-});
-
 // Posts collection schema
 const postsCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "src/content/posts" }),
@@ -66,7 +44,6 @@ const postsCollection = defineCollection({
     date: z.coerce.date().optional(),
     image: z.string().optional(),
     categories: z.array(z.string()).default(() => ["others"]),
-    authors: z.array(z.string()).default(() => ["Admin"]),
     tags: z.array(z.string()).default(() => ["others"]),
     draft: z.boolean().optional(),
   }),
@@ -90,6 +67,5 @@ export const collections = {
   posts: postsCollection,
   about: aboutCollection,
   contact: contactCollection,
-  authors: authorsCollection,
   pages: pagesCollection,
 };
