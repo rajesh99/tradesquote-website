@@ -1,0 +1,63 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const left = {
+  label: "Rule of Thumb",
+  color: C.orange,
+  lightColor: C.orangeLight,
+  pros: ["Fast estimate", "Good for budgeting", "±20% accuracy"],
+  cons: ["Ignores climate zone", "Ignores duct losses", "Not for final sizing"],
+};
+const right = {
+  label: "Manual J (ACCA)",
+  color: C.primary,
+  lightColor: C.primaryLight,
+  pros: ["Design-temp inputs", "Accounts for envelope", "Accepted by code & mfr"],
+  cons: ["Takes 1–2 hours", "Requires a contractor", "Costs $150–$400+"],
+};
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>Rule of thumb versus Manual J load calculation comparison</title>
+  <desc>
+    Side-by-side comparison: rule-of-thumb sizing is fast and useful for budgeting but is accurate
+    only to about ±20% and ignores duct losses. Manual J is code-accepted and accurate but requires
+    a contractor and costs extra.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="360" y="36" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Rule of Thumb vs. Manual J</text>
+  <text x="360" y="56" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="11">Choose the method that matches your decision</text>
+
+  <!-- Left panel: Rule of Thumb -->
+  <rect x="24" y="68" width="320" height="206" rx="10" fill={left.lightColor} stroke={left.color} stroke-width="1.5" stroke-opacity="0.55" />
+  <text x="184" y="94" text-anchor="middle" fill={left.color} font-family={FONT} font-size="13" font-weight="800">{left.label}</text>
+
+  <text x="44" y="118" fill={C.green} font-family={FONT} font-size="11" font-weight="700">✓ Works for</text>
+  {left.pros.map((p, i) => (
+    <text x="48" y={136 + i * 18} fill={C.dark} font-family={FONT} font-size="11">{p}</text>
+  ))}
+
+  <text x="44" y="214" fill={C.red} font-family={FONT} font-size="11" font-weight="700">✗ Limitations</text>
+  {left.cons.map((c, i) => (
+    <text x="48" y={232 + i * 18} fill={C.muted} font-family={FONT} font-size="11">{c}</text>
+  ))}
+
+  <!-- VS label -->
+  <circle cx="360" cy="172" r="20" fill={C.dark} fill-opacity="0.08" />
+  <text x="360" y="178" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">VS</text>
+
+  <!-- Right panel: Manual J -->
+  <rect x="376" y="68" width="320" height="206" rx="10" fill={right.lightColor} stroke={right.color} stroke-width="1.5" stroke-opacity="0.55" />
+  <text x="536" y="94" text-anchor="middle" fill={right.color} font-family={FONT} font-size="13" font-weight="800">{right.label}</text>
+
+  <text x="396" y="118" fill={C.green} font-family={FONT} font-size="11" font-weight="700">✓ Works for</text>
+  {right.pros.map((p, i) => (
+    <text x="400" y={136 + i * 18} fill={C.dark} font-family={FONT} font-size="11">{p}</text>
+  ))}
+
+  <text x="396" y="214" fill={C.red} font-family={FONT} font-size="11" font-weight="700">✗ Limitations</text>
+  {right.cons.map((c, i) => (
+    <text x="400" y={232 + i * 18} fill={C.muted} font-family={FONT} font-size="11">{c}</text>
+  ))}
+</svg>

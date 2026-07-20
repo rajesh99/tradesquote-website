@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Repair cost ranges from the post's table — low/high/color
+const repairs = [
+  { label: "Service call / diagnostic", low: 75,   high: 200,  color: C.muted  },
+  { label: "Capacitor replacement",     low: 150,  high: 400,  color: C.primary },
+  { label: "Contactor replacement",     low: 150,  high: 350,  color: C.primary },
+  { label: "Refrigerant recharge",      low: 200,  high: 600,  color: C.blue    },
+  { label: "Blower motor",              low: 400,  high: 1500, color: C.blue    },
+  { label: "Control board",             low: 300,  high: 800,  color: C.orange  },
+  { label: "Thermostat (installed)",    low: 150,  high: 400,  color: C.green   },
+  { label: "Compressor replacement",    low: 1500, high: 3500, color: C.red     },
+  { label: "Heat exchanger (furnace)",  low: 1500, high: 3500, color: C.red     },
+];
+
+const scaleMax = 3500;
+const barLeft = 220;
+const barWidth = 460;
+const toX = (v: number) => barLeft + (v / scaleMax) * barWidth;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 370" fill="none" aria-hidden="true">
+  <title>Common HVAC repair cost ranges</title>
+  <desc>
+    Horizontal bars showing typical installed cost ranges for nine common HVAC repairs. Service calls
+    run $75–$200; capacitor and contactor replacements $150–$400; refrigerant recharge $200–$600;
+    blower motor $400–$1,500; control board $300–$800; thermostat $150–$400; compressor and heat
+    exchanger replacements $1,500–$3,500.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="354" rx="12" fill={C.panelBg} stroke={C.border} />
+
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Common HVAC repair cost ranges
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    Installed price including parts and labor · 2026 typical ranges
+  </text>
+
+  {/* Scale gridlines */}
+  {[0, 1000, 2000, 3000].map((v) => (
+    <g>
+      <line x1={toX(v)} y1="65" x2={toX(v)} y2="338" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+      <text x={toX(v)} y="352" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">
+        ${v === 0 ? "0" : `${v / 1000}k`}
+      </text>
+    </g>
+  ))}
+
+  {repairs.map((r, i) => {
+    const y = 72 + i * 30;
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="600">
+          {r.label}
+        </text>
+        <rect
+          x={toX(r.low)}
+          y={y}
+          width={toX(r.high) - toX(r.low)}
+          height="18"
+          rx="4"
+          fill={r.color}
+          opacity="0.82"
+        />
+        <text x={toX(r.low) - 4} y={y + 13} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8">
+          ${r.low}
+        </text>
+        <text x={toX(r.high) + 4} y={y + 13} fill={C.muted} font-family={FONT} font-size="8">
+          ${r.high >= 1000 ? `${(r.high / 1000).toFixed(1)}k` : r.high}
+        </text>
+      </g>
+    );
+  })}
+</svg>

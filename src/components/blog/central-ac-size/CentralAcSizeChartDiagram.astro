@@ -1,0 +1,43 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const rows = [
+  { sqft: "900 – 1,200", tons: "1.5 – 2.0 ton", btu: "18 – 24k BTU", mid: 21000 },
+  { sqft: "1,200 – 1,600", tons: "2.0 – 2.5 ton", btu: "24 – 30k BTU", mid: 27000 },
+  { sqft: "1,600 – 2,000", tons: "2.5 – 3.0 ton", btu: "30 – 36k BTU", mid: 33000 },
+  { sqft: "2,000 – 2,400", tons: "3.0 – 3.5 ton", btu: "36 – 42k BTU", mid: 39000 },
+  { sqft: "2,400 – 3,000", tons: "3.5 – 4.5 ton", btu: "42 – 54k BTU", mid: 48000 },
+  { sqft: "3,000 – 3,500", tons: "4.5 – 5.0 ton", btu: "54 – 60k BTU", mid: 57000 },
+];
+
+const scaleMax = 60000;
+const barLeft = 124;
+const barArea = 300;
+const toW = (v: number) => (v / scaleMax) * barArea;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>Central AC size by square footage</title>
+  <desc>
+    Approximate central AC size by home square footage: 900–1,200 sq ft needs 1.5–2.0 tons (18–24k BTU),
+    scaling up to 3,000–3,500 sq ft at 4.5–5.0 tons (54–60k BTU). Adjust up for hot climates and poor
+    insulation.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Central AC size by square footage</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A starting point — adjust for climate, insulation, and ceiling height</text>
+
+  {rows.map((r, i) => {
+    const y = 72 + i * 37;
+    return (
+      <g>
+        <text x="24" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.sqft}</text>
+        <text x="24" y={y + 29} fill={C.muted} font-family={FONT} font-size="8.5">sq ft</text>
+        <rect x={barLeft} y={y + 4} width={toW(r.mid)} height="20" rx="5" fill={C.primary} opacity="0.85" />
+        <text x={barLeft + toW(r.mid) + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{r.tons}</text>
+        <text x={barLeft + toW(r.mid) + 8} y={y + 27} fill={C.muted} font-family={FONT} font-size="9">{r.btu}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,86 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const cols = [
+  {
+    title: "Physical Ductulator",
+    badge: "Slide rule wheel",
+    badgeColor: C.muted,
+    pros: ["Fast in the field", "No battery / no phone"],
+    cons: ["One friction rate at a time", "No rectangular equivalents"],
+    footerLabel: "Best for: quick single-segment field check",
+  },
+  {
+    title: "Online Ductulator",
+    badge: "Free · browser-based",
+    badgeColor: C.primary,
+    pros: ["Round + rectangular sizing", "Multiple friction rates fast"],
+    cons: ["Needs phone or laptop", "Single segment only"],
+    footerLabel: "Best for: design-phase sizing, rectangular runs",
+  },
+  {
+    title: "McQuay Duct Sizer",
+    badge: "Desktop app",
+    badgeColor: C.blue,
+    pros: ["Fitting loss libraries", "Full Manual D integration"],
+    cons: ["Paid license for full features", "Steeper learning curve"],
+    footerLabel: "Best for: commercial / whole-system Manual D",
+  },
+];
+
+const colW = 218;
+const gutter = 16;
+const startX = 20;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>Ductulator tool comparison: physical wheel vs online calculator vs McQuay</title>
+  <desc>
+    Side-by-side comparison of a physical ductulator wheel, an online ductulator, and McQuay duct sizer —
+    covering pros, cons, and best use cases for each tool.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Duct sizing tool comparison</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">Physical wheel · Online ductulator · McQuay desktop — choose by use case</text>
+
+  {cols.map((col, i) => {
+    const x = startX + i * (colW + gutter);
+    return (
+      <g>
+        <!-- Card -->
+        <rect x={x} y="68" width={colW} height="226" rx="9" fill={C.white} stroke={C.border} stroke-width="1.3" />
+
+        <!-- Title bar -->
+        <rect x={x} y="68" width={colW} height="36" rx="9" fill={col.badgeColor} fill-opacity="0.12" />
+        <rect x={x} y="86" width={colW} height="18" fill={col.badgeColor} fill-opacity="0.12" />
+        <text x={x + colW / 2} y="92" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{col.title}</text>
+
+        <!-- Badge -->
+        <rect x={x + 10} y="112" width={colW - 20} height="20" rx="10" fill={col.badgeColor} fill-opacity="0.15" stroke={col.badgeColor} stroke-width="1" />
+        <text x={x + colW / 2} y="126" text-anchor="middle" fill={col.badgeColor} font-family={FONT} font-size="9.5" font-weight="700">{col.badge}</text>
+
+        <!-- Pros -->
+        {col.pros.map((p, j) => (
+          <g>
+            <circle cx={x + 18} cy={152 + j * 22} r="5" fill={C.green} fill-opacity="0.20" />
+            <text x={x + 18} cy={152 + j * 22} text-anchor="middle" fill={C.green} font-family={FONT} font-size="9" font-weight="700" y={156 + j * 22}>✓</text>
+            <text x={x + 30} y={157 + j * 22} fill={C.dark} font-family={FONT} font-size="10">{p}</text>
+          </g>
+        ))}
+
+        <!-- Cons -->
+        {col.cons.map((c, j) => (
+          <g>
+            <circle cx={x + 18} cy={200 + j * 22} r="5" fill={C.orange} fill-opacity="0.20" />
+            <text x={x + 18} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10" font-weight="700" y={204 + j * 22}>–</text>
+            <text x={x + 30} y={205 + j * 22} fill={C.muted} font-family={FONT} font-size="10">{c}</text>
+          </g>
+        ))}
+
+        <!-- Footer label -->
+        <text x={x + colW / 2} y="284" text-anchor="middle" fill={col.badgeColor} font-family={FONT} font-size="9" font-weight="600">{col.footerLabel}</text>
+      </g>
+    );
+  })}
+</svg>

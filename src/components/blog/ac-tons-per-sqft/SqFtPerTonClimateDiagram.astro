@@ -1,0 +1,41 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Sq ft per ton by climate — post table data
+const climates = [
+  { label: "Hot / Humid (South, SW)", range: "450 – 550 sq ft/ton", bar: 450, barMax: 800, color: C.orange, note: "more tons needed" },
+  { label: "Moderate (Midwest, Mid-Atlantic)", range: "550 – 650 sq ft/ton", bar: 600, barMax: 800, color: C.primary, note: "middle ground" },
+  { label: "Cool (North, Pacific NW)", range: "650 – 800 sq ft/ton", bar: 760, barMax: 800, color: C.blue, note: "fewer tons needed" },
+];
+
+const barLeft = 290;
+const barAreaWidth = 380;
+const toW = (v: number, max: number) => (v / max) * barAreaWidth;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+  <title>Sq ft per ton by climate zone</title>
+  <desc>
+    Horizontal bars showing square feet per ton by climate: hot/humid climates cover 450–550 sq ft per ton
+    (more tons needed), moderate climates 550–650 sq ft per ton, and cool climates 650–800 sq ft per ton
+    (fewer tons needed).
+  </desc>
+
+  <rect x="8" y="8" width="704" height="224" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Sq ft per ton by climate zone</text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">More sq ft per ton = fewer tons needed for the same home size</text>
+
+  {climates.map((c, i) => {
+    const y = 74 + i * 54;
+    const w = toW(c.bar, c.barMax);
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{c.label}</text>
+        <rect x={barLeft} y={y} width={w} height="24" rx="6" fill={c.color} opacity="0.22" />
+        <rect x={barLeft} y={y} width={w} height="24" rx="6" fill="none" stroke={c.color} stroke-width="1.4" />
+        <text x={barLeft + 8} y={y + 16} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{c.range}</text>
+        <text x={barLeft + w + 8} y={y + 16} fill={C.muted} font-family={FONT} font-size="10">← {c.note}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,95 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const factors = [
+  {
+    icon: "★",
+    label: "SEER2 rating",
+    effect: "Higher SEER2 = fewer kWh per BTU removed",
+    color: C.primary,
+    bg: C.primaryLight,
+  },
+  {
+    icon: "☁",
+    label: "Thermostat setpoint",
+    effect: "Each degree lower adds ~3–5% runtime",
+    color: C.blue,
+    bg: C.blueLight,
+  },
+  {
+    icon: "⬡",
+    label: "Insulation and sealing",
+    effect: "Poor envelope = longer run times",
+    color: C.orange,
+    bg: C.orangeLight,
+  },
+  {
+    icon: "▲",
+    label: "Duct leaks",
+    effect: "15–25% capacity lost in unconditioned spaces",
+    color: C.red,
+    bg: C.redLight,
+  },
+  {
+    icon: "✦",
+    label: "Maintenance",
+    effect: "Dirty coils and filters raise kWh draw",
+    color: C.green,
+    bg: C.greenLight,
+  },
+];
+
+const rowH = 48;
+const totalH = 8 + 16 + 28 + 16 + factors.length * rowH + 20;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 720 ${totalH}`} fill="none" aria-hidden="true">
+  <title>Factors that affect real AC kWh usage</title>
+  <desc>
+    Five factors that change how many kilowatt-hours an air conditioner actually uses: SEER2 rating,
+    thermostat setpoint, insulation and air sealing, duct leaks, and maintenance.
+  </desc>
+
+  <rect x="8" y="8" width="704" height={totalH - 16} rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    What affects real kWh usage
+  </text>
+  <text x="24" y="56" fill={C.muted} font-family={FONT} font-size="11">
+    These factors raise or lower how many kWh your AC actually draws per hour
+  </text>
+
+  {factors.map((f, i) => {
+    const y = 68 + i * rowH;
+    return (
+      <g>
+        {/* Row background on hover-alt rows */}
+        {i % 2 === 1 && (
+          <rect x="16" y={y} width="688" height={rowH - 2} rx="6" fill={C.white} fill-opacity="0.6" />
+        )}
+        {/* Color icon pill */}
+        <rect x="24" y={y + 8} width="30" height="30" rx="8" fill={f.bg} />
+        <text
+          x="39"
+          y={y + 28}
+          text-anchor="middle"
+          fill={f.color}
+          font-family={FONT}
+          font-size="14"
+          font-weight="700"
+        >
+          {f.icon}
+        </text>
+        {/* Label */}
+        <text x="66" y={y + 20} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">
+          {f.label}
+        </text>
+        {/* Effect text */}
+        <text x="66" y={y + 36} fill={C.muted} font-family={FONT} font-size="10.5">
+          {f.effect}
+        </text>
+        {/* Accent dot on left edge */}
+        <rect x="8" y={y + 12} width="4" height="22" rx="2" fill={f.color} opacity="0.55" />
+      </g>
+    );
+  })}
+</svg>

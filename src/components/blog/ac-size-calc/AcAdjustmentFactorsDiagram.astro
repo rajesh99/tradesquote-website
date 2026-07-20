@@ -1,0 +1,41 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Adjustment factors from the post
+const factors = [
+  { label: "9-ft ceilings",             multiplier: "× 1.13", impact: "+13%", color: C.blue,   bgColor: C.blueLight },
+  { label: "10-ft ceilings",            multiplier: "× 1.25", impact: "+25%", color: C.blue,   bgColor: C.blueLight },
+  { label: "Hot climate",               multiplier: "× 1.15", impact: "+15%", color: C.orange, bgColor: C.orangeLight },
+  { label: "Poor insulation",           multiplier: "× 1.15", impact: "+15%", color: C.orange, bgColor: C.orangeLight },
+  { label: "Large south/west windows",  multiplier: "× 1.10", impact: "+10%", color: C.primary, bgColor: C.primaryLight },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>AC sizing adjustment factors</title>
+  <desc>
+    Five multipliers to apply to base BTU: 9-ft ceilings add 13%, 10-ft ceilings add 25%, hot climate
+    adds 15%, poor insulation adds 15%, and large south or west windows add 10%.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Adjustment factors — multiply your base BTU</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Stack these when multiple conditions apply to the same home</text>
+
+  {factors.map((f, i) => {
+    const y = 68 + i * 38;
+    return (
+      <g>
+        {/* Row bg on hover area */}
+        <rect x="24" y={y} width="672" height="32" rx="6" fill={f.bgColor} fill-opacity="0.45" />
+        {/* Label */}
+        <text x="36" y={y + 21} fill={C.dark} font-family={FONT} font-size="12" font-weight="600">{f.label}</text>
+        {/* Multiplier badge */}
+        <rect x="400" y={y + 4} width="86" height="22" rx="11" fill={f.color} fill-opacity="0.15" stroke={f.color} stroke-width="1.2" />
+        <text x="443" y={y + 20} text-anchor="middle" fill={f.color} font-family={FONT} font-size="12" font-weight="800">{f.multiplier}</text>
+        {/* Impact label */}
+        <text x="510" y={y + 21} fill={f.color} font-family={FONT} font-size="12" font-weight="700">{f.impact}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,43 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const rows = [
+  ["100 CFM", "6 in", 100],
+  ["225 CFM", "8 in", 225],
+  ["350 CFM", "9 in", 350],
+  ["450 CFM", "10 in", 450],
+  ["700 CFM", "12 in", 700],
+  ["1,100 CFM", "14 in", 1100],
+  ["1,700 CFM", "16 in", 1700],
+];
+
+const scaleMax = 1700;
+const barLeft = 112;
+const barArea = 430;
+const toW = (v: number) => (v / scaleMax) * barArea;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Round duct size by CFM</title>
+  <desc>
+    Round metal duct size by airflow at about 0.10 in.wg per 100 ft: 100 CFM needs 6 inches, 225 needs 8,
+    350 needs 9, 450 needs 10, 700 needs 12, 1,100 needs 14, and 1,700 needs 16 inches. Flex duct needs one
+    size larger.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Round duct size by CFM</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Galvanized round at ~0.10 in.wg/100 ft · flex needs one size larger</text>
+
+  {rows.map((r, i) => {
+    const y = 70 + i * 31;
+    const w = toW(r[2] as number);
+    return (
+      <g>
+        <text x="24" y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r[0]}</text>
+        <rect x={barLeft} y={y + 3} width={w} height="20" rx="5" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={barLeft + w + 8} y={y + 18} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{r[1]}</text>
+      </g>
+    );
+  })}
+</svg>

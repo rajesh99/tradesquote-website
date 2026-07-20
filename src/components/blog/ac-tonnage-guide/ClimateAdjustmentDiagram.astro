@@ -1,0 +1,49 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// From the post's "Climate Adjustments" table
+const zones = [
+  { label: "Hot / humid",       sub: "South, Southwest",   sqftPerTon: "450–550", bar: 340, color: C.orange,  bg: C.orangeLight,  border: C.orange },
+  { label: "Moderate",          sub: "Midwest, Mid-Atlantic", sqftPerTon: "550–650", bar: 430, color: C.blue,   bg: C.blueLight,    border: C.blue },
+  { label: "Cool",              sub: "North, Pacific NW",  sqftPerTon: "650–800", bar: 530, color: C.primary, bg: C.primaryLight, border: C.primary },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+  <title>AC tonnage climate adjustment — sq ft per ton by zone</title>
+  <desc>
+    How many square feet per ton to use by climate zone: 450–550 in hot/humid climates,
+    550–650 in moderate climates, and 650–800 in cool northern climates.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="224" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Climate adjustment: sq ft per ton by zone
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    Skipping this step oversizes northern homes and undersizes southern ones
+  </text>
+
+  {/* Column headers */}
+  <text x="168" y="72" fill={C.muted} font-family={FONT} font-size="9.5" font-weight="600" letter-spacing="0.4">
+    SQ FT PER TON (wider bar = more sq ft covered per ton = less cooling needed)
+  </text>
+
+  {zones.map((z, i) => {
+    const y = 82 + i * 48;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">
+          {z.label}
+        </text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="9.5">
+          {z.sub}
+        </text>
+        <rect x="168" y={y + 2} width={z.bar} height="24" rx="7" fill={z.bg} stroke={z.border} stroke-width="1.3" />
+        <text x={168 + z.bar + 8} y={y + 19} fill={z.color} font-family={FONT} font-size="12" font-weight="800">
+          {z.sqftPerTon} sq ft / ton
+        </text>
+      </g>
+    );
+  })}
+</svg>

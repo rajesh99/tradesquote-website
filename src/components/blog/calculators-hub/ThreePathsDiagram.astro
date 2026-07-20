@@ -1,0 +1,44 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const paths = [
+  { title: "Size equipment", color: C.primary, bg: C.primaryLight, items: ["BTU · Tonnage · Manual J", "Heat pump · Furnace", "Mini-split"] },
+  { title: "Diagnose a system", color: C.blue, bg: C.blueLight, items: ["Delta T · Static pressure", "Superheat · Subcooling", "Refrigerant charge"] },
+  { title: "Price a job", color: C.orange, bg: C.orangeLight, items: ["Replacement · Installation", "Operating cost", "Contractor estimate"] },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>Three common paths through the HVAC calculators</title>
+  <desc>
+    Start by choosing a goal. Size equipment uses BTU, tonnage, Manual J, heat pump, furnace, and
+    mini-split calculators. Diagnose a system uses delta T, static pressure, superheat, subcooling, and
+    refrigerant charge. Price a job uses replacement, installation, operating cost, and contractor estimate
+    calculators.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Start here: three common paths</text>
+
+  <rect x="280" y="48" width="160" height="36" rx="18" fill={C.dark} />
+  <text x="360" y="71" text-anchor="middle" fill={C.white} font-family={FONT} font-size="12" font-weight="700">What do you need?</text>
+
+  <path d="M360 84 V100" stroke={C.border} stroke-width="1.4" fill="none" />
+  <path d="M132 100 H588" stroke={C.border} stroke-width="1.4" fill="none" />
+  <path d="M132 100 V118" stroke={C.border} stroke-width="1.4" fill="none" />
+  <path d="M360 100 V118" stroke={C.border} stroke-width="1.4" fill="none" />
+  <path d="M588 100 V118" stroke={C.border} stroke-width="1.4" fill="none" />
+
+  {paths.map((p, i) => {
+    const x = 24 + i * 228;
+    return (
+      <g>
+        <rect x={x} y="118" width="216" height="150" rx="10" fill={p.bg} stroke={p.color} stroke-width="1.4" />
+        <text x={x + 16} y="144" fill={p.color} font-family={FONT} font-size="12.5" font-weight="800">{p.title}</text>
+        {p.items.map((it, j) => (
+          <text x={x + 16} y={172 + j * 26} fill={C.dark} font-family={FONT} font-size="10">{it}</text>
+        ))}
+      </g>
+    );
+  })}
+</svg>

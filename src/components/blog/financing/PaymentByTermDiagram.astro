@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Data from post table: $10,000 system
+const rows = [
+  { label: "60 mo / 0% dealer promo", monthly: 167, total: 10000, color: C.green,  totalColor: C.greenLight,  totalStroke: C.green  },
+  { label: "60 mo / 6.99% APR",       monthly: 198, total: 11880, color: C.primary, totalColor: C.primaryLight, totalStroke: C.primary },
+  { label: "84 mo / 9.99% APR",       monthly: 166, total: 13944, color: C.blue,   totalColor: C.blueLight,   totalStroke: C.blue   },
+  { label: "120 mo / 12.99% APR",     monthly: 147, total: 17640, color: C.orange, totalColor: C.orangeLight,  totalStroke: C.orange },
+];
+
+const maxTotal = 17640;
+const barLeft = 300;
+const barWidth = 390;
+const toX = (v: number) => barLeft + (v / maxTotal) * barWidth;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Monthly payment vs total cost for a $10,000 HVAC system</title>
+  <desc>
+    Four financing scenarios for a $10,000 HVAC system: 60-month 0% dealer promo pays $167/mo and $10,000 total;
+    60-month 6.99% APR pays $198/mo and $11,880 total; 84-month 9.99% pays $166/mo and $13,944 total;
+    120-month 12.99% pays $147/mo and $17,640 total.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Monthly payment vs. total cost — $10,000 system
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    Longer terms lower monthly payments but significantly increase total interest paid
+  </text>
+
+  {/* Column headers */}
+  <text x="24"  y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Scenario</text>
+  <text x="242" y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">$/mo</text>
+  <text x={barLeft} y="74" fill={C.muted} font-family={FONT} font-size="10" font-weight="600">Total paid →</text>
+
+  {/* Scale lines */}
+  {[0, 5000, 10000, 15000].map((v) => (
+    <g>
+      <line x1={toX(v)} y1="80" x2={toX(v)} y2="272" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+      <text x={toX(v)} y="286" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">
+        ${(v / 1000).toFixed(0)}k
+      </text>
+    </g>
+  ))}
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 46;
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">{r.label}</text>
+
+        {/* Monthly badge */}
+        <rect x="228" y={y} width="58" height="24" rx="6" fill={r.totalColor} stroke={r.totalStroke} stroke-width="1" />
+        <text x="257" y={y + 16} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">${r.monthly}</text>
+
+        {/* Total bar */}
+        <rect x={barLeft} y={y + 2} width={toX(r.total) - barLeft} height="20" rx="5" fill={r.color} opacity="0.80" />
+        <text x={toX(r.total) + 5} y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+          ${r.total.toLocaleString()}
+        </text>
+      </g>
+    );
+  })}
+</svg>

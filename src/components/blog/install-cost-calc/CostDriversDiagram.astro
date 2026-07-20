@@ -1,0 +1,38 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+const drivers = [
+  { factor: "System tonnage", impact: "Larger system = higher equipment + labor" },
+  { factor: "SEER2 / efficiency tier", impact: "Each tier adds $500 – $1,500+" },
+  { factor: "Ductwork condition", impact: "New or replaced ducts add $2,000 – $6,000+" },
+  { factor: "Refrigerant line set", impact: "Longer runs, wall penetrations" },
+  { factor: "Electrical upgrade", impact: "Older panels may need a subpanel / breaker" },
+  { factor: "Permit & inspection", impact: "$100 – $500 by jurisdiction" },
+  { factor: "Labor market", impact: "Urban areas run 20 – 40% above rural" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 332" fill="none" aria-hidden="true">
+  <title>What drives HVAC installation cost</title>
+  <desc>
+    Seven factors that move an HVAC installation quote: system tonnage, SEER2 efficiency tier (plus $500 to
+    $1,500 each), ductwork condition (plus $2,000 to $6,000), refrigerant line set, electrical upgrades,
+    permit and inspection ($100 to $500), and the local labor market (20 to 40% higher in urban areas).
+  </desc>
+
+  <rect x="8" y="8" width="704" height="316" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What drives the price</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Tonnage sets the base — these factors move the final number</text>
+
+  {drivers.map((d, i) => {
+    const y = 70 + i * 36;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="30" rx="7" fill={C.white} stroke={C.border} stroke-width="1.1" />
+        <rect x="24" y={y} width="5" height="30" rx="2.5" fill={C.primary} />
+        <text x="44" y={y + 19} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{d.factor}</text>
+        <text x="316" y={y + 19} fill={C.muted} font-family={FONT} font-size="10.5">{d.impact}</text>
+      </g>
+    );
+  })}
+</svg>

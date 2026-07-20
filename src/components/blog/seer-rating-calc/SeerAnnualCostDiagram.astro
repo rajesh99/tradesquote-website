@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+// Source: post table — 3-ton system, 2,000 cooling hours, $0.22/kWh
+const rows = [
+  { label: "SEER2 13.4 (min)", kwh: 5373, cost: 1182, color: C.orange },
+  { label: "SEER2 15",         kwh: 4800, cost: 1056, color: C.blue },
+  { label: "SEER2 16",         kwh: 4500, cost: 990,  color: C.blue },
+  { label: "SEER2 18",         kwh: 4000, cost: 880,  color: C.primary },
+  { label: "SEER2 20",         kwh: 3600, cost: 792,  color: C.primary },
+];
+
+const maxCost = 1300;
+const barLeft = 188;
+const barMaxW = 490;
+const toW = (v: number) => (v / maxCost) * barMaxW;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>Annual cooling cost by SEER2 rating</title>
+  <desc>
+    Horizontal bar chart showing annual cooling cost for a 3-ton system running 2,000 hours at $0.22/kWh.
+    SEER2 13.4 costs $1,182/yr while SEER2 20 costs $792/yr — a $390 annual difference.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Annual cooling cost by SEER2 rating
+  </text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">
+    3-ton · 2,000 run hours · $0.22/kWh · bars show annual cost
+  </text>
+
+  {/* Scale lines */}
+  {[0, 400, 800, 1200].map((v) => {
+    const x = barLeft + toW(v);
+    return (
+      <g>
+        <line x1={x} y1="66" x2={x} y2="274" stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+        <text x={x} y="288" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">
+          ${v}
+        </text>
+      </g>
+    );
+  })}
+
+  {rows.map((r, i) => {
+    const y = 72 + i * 38;
+    const w = toW(r.cost);
+    return (
+      <g>
+        <text x="24" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">
+          {r.label}
+        </text>
+        <rect x={barLeft} y={y} width={w} height="22" rx="4" fill={r.color} opacity="0.82" />
+        <text x={barLeft + w + 6} y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+          ${r.cost.toLocaleString()}/yr
+        </text>
+        <text x={barLeft + w + 6} y={y + 28} fill={C.muted} font-family={FONT} font-size="8.5">
+          {r.kwh.toLocaleString()} kWh
+        </text>
+      </g>
+    );
+  })}
+</svg>
