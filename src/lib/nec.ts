@@ -2,8 +2,8 @@
  * Shared NEC (NFPA 70) reference data and helpers for the electrical calculators.
  *
  * Baseline: **NEC 2023**. Every export names the article or table it comes from so
- * the values can be re-verified against a future code cycle. All twelve electrical
- * calculators read from this module rather than carrying their own copies, so the
+ * the values can be re-verified against a future code cycle. Every electrical
+ * calculator reads from this module rather than carrying its own copies, so the
  * reference tables rendered on the pages and the numbers the scripts compute can
  * never drift apart.
  *
@@ -656,4 +656,59 @@ export function cmilOf(label: string): number {
 /** "12" → "12 AWG", "250 kcmil" → "250 kcmil". */
 export function sizeLabel(label: string): string {
   return label.includes("kcmil") ? label : `${label} AWG`;
+}
+
+/* ------------------------------------------------------------------------- *
+ * Power and unit conversion — shared by the conversion-cluster calculators   *
+ * ------------------------------------------------------------------------- */
+
+/** √3, the line-to-line factor in balanced three-phase power. */
+export const SQRT3 = Math.sqrt(3);
+
+/** Conventional electrical horsepower, in watts. */
+export const WATTS_PER_HP = 745.7;
+
+/** 1 watt = 3.412142 BTU/h. */
+export const BTU_PER_WATT = 3.412142;
+
+export type PhaseMode = "dc" | "1ph" | "3ph";
+
+/** Denominator that relates watts to amps for each supply type. */
+export function powerDivisor(mode: PhaseMode, volts: number, powerFactor: number): number {
+  if (mode === "dc") return volts;
+  if (mode === "3ph") return SQRT3 * volts * powerFactor;
+  return volts * powerFactor;
+}
+
+/** Watts → amps. DC ignores power factor. */
+export function wattsToAmps(watts: number, mode: PhaseMode, volts: number, powerFactor: number): number {
+  const divisor = powerDivisor(mode, volts, powerFactor);
+  return divisor > 0 ? watts / divisor : 0;
+}
+
+/** Amps → watts (real power). */
+export function ampsToWatts(amps: number, mode: PhaseMode, volts: number, powerFactor: number): number {
+  return amps * powerDivisor(mode, volts, powerFactor);
+}
+
+/** Amps → volt-amperes (apparent power — power factor does not apply). */
+export function ampsToVoltAmps(amps: number, mode: PhaseMode, volts: number): number {
+  return mode === "3ph" ? SQRT3 * volts * amps : volts * amps;
+}
+
+/**
+ * Reactive power from real power and power factor: Q = P × tan(φ), where
+ * φ = arccos(PF). Used for power-factor correction sizing.
+ */
+export function tanPhi(powerFactor: number): number {
+  const pf = Math.min(1, Math.max(0.01, powerFactor));
+  return Math.sqrt(1 - pf * pf) / pf;
+}
+
+/** Format a value with thousands separators and a variable number of decimals. */
+export function fmtSmart(value: number): string {
+  if (!Number.isFinite(value)) return "—";
+  const abs = Math.abs(value);
+  const digits = abs >= 1000 ? 0 : abs >= 100 ? 1 : abs >= 1 ? 2 : 4;
+  return value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }

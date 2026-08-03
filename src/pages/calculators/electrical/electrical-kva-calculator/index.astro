@@ -1,0 +1,551 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { SQRT3, fmt } from "@/lib/nec";
+
+const title = "kVA Calculator — Apparent, Real & Reactive Power | TradesQuote";
+const description =
+  "Free kVA calculator for single-phase and three-phase systems. Convert between kVA, kW, kVAR, and line current at any power factor, and get the next standard transformer size.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-kva-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "kVA Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "kVA Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online kVA calculator converting between apparent power, real power, reactive power, and line current for single-phase and three-phase systems, with standard transformer sizing.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I calculate kVA?",
+    answer:
+      "Multiply voltage by current and divide by 1,000 — with the √3 factor for three-phase. <strong>Single-phase: kVA = V × I ÷ 1,000.</strong> <strong>Three-phase: kVA = √3 × V × I ÷ 1,000.</strong> So 100 A at 480 V three-phase is 1.732 × 480 × 100 ÷ 1,000 = <strong>83.14 kVA</strong>.",
+  },
+  {
+    question: "What's the difference between kVA and kW?",
+    answer:
+      "<strong>kVA</strong> is apparent power — everything the conductor and transformer must carry. <strong>kW</strong> is real power — the part doing useful work, and what the energy meter records. They are related by power factor: <strong>kW = kVA × PF</strong>. At unity power factor they are identical; at 0.8 power factor a 100 kVA load delivers only 80 kW.",
+  },
+  {
+    question: "Why are transformers and generators rated in kVA?",
+    answer:
+      "Because their limits are thermal and current-driven, not work-driven. A transformer winding heats according to the current flowing through it regardless of whether that current is in phase with the voltage. Rating in kVA is therefore honest — the manufacturer doesn't have to guess your power factor. It also means comparing your calculated <strong>kVA</strong> against the nameplate is the only valid check.",
+  },
+  {
+    question: "What is kVAR and do I care?",
+    answer:
+      "Reactive power — the component that circulates without doing work, from motor and transformer magnetising current. <strong>kVAR = √(kVA² − kW²)</strong>. On a residential job you can ignore it. On a commercial or industrial job it matters twice: it inflates the current your conductors carry, and utilities frequently bill a <strong>kVA demand charge</strong> or a power-factor penalty because of it.",
+  },
+  {
+    question: "How do I size a transformer from a load?",
+    answer:
+      'Calculate the load in kVA — not kW — then choose the next standard rating above it, allowing headroom for growth. Standard dry-type sizes run 3, 6, 9, 15, 22.5, 30, 45, 75, 112.5, 150, 225, 300, 500, 750 and 1,000 kVA. Primary and secondary conductors and overcurrent protection are then sized per <strong>NEC 450.3</strong>, generally at 125% of the respective full-load current.',
+  },
+  {
+    question: "Does a higher power factor reduce my kVA?",
+    answer:
+      'Yes, and that is exactly what power-factor correction buys. For a fixed real load, raising power factor from 0.75 to 0.95 drops apparent power from 133 kVA to 105 kVA — a 21% reduction in current, which frees conductor and transformer capacity and cuts any kVA demand charge. The <a href="/calculators/electrical/electrical-power-factor-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Power Factor Correction Calculator</a> sizes the capacitor bank.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load in kVA? Quote the equipment in seconds.";
+const ctaDescription =
+  "Transformer, conductors, protection, and labor — TradesQuote turns the whole scope into a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-three-phase-power-calculator",
+    title: "Three-Phase Power Calculator",
+    description: "kW, kVA, kVAR, and line current from any input.",
+  },
+  {
+    href: "/calculators/electrical/electrical-power-factor-calculator",
+    title: "Power Factor Correction",
+    description: "Cut apparent power with a capacitor bank.",
+  },
+  {
+    href: "/calculators/electrical/electrical-amps-to-watts-calculator",
+    title: "Amps to Watts Calculator",
+    description: "The single-phase version of the same triangle.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size conductors for the current kVA implies.",
+  },
+];
+
+/** Line current per kVA at common system voltages — the lookup electricians memorise. */
+const currentRows = [
+  { volts: 208, phase: "3φ" },
+  { volts: 240, phase: "1φ" },
+  { volts: 240, phase: "3φ" },
+  { volts: 480, phase: "3φ" },
+  { volts: 600, phase: "3φ" },
+].map((r) => {
+  const factor = r.phase === "3φ" ? SQRT3 * r.volts : r.volts;
+  return {
+    ...r,
+    a15: (15 * 1000) / factor,
+    a45: (45 * 1000) / factor,
+    a75: (75 * 1000) / factor,
+    a150: (150 * 1000) / factor,
+    a300: (300 * 1000) / factor,
+  };
+});
+
+const styles = electricalAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="kVA Calculator — Apparent, Real & Reactive Power" />
+    <meta
+      property="og:description"
+      content="Convert between kVA, kW, kVAR, and line current for single-phase and three-phase — with the next standard transformer size."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="kVA Calculator — Apparent, Real & Reactive Power" />
+    <meta name="twitter:description" content="kVA, kW, kVAR, and amps at any power factor. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb category="Electrical" categoryHref="/calculators/electrical" current="kVA Calculator" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              kVA Calculator <span class="text-emerald-600">— Apparent, Real & Reactive</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Transformers, generators, and UPS units are rated in <strong>kVA</strong> because their limit is
+              current, not work. Your load is usually known in <strong>kW</strong>. Power factor is what
+              separates them, and the third leg — <strong>kVAR</strong> — is the reactive current that inflates
+              your conductors and your demand charge. This calculator solves all three from whichever one you
+              have.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 20L20 4M4 20h16M4 20V4"></path>
+            </svg>
+            Solve the power triangle
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <label for="kv-mode" class="text-sm font-semibold text-slate-800">What do you know?</label>
+                <select
+                  id="kv-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="from-amps" selected>Line current</option>
+                  <option value="from-kw">Real power (kW)</option>
+                  <option value="from-kva">Apparent power (kVA)</option>
+                </select>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="kv-value" class="text-sm font-semibold text-slate-800">
+                    <span id="kv-value-label">Line current</span>
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="kv-value"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value="100"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span id="kv-value-unit" class="text-sm text-slate-500 w-8">A</span>
+                  </div>
+                </div>
+                <input
+                  id="kv-value-range"
+                  type="range"
+                  min="1"
+                  max="1000"
+                  step="1"
+                  value="100"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-emerald-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>1,000</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="kv-phase" class="text-sm font-semibold text-slate-800">Phase</label>
+                  <select
+                    id="kv-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="3ph" selected>Three-phase</option>
+                    <option value="1ph">Single-phase</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="kv-volts" class="text-sm font-semibold text-slate-800">Voltage</label>
+                  <select
+                    id="kv-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="120">120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240">240 V</option>
+                    <option value="480" selected>480 V</option>
+                    <option value="600">600 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="kv-pf" class="text-sm font-semibold text-slate-800">Power factor</label>
+                  <input
+                    id="kv-pf"
+                    type="number"
+                    min="0.1"
+                    max="1"
+                    step="0.01"
+                    value="0.85"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                id="kv-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">
+                Converted to <span id="kv-primary-label">apparent power</span>
+              </p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="kv-primary" class="text-5xl font-extrabold tracking-tight text-emerald-600">83.14 kVA</span>
+              </div>
+              <p id="kv-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Reactive power is circulating without doing work.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Real power</p>
+                  <p id="kv-kw" class="mt-1 text-2xl font-bold text-slate-900">70.67 kW</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Line current</p>
+                  <p id="kv-amps" class="mt-1 text-2xl font-bold text-slate-900">100 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Formula</span><span id="kv-bd-formula" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Apparent power (S)</span><span id="kv-bd-kva" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Real power (P)</span><span id="kv-bd-kw" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Reactive power (Q)</span><span id="kv-bd-kvar" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Line current</span><span id="kv-bd-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Next standard transformer</span><span id="kv-bd-standard" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Transformer primary and secondary conductors and overcurrent protection are sized per NEC 450.3,
+                generally at 125% of the respective full-load current.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three quantities forming a right triangle. Power factor is the cosine of its angle.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Apparent power (kVA) — what the equipment carries</div>
+            <div>1φ: kVA&nbsp;=&nbsp;V × I ÷ 1,000&nbsp;&nbsp;·&nbsp;&nbsp;3φ: kVA&nbsp;=&nbsp;<span class="text-amber-300">1.732</span> × V × I ÷ 1,000</div>
+            <div class="mt-4 text-cyan-300"># Real power (kW) — what does work</div>
+            <div>kW&nbsp;=&nbsp;kVA × PF</div>
+            <div class="mt-4 text-cyan-300"># Reactive power (kVAR) — closes the triangle</div>
+            <div>kVAR&nbsp;=&nbsp;√(kVA² − kW²)&nbsp;&nbsp;·&nbsp;&nbsp;PF&nbsp;=&nbsp;kW ÷ kVA</div>
+            <div class="mt-4 text-cyan-300"># Line current from kVA</div>
+            <div>1φ: I&nbsp;=&nbsp;kVA × 1,000 ÷ V&nbsp;&nbsp;·&nbsp;&nbsp;3φ: I&nbsp;=&nbsp;kVA × 1,000 ÷ (<span class="text-amber-300">1.732</span> × V)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Equipment is rated in kVA for a reason</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A winding heats from the current through it, in phase or not. Rating in kVA means the
+                manufacturer never has to assume your power factor — and means you must compare kVA to kVA.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Power factor is a discount on capacity</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At PF 0.8, a 100 kVA transformer delivers 80 kW. Raise the load's power factor and the same
+                transformer delivers more useful work with no hardware change.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">A feeder measurement, a transformer sizing, and a generator check.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">100 A measured at 480 V three-phase, PF 0.85</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A clamp-meter reading on an existing feeder. The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              kVA = 1.732 × 480 × 100 ÷ 1,000 = <span class="font-bold text-emerald-700">83.14 kVA</span><br />
+              kW = 83.14 × 0.85 = 70.67 kW<br />
+              kVAR = √(83.14² − 70.67²) = 43.80 kVAR<br />
+              next standard transformer: 112.5 kVA
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 83 kVA of load doing 71 kW of work. The
+              43.80 kVAR is what a capacitor bank would target — and what a kVA demand charge would bill.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Sizing a transformer for a 60 kW load</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">208 V three-phase secondary, PF 0.9.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              kVA = 60 ÷ 0.9 = <span class="font-bold text-emerald-700">66.67 kVA</span><br />
+              secondary current = 66,670 ÷ (1.732 × 208) = 185.0 A<br />
+              next standard size: <span class="font-bold text-emerald-700">75 kVA</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> sizing on the 60 kW figure would have
+              suggested a 60 kVA unit and undersized it. Always convert to kVA first — the 0.9 power factor adds
+              6.67 kVA of capacity the transformer must actually carry.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Single-phase: 200 A at 240 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A residential service at unity power factor.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              kVA = 240 × 200 ÷ 1,000 = <span class="font-bold text-emerald-700">48 kVA</span><br />
+              at PF 1.0: kW = 48 kW · kVAR = 0
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a fully loaded 200 A residential service
+              is 48 kVA. Useful for generator sizing — and note that a "48 kW" generator published at 0.8 power
+              factor is a 60 kVA machine, so it would cover this comfortably.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Line current by kVA and voltage</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Full-load line current for standard transformer sizes. Power factor does not appear because apparent
+            power already accounts for it — this is the current the conductors carry.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">System</th>
+                  <th class="py-3 px-4 font-semibold">15 kVA</th>
+                  <th class="py-3 px-4 font-semibold">45 kVA</th>
+                  <th class="py-3 px-4 font-semibold">75 kVA</th>
+                  <th class="py-3 px-4 font-semibold">150 kVA</th>
+                  <th class="py-3 px-4 font-semibold">300 kVA</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  currentRows.map((row, index) => (
+                    <tr class={index === currentRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {row.volts} V {row.phase}
+                      </td>
+                      <td class="py-3 px-4">{fmt(row.a15, 1)} A</td>
+                      <td class="py-3 px-4">{fmt(row.a45, 1)} A</td>
+                      <td class="py-3 px-4">{fmt(row.a75, 1)} A</td>
+                      <td class="py-3 px-4">{fmt(row.a150, 1)} A</td>
+                      <td class="py-3 px-4">{fmt(row.a300, 1)} A</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: √3 = {fmt(SQRT3, 4)}. NEC (NFPA 70) 2023 — Article 450 transformers,
+            450.3 overcurrent protection at 125% of full-load current, Table 310.16 conductor ampacities,
+            220.61 neutral load. Standard dry-type transformer kVA ratings per industry convention. Generator
+            kVA ratings are conventionally published at 0.8 power factor. Local amendments override the model
+            code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about kVA, kW, kVAR, and transformer sizing."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalKvaCalculator } from "@/scripts/calculators/electrical-kva-calculator";
+    initElectricalKvaCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

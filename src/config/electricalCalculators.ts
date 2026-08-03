@@ -130,6 +130,105 @@ export const electricalCalculators: ElectricalCalculator[] = [
     accent: "rose",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
   },
+  {
+    slug: "electrical-watts-to-amps-calculator",
+    title: "Watts to Amps Calculator",
+    description:
+      "Convert watts to amps for DC, single-phase, and three-phase circuits — then get the breaker and conductor that current needs.",
+    question: "How many amps is 1,500 watts?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18" opacity="0"/></svg>`,
+  },
+  {
+    slug: "electrical-amps-to-watts-calculator",
+    title: "Amps to Watts Calculator",
+    description:
+      "Convert amps to watts and volt-amperes, with power factor handled properly so real and apparent power are never confused.",
+    question: "How many watts is 20 amps?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3L4 14h7v7l7-11h-7z"/></svg>`,
+  },
+  {
+    slug: "electrical-ohms-law-calculator",
+    title: "Ohm's Law Calculator",
+    description:
+      "Enter any two of voltage, current, resistance, and power — the other two are solved instantly, with the formula used shown.",
+    question: "What is the current if V is 120 and R is 10?",
+    accent: "teal",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 17c1.5-1.5 2-3 2-5a1 1 0 112 0c0 2 .5 3.5 2 5"/></svg>`,
+  },
+  {
+    slug: "electrical-unit-converter",
+    title: "Electrical Unit Converter",
+    description:
+      "Convert between watts, kilowatts, horsepower, BTU per hour, volt-amperes, and amps — the units that appear on nameplates and never match.",
+    question: "How many watts is 1 horsepower?",
+    accent: "sky",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`,
+  },
+  {
+    slug: "electrical-kva-calculator",
+    title: "kVA Calculator",
+    description:
+      "Apparent power, real power, and reactive power from line current or load — single-phase and three-phase, with the next standard transformer size.",
+    question: "How many kVA is 100 amps at 480 volts?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 20L20 4M4 20h16M4 20V4"/></svg>`,
+  },
+  {
+    slug: "electrical-three-phase-power-calculator",
+    title: "Three-Phase Power Calculator",
+    description:
+      "Line current, kW, kVA, and kVAR for balanced three-phase systems — from load, from amps, or from motor horsepower with efficiency.",
+    question: "What amps does a 50 kW three-phase load draw?",
+    accent: "cyan",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 18c2-8 4-8 6 0s4 8 6 0 2-8 4-4"/></svg>`,
+  },
+  {
+    slug: "electrical-power-factor-calculator",
+    title: "Power Factor Correction Calculator",
+    description:
+      "Capacitor kVAR needed to move from your current power factor to a target — with the line current saved and the demand charge it avoids.",
+    question: "How much kVAR to correct 0.75 power factor to 0.95?",
+    accent: "teal",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 7h4v4"/></svg>`,
+  },
+  {
+    slug: "electrical-kwh-cost-calculator",
+    title: "kWh Cost Calculator",
+    description:
+      "What any appliance or circuit costs to run — daily, monthly, and annually — from its wattage, run time, and your electricity rate.",
+    question: "What does a 1,500 watt heater cost to run?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
+  {
+    slug: "electrical-panel-upgrade-cost-calculator",
+    title: "Panel Upgrade Cost Calculator",
+    description:
+      "What a service or panel upgrade actually costs — panel, meter socket, service conductors, mast, permit, and labor, built up part by part.",
+    question: "How much does a 200 amp panel upgrade cost?",
+    accent: "rose",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
+  },
+  {
+    slug: "electrical-rewiring-cost-calculator",
+    title: "Rewiring Cost Calculator",
+    description:
+      "Whole-house rewiring cost by square footage, wall access, and construction age — with the dollars-per-square-foot figure to sanity-check it.",
+    question: "How much does it cost to rewire a house?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M10 21v-6h4v6"/></svg>`,
+  },
+  {
+    slug: "electrical-labor-rate-calculator",
+    title: "Labor Rate Calculator",
+    description:
+      "Your true loaded cost per billable hour from wage, burden, overhead, and unbillable time — then the rate to bill at your target margin.",
+    question: "What should my hourly rate be?",
+    accent: "rose",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
 ];
 
 export type ElectricalCalculatorGroup = {
@@ -165,10 +264,30 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
     ],
   },
   {
+    label: "Formulas & Conversions",
+    description:
+      "The arithmetic behind every circuit — watts to amps and back, Ohm's law, apparent versus real power, three-phase √3 math, power-factor correction, and running cost.",
+    slugs: [
+      "electrical-watts-to-amps-calculator",
+      "electrical-amps-to-watts-calculator",
+      "electrical-ohms-law-calculator",
+      "electrical-unit-converter",
+      "electrical-kva-calculator",
+      "electrical-three-phase-power-calculator",
+      "electrical-power-factor-calculator",
+      "electrical-kwh-cost-calculator",
+    ],
+  },
+  {
     label: "Cost & Pricing",
     description:
       "Price the work once the circuit is designed — labor, material, overhead, and the margin that has to survive all of it.",
-    slugs: ["electrical-estimate-calculator"],
+    slugs: [
+      "electrical-estimate-calculator",
+      "electrical-panel-upgrade-cost-calculator",
+      "electrical-rewiring-cost-calculator",
+      "electrical-labor-rate-calculator",
+    ],
   },
 ];
 
@@ -366,13 +485,90 @@ export const electricalCalculatorGuide = [
     accent: "rose" as const,
     rule: "(labor + fixtures + material + overhead) ÷ (1 − margin)",
   },
+  {
+    question: "How many amps does this wattage draw?",
+    slug: "electrical-watts-to-amps-calculator",
+    tool: "Watts to Amps Calculator",
+    accent: "emerald" as const,
+    rule: "DC: I = P÷V · 1φ: I = P÷(V×PF) · 3φ: I = P÷(√3×V×PF)",
+  },
+  {
+    question: "How many watts is this current?",
+    slug: "electrical-amps-to-watts-calculator",
+    tool: "Amps to Watts Calculator",
+    accent: "emerald" as const,
+    rule: "P = V×I×PF · apparent VA = V×I (or √3×V×I)",
+  },
+  {
+    question: "I know two of V, I, R, P — what are the others?",
+    slug: "electrical-ohms-law-calculator",
+    tool: "Ohm's Law Calculator",
+    accent: "teal" as const,
+    rule: "V = I×R · P = V×I · P = I²R · P = V²÷R",
+  },
+  {
+    question: "How do I convert between watts, horsepower, and BTU?",
+    slug: "electrical-unit-converter",
+    tool: "Electrical Unit Converter",
+    accent: "sky" as const,
+    rule: "1 hp = 745.7 W · 1 W = 3.412 BTU/h · 1 ton = 12,000 BTU/h",
+  },
+  {
+    question: "How many kVA is this load?",
+    slug: "electrical-kva-calculator",
+    tool: "kVA Calculator",
+    accent: "emerald" as const,
+    rule: "1φ: kVA = V×I÷1,000 · 3φ: kVA = √3×V×I÷1,000 · kW = kVA×PF",
+  },
+  {
+    question: "What line current does a three-phase load draw?",
+    slug: "electrical-three-phase-power-calculator",
+    tool: "Three-Phase Power Calculator",
+    accent: "cyan" as const,
+    rule: "I = kW×1,000 ÷ (√3 × V × PF)",
+  },
+  {
+    question: "How much capacitor kVAR do I need?",
+    slug: "electrical-power-factor-calculator",
+    tool: "Power Factor Correction Calculator",
+    accent: "teal" as const,
+    rule: "Qc = P × (tan φ₁ − tan φ₂), φ = arccos(PF)",
+  },
+  {
+    question: "What does this appliance cost to run?",
+    slug: "electrical-kwh-cost-calculator",
+    tool: "kWh Cost Calculator",
+    accent: "amber" as const,
+    rule: "cost = W÷1,000 × hours × days × $/kWh",
+  },
+  {
+    question: "How much does a panel upgrade cost?",
+    slug: "electrical-panel-upgrade-cost-calculator",
+    tool: "Panel Upgrade Cost Calculator",
+    accent: "rose" as const,
+    rule: "panel + meter + conductors×ft + mast + permit + labor, × region",
+  },
+  {
+    question: "How much does it cost to rewire a house?",
+    slug: "electrical-rewiring-cost-calculator",
+    tool: "Rewiring Cost Calculator",
+    accent: "orange" as const,
+    rule: "sq ft × $/sq ft by access × age × storeys + panel + permit",
+  },
+  {
+    question: "What hourly rate do I need to charge? (contractors)",
+    slug: "electrical-labor-rate-calculator",
+    tool: "Labor Rate Calculator",
+    accent: "rose" as const,
+    rule: "(wage + burden + overhead) ÷ billable hours ÷ (1 − margin)",
+  },
 ];
 
 export const electricalFaqs = [
   {
     question: "Are these electrical calculators really free?",
     answer:
-      "Yes. All twelve are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. All twenty-three are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which NEC edition are these calculators based on?",
@@ -382,7 +578,7 @@ export const electricalFaqs = [
   {
     question: "Which electrical calculator should I use first?",
     answer:
-      "For a new circuit the order is Load → Wire → Breaker → Conduit/Box → Ground. If you already know the amps, start at the Wire Size Calculator. If you're sizing or upgrading a service, start at the Residential Load Calculator and follow it into the Service Size Calculator. If the job is an EV charger, the EV Charger Circuit Calculator does the whole chain including the panel-capacity check.",
+      "For a new circuit the order is Load → Wire → Breaker → Conduit/Box → Ground. If you already know the amps, start at the Wire Size Calculator. If you're sizing or upgrading a service, start at the Residential Load Calculator and follow it into the Service Size Calculator. If the job is an EV charger, the EV Charger Circuit Calculator does the whole chain including the panel-capacity check. If you only have a wattage or a horsepower rating to work from, convert it first with the Watts to Amps Calculator or the Unit Converter, then carry the amps into the sizing tools.",
   },
   {
     question: "Can I use these results to pull a permit or pass inspection?",
@@ -397,7 +593,7 @@ export const electricalFaqs = [
   {
     question: "Do these work for commercial and industrial work?",
     answer:
-      "The load calculators are tuned for dwellings (NEC 220.82 optional method). The conductor, ampacity, breaker, conduit fill, box fill, and grounding calculators are code-general and work for commercial work at the same voltages. Commercial load calculations, motor circuits, transformers, and available fault current are on the roadmap as separate tools.",
+      "The load calculators are tuned for dwellings (NEC 220.82 optional method). The conductor, ampacity, breaker, conduit fill, box fill, and grounding calculators are code-general and work for commercial installations at the same voltages, and the three-phase, kVA, and power-factor tools are built for 208 V, 480 V, and 600 V systems. Commercial load calculations, motor circuits, transformer sizing, and available fault current are on the roadmap as separate tools.",
   },
   {
     question: "Do you have calculators for other trades?",

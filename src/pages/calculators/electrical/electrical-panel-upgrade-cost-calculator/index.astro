@@ -1,0 +1,621 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+
+const title = "Panel Upgrade Cost Calculator — 100A to 200A Service | TradesQuote";
+const description =
+  "Free electrical panel and service upgrade cost calculator. Build the price from parts — panel, meter socket, service conductors, mast, permit, and labor — instead of guessing at a total.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-panel-upgrade-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Panel Upgrade Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Panel Upgrade Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online electrical panel and service upgrade cost calculator building the estimate from panel, meter socket, service conductors, mast, permit, and labor line items.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does a 200 amp panel upgrade cost?",
+    answer:
+      "US market data for 2026 puts residential panel and service upgrades at roughly <strong>$1,300 to $5,000</strong> installed, with most 100 A to 200 A jobs landing near <strong>$3,000</strong>. The spread is driven by whether the meter socket and service conductors change, overhead mast versus underground lateral, how far the panel is from the meter, permit fees, and how much circuit re-termination the old panel needs.",
+  },
+  {
+    question: "Is a panel replacement the same as a service upgrade?",
+    answer:
+      "No, and conflating them costs customers money. A <strong>panel replacement</strong> swaps the panelboard while keeping the same service rating — no utility involvement, no new service-entrance conductors, no meter work. A <strong>service upgrade</strong> raises the rating, which means new service conductors, usually a new meter socket, utility coordination and a disconnect, and often mast or lateral work. The second job can cost three or four times the first.",
+  },
+  {
+    question: "Do I actually need an upgrade?",
+    answer:
+      'Often not. Run the load calculation before pricing anything: many homes told they need an upgrade have plenty of capacity. A 48 A EV charger adds only about 4,600 VA to a NEC 220.82 calculated load thanks to the 40% remainder factor. Check with the <a href="/calculators/electrical/electrical-load-calculator" class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Residential Load Calculator</a> and the <a href="/calculators/electrical/electrical-service-size-calculator" class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Service Size Calculator</a> first — and remember NEC 220.87 lets you use twelve months of measured demand instead of an estimate.',
+  },
+  {
+    question: "Why is the labor estimate so high for a simple swap?",
+    answer:
+      "Because the wire time is the small part. A service upgrade includes pulling the permit, coordinating the utility disconnect and reconnect, waiting for the inspector, re-terminating every existing circuit onto the new bus, replacing the grounding electrode conductor and bonding, and often correcting pre-existing violations the inspector now sees. Shops that quote six hours of visible work on a job that takes ten lose most of the profit.",
+  },
+  {
+    question: "What drives the biggest cost swings?",
+    answer:
+      "Three things. <strong>Meter and service conductor work</strong> — if the utility point of attachment, the meter socket, and the conductors all change, you have effectively two jobs. <strong>Panel location</strong> — a long run from meter to panel multiplies the conductor cost, and 4/0 aluminum or 2/0 copper is not cheap per foot. <strong>Pre-existing conditions</strong> — knob-and-tube, aluminum branch circuits, missing grounds, or a failed grounding electrode all become your problem at inspection.",
+  },
+  {
+    question: "Should I upgrade to 400 amps?",
+    answer:
+      "Rarely worth it on a single dwelling. A 400 A service roughly doubles the panel and conductor cost, usually needs two 200 A panels or a 400 A meter-main, and frequently triggers utility transformer work. Most all-electric homes — heat pump, EV charging, induction, heat pump water heater — still calculate under 200 A once NEC 220.82 demand factors are applied. Verify with a load calculation before quoting 400 A.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Upgrade priced? Send a real estimate in seconds.";
+const ctaDescription =
+  "This gets you to a number. TradesQuote gets you to a document the customer can sign — describe the job or upload photos and our AI builds the full line-item estimate, validated by a built-in quality control agent and ready for online signature.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Confirm the upgrade is actually needed.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "The conductors this quote has to include.",
+  },
+  {
+    href: "/calculators/electrical/electrical-labor-rate-calculator",
+    title: "Labor Rate Calculator",
+    description: "Get the loaded rate this calculator needs.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Electrical Estimate Calculator",
+    description: "Apply your target margin to any job.",
+  },
+];
+
+const styles = electricalAccentStyles.rose;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Panel Upgrade Cost Calculator — 100A to 200A" />
+    <meta
+      property="og:description"
+      content="Build a service upgrade price from parts — panel, meter, conductors, mast, permit, labor — instead of guessing at a total."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Panel Upgrade Cost Calculator — 100A to 200A" />
+    <meta name="twitter:description" content="What a panel or service upgrade really costs. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Panel Upgrade Cost Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Panel Upgrade Cost Calculator <span class="text-rose-600">— Built From Parts</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              "$3,000 for a panel upgrade" is an average, not an estimate. The real number depends on whether
+              the meter socket changes, how far the panel sits from the meter, whether the service is overhead
+              or underground, and how many hours the utility coordination and inspection actually consume. Build
+              it up line by line instead.
+            </p>
+
+            <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm text-amber-900 leading-relaxed">
+                <span class="font-semibold">Check first, quote second.</span> Many homes told they need an
+                upgrade do not. Run the load calculation before pricing — a 48 A EV charger adds only about
+                4,600 VA to a NEC 220.82 calculated load, and NEC 220.87 lets you use measured demand instead of
+                an estimate.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+              ></path>
+            </svg>
+            Build the upgrade price
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="pu-rating" class="text-sm font-semibold text-slate-800">New service rating</label>
+                  <select
+                    id="pu-rating"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="100">100 A</option>
+                    <option value="125">125 A</option>
+                    <option value="150">150 A</option>
+                    <option value="200" selected>200 A</option>
+                    <option value="400">400 A</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="pu-service-type" class="text-sm font-semibold text-slate-800">Service type</label>
+                  <select
+                    id="pu-service-type"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="overhead" selected>Overhead — mast or riser</option>
+                    <option value="underground">Underground lateral</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="pu-meter" class="text-sm font-semibold text-slate-800">Meter socket</label>
+                  <select
+                    id="pu-meter"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="yes" selected>Replaced</option>
+                    <option value="no">Reused</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="pu-permit" class="text-sm font-semibold text-slate-800">Permit fee</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="pu-permit"
+                      type="number"
+                      min="0"
+                      max="5000"
+                      value="250"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="pu-length" class="text-sm font-semibold text-slate-800">
+                    Service conductor run
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="pu-length"
+                      type="number"
+                      min="0"
+                      max="300"
+                      value="30"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="pu-length-range"
+                  type="range"
+                  min="5"
+                  max="200"
+                  step="5"
+                  value="30"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5</span><span>200 ft</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">Meter to panel — long runs are a major cost driver.</p>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="pu-hours" class="text-sm font-semibold text-slate-800">Labor hours</label>
+                  <input
+                    id="pu-hours"
+                    type="number"
+                    min="0"
+                    max="80"
+                    step="0.5"
+                    value="10"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Include permit + inspection</p>
+                </div>
+                <div>
+                  <label for="pu-rate" class="text-sm font-semibold text-slate-800">Rate $/h</label>
+                  <input
+                    id="pu-rate"
+                    type="number"
+                    min="0"
+                    max="400"
+                    value="95"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="pu-region" class="text-sm font-semibold text-slate-800">Region</label>
+                  <select
+                    id="pu-region"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="0.85">Low cost</option>
+                    <option value="1" selected>Average</option>
+                    <option value="1.25">High cost metro</option>
+                    <option value="1.5">Very high cost</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="pu-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-rose-100 bg-rose-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Estimated cost</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="pu-total" class="text-5xl font-extrabold tracking-tight text-rose-600">$3,060</span>
+              </div>
+              <p id="pu-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Inside the $1,300–$5,000 range published for US residential panel and service upgrades in 2026.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Likely low</p>
+                  <p id="pu-low" class="mt-1 text-2xl font-bold text-slate-900">$2,601</p>
+                </div>
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Likely high</p>
+                  <p id="pu-high" class="mt-1 text-2xl font-bold text-slate-900">$3,519</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-rose-100 bg-white" open>
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Panel + breakers</span><span id="pu-bd-panel" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Meter socket</span><span id="pu-bd-meter" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Service conductors</span><span id="pu-bd-conductors" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Mast / riser</span><span id="pu-bd-mast" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Permit</span><span id="pu-bd-permit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Labor</span><span id="pu-bd-labor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Subtotal</span><span id="pu-bd-subtotal" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span class="font-bold">Regional adjustment</span><span id="pu-bd-region" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Material figures are 2026 US market averages and exclude your margin — run the total through the
+                Electrical Estimate Calculator to price it. Grounding electrode work, drywall repair, and
+                correcting pre-existing violations are not included.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The build-up, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Material by service rating</div>
+            <div>panel + breakers: 100 A $400 · 150 A $600 · <span class="text-amber-300">200 A $900</span> · 400 A $2,200</div>
+            <div>service conductors per ft: 100 A $6 · 150 A $9 · <span class="text-amber-300">200 A $12</span> · 400 A $28</div>
+            <div class="mt-4 text-cyan-300"># Conditional items</div>
+            <div>meter socket replaced: + <span class="text-amber-300">$250</span>&nbsp;&nbsp;·&nbsp;&nbsp;overhead mast/riser: + <span class="text-amber-300">$350</span></div>
+            <div class="mt-4 text-cyan-300"># Then</div>
+            <div>subtotal&nbsp;=&nbsp;panel + meter + (conductor $/ft × ft) + mast + permit + (hours × rate)</div>
+            <div>total&nbsp;=&nbsp;subtotal × regional multiplier&nbsp;&nbsp;·&nbsp;&nbsp;range shown at ±15%</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Panel swap ≠ service upgrade</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Keeping the rating means no utility involvement, no new service conductors, no meter work — often
+                a third of the cost. Diagnose which job you are quoting before you price it.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Conductor length is the sleeper</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At $12/ft for 200 A, moving the panel from 30 ft to 100 ft away adds $840 of material before
+                labor — and may push the conductor up a size for voltage drop.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Hours include the waiting</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Permit, utility disconnect and reconnect, inspection, and re-terminating every existing circuit.
+                Quoting only visible wire time is how these jobs lose money.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">400 A is rarely justified</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It roughly doubles panel and conductor cost and often triggers utility transformer work. Most
+                all-electric homes still calculate under 200 A after 220.82 demand factors.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">The standard upgrade, a panel-only swap, and the expensive version.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">100 A → 200 A, overhead, 30 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Meter socket replaced · $250 permit · 10 h at $95 · average region. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              panel $900 + meter $250 + conductors 30 × $12 = $360<br />
+              + mast $350 + permit $250 + labor 10 × $95 = $950<br />
+              subtotal = <span class="font-bold text-rose-700">$3,060</span> · range $2,601 – $3,519
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> right on the $3,000 figure the market
+              data reports as typical. Note this is <em>cost</em>, not price — apply your margin before quoting.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Panel-only swap, same 200 A rating</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Meter reused · underground lateral (no mast) · 5 ft of conductor · 6 h at $95.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              panel $900 + meter $0 + conductors 5 × $12 = $60<br />
+              + mast $0 + permit $250 + labor 6 × $95 = $570<br />
+              subtotal = <span class="font-bold text-rose-700">$1,780</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> $1,280 less than the full upgrade for
+              work that looks similar to the customer. Being able to show this difference is how you win the job
+              honestly when the panel is obsolete but the service is adequate.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">400 A in a high-cost metro, 80 ft run</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Meter replaced · overhead mast · 80 ft · $600 permit · 20 h at $125 · ×1.25 region.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              panel $2,200 + meter $250 + conductors 80 × $28 = $2,240<br />
+              + mast $350 + permit $600 + labor 20 × $125 = $2,500<br />
+              subtotal $8,140 × 1.25 = <span class="font-bold text-rose-700">$10,175</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> more than three times the standard job —
+              and the conductors alone cost more than the whole panel-only swap. This is why confirming a 400 A
+              service is genuinely required, rather than assumed, matters so much.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">2026 US market reference</h2>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Job</th>
+                  <th class="py-3 px-5 font-semibold">Typical installed price</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr class="border-b border-slate-100">
+                  <td class="py-3 px-5 font-semibold text-slate-900">Panel replacement, same rating</td>
+                  <td class="py-3 px-5">$1,300 – $2,500</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-3 px-5 font-semibold text-slate-900">100 A → 200 A service upgrade</td>
+                  <td class="py-3 px-5">$2,000 – $5,000 · most near $3,000</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-3 px-5 font-semibold text-slate-900">200 A → 400 A service</td>
+                  <td class="py-3 px-5">$5,000 – $12,000+</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="py-3 px-5 font-semibold text-slate-900">Subpanel install</td>
+                  <td class="py-3 px-5">$600 – $2,000</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-5 font-semibold text-slate-900">Load management device (instead of upgrade)</td>
+                  <td class="py-3 px-5">$400 – $1,200</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: 2026 US market cost data from
+            <a
+              href="https://homeguide.com/costs/cost-to-replace-electrical-panel"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">HomeGuide</a
+            > and
+            <a
+              href="https://www.angi.com/articles/ask-angie-what-does-it-cost-upgrade-200-amps.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Angi</a
+            >. Code references: NEC (NFPA 70) 2023 — Article 230 services, 230.79 service disconnect rating,
+            Table 310.12 dwelling service conductors, Article 408 panelboards, Article 250 grounding, Article 750
+            energy management systems. Ranges are market observations, not quotes; utility requirements and local
+            amendments vary significantly.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about panel and service upgrade cost."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalPanelUpgradeCostCalculator } from "@/scripts/calculators/electrical-panel-upgrade-cost-calculator";
+    initElectricalPanelUpgradeCostCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

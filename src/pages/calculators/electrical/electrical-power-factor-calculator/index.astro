@@ -1,0 +1,578 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { fmt, tanPhi } from "@/lib/nec";
+
+const title = "Power Factor Correction Calculator — Capacitor kVAR Sizing | TradesQuote";
+const description =
+  "Free power factor correction calculator. Size the capacitor kVAR needed to move from your current power factor to a target, and see the line current freed up and the kVA demand charge avoided.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-power-factor-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Power Factor Correction Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Power Factor Correction Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online power factor correction calculator sizing capacitor kVAR from current and target power factor, with line current reduction and demand-charge saving.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I calculate capacitor kVAR for power factor correction?",
+    answer:
+      "<strong>Qc = P × (tan φ₁ − tan φ₂)</strong>, where P is real power in kW, φ₁ = arccos(current PF) and φ₂ = arccos(target PF). Correcting a 100 kW load from 0.75 to 0.95 needs 100 × (0.8819 − 0.3287) = <strong>55.32 kVAR</strong> of capacitance, so you would install a 60 kVAR bank.",
+  },
+  {
+    question: "What is power factor and why is it low?",
+    answer:
+      "Power factor is the ratio of real power to apparent power — how much of the current is actually doing work. It drops below 1.0 whenever <strong>inductive</strong> loads are present, because they draw magnetising current that lags the voltage. Motors, transformers, welders, and magnetic ballasts are the usual culprits. A lightly loaded motor is worse than a fully loaded one, so oversized motors are a common cause of poor plant power factor.",
+  },
+  {
+    question: "What power factor should I target?",
+    answer:
+      "<strong>0.95</strong> is the usual target. It captures most of the available benefit and stays clear of the risk of <em>over-correction</em>, where too much capacitance pushes power factor leading and can cause voltage rise, resonance with harmonics, and self-excitation problems on motors. Chasing 0.99 costs disproportionately more capacitance for very little extra gain — the tangent curve steepens sharply near unity.",
+  },
+  {
+    question: "How much money does correction actually save?",
+    answer:
+      "It depends entirely on your tariff. If the utility bills on <strong>kW demand only</strong> and applies no power-factor penalty, correction saves nothing directly on the bill — though it still frees conductor and transformer capacity. If the tariff has a <strong>kVA demand charge</strong> or a power-factor penalty below some threshold (commonly 0.90 or 0.95), the savings can be substantial and pay back a bank in one to three years. Enter your kVA demand rate above to see the figure.",
+  },
+  {
+    question: "Where do the capacitors go?",
+    answer:
+      "Three options with different trade-offs. <strong>At the motor</strong> is most effective because it unloads the branch circuit as well as the service, but needs care not to over-correct at light load and must be switched with the motor. <strong>At the panel</strong> is a good compromise. <strong>At the service</strong> corrects the utility bill but leaves internal conductors carrying the full reactive current. Automatic switched banks are used where load varies widely.",
+  },
+  {
+    question: "Can capacitors cause problems?",
+    answer:
+      "Yes, and this is why 0.95 rather than unity is the target. Fixed capacitance on a variable load can <strong>over-correct</strong> at light load, producing a leading power factor and voltage rise. Capacitors also form a resonant circuit with the supply inductance, and if that resonance lands near a harmonic frequency present in the system — very common where there are VFDs — currents can amplify badly. Harmonic-filtered or detuned banks exist for exactly this case.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Correction sized? Quote the install in seconds.";
+const ctaDescription =
+  "Capacitor bank, disconnect, conductors, and labor — TradesQuote turns the scope into a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-kva-calculator",
+    title: "kVA Calculator",
+    description: "See the apparent power correction reduces.",
+  },
+  {
+    href: "/calculators/electrical/electrical-three-phase-power-calculator",
+    title: "Three-Phase Power Calculator",
+    description: "Line current before and after correction.",
+  },
+  {
+    href: "/calculators/electrical/electrical-kwh-cost-calculator",
+    title: "kWh Cost Calculator",
+    description: "The energy side of a commercial bill.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size conductors for the reduced current.",
+  },
+];
+
+/** kVAR required per kW of load, by starting and target power factor. */
+const targets = [0.9, 0.95, 1.0];
+const startPfs = [0.65, 0.7, 0.75, 0.8, 0.85, 0.9];
+const multiplierRows = startPfs.map((start) => ({
+  start,
+  values: targets.map((target) => (target > start ? tanPhi(start) - tanPhi(target) : null)),
+}));
+
+const styles = electricalAccentStyles.teal;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Power Factor Correction Calculator — Capacitor kVAR" />
+    <meta
+      property="og:description"
+      content="Size the capacitor kVAR to move from your current power factor to a target, with the line current freed and demand charge avoided."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Power Factor Correction Calculator — Capacitor kVAR" />
+    <meta name="twitter:description" content="Qc = P × (tan φ₁ − tan φ₂), done for you. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Power Factor Correction Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Power Factor Correction <span class="text-teal-600">— Capacitor kVAR Sizing</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Inductive loads draw magnetising current that does no work but still has to travel through your
+              conductors and transformer. Capacitors supply that reactive current locally instead. The sizing
+              formula is <strong>Qc = P × (tan φ₁ − tan φ₂)</strong> — and the practical target is
+              <strong>0.95</strong>, not unity, because over-correction causes its own problems.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 7h4v4"></path>
+            </svg>
+            Size the capacitor bank
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="pf-kw" class="text-sm font-semibold text-slate-800">Real power load</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="pf-kw"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value="100"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">kW</span>
+                  </div>
+                </div>
+                <input
+                  id="pf-kw-range"
+                  type="range"
+                  min="5"
+                  max="1000"
+                  step="5"
+                  value="100"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-teal-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5</span><span>1,000 kW</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="pf-current" class="text-sm font-semibold text-slate-800">Current power factor</label>
+                  <input
+                    id="pf-current"
+                    type="number"
+                    min="0.1"
+                    max="0.999"
+                    step="0.01"
+                    value="0.75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">From your utility bill or a power-quality meter</p>
+                </div>
+
+                <div>
+                  <label for="pf-target" class="text-sm font-semibold text-slate-800">Target power factor</label>
+                  <input
+                    id="pf-target"
+                    type="number"
+                    min="0.1"
+                    max="1"
+                    step="0.01"
+                    value="0.95"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">0.95 is the practical target — avoid over-correction</p>
+                </div>
+
+                <div>
+                  <label for="pf-phase" class="text-sm font-semibold text-slate-800">Phase</label>
+                  <select
+                    id="pf-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    <option value="3ph" selected>Three-phase</option>
+                    <option value="1ph">Single-phase</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="pf-volts" class="text-sm font-semibold text-slate-800">Voltage</label>
+                  <select
+                    id="pf-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    <option value="208">208 V</option>
+                    <option value="240">240 V</option>
+                    <option value="480" selected>480 V</option>
+                    <option value="600">600 V</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="pf-demand-rate" class="text-sm font-semibold text-slate-800">
+                    kVA demand rate ($ per kVA per month)
+                  </label>
+                  <input
+                    id="pf-demand-rate"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Leave at 0 if your tariff bills kW demand only — correction then saves capacity, not money.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="pf-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Capacitance required</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="pf-kvar" class="text-5xl font-extrabold tracking-tight text-teal-600">55.32 kVAR</span>
+              </div>
+              <p id="pf-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Correcting 0.75 → 0.95 cuts apparent power and line current.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Standard bank</p>
+                  <p id="pf-bank" class="mt-1 text-2xl font-bold text-slate-900">60 kVAR</p>
+                </div>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Line current freed</p>
+                  <p id="pf-amps-saved" class="mt-1 text-2xl font-bold text-slate-900">33.76 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Starting angle</span><span id="pf-bd-tan1" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Target angle</span><span id="pf-bd-tan2" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Capacitance</span><span id="pf-bd-kvar" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>kVA before</span><span id="pf-bd-kva-before" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>kVA after</span><span id="pf-bd-kva-after" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Amps before</span><span id="pf-bd-amps-before" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Amps after</span><span id="pf-bd-amps-after" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Demand saving</span><span id="pf-bd-saving" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Where VFDs or other harmonic sources are present, use a detuned or harmonic-filtered bank —
+                plain capacitors can resonate with the supply inductance and amplify harmonic currents.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Turn each power factor into an angle</div>
+            <div>φ&nbsp;=&nbsp;arccos(PF)&nbsp;&nbsp;·&nbsp;&nbsp;tan φ&nbsp;=&nbsp;√(1 − PF²) ÷ PF</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — The capacitance needed</div>
+            <div>Qc&nbsp;=&nbsp;P × (tan φ₁ − tan φ₂)&nbsp;&nbsp;<span class="text-slate-400">kVAR</span></div>
+            <div class="mt-4 text-cyan-300"># Step 3 — What it buys</div>
+            <div>kVA&nbsp;=&nbsp;P ÷ PF&nbsp;&nbsp;→&nbsp;&nbsp;apparent power falls as PF rises</div>
+            <div>3φ: I&nbsp;=&nbsp;kVA × 1,000 ÷ (<span class="text-amber-300">1.732</span> × V)&nbsp;&nbsp;→&nbsp;&nbsp;line current falls with it</div>
+            <div class="mt-4 text-cyan-300"># Why 0.95 and not 1.00</div>
+            <div>tan φ rises steeply near unity — the last 0.05 costs disproportionate kVAR</div>
+            <div>and fixed capacitance on a light load over-corrects into leading PF</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Correction doesn't reduce kW</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Real power is unchanged — the load still does the same work. What falls is apparent power and
+                therefore current, which frees capacity and cuts a kVA demand charge.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Check the tariff first</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                If the utility bills kW demand with no PF penalty, correction saves no money on the bill. It is
+                a capacity project then, not an energy project — still valuable, but justified differently.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Location changes the benefit</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At the motor, correction unloads the branch circuit too. At the service, only the utility side
+                benefits and internal conductors still carry the reactive current.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Harmonics complicate it</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Capacitors plus supply inductance form a resonant circuit. If that resonance sits near a
+                harmonic a VFD produces, currents amplify. Detuned banks exist for this.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A standard correction, a tariff with a demand charge, and the diminishing return near unity.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">100 kW load, 0.75 → 0.95 at 480 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              tan φ₁ = 0.8819 · tan φ₂ = 0.3287<br />
+              Qc = 100 × (0.8819 − 0.3287) = <span class="font-bold text-teal-700">55.32 kVAR</span> → 60 kVAR bank<br
+              />
+              kVA: 133.33 → 105.26 · amps: 160.4 → 126.6<br />
+              line current freed: <span class="font-bold text-teal-700">33.76 A (21.1%)</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 21% of the feeder's current capacity
+              recovered without touching a conductor. On a service running near its limit, that is often cheaper
+              than an upgrade.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Same load with an $18/kVA demand charge</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A typical commercial kVA demand tariff.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              kVA reduction = 133.33 − 105.26 = 28.07 kVA<br />
+              28.07 × $18 = <span class="font-bold text-teal-700">$505/month</span> → $6,063/year
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 60 kVAR bank typically installs for a
+              few thousand dollars, so payback here is well under a year. This is the case that makes correction
+              an easy sell — but it exists only because the tariff bills kVA.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Chasing unity — 0.95 → 1.00</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The same 100 kW load, going the last step.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              0.75 → 0.95 needed 55.32 kVAR and saved 28.07 kVA<br />
+              0.95 → 1.00 needs a further <span class="font-bold text-amber-700">32.87 kVAR</span> and saves only
+              5.26 kVA<br />
+              59% more capacitance for <span class="font-bold text-rose-700">19% more benefit</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the tangent curve steepens sharply near
+              unity, so the last 0.05 is poor value — and fixed capacitance that reaches unity at full load will
+              over-correct into leading power factor whenever the load drops. That is why 0.95 is the standard
+              target.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">kVAR multiplier table</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Multiply your load in kW by the figure below to get the required capacitor kVAR. These are the
+            <strong>tan φ₁ − tan φ₂</strong> values, computed with the same function the calculator uses.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Current PF</th>
+                  {targets.map((t) => <th class="py-3 px-5 font-semibold">Target {t.toFixed(2)}</th>)}
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  multiplierRows.map((row, index) => (
+                    <tr class={index === multiplierRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.start.toFixed(2)}</td>
+                      {row.values.map((v) => (
+                        <td class="py-3 px-5">{v === null ? <span class="text-slate-300">—</span> : fmt(v, 4)}</td>
+                      ))}
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: Qc = P × (tan φ₁ − tan φ₂) is standard power-engineering practice. NEC
+            (NFPA 70) 2023 — Article 460 capacitors, 460.8 conductor sizing at 135% of capacitor rated current,
+            460.9 overcurrent protection, Article 430 Part VIII for capacitors on motor circuits. IEEE 519 covers
+            harmonic limits relevant to capacitor resonance. Utility demand-charge structures vary — confirm the
+            tariff before promising a saving.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about power factor, capacitor sizing, and over-correction."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalPowerFactorCalculator } from "@/scripts/calculators/electrical-power-factor-calculator";
+    initElectricalPowerFactorCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -25,7 +25,7 @@ import {
 
 const title = "Free Electrical Calculators (NEC) | TradesQuote";
 const description =
-  "Twelve free NEC-based electrical calculators — wire size by ampacity and voltage drop, voltage drop, ampacity derating for ambient and bundling, breaker sizing, service and feeder conductors, equipment and electrode grounding, conduit fill, box fill, residential load calculation, service sizing, EV charger circuits, and electrical job pricing. Every formula explained in plain English with the code article cited.";
+  "Twenty-three free NEC-based electrical calculators — wire size by ampacity and voltage drop, ampacity derating, breaker sizing, service and feeder conductors, grounding, conduit and box fill, residential load calculation, service sizing, EV charger circuits, watts to amps, Ohm's law, unit conversion, kVA, three-phase power, power-factor correction, running cost, panel upgrade and rewiring cost, labor rate, and job pricing. Every formula explained in plain English with the code article cited.";
 
 const pageUrl = "https://www.tradesquote.ai/calculators/electrical";
 const basePath = "/calculators/electrical";
@@ -47,7 +47,7 @@ const itemListData = {
   "@type": "ItemList",
   name: "Free Electrical Calculators",
   description:
-    "Free online electrical calculators built on the National Electrical Code: wire size from Table 310.16 ampacity and voltage drop, voltage drop, ampacity derating, breaker sizing, dwelling service and feeder conductors from Table 310.12, equipment grounding and grounding electrode conductors, Chapter 9 conduit fill, 314.16 box fill, NEC 220.82 residential load calculation, service sizing, NEC 625 EV charger circuits, and contractor job pricing.",
+    "Free online electrical calculators built on the National Electrical Code: wire size from Table 310.16 ampacity and voltage drop, ampacity derating, breaker sizing, dwelling service and feeder conductors from Table 310.12, equipment grounding and grounding electrode conductors, Chapter 9 conduit fill, 314.16 box fill, NEC 220.82 residential load calculation, service sizing, NEC 625 EV charger circuits, watts-to-amps and Ohm's law conversions, kVA and three-phase power, power-factor correction, appliance running cost, panel upgrade and whole-house rewiring cost, loaded labor rate, and contractor job pricing.",
   itemListElement: electricalCalculators.map((calc, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -114,7 +114,7 @@ const ctaDescription =
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Electrical Tools · 12 Free Calculators
+              Electrical Tools · {electricalCalculators.length} Free Calculators
             </span>
 
             <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
@@ -124,9 +124,10 @@ const ctaDescription =
             <p class="mt-5 text-lg text-slate-600 leading-relaxed">
               Size a circuit end to end without opening the code book: conductor gauge from ampacity
               <em>and</em> voltage drop, the breaker that protects it, the conduit and box that hold it, and the
-              grounding conductors that go with it. Then run the whole-house load calculation that decides
-              whether the service can take it — and price the job. Every tool is free, instant, and explains its
-              formula in plain English with the NEC article cited.
+              grounding conductors that go with it. Convert whatever the nameplate gives you — watts,
+              horsepower, kVA — into the amps the sizing tools need. Run the whole-house load calculation that
+              decides whether the service can take it. Then price the job. Every tool is free, instant, and
+              explains its formula in plain English with the NEC article cited.
             </p>
 
             <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
@@ -166,6 +167,13 @@ const ctaDescription =
             >
               <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 8l-4 5h3l-1 4 4-5h-3l1-4z"/></svg>
               Wire an EV charger
+            </a>
+            <a
+              href={`${basePath}/electrical-watts-to-amps-calculator`}
+              class="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-white px-4 py-2.5 text-sm font-medium text-teal-700 shadow-sm hover:bg-teal-50 hover:border-teal-300 transition-colors"
+            >
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>
+              Convert watts, amps & hp
             </a>
             <a
               href={`${basePath}/electrical-estimate-calculator`}
@@ -232,9 +240,9 @@ const ctaDescription =
             <h2 class="text-lg font-bold text-slate-700">More electrical tools on the way</h2>
           </div>
           <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-            Unit conversions (watts to amps, kVA, Ohm's law), motor and transformer circuits, available fault
-            current, solar interconnection, generator sizing, and lighting layout are next. Calculators for
-            these trades are also planned:
+            Motor and transformer circuits, available fault current, solar interconnection and the 705.12 120%
+            busbar rule, generator sizing, and lighting layout are next. Calculators for these trades are also
+            planned:
           </p>
           <div class="mt-3 flex flex-wrap gap-2">
             {
@@ -336,8 +344,23 @@ const ctaDescription =
           <div>amps&nbsp;=&nbsp;VA ÷ <span class="text-amber-300">240</span>&nbsp;&nbsp;→&nbsp;&nbsp;smallest standard service ≥ amps&nbsp;&nbsp;·&nbsp;&nbsp;flag above <span class="text-amber-300">80%</span> utilisation</div>
           <div class="mt-4 text-emerald-300"># EV charger circuit (625.41, 625.42)</div>
           <div>continuous load&nbsp;→&nbsp;conductors and OCPD at <span class="text-amber-300">125%</span>&nbsp;&nbsp;·&nbsp;&nbsp;48A → 60A breaker, 6 AWG Cu, 10 AWG EGC</div>
+          <div class="mt-4 text-emerald-300"># Watts ↔ amps</div>
+          <div>DC: I&nbsp;=&nbsp;P ÷ V&nbsp;&nbsp;·&nbsp;&nbsp;1φ: I&nbsp;=&nbsp;P ÷ (V × PF)&nbsp;&nbsp;·&nbsp;&nbsp;3φ: I&nbsp;=&nbsp;P ÷ (<span class="text-amber-300">1.732</span> × V × PF)</div>
+          <div class="mt-4 text-teal-300"># Ohm's law and the power wheel</div>
+          <div>V&nbsp;=&nbsp;I × R&nbsp;&nbsp;·&nbsp;&nbsp;P&nbsp;=&nbsp;V × I&nbsp;&nbsp;·&nbsp;&nbsp;P&nbsp;=&nbsp;I² × R&nbsp;&nbsp;·&nbsp;&nbsp;P&nbsp;=&nbsp;V² ÷ R</div>
+          <div class="mt-4 text-sky-300"># Unit conversions</div>
+          <div>1 hp&nbsp;=&nbsp;<span class="text-amber-300">745.7</span> W&nbsp;&nbsp;·&nbsp;&nbsp;1 W&nbsp;=&nbsp;<span class="text-amber-300">3.412</span> BTU/h&nbsp;&nbsp;·&nbsp;&nbsp;1 ton&nbsp;=&nbsp;<span class="text-amber-300">12,000</span> BTU/h</div>
+          <div class="mt-4 text-emerald-300"># Apparent, real, and reactive power</div>
+          <div>1φ: kVA&nbsp;=&nbsp;V × I ÷ 1,000&nbsp;&nbsp;·&nbsp;&nbsp;3φ: kVA&nbsp;=&nbsp;<span class="text-amber-300">1.732</span> × V × I ÷ 1,000</div>
+          <div>kW&nbsp;=&nbsp;kVA × PF&nbsp;&nbsp;·&nbsp;&nbsp;kVAR&nbsp;=&nbsp;√(kVA² − kW²)</div>
+          <div class="mt-4 text-teal-300"># Power factor correction</div>
+          <div>Qc&nbsp;=&nbsp;P × (tan φ₁ − tan φ₂),&nbsp;&nbsp;φ&nbsp;=&nbsp;arccos(PF)</div>
+          <div class="mt-4 text-amber-300"># Running cost</div>
+          <div>cost&nbsp;=&nbsp;W ÷ <span class="text-amber-300">1,000</span> × hours × days × $/kWh</div>
           <div class="mt-4 text-rose-300"># Job price (estimate calculator)</div>
           <div>price&nbsp;=&nbsp;(labor + fixtures + material + overhead) ÷ (1 − <span class="text-amber-300">margin</span>)</div>
+          <div class="mt-4 text-rose-300"># Loaded labor rate</div>
+          <div>bill rate&nbsp;=&nbsp;(wage + burden + overhead) ÷ billable hours ÷ (1 − margin)</div>
         </div>
 
         <p class="mt-6 text-sm text-slate-500">

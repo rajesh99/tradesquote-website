@@ -1,0 +1,581 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { SQRT3, fmt, wattsToAmps } from "@/lib/nec";
+
+const title = "Watts to Amps Calculator — DC, Single-Phase & Three-Phase | TradesQuote";
+const description =
+  "Free watts to amps calculator. Convert watts to amps for DC, single-phase, and three-phase circuits at any voltage and power factor — then get the breaker and copper conductor that current requires.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-watts-to-amps-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Watts to Amps Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Watts to Amps Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online watts to amps converter for DC, single-phase, and three-phase circuits, returning line current plus the required overcurrent device and conductor size.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I convert watts to amps?",
+    answer:
+      "Divide watts by volts — then adjust for the supply type. <strong>DC: I = P ÷ V.</strong> <strong>Single-phase AC: I = P ÷ (V × PF).</strong> <strong>Three-phase AC: I = P ÷ (√3 × V × PF).</strong> So 1,500 W at 120 V single-phase with unity power factor is 1,500 ÷ 120 = <strong>12.5 amps</strong>.",
+  },
+  {
+    question: "How many amps is 1,500 watts?",
+    answer:
+      "At <strong>120 V</strong>, 1,500 W draws <strong>12.5 A</strong> — which is why 1,500 W is the standard ceiling for portable heaters and hair dryers on a 15 A circuit. At <strong>240 V</strong> the same 1,500 W draws only <strong>6.25 A</strong>. Doubling the voltage halves the current for identical power, which is the entire reason 240 V circuits exist for large appliances.",
+  },
+  {
+    question: "Do I need to include power factor?",
+    answer:
+      "For resistive loads — heaters, incandescent lamps, electric water heaters, resistance elements — power factor is <strong>1.0</strong> and you can ignore it. For motors, transformers, LED drivers, and switch-mode power supplies it is typically <strong>0.7 to 0.95</strong>, and leaving it out will <em>understate</em> the current. A motor nameplate usually lists power factor; if it doesn't, 0.85 is a reasonable planning assumption.",
+  },
+  {
+    question: "Why does three-phase draw less current for the same watts?",
+    answer:
+      "Because the three phase currents are 120° apart, so the same real power is delivered across three conductors instead of two. The √3 factor works out to roughly <strong>42% less line current</strong> than single-phase at the same voltage. Less current means smaller conductors, less voltage drop, and cheaper distribution — which is why commercial and industrial buildings are three-phase.",
+  },
+  {
+    question: "Is the breaker the same as the calculated amps?",
+    answer:
+      'No, and this is where people get caught. The calculated current is what the load draws; the breaker has to be the <strong>next standard rating above it</strong>, and for a <strong>continuous</strong> load (three hours or more) the requirement is 125% of the current per NEC 210.20(A). A 12.5 A continuous load needs 15.6 A of capacity, so a 20 A circuit. Toggle the continuous option above, or use the <a href="/calculators/electrical/electrical-breaker-size-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Breaker Size Calculator</a>.',
+  },
+  {
+    question: "What about VA instead of watts?",
+    answer:
+      'Volt-amperes are <em>apparent</em> power and watts are <em>real</em> power; they differ by the power factor. Conductors and breakers are sized from <strong>VA</strong>, because the conductor carries the full current regardless of how much of it does useful work. If your nameplate gives VA, enter it here with power factor set to 1.0 — that returns the true current. The <a href="/calculators/electrical/electrical-kva-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">kVA Calculator</a> handles the relationship in detail.',
+  },
+  {
+    question: "Does this work for motor circuits?",
+    answer:
+      "Use it for a rough check only. <strong>NEC 430.6(A)(1)</strong> requires motor conductors to be sized from the full-load current values in Tables 430.248 and 430.250 — <em>not</em> from the motor nameplate and not from a watts calculation. The Code tables are deliberately conservative. This converter is right for resistive loads, appliances, and general power estimating.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Current known? Quote the circuit in seconds.";
+const ctaDescription =
+  "Converting the load is step one. TradesQuote turns the whole job into a detailed line-item estimate — conductor, breaker, raceway, devices, and labor — with quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-amps-to-watts-calculator",
+    title: "Amps to Watts Calculator",
+    description: "The same conversion in reverse.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size the conductor for the amps you just found.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "The 125% continuous-load rule applied properly.",
+  },
+  {
+    href: "/calculators/electrical/electrical-kva-calculator",
+    title: "kVA Calculator",
+    description: "Apparent versus real power, and reactive kVAR.",
+  },
+];
+
+/** Common wattages at the voltages they actually run on, computed with the same helper the script uses. */
+const conversionRows = [
+  { watts: 100, note: "LED floodlight / small fan" },
+  { watts: 500, note: "Small tool, blender" },
+  { watts: 1000, note: "Microwave, space heater on low" },
+  { watts: 1500, note: "Portable heater, hair dryer — the 15 A limit" },
+  { watts: 2400, note: "Full 20 A circuit at 120 V" },
+  { watts: 4500, note: "Electric water heater element" },
+  { watts: 5000, note: "Clothes dryer" },
+  { watts: 9600, note: "40 A EV charger at 240 V" },
+  { watts: 12000, note: "Electric range" },
+].map((r) => ({
+  ...r,
+  a120: wattsToAmps(r.watts, "1ph", 120, 1),
+  a240: wattsToAmps(r.watts, "1ph", 240, 1),
+  a480: wattsToAmps(r.watts, "3ph", 480, 1),
+}));
+
+const styles = electricalAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Watts to Amps Calculator — DC, 1φ & 3φ" />
+    <meta
+      property="og:description"
+      content="Convert watts to amps for DC, single-phase, and three-phase at any voltage and power factor — plus the breaker and conductor that current needs."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Watts to Amps Calculator — DC, 1φ & 3φ" />
+    <meta
+      name="twitter:description"
+      content="Watts to amps for any voltage and power factor, with the breaker and wire size. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Watts to Amps Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Watts to Amps Calculator <span class="text-emerald-600">— DC, 1φ & 3φ</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Nameplates give you watts. Conductors, breakers, and code tables all want amps. The conversion is
+              one division — <strong>amps = watts ÷ volts</strong> — but the divisor changes with the supply
+              type: multiply by power factor for AC, and by √3 as well for three-phase. This calculator handles
+              all three, then carries the answer forward into the breaker and conductor it requires.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Convert watts to amps
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="wa-watts" class="text-sm font-semibold text-slate-800">Power</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="wa-watts"
+                      type="number"
+                      min="0"
+                      max="200000"
+                      value="1500"
+                      class="w-28 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">watts</span>
+                  </div>
+                </div>
+                <input
+                  id="wa-watts-range"
+                  type="range"
+                  min="50"
+                  max="50000"
+                  step="50"
+                  value="1500"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-emerald-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>50</span><span>50,000 W</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="wa-mode" class="text-sm font-semibold text-slate-800">Supply type</label>
+                  <select
+                    id="wa-mode"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="1ph" selected>AC single-phase</option>
+                    <option value="3ph">AC three-phase</option>
+                    <option value="dc">DC</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="wa-volts" class="text-sm font-semibold text-slate-800">Voltage</label>
+                  <select
+                    id="wa-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="12">12 V</option>
+                    <option value="24">24 V</option>
+                    <option value="48">48 V</option>
+                    <option value="120" selected>120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240">240 V</option>
+                    <option value="277">277 V</option>
+                    <option value="480">480 V</option>
+                    <option value="600">600 V</option>
+                  </select>
+                </div>
+
+                <div id="wa-pf-wrap">
+                  <label for="wa-pf" class="text-sm font-semibold text-slate-800">Power factor</label>
+                  <input
+                    id="wa-pf"
+                    type="number"
+                    min="0.1"
+                    max="1"
+                    step="0.01"
+                    value="1"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">1.0 for resistive · 0.85 typical for motors</p>
+                </div>
+
+                <div>
+                  <label for="wa-continuous" class="text-sm font-semibold text-slate-800">Continuous load?</label>
+                  <select
+                    id="wa-continuous"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="no" selected>No</option>
+                    <option value="yes">Yes — 3 hours or more (×1.25)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="wa-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Current</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="wa-amps" class="text-5xl font-extrabold tracking-tight text-emerald-600">12.50 A</span>
+              </div>
+              <p id="wa-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Single-phase: amps = watts ÷ (volts × power factor).
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Minimum breaker</p>
+                  <p id="wa-breaker" class="mt-1 text-2xl font-bold text-slate-900">15 A</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Conductor</p>
+                  <p id="wa-conductor" class="mt-1 text-2xl font-bold text-slate-900">14 AWG Cu</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Formula</span><span id="wa-bd-formula" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Divisor</span><span id="wa-bd-divisor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Current</span><span id="wa-bd-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Required capacity</span><span id="wa-bd-required" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Next standard breaker</span><span id="wa-bd-breaker" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Kilowatts</span><span id="wa-bd-kw" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Conductor shown is the general-purpose minimum at the 75 °C column before any derating. Motor
+                circuits must use the NEC Table 430.248/430.250 full-load currents instead.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One division. What changes between supply types is only what goes in the denominator.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># DC — no power factor exists</div>
+            <div>I&nbsp;=&nbsp;P ÷ V</div>
+            <div class="mt-4 text-cyan-300"># AC single-phase</div>
+            <div>I&nbsp;=&nbsp;P ÷ (V × PF)</div>
+            <div class="mt-4 text-cyan-300"># AC three-phase (balanced)</div>
+            <div>I&nbsp;=&nbsp;P ÷ (<span class="text-amber-300">1.732</span> × V × PF)</div>
+            <div class="mt-4 text-cyan-300"># Then the circuit that carries it (NEC 210.20(A), 240.6(A))</div>
+            <div>
+              required&nbsp;=&nbsp;I × <span class="text-amber-300">1.25</span> if continuous&nbsp;&nbsp;→&nbsp;&nbsp;breaker
+              = next standard rating
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Voltage is the lever</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Double the voltage and the current halves for the same watts. That is why dryers, ranges, and EV
+                chargers run at 240 V and why commercial distribution is 480 V.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Power factor only cuts one way</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A power factor below 1.0 always <em>increases</em> current for the same real power. Omitting it
+                on a motor load undersizes the conductor.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Where 1.732 comes from</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                √3, the geometric consequence of three phases 120° apart. It means three-phase carries the same
+                power with about 42% less line current than single-phase.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Amps aren't the breaker</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The calculated current is the load. The breaker is the next standard rating above it — 125% of
+                it if the load is continuous.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The 1,500 W heater everyone asks about, a motor where power factor matters, and a three-phase load.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">1,500 W space heater at 120 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Resistive load, power factor 1.0. The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              I = 1,500 ÷ (120 × 1.0) = <span class="font-bold text-emerald-700">12.50 A</span><br />
+              breaker: next standard above 12.5 A = 15 A · conductor 14 AWG Cu<br />
+              as a continuous load: 12.5 × 1.25 = 15.63 A → 20 A breaker on 12 AWG
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 12.5 A is exactly why 1,500 W is the
+              ceiling for portable heaters — it sits at 83% of a 15 A circuit. Run it for three hours or more
+              and it becomes a continuous load needing a 20 A circuit.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">2,000 W motor at 240 V, PF 0.85</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Single-phase inductive load.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              with PF: I = 2,000 ÷ (240 × 0.85) = <span class="font-bold text-emerald-700">9.80 A</span><br />
+              ignoring PF: I = 2,000 ÷ 240 = 8.33 A &nbsp;
+              <span class="text-rose-700">← 15% understated</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> leaving power factor out of an inductive
+              load understates current by 15% here. On a real motor circuit you would ignore both figures and
+              use the Table 430.248 full-load current instead — but the arithmetic shows why power factor is
+              never optional on AC.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">30,000 W at 480 V three-phase, PF 0.9</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A commercial rooftop unit or a bank of process heaters.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              three-phase: I = 30,000 ÷ (1.732 × 480 × 0.9) = <span class="font-bold text-emerald-700">40.09 A</span
+              ><br />
+              single-phase at 480 V would be: 30,000 ÷ (480 × 0.9) = 69.44 A<br />
+              same power, <span class="font-bold text-emerald-700">42% less line current</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 40 A of three-phase lands on 8 AWG
+              copper; 69 A of single-phase would need 4 AWG. The conductor saving across a whole building is
+              the commercial case for three-phase service.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Watts to amps quick chart</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Common wattages at unity power factor. Notice how the same load moves down two columns simply by
+            changing the supply voltage.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Power</th>
+                  <th class="py-3 px-4 font-semibold">120 V 1φ</th>
+                  <th class="py-3 px-4 font-semibold">240 V 1φ</th>
+                  <th class="py-3 px-4 font-semibold">480 V 3φ</th>
+                  <th class="py-3 px-5 font-semibold">Typical load</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  conversionRows.map((row, index) => (
+                    <tr class={index === conversionRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.watts.toLocaleString("en-US")} W</td>
+                      <td class="py-3 px-4">{fmt(row.a120, 2)} A</td>
+                      <td class="py-3 px-4">{fmt(row.a240, 2)} A</td>
+                      <td class="py-3 px-4">{fmt(row.a480, 2)} A</td>
+                      <td class="py-3 px-5 text-slate-500">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: √3 = {fmt(SQRT3, 4)}. NEC (NFPA 70) 2023 — 210.20(A) continuous load,
+            240.6(A) standard overcurrent ratings, Table 310.16 conductor ampacities, 430.6(A)(1) and Tables
+            430.248 and 430.250 for motor full-load currents. Local amendments override the model code, and a
+            licensed electrician plus the AHJ have final say on anything installed.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about converting watts to amps and sizing the circuit."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalWattsToAmpsCalculator } from "@/scripts/calculators/electrical-watts-to-amps-calculator";
+    initElectricalWattsToAmpsCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>
