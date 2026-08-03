@@ -1,17 +1,36 @@
 ---
-import type { HvacCalculator } from "@/config/hvacCalculators";
-import { hvacAccentStyles } from "@/config/hvacCalculators";
+/**
+ * Category-neutral calculator card. Pass the calculator, its resolved accent
+ * `styles` object, and the category `basePath` — the card itself knows nothing
+ * about which trade it is rendering.
+ */
+export type CalculatorCardStyles = {
+  iconBg: string;
+  iconColor: string;
+  hoverBorder: string;
+  hoverTitle: string;
+  ctaColor: string;
+};
+
+export type CalculatorCardData = {
+  slug: string;
+  title: string;
+  description: string;
+  question: string;
+  icon: string;
+};
 
 interface Props {
-  calculator: HvacCalculator;
+  calculator: CalculatorCardData;
+  styles: CalculatorCardStyles;
+  basePath: string;
 }
 
-const { calculator } = Astro.props;
-const styles = hvacAccentStyles[calculator.accent];
+const { calculator, styles, basePath } = Astro.props;
 ---
 
 <a
-  href={`/calculators/hvac/${calculator.slug}`}
+  href={`${basePath}/${calculator.slug}`}
   class={`group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${styles.hoverBorder} hover:shadow-md transition`}
 >
   <div class="flex items-center gap-3">

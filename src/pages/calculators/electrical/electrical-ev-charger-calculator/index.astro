@@ -1,0 +1,606 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { STANDARD_SERVICE_RATINGS, egcSize, findSizeByAmpacity, nextStandardOcpd, sizeLabel } from "@/lib/nec";
+
+const title = "EV Charger Wire & Breaker Size Calculator — NEC 625 | TradesQuote";
+const description =
+  "Free EV charger circuit calculator. NEC 625 treats EVSE as a continuous load, so conductors and breaker go at 125% of the charger's output. Get the breaker, wire size, ground, voltage drop, and whether your existing service can actually take it.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-ev-charger-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "EV Charger Circuit Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "EV Charger Circuit Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC 625 EV charger circuit calculator returning breaker size, conductor size, equipment grounding conductor, voltage drop, and a service-capacity verdict from the charger's rated output current.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size breaker for a 48 amp EV charger?",
+    answer:
+      "A <strong>60 amp</strong> breaker. EV charging is a continuous load under <strong>NEC 625.41</strong>, so the overcurrent device and conductors must be rated at 125% of the charger's output: 48 × 1.25 = 60 A, which is a standard 240.6(A) rating. The matching conductor is <strong>6 AWG copper</strong> (65 A at 75 °C) with a <strong>10 AWG copper</strong> equipment grounding conductor from Table 250.122.",
+  },
+  {
+    question: "What wire size for an EV charger?",
+    answer:
+      "It follows from the breaker, not from the charger. The most common configurations are <strong>6 AWG copper on a 60 A breaker</strong> for a 48 A charger, and <strong>8 AWG copper on a 50 A breaker</strong> for a 40 A charger. A 32 A charger needs a 40 A breaker and 8 AWG. Long runs may push the conductor up a size for voltage drop — set the run length above and the calculator flags it.",
+  },
+  {
+    question: "Why is 125% required for EV charging?",
+    answer:
+      "Because a car charges at full current for hours. <strong>NEC 625.41</strong> classifies EVSE as a continuous load, which triggers the 210.20(A) requirement that the overcurrent device be rated at 125% of a continuous load. Stated the other way round: a charger may draw no more than 80% of its breaker rating. This is why a NEMA 14-50 receptacle on a 50 A breaker supports a 40 A charger, not a 50 A one.",
+  },
+  {
+    question: "Do I need a panel upgrade for an EV charger?",
+    answer:
+      'Frequently not. A 48 A charger is 11,520 VA of nameplate, but under the NEC 220.82 optional method the 40% remainder factor means it adds only about <strong>4,600 VA</strong> to the calculated load. Many homes have the capacity already. Run the <a href="/calculators/electrical/electrical-load-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Residential Load Calculator</a> before anyone quotes an upgrade — and if it genuinely does not fit, load management is usually the cheaper answer.',
+  },
+  {
+    question: "Can I put two EV chargers on one circuit?",
+    answer:
+      "Not on a single branch circuit in the normal sense — each EVSE generally needs its own circuit and its own overcurrent protection. What you <em>can</em> do is use a listed <strong>load-sharing or load-management system</strong> under NEC 625.42 and Article 750, where two or more chargers share a circuit's capacity by coordinating with each other so the total never exceeds the rating. Several manufacturers build this in, and it is the standard approach for a two-car garage on a modest service.",
+  },
+  {
+    question: "Hardwired or NEMA 14-50 — which is better?",
+    answer:
+      "<strong>Hardwired</strong> is required above 48 A, supports the highest charge rates, and eliminates the receptacle as a failure point — plug-in EVSE connections are a well-documented source of overheating when the receptacle is a cheap one. <strong>NEMA 14-50</strong> is more flexible, lets you take the charger when you move, and can be easier to permit. Note that a 14-50 on a 50 A breaker caps you at 40 A of charging, and that NEC 625.54 requires GFCI protection for receptacle-supplied EVSE.",
+  },
+  {
+    question: "Does a load management device let me skip the upgrade?",
+    answer:
+      "Yes, and it is an explicitly permitted compliance path — not a workaround. <strong>NEC 625.42</strong> allows an energy management system under Article 750 to set the maximum EVSE load used in the calculation, and <strong>220.83(C)</strong> and <strong>750.30</strong> govern how. The device monitors total demand and reduces or interrupts charging when the house approaches its limit. At a few hundred dollars against several thousand for new service conductors, a meter socket, and utility coordination, it is usually the right recommendation.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "EV circuit sized? Quote the install in seconds.";
+const ctaDescription =
+  "Charger, breaker, conductor, conduit, permit, and labor — TradesQuote turns an EVSE install into a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "Check whether the house has the capacity.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "See the headroom on the existing panel.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "The 125% continuous-load rule in general.",
+  },
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "Check a long run out to a detached garage.",
+  },
+];
+
+const chargerOptions = [16, 24, 32, 40, 48, 64, 80];
+
+/** Charger output → breaker → conductor → EGC, all from the same helpers the script uses. */
+const chargerTable = chargerOptions.map((amps) => {
+  const breaker = nextStandardOcpd(amps * 1.25);
+  const conductor = findSizeByAmpacity(breaker, "copper", 75);
+  return {
+    amps,
+    breaker,
+    conductor: conductor ? sizeLabel(conductor.label) : "—",
+    egc: sizeLabel(egcSize(breaker, "copper")),
+    va: amps * 240,
+    kw: ((amps * 240) / 1000).toFixed(1),
+  };
+});
+
+const styles = electricalAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="EV Charger Wire & Breaker Size Calculator — NEC 625" />
+    <meta
+      property="og:description"
+      content="Breaker, conductor, ground, voltage drop, and a service-capacity check for any Level 2 EV charger — sized as a continuous load per NEC 625."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EV Charger Wire & Breaker Size Calculator — NEC 625" />
+    <meta
+      name="twitter:description"
+      content="What size wire and breaker for an EV charger, and whether your panel can take it. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="EV Charger Circuit Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              EV Charger Circuit Calculator <span class="text-emerald-600">— NEC 625</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A car charges at full current for hours, so <strong>NEC 625.41</strong> treats EVSE as a
+              continuous load: conductors and overcurrent protection at <strong>125%</strong> of the charger's
+              rated output. That single rule sets the breaker, which sets the wire, which sets the ground. Then
+              comes the question that actually decides the job — <strong>will the existing service take it?</strong>
+              This calculator runs the whole chain, including the panel check.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 8l-4 5h3l-1 4 4-5h-3l1-4z"></path>
+            </svg>
+            Size the EVSE circuit
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ev-amps" class="text-sm font-semibold text-slate-800">Charger output current</label>
+                  <select
+                    id="ev-amps"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    {
+                      chargerOptions.map((amps) => (
+                        <option value={amps} selected={amps === 48}>
+                          {amps} A ({((amps * 240) / 1000).toFixed(1)} kW at 240 V)
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    The charger's rated output, not the breaker size. Many plug-in units ship set below maximum.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="ev-voltage" class="text-sm font-semibold text-slate-800">Supply voltage</label>
+                  <select
+                    id="ev-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="240" selected>240 V (residential)</option>
+                    <option value="208">208 V (commercial 3φ)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ev-material" class="text-sm font-semibold text-slate-800">Conductor material</label>
+                  <select
+                    id="ev-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum / copper-clad</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ev-length" class="text-sm font-semibold text-slate-800">One-way run length</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ev-length"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="60"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold text-slate-800">Will it fit the existing service?</p>
+                <div class="mt-3 grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="ev-existing-va" class="text-xs font-medium text-slate-600">
+                      Existing calculated load (VA)
+                    </label>
+                    <input
+                      id="ev-existing-va"
+                      type="number"
+                      min="0"
+                      max="200000"
+                      value="24280"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <p class="mt-1 text-xs text-slate-500">From the Residential Load Calculator.</p>
+                  </div>
+                  <div>
+                    <label for="ev-service" class="text-xs font-medium text-slate-600">Service rating</label>
+                    <select
+                      id="ev-service"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    >
+                      {
+                        STANDARD_SERVICE_RATINGS.map((rating) => (
+                          <option value={rating} selected={rating === 200}>
+                            {rating} A
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">
+                  This check adds the charger at <strong>full nameplate</strong> — the conservative view. Adding
+                  it through the load calculator instead lets the 40% remainder factor apply, which gives a
+                  smaller and equally valid number.
+                </p>
+              </div>
+
+              <button
+                id="ev-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Required breaker</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ev-breaker" class="text-5xl font-extrabold tracking-tight text-emerald-600">60 A</span>
+              </div>
+              <p id="ev-verdict" class="mt-1 text-sm font-semibold text-emerald-700">
+                Fits — the charger brings the service to 74.6% of 200 A.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Conductor</p>
+                  <p id="ev-conductor" class="mt-1 text-xl font-bold text-slate-900">6 AWG copper</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Equipment ground</p>
+                  <p id="ev-egc" class="mt-1 text-xl font-bold text-slate-900">10 AWG copper</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Continuous load ×1.25</span><span id="ev-bd-continuous" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Breaker</span><span id="ev-bd-breaker" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 text-right">
+                    <span class="shrink-0">Conductor</span><span id="ev-bd-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Ground</span><span id="ev-bd-egc" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Voltage drop</span><span id="ev-bd-drop" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>EVSE load</span><span id="ev-bd-evse-va" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>New total load</span><span id="ev-bd-new-total" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Service used</span><span id="ev-bd-utilisation" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Receptacle-supplied EVSE requires GFCI protection (625.54). Above 48 A the charger must be
+                hardwired. Derating is not applied here — check it if the conductors share a raceway.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One multiplication drives everything else. The rest is lookups and a capacity check.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Continuous load (NEC 625.41, 210.20(A))</div>
+            <div>required&nbsp;=&nbsp;charger amps × <span class="text-amber-300">1.25</span></div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Breaker (NEC 240.6(A))</div>
+            <div>breaker&nbsp;=&nbsp;next standard rating ≥ required</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Conductor (Table 310.16, 75 °C)</div>
+            <div>conductor&nbsp;=&nbsp;smallest AWG whose ampacity ≥ breaker</div>
+            <div class="mt-4 text-cyan-300"># Step 4 — Ground (Table 250.122)</div>
+            <div>EGC&nbsp;=&nbsp;lookup by breaker rating</div>
+            <div class="mt-4 text-cyan-300"># Step 5 — Voltage drop</div>
+            <div>VD%&nbsp;=&nbsp;(2 × K × I × L ÷ CM) ÷ V × 100&nbsp;&nbsp;→&nbsp;&nbsp;upsize if over 3%</div>
+            <div class="mt-4 text-cyan-300"># Step 6 — Does the service have room?</div>
+            <div>
+              new load&nbsp;=&nbsp;existing calculated VA + (charger amps × V)&nbsp;&nbsp;·&nbsp;&nbsp;utilisation&nbsp;=&nbsp;new
+              load ÷ 240 ÷ service rating
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">80% is the same rule</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Sizing at 125% of the charger means the charger draws 80% of the breaker. A 50 A circuit
+                supports 40 A of charging, a 60 A circuit supports 48 A. That is why chargers come in those odd
+                numbers.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Nameplate vs calculated load</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The circuit is sized at full nameplate. The <em>service</em> calculation gets the 40% remainder
+                factor under 220.82. Same charger, two different numbers, both correct in their own context.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Load management is legitimate</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                NEC 625.42 and Article 750 let an energy management system set the EVSE load used in the
+                calculation. It is a permitted compliance path, not a loophole — and far cheaper than new
+                service conductors.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">208 V changes the math</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Commercial three-phase supplies give 208 V, so the same 48 A charger delivers 10 kW instead of
+                11.5 kW. The circuit is identical; the charge rate is 13% lower.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The full-rate hardwired install, the most common plug-in setup, and the case where it genuinely does
+          not fit.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">48 A hardwired charger — 200 A service, 60 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Copper · 240 V · existing calculated load 24,280 VA. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 48 × 1.25 = 60 A → 60 A breaker<br />
+              conductor: 6 AWG Cu = 65 A at 75 °C ✓<br />
+              EGC (Table 250.122, 60 A) = 10 AWG Cu<br />
+              drop = 2 × 12.9 × 48 × 60 ÷ 26,240 = 2.83 V = 1.18% ✓<br />
+              service: 24,280 + 11,520 = 35,800 VA ÷ 240 = 149.2 A = 74.6% of 200 A<br />
+              → <span class="font-bold text-emerald-700">60 A breaker · 6 AWG Cu · 10 AWG ground · fits</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 11.5 kW of charging, roughly 35 miles of
+              range per hour, on a service with a quarter of its capacity still spare. This is the install most
+              people should be quoting.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">40 A charger on a NEMA 14-50</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              The most common residential setup. Copper · 240 V · 60 ft.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 40 × 1.25 = 50 A → 50 A breaker<br />
+              conductor: 8 AWG Cu = 50 A at 75 °C ✓<br />
+              EGC (Table 250.122, 50 A) = 10 AWG Cu<br />
+              drop = 2 × 12.9 × 40 × 60 ÷ 16,510 = 3.75 V = 1.56% ✓<br />
+              → <span class="font-bold text-emerald-700">50 A breaker · 8 AWG Cu · 10 AWG ground</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 9.6 kW. Note that a 14-50 receptacle on
+              a 50 A breaker <em>caps</em> you at 40 A of charging — the 80% rule again. Many plug-in chargers
+              ship configured to 32 A and have to be set up to 40 A during commissioning. Receptacle-fed EVSE
+              also needs GFCI protection per 625.54.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">48 A charger on a 100 A service — the hard case</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Same house load of 24,280 VA, but only a 100 A service.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              circuit is identical: 60 A breaker, 6 AWG Cu, 10 AWG ground<br />
+              service: 35,800 VA ÷ 240 = 149.2 A on a 100 A service =
+              <span class="font-bold text-rose-700">149.2%</span><br />
+              → <span class="font-bold text-rose-700">will not fit at full nameplate</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> three real options, cheapest first.
+              Drop to a 32 A charger (7,680 VA) and re-run the 220.82 calculation, where the 40% factor applies.
+              Add an Article 750 load-management device that limits charging during household peaks. Or upgrade
+              the service. Always price the first two before quoting the third.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            EV charger circuit chart
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Every common Level 2 charger output with its breaker, copper conductor at 75 °C, and equipment
+            grounding conductor — computed by the same NEC lookups the calculator uses. Add the charge rate at
+            240 V for context.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Charger</th>
+                  <th class="py-3 px-5 font-semibold">Breaker</th>
+                  <th class="py-3 px-5 font-semibold">Copper conductor</th>
+                  <th class="py-3 px-5 font-semibold">Ground</th>
+                  <th class="py-3 px-5 font-semibold">Rate at 240 V</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  chargerTable.map((row, index) => (
+                    <tr class={index === chargerTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.amps} A</td>
+                      <td class="py-3 px-5">{row.breaker} A</td>
+                      <td class="py-3 px-5">{row.conductor}</td>
+                      <td class="py-3 px-5">{row.egc}</td>
+                      <td class="py-3 px-5 text-slate-500">
+                        {row.kw} kW · {row.va.toLocaleString("en-US")} VA
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-sm text-amber-900 leading-relaxed">
+              <span class="font-semibold">Incentives change fast.</span> The 30% federal 30C credit for EV
+              charging equipment expired on <strong>30 June 2026</strong>. Verify current federal, state, and
+              utility incentives at the time you quote — do not carry a stale figure into an estimate.
+            </p>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — Article 625 electric vehicle power transfer systems,
+            625.41 overcurrent protection, 625.42 rating and energy management, 625.54 GFCI protection for
+            receptacle-supplied EVSE, 210.20(A) continuous load, 240.6(A) standard ratings, Table 310.16
+            ampacities, Table 250.122 equipment grounding conductors, Article 750 energy management systems,
+            220.82 and 220.83(C) load calculations. Local amendments and utility programs override the model
+            code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about EV charger circuits, panel capacity, and load management."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalEvChargerCalculator } from "@/scripts/calculators/electrical-ev-charger-calculator";
+    initElectricalEvChargerCalculator();
+  </script>
+</Layout>

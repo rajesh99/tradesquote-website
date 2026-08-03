@@ -1,6 +1,12 @@
 ---
+/**
+ * HVAC-flavoured wrapper around the category-neutral `RelatedCalculators`.
+ * Kept so the 40+ existing HVAC calculator pages need no changes; it just
+ * resolves the HVAC accent map and forwards.
+ */
 import type { HvacCalculatorAccent } from "@/config/hvacCalculators";
 import { hvacAccentStyles } from "@/config/hvacCalculators";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
 
 export type HvacRelatedCalculator = {
   href: string;
@@ -18,19 +24,4 @@ const { calculators, accent = "blue", heading = "More HVAC calculators" } = Astr
 const styles = hvacAccentStyles[accent];
 ---
 
-<section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
-  <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">{heading}</h2>
-  <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {
-      calculators.map((calc) => (
-        <a
-          href={calc.href}
-          class={`group rounded-xl border border-slate-200 bg-white p-5 ${styles.hoverBorder} hover:shadow-md transition`}
-        >
-          <p class={`font-semibold text-slate-900 ${styles.hoverTitle}`}>{calc.title}</p>
-          <p class="mt-1 text-sm text-slate-500">{calc.description}</p>
-        </a>
-      ))
-    }
-  </div>
-</section>
+<RelatedCalculators {calculators} {styles} {heading} />

@@ -1,0 +1,615 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { STANDARD_SERVICE_RATINGS } from "@/lib/nec";
+
+const title = "Electrical Service Size Calculator — 100A to 400A & Panel Headroom | TradesQuote";
+const description =
+  "Free electrical service size calculator. Turn a calculated load in VA into a standard service rating, see what percentage of an existing panel is used, and find out exactly how much headroom is left for an EV charger, heat pump, or induction range.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-service-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Service Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Service Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online electrical service size calculator converting a calculated load in volt-amperes into a standard service rating, with panel utilisation percentage and remaining capacity for planned additions.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size electrical service do I need?",
+    answer:
+      'Divide the calculated load in VA by 240 to get amps, then pick the smallest standard service at or above that number. For most single-family homes the honest answer is <strong>200 A</strong> — not because the calculation demands it, but because the cost gap over 125 A or 150 A is small and the headroom covers future EV charging and electrification. Run the <a href="/calculators/electrical/electrical-load-calculator" class="font-semibold text-indigo-700 underline decoration-indigo-300 hover:decoration-indigo-600">Residential Load Calculator</a> first to get the VA figure.',
+  },
+  {
+    question: "Is 100 amp service enough?",
+    answer:
+      "For a gas-heated house with an electric range, dryer, and water heater, a 100 A service is usually adequate on paper — those homes typically calculate in the 80–100 A range. It becomes marginal the moment you add EV charging plus a heat pump, and inadequate for a fully electrified home. The deciding factor is the calculation, not the age of the panel.",
+  },
+  {
+    question: "How do I know if my panel is full versus overloaded?",
+    answer:
+      "They are completely different problems with different fixes. <strong>Full</strong> means no physical breaker spaces left — solvable with tandem breakers where the panel is listed for them, or with a subpanel, for a few hundred dollars. <strong>Overloaded</strong> means the calculated load exceeds what the service can carry — that needs a service upgrade, which is an order of magnitude more expensive. A panel can be completely full with plenty of capacity, or have empty spaces and no capacity at all.",
+  },
+  {
+    question: "What's the 80% rule for panels?",
+    answer:
+      "It is a planning convention rather than a Code requirement for services. NEC 210.20(A) requires continuous loads to be at 125% — equivalently 80% — but a service is sized from a calculated load that already includes demand factors, so it is not double-discounted. Staying under <strong>80% utilisation</strong> is nonetheless good practice: it leaves room for future load and keeps the main breaker off its thermal limit. This calculator flags anything above 80%.",
+  },
+  {
+    question: "Can I add an EV charger to a 100 amp panel?",
+    answer:
+      "Often yes. A 48 A charger is 11,520 VA of nameplate but adds only about 4,600 VA to a 220.82 calculated load thanks to the 40% remainder factor. Whether it fits depends entirely on what else is on the service. If it does not fit, an <strong>energy management system</strong> under NEC Article 750 that sheds or limits charging during peak demand is almost always cheaper than a service upgrade — and it is an explicitly permitted compliance path.",
+  },
+  {
+    question: "Does upgrading the panel mean upgrading the service?",
+    answer:
+      "Not necessarily, and conflating them costs customers money. Replacing a full or obsolete <strong>panel</strong> while keeping the same service rating is a panel swap — no utility involvement, no new service conductors, no meter work. Increasing the service <strong>rating</strong> means new service-entrance conductors, usually a new meter socket, utility coordination, and often a mast or lateral upgrade. The second job can cost three or four times the first.",
+  },
+  {
+    question: "What does a 200 amp service cost?",
+    answer:
+      'Market data for 2026 puts a residential panel or service upgrade at roughly <strong>$1,300 to $5,000</strong> installed, with most 100 A to 200 A upgrades landing near $3,000. The spread is driven by whether the meter socket and service conductors have to change, mast versus underground lateral, panel location, permit and inspection fees, and how much circuit re-termination is involved. Price your own job with the <a href="/calculators/electrical/electrical-estimate-calculator" class="font-semibold text-indigo-700 underline decoration-indigo-300 hover:decoration-indigo-600">Electrical Estimate Calculator</a>.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Service size settled? Quote the upgrade in seconds.";
+const ctaDescription =
+  "Panel, meter socket, conductors, grounding, permit, and a day of labor — TradesQuote turns a service upgrade into a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "Get the calculated VA this tool needs.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "Conductors for the service you just picked.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ev-charger-calculator",
+    title: "EV Charger Circuit Calculator",
+    description: "Check the charger against this headroom.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Electrical Estimate Calculator",
+    description: "Price the upgrade at your target margin.",
+  },
+];
+
+/** What each standard service supports, and what typical additions cost in VA. */
+const capacityTable = STANDARD_SERVICE_RATINGS.filter((r) => r >= 100).map((rating) => ({
+  rating,
+  maxVa: rating * 240,
+  comfortableVa: Math.round(rating * 0.8 * 240),
+}));
+
+const additionsTable = [
+  { addition: "Level 2 EV charger, 48 A", va: 11520, note: "Adds ~4,600 VA to a 220.82 calculation" },
+  { addition: "Level 2 EV charger, 40 A", va: 9600, note: "Adds ~3,840 VA to a 220.82 calculation" },
+  { addition: "Level 2 EV charger, 32 A", va: 7680, note: "Common plug-in setting" },
+  { addition: "Heat pump, 3 ton", va: 5500, note: "Counted at 100% under 220.82(C)" },
+  { addition: "Electric strip heat, 10 kW", va: 10000, note: "The real driver of electrification upgrades" },
+  { addition: "Induction range", va: 12000, note: "Replaces a gas range with a 40–50 A circuit" },
+  { addition: "Heat pump water heater", va: 4500, note: "Often 1,500 VA in heat-pump-only mode" },
+  { addition: "Hot tub / spa", va: 11500, note: "48 A at 240 V" },
+];
+
+const styles = electricalAccentStyles.indigo;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Electrical Service Size Calculator — 100A to 400A" />
+    <meta
+      property="og:description"
+      content="Turn a calculated load into a service rating, and see exactly how much headroom is left for an EV charger or heat pump."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Electrical Service Size Calculator — 100A to 400A" />
+    <meta
+      name="twitter:description"
+      content="Service rating, panel utilisation, and remaining capacity for future load. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Service Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Service Size Calculator <span class="text-indigo-600">— Rating & Headroom</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A calculated load in volt-amperes only becomes useful when you turn it into a service rating and
+              ask the real question: <strong>how much room is left?</strong> This tool converts VA to amps, picks
+              the smallest standard service that covers it, and then tells you what the remaining capacity on an
+              existing panel will actually fit — an EV charger, a heat pump, both, or neither.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+            </svg>
+            Size the service
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ss-va" class="text-sm font-semibold text-slate-800">Calculated load</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ss-va"
+                      type="number"
+                      min="0"
+                      max="200000"
+                      value="24280"
+                      class="w-28 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">VA</span>
+                  </div>
+                </div>
+                <input
+                  id="ss-va-range"
+                  type="range"
+                  min="5000"
+                  max="100000"
+                  step="500"
+                  value="24280"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-indigo-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5,000</span><span>100,000 VA</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  From the Residential Load Calculator, or your own NEC 220.82 or 220.87 figure.
+                </p>
+              </div>
+
+              <div>
+                <label for="ss-future" class="text-sm font-semibold text-slate-800">
+                  Planned additions (VA)
+                </label>
+                <div class="mt-2 flex items-center gap-2">
+                  <input
+                    id="ss-future"
+                    type="number"
+                    min="0"
+                    max="100000"
+                    value="0"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                  <span class="text-sm text-slate-500 shrink-0">VA</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  EV charger, heat pump, induction range — see the additions table below for typical figures.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ss-existing" class="text-sm font-semibold text-slate-800">Existing service rating</label>
+                  <select
+                    id="ss-existing"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    {
+                      STANDARD_SERVICE_RATINGS.map((rating) => (
+                        <option value={rating} selected={rating === 200}>
+                          {rating} A
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ss-voltage" class="text-sm font-semibold text-slate-800">System voltage</label>
+                  <select
+                    id="ss-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    <option value="240" selected>240 V (residential)</option>
+                    <option value="208">208 V</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="ss-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Minimum service</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ss-service" class="text-5xl font-extrabold tracking-tight text-indigo-600">125 A</span>
+              </div>
+              <p id="ss-note" class="mt-1 text-sm font-semibold text-emerald-700">
+                50.6% of the 200 A service is used — comfortable headroom remains.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Existing panel used</p>
+                  <p id="ss-utilisation" class="mt-1 text-2xl font-bold text-slate-900">50.6%</p>
+                </div>
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Headroom</p>
+                  <p id="ss-headroom" class="mt-1 text-2xl font-bold text-slate-900">98.8 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Amps</span><span id="ss-bd-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Minimum standard service</span><span id="ss-bd-minimum" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Existing rating</span><span id="ss-bd-existing" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Spare capacity</span><span id="ss-bd-spare-va" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>That fits</span><span id="ss-bd-fits" class="font-semibold text-slate-900 text-right">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Verdict</span><span id="ss-bd-verdict" class="font-bold text-slate-900 text-right">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Headroom is calculated against the full service rating. Utility requirements, panel busbar
+                ratings, and available breaker spaces are separate constraints — a service with capacity can
+                still be out of physical room.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One division and one lookup, then the part that actually matters — subtraction.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Convert to amps</div>
+            <div>amps&nbsp;=&nbsp;(calculated VA + planned VA) ÷ <span class="text-amber-300">240</span></div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Pick a standard service (230.79)</div>
+            <div>
+              service&nbsp;=&nbsp;smallest of <span class="text-amber-300">100</span>,
+              <span class="text-amber-300">125</span>, <span class="text-amber-300">150</span>,
+              <span class="text-amber-300">200</span>, <span class="text-amber-300">225</span>,
+              <span class="text-amber-300">320</span>, <span class="text-amber-300">400</span> A ≥ amps
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Measure the existing panel</div>
+            <div>utilisation%&nbsp;=&nbsp;amps ÷ existing rating × 100</div>
+            <div>headroom A&nbsp;=&nbsp;existing rating − amps&nbsp;&nbsp;·&nbsp;&nbsp;headroom VA&nbsp;=&nbsp;headroom A × 240</div>
+            <div class="mt-4 text-cyan-300"># Planning threshold</div>
+            <div>flag anything above <span class="text-amber-300">80%</span> utilisation</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Full is not overloaded</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                No spare breaker spaces is a few-hundred-dollar problem — tandems or a subpanel. Not enough
+                capacity is a few-thousand-dollar problem. Diagnose which one you have before quoting.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Minimum is rarely the answer</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A 101 A load technically fits a 125 A service. Almost nobody installs one, because 200 A costs
+                marginally more and absorbs the next twenty years of electrification.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Load management is a real option</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                NEC Article 750 energy management systems are an explicitly permitted compliance path. Limiting
+                EV charging during peak demand is often far cheaper than new service conductors and a meter.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Measured beats estimated</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                With twelve months of utility data, NEC 220.87 lets you use actual peak demand instead of the
+                calculation. On older homes that usually proves the existing service is fine.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 24,280 VA load on three different services — comfortable, over capacity, and the awkward
+          middle where load management wins.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">24,280 VA on a 200 A service</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above — a typical gas-heated 2,000 sq ft home.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              amps = 24,280 ÷ 240 = 101.2 A → minimum service 125 A<br />
+              on the 200 A panel: 101.2 ÷ 200 = 50.6% used<br />
+              headroom = 200 − 101.2 = 98.8 A = 23,720 VA<br />
+              → <span class="font-bold text-emerald-700">fits a 48 A EV charger AND a heat pump</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> half the service is unused. This is the
+              case to show a homeowner who has been told they need an upgrade before adding a charger.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Same load on a 100 A service</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">An older home that was never upgraded.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              amps = 101.2 A on a 100 A service<br />
+              utilisation = 101.2%<br />
+              headroom = <span class="font-bold text-rose-700">−1.2 A</span><br />
+              → <span class="font-bold text-rose-700">over capacity — upgrade or shed load</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> marginally over, which is the most
+              annoying outcome. Before quoting an upgrade, check whether twelve months of utility data lets you
+              use NEC 220.87 instead — measured peak demand on a house like this often lands near 60 A.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Same load on a 150 A service, adding a charger</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              24,280 VA existing plus 11,520 VA of planned EVSE nameplate on a 150 A panel.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              amps = (24,280 + 11,520) ÷ 240 = 149.2 A<br />
+              utilisation = 149.2 ÷ 150 = <span class="font-bold text-amber-700">99.4%</span><br />
+              headroom = 0.8 A<br />
+              → <span class="font-bold text-amber-700">technically fits, practically no margin</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the awkward middle. An Article 750 load
+              management device that limits charging when household demand is high solves this for a few hundred
+              dollars, versus several thousand for a service upgrade. Note that entering the charger through the
+              load calculator instead — where the 40% remainder factor applies — gives 120.4 A and 80%
+              utilisation, which is the more defensible number to submit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Reference tables</h2>
+
+          <h3 class="mt-8 text-xl font-bold text-slate-900">What each standard service supports</h3>
+          <p class="mt-2 text-slate-600">
+            Full capacity at 240 V, and the load that keeps you under the 80% planning threshold.
+          </p>
+          <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Service</th>
+                  <th class="py-3 px-5 font-semibold">Full capacity</th>
+                  <th class="py-3 px-5 font-semibold">Comfortable load (80%)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  capacityTable.map((row, index) => (
+                    <tr class={index === capacityTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.rating} A</td>
+                      <td class="py-3 px-5">{row.maxVa.toLocaleString("en-US")} VA</td>
+                      <td class="py-3 px-5">{row.comfortableVa.toLocaleString("en-US")} VA</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="mt-12 text-xl font-bold text-slate-900">What typical additions cost in VA</h3>
+          <p class="mt-2 text-slate-600">
+            Nameplate figures. Run them through the load calculator to see the smaller number the 40% remainder
+            factor produces.
+          </p>
+          <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Addition</th>
+                  <th class="py-3 px-5 font-semibold">Nameplate VA</th>
+                  <th class="py-3 px-5 font-semibold">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  additionsTable.map((row, index) => (
+                    <tr class={index === additionsTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.addition}</td>
+                      <td class="py-3 px-5">{row.va.toLocaleString("en-US")} VA</td>
+                      <td class="py-3 px-5 text-slate-500">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — 220.82 optional dwelling calculation, 220.87
+            determining existing loads from measured demand, 230.79 service disconnect rating, 230.42 service
+            conductor sizing, 408.36 panelboard overcurrent protection, Article 750 energy management systems,
+            210.20(A) continuous load. Cost ranges from 2026 US market data (HomeGuide, Angi). Utility
+            requirements vary; local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about service sizing, panel capacity, and upgrades."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalServiceSizeCalculator } from "@/scripts/calculators/electrical-service-size-calculator";
+    initElectricalServiceSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

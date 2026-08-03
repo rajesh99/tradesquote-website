@@ -179,7 +179,13 @@ const ctaDescription =
               <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {group.slugs.map((slug) => {
                   const calculator = hvacCalculators.find((c) => c.slug === slug);
-                  return calculator ? <CalculatorToolCard {calculator} /> : null;
+                  return calculator ? (
+                    <CalculatorToolCard
+                      {calculator}
+                      styles={hvacAccentStyles[calculator.accent]}
+                      basePath="/calculators/hvac"
+                    />
+                  ) : null;
                 })}
               </div>
             </div>

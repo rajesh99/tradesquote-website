@@ -59,8 +59,9 @@ export const calculatorCategories: CalculatorCategory[] = [
     slug: "electrical",
     name: "Electrical",
     description:
-      "Wire gauge, circuit load, conduit fill, and voltage drop calculators for electrical installations.",
-    status: "coming-soon",
+      "Conductor sizing, protection, and load calculations built on the NEC — wire size by ampacity and voltage drop, derating for ambient and bundling, breaker sizing, service and feeder conductors, equipment and electrode grounding, conduit and box fill, residential load calculation, service sizing, EV charger circuits, and job pricing.",
+    toolCount: 12,
+    status: "live",
     accent: "sky",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
   },

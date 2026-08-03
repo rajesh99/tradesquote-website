@@ -1,0 +1,663 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { AMBIENT_CORRECTION, BUNDLING_ADJUSTMENT, CONDUCTOR_SIZES } from "@/lib/nec";
+
+const title = "Ampacity Calculator — NEC 310.16 Derating for Heat & Bundling | TradesQuote";
+const description =
+  "Free NEC ampacity and derating calculator. Apply Table 310.15(B)(1) ambient temperature correction and 310.15(C)(1) conductor bundling adjustment to any conductor, then see the 110.14(C) termination cap and the 240.4(D) breaker limit that actually govern.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-ampacity-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Ampacity & Derating Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Ampacity & Derating Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC ampacity calculator that derates a conductor for ambient temperature and conductor bundling, then applies the termination temperature limit and small-conductor overcurrent cap.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "When do I have to derate a conductor?",
+    answer:
+      "Two triggers, and they stack. <strong>Ambient temperature</strong> correction from Table 310.15(B)(1) applies whenever the ambient is anything other than 26–30 °C (79–86 °F) — attics, rooftops, boiler rooms, and cold storage all qualify. <strong>Conductor bundling</strong> adjustment from Table 310.15(C)(1) applies when more than three current-carrying conductors share a raceway or cable for more than 24 inches. If both apply, multiply the base ampacity by both factors.",
+  },
+  {
+    question: "Do neutrals count as current-carrying conductors?",
+    answer:
+      "Usually yes, with important exceptions in <strong>NEC 310.15(E)</strong>. The neutral of a balanced 3-wire single-phase circuit, or of a balanced 4-wire three-phase circuit, does <em>not</em> count. But the neutral of a 4-wire three-phase circuit supplying substantially <strong>nonlinear loads</strong> (LED drivers, computers, VFDs) <em>does</em> count, because harmonic currents add rather than cancel there.",
+  },
+  {
+    question: "Does the equipment grounding conductor count?",
+    answer:
+      "No. <strong>NEC 310.15(E)(3)</strong> excludes grounding and bonding conductors from the conductor count — they carry no current under normal operation. Only the ungrounded conductors, and any neutral that counts under 310.15(E), go into the bundling number.",
+  },
+  {
+    question: "Why can 90 °C wire never actually be used at its 90 °C ampacity?",
+    answer:
+      "Because of <strong>NEC 110.14(C)</strong>. Almost all breakers, panelboards, and equipment terminals are listed for 75 °C (some small equipment only 60 °C), and a conductor may not be used above its ampacity at the temperature rating of the terminations. So THHN's 90 °C column is real, but you may only use it as the <em>starting point for derating math</em> — the final usable ampacity is capped at the 75 °C value. This calculator shows both numbers and which one governs.",
+  },
+  {
+    question: "How many conductors before bundling derating kicks in?",
+    answer:
+      "More than three current-carrying conductors triggers Table 310.15(C)(1): <strong>4–6 conductors × 0.80</strong>, 7–9 × 0.70, 10–20 × 0.50, 21–30 × 0.45, 31–40 × 0.40, 41 or more × 0.35. There is a 24-inch exception — conductors bundled for 24 inches or less do not require adjustment.",
+  },
+  {
+    question: "Does conduit in direct sunlight need extra correction?",
+    answer:
+      "Yes. <strong>NEC 310.15(B)(3)</strong> requires an adder for raceways and cables exposed to direct sunlight on or above rooftops. Table 310.15(B)(3)(c) historically added up to 33 °C for raceways very close to the roof deck. Enter the sun-adjusted ambient temperature above rather than the shade air temperature — a 95 °F day can produce a 120 °F+ effective ambient inside rooftop EMT.",
+  },
+  {
+    question: "Can I round up to the next breaker size?",
+    answer:
+      'Often, yes. <strong>NEC 240.4(B)</strong> permits the next higher standard overcurrent rating when the conductor ampacity does not correspond to a standard rating, for circuits rated 800 A or less that do not supply receptacles for cord-and-plug-connected portable loads. That allowance is still bounded by <strong>240.4(D)</strong> for 14, 12, and 10 AWG. The <a href="/calculators/electrical/electrical-breaker-size-calculator" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">Breaker Size Calculator</a> works the problem from the load side.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Ampacity confirmed? Turn it into a priced quote.";
+const ctaDescription =
+  "Derating decides the conductor; TradesQuote decides the price. Describe the job or upload photos and our AI builds a detailed line-item estimate — wire, raceway, terminations, and labor — with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size a conductor by ampacity and voltage drop.",
+  },
+  {
+    href: "/calculators/electrical/electrical-conduit-fill-calculator",
+    title: "Conduit Fill Calculator",
+    description: "The raceway side of the bundling problem.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "Size the overcurrent device from the load.",
+  },
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "Check drop and the longest compliant run.",
+  },
+];
+
+const gaugeOptions = CONDUCTOR_SIZES.filter((s) => s.copper[75] !== null).map((s) => s.label);
+
+/**
+ * Rows shown in the ambient-correction table. Precomputed here rather than
+ * filtered inline: the Astro compiler reads a `<=` inside a template expression
+ * as the start of an element tag.
+ */
+const ambientRows = AMBIENT_CORRECTION.filter((r) => r.maxC < 61);
+
+const styles = electricalAccentStyles.cyan;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ampacity Calculator — NEC Derating for Heat & Bundling" />
+    <meta
+      property="og:description"
+      content="Derate any conductor for ambient temperature and bundling, then see the 110.14(C) termination cap and 240.4(D) breaker limit that actually govern."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ampacity Calculator — NEC Derating for Heat & Bundling" />
+    <meta
+      name="twitter:description"
+      content="Ambient correction × bundling adjustment, capped by the termination rating. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Ampacity & Derating Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Ampacity Calculator <span class="text-cyan-600">— Derating for Heat & Bundling</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The number in Table 310.16 assumes a 30 °C ambient and no more than three current-carrying
+              conductors. Real installations violate both assumptions constantly — hot attics, rooftop EMT,
+              and raceways full of circuits. This calculator applies the ambient correction and bundling
+              adjustment, then shows the two ceilings people forget: the <strong>110.14(C)</strong>
+              termination-temperature cap and the <strong>240.4(D)</strong> small-conductor breaker limit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Derate your conductor
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="amp-ambient" class="text-sm font-semibold text-slate-800">Ambient temperature</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="amp-ambient"
+                      type="number"
+                      min="30"
+                      max="185"
+                      value="104"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">°F</span>
+                  </div>
+                </div>
+                <input
+                  id="amp-ambient-range"
+                  type="range"
+                  min="50"
+                  max="176"
+                  step="1"
+                  value="104"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>50 °F</span><span>176 °F</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  For rooftop raceway in direct sun, add the 310.15(B)(3) adder before entering the value.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="amp-gauge" class="text-sm font-semibold text-slate-800">Conductor size</label>
+                  <select
+                    id="amp-gauge"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    {
+                      gaugeOptions.map((label) => (
+                        <option value={label} selected={label === "10"}>
+                          {label.includes("kcmil") ? label : `${label} AWG`}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="amp-material" class="text-sm font-semibold text-slate-800">Conductor material</label>
+                  <select
+                    id="amp-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum / copper-clad</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="amp-insulation" class="text-sm font-semibold text-slate-800">
+                    Insulation rating
+                  </label>
+                  <select
+                    id="amp-insulation"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="60">60 °C (NM-B, TW)</option>
+                    <option value="75">75 °C (THW, XHHW)</option>
+                    <option value="90" selected>90 °C (THHN, THWN-2, XHHW-2)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="amp-termination" class="text-sm font-semibold text-slate-800">
+                    Termination rating
+                  </label>
+                  <select
+                    id="amp-termination"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="60">60 °C</option>
+                    <option value="75" selected>75 °C (most equipment)</option>
+                    <option value="90">90 °C (rare)</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="amp-count" class="text-sm font-semibold text-slate-800">
+                    Current-carrying conductors in the raceway
+                  </label>
+                  <input
+                    id="amp-count"
+                    type="number"
+                    min="1"
+                    max="60"
+                    value="6"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Exclude grounds (310.15(E)(3)) and the neutral of a balanced circuit (310.15(E)(1)).
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="amp-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Usable ampacity</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="amp-derated" class="text-5xl font-extrabold tracking-tight text-cyan-600">29.1 A</span>
+              </div>
+              <p id="amp-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Base 40 A × 0.91 ambient × 0.8 bundling.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Table 310.16 base</p>
+                  <p id="amp-base" class="mt-1 text-2xl font-bold text-slate-900">40 A</p>
+                </div>
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Max breaker</p>
+                  <p id="amp-max-ocpd" class="mt-1 text-2xl font-bold text-slate-900">30 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Base ampacity</span><span id="amp-bd-base" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Ambient correction</span><span id="amp-bd-ambient" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Bundling adjustment</span><span id="amp-bd-bundling" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Derated result</span><span id="amp-bd-derated" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>110.14(C) cap</span><span id="amp-bd-term-cap" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>240.4(D) cap</span><span id="amp-bd-small-cap" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Governing limit</span><span
+                      id="amp-bd-governing"
+                      class="font-bold text-slate-900">—</span
+                    >
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Rooftop sun exposure, underground duct banks, and conductors in ambient
+                above 40 °C carry extra requirements. A licensed electrician and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Derating is multiplication, then two ceilings. The multiplication reduces what the conductor can
+            carry; the ceilings cap what you are allowed to use regardless of the math.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Start at the insulation's column (Table 310.16)</div>
+            <div>base&nbsp;=&nbsp;ampacity at 60, 75, or 90 °C for that size and material</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Multiply both correction factors</div>
+            <div>derated&nbsp;=&nbsp;base × ambient factor × bundling factor</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Cap at the termination rating (110.14(C))</div>
+            <div>usable&nbsp;=&nbsp;min(derated, ampacity at the termination temperature)</div>
+            <div class="mt-4 text-cyan-300"># Step 4 — Cap the breaker (240.4(B) up, 240.4(D) down)</div>
+            <div>
+              max OCPD&nbsp;=&nbsp;min(next standard rating ≥ usable, 240.4(D) limit)
+            </div>
+            <div class="mt-4 text-cyan-300"># 240.4(D) limits</div>
+            <div>
+              14 AWG Cu <span class="text-amber-300">15 A</span>&nbsp;·&nbsp;12 AWG Cu
+              <span class="text-amber-300">20 A</span>&nbsp;·&nbsp;10 AWG Cu <span class="text-amber-300">30 A</span
+              >&nbsp;·&nbsp;12 AWG Al <span class="text-amber-300">15 A</span>&nbsp;·&nbsp;10 AWG Al
+              <span class="text-amber-300">25 A</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why start at 90 °C?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Because derating is allowed to begin from the insulation's own rating. THHN starting at 40 A
+                and derating to 29 A beats starting at the 35 A termination value and derating to 25 A. You
+                just can't finish above the termination cap.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The factors multiply</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Heat and bundling are independent problems, so their factors compound. 0.91 × 0.80 = 0.728 —
+                a conductor keeping less than three-quarters of its table value.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Ambient is where the wire is</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Not the outdoor air temperature and not the room the panel is in — the temperature surrounding
+                the conductor along its run. An attic in July and a walk-in freezer are both derating cases.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The 24-inch exception</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Bundling adjustment applies only where conductors run together for more than 24 inches.
+                A short nipple between two panels does not trigger it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The default case, the "why can't I put 10 AWG on a 40 amp breaker" case, and a large feeder losing
+          more than most people expect.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Hot attic, shared raceway — 10 AWG THHN</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Copper · 90 °C insulation · 104 °F (40 °C) ambient · 6 current-carrying conductors · 75 °C
+              terminations. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              base (90 °C) = 40 A<br />
+              × 0.91 (36–40 °C ambient) × 0.80 (4–6 conductors) = 29.1 A<br />
+              110.14(C) cap at 75 °C = 35 A → not binding<br />
+              240.4(B) rounds up to 30 A; 240.4(D) caps 10 AWG at 30 A<br />
+              → <span class="font-bold text-cyan-700">29.1 A usable · 30 A max breaker</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a conductor most people would call
+              "good for 30 amps" is carrying 29.1 A of real capacity here. It still lands on a 30 A breaker via
+              the 240.4(B) round-up, but the margin is gone — a seventh conductor in that raceway drops it to
+              25.5 A, and at ten conductors the 0.50 factor takes it to 18.2 A, which forces a 20 A device.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Ideal conditions — 10 AWG THHN, nothing derated</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Copper · 90 °C insulation · 86 °F (30 °C) ambient · 3 conductors · 75 °C terminations.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              base (90 °C) = 40 A × 1.00 × 1.00 = 40 A<br />
+              110.14(C) cap at 75 °C = <span class="font-bold text-amber-700">35 A ← governs</span><br />
+              240.4(D) caps 10 AWG copper at 30 A<br />
+              → <span class="font-bold text-cyan-700">35 A usable · 30 A max breaker</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> this is the answer to "why can't I put
+              10 AWG on a 40 amp breaker?" Even with zero derating, two separate rules pull it down — the
+              termination cap to 35 A and the small-conductor rule to a 30 A device.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Crowded industrial raceway — 4/0 THHN</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Copper · 90 °C insulation · 113 °F (45 °C) ambient · 9 current-carrying conductors · 75 °C
+              terminations.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              base (90 °C) = 260 A<br />
+              × 0.87 (41–45 °C) × 0.70 (7–9 conductors) = 158.3 A<br />
+              110.14(C) cap at 75 °C = 230 A → not binding<br />
+              → <span class="font-bold text-cyan-700">158.3 A usable · 175 A max breaker</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 4/0 copper that "everyone knows" is
+              good for 230 A is down to 158 A here — a 31% loss. This is the single most common cause of
+              undersized conductors on commercial jobs, because the derating gets skipped and the table value
+              gets used directly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The two derating tables</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Ambient temperature correction from Table 310.15(B)(1), and conductor bundling adjustment from
+            Table 310.15(C)(1). Multiply both.
+          </p>
+
+          <div class="mt-8 grid lg:grid-cols-2 gap-6">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+                <h3 class="font-bold text-slate-900">Ambient correction — Table 310.15(B)(1)</h3>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Ambient</th>
+                    <th class="py-2.5 px-5 font-semibold">60 °C</th>
+                    <th class="py-2.5 px-5 font-semibold">75 °C</th>
+                    <th class="py-2.5 px-5 font-semibold">90 °C</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    ambientRows.map((row, index) => (
+                      <tr class={index === ambientRows.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 whitespace-nowrap">{row.label}</td>
+                        <td class="py-2.5 px-5">{row.f60 === 0 ? "—" : row.f60.toFixed(2)}</td>
+                        <td class="py-2.5 px-5">{row.f75.toFixed(2)}</td>
+                        <td class="py-2.5 px-5 font-semibold text-slate-900">{row.f90.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+                <h3 class="font-bold text-slate-900">Bundling adjustment — Table 310.15(C)(1)</h3>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Current-carrying conductors</th>
+                    <th class="py-2.5 px-5 font-semibold">Factor</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    BUNDLING_ADJUSTMENT.map((row, index) => (
+                      <tr class={index === BUNDLING_ADJUSTMENT.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5">{row.label}</td>
+                        <td class="py-2.5 px-5 font-semibold text-slate-900">{row.factor.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+              <div class="border-t border-slate-200 bg-slate-50 px-5 py-3">
+                <p class="text-xs text-slate-500">
+                  Applies where conductors are bundled for more than 24 inches. Grounds never count; the
+                  neutral counts only per 310.15(E).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — Table 310.16 ampacities, Table 310.15(B)(1) ambient
+            correction, 310.15(B)(3) rooftop sunlight exposure, Table 310.15(C)(1) bundling adjustment,
+            310.15(E) neutral and grounding conductor counting, 110.14(C) termination temperature limitations,
+            240.4(B) and 240.4(D) overcurrent protection. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about ampacity, derating, and termination temperature limits."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalAmpacityCalculator } from "@/scripts/calculators/electrical-ampacity-calculator";
+    initElectricalAmpacityCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+/**
+ * Category-neutral "more calculators" grid. Callers resolve the accent to a
+ * `styles` object from their own category config, so this component has no
+ * trade-specific imports. `HvacRelatedCalculators.astro` delegates here.
+ */
+export type RelatedCalculator = {
+  href: string;
+  title: string;
+  description: string;
+};
+
+export type RelatedCalculatorStyles = {
+  hoverBorder: string;
+  hoverTitle: string;
+};
+
+interface Props {
+  calculators: RelatedCalculator[];
+  styles: RelatedCalculatorStyles;
+  heading: string;
+}
+
+const { calculators, styles, heading } = Astro.props;
+---
+
+<section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
+  <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">{heading}</h2>
+  <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {
+      calculators.map((calc) => (
+        <a
+          href={calc.href}
+          class={`group rounded-xl border border-slate-200 bg-white p-5 ${styles.hoverBorder} hover:shadow-md transition`}
+        >
+          <p class={`font-semibold text-slate-900 ${styles.hoverTitle}`}>{calc.title}</p>
+          <p class="mt-1 text-sm text-slate-500">{calc.description}</p>
+        </a>
+      ))
+    }
+  </div>
+</section>
