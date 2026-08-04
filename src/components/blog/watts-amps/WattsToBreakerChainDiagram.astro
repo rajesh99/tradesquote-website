@@ -1,0 +1,62 @@
+---
+import { findSizeByAmpacity, fmt, fmtSmart, nextStandardOcpd, sizeLabel, wattsToAmps } from "@/lib/nec";
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("wbc");
+
+/**
+ * Where the conversion stops being the answer. A 1,800 W continuous heater on 120 V
+ * converts to 15 A, which is exactly a 15 A breaker — and is not allowed on one.
+ * Computed with the same helpers the watts-to-amps calculator uses.
+ */
+const WATTS = 1800;
+const VOLTS = 120;
+
+const amps = wattsToAmps(WATTS, "1ph", VOLTS, 1);
+const required = amps * 1.25;
+const breaker = nextStandardOcpd(required);
+const conductor = findSizeByAmpacity(breaker, "copper", 75);
+
+const steps = [
+  { label: "Load", value: `${WATTS.toLocaleString("en-US")} W`, note: "nameplate rating", accent: C.blue, bg: C.blueLight },
+  { label: "÷ 120 V", value: `${fmtSmart(amps)} A`, note: "the conversion", accent: C.blue, bg: C.blueLight },
+  { label: "× 1.25 continuous", value: `${fmtSmart(required)} A`, note: "210.20(A) — runs 3 h+", accent: C.orange, bg: C.orangeLight },
+  { label: "Round up, 240.6(A)", value: `${breaker} A`, note: "next standard size", accent: C.orange, bg: C.orangeLight },
+  { label: "Conductor", value: conductor ? sizeLabel(conductor.label) : "—", note: "Table 310.16, 75 °C Cu", accent: C.primary, bg: C.primaryLight },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>From watts to the breaker and wire that actually go in</title>
+  <desc>
+    An 1,800 watt space heater on 120 volts converts to 15.00 amps. Because it runs for three hours or more it is
+    a continuous load, so 125 percent gives 18.75 amps of required ampacity. Rounded up to the next standard
+    overcurrent device rating that is a 20 amp breaker, which needs 12 AWG copper. The conversion alone would have
+    suggested a 15 amp circuit, which is not permitted for this load.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`${fmtSmart(amps)} A is the conversion. ${breaker} A is the circuit.`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`A ${WATTS.toLocaleString("en-US")} W space heater on ${VOLTS} V — a continuous load, so the amps are not the answer.`}</text>
+
+  {steps.map((s, i) => {
+    const x = 24 + i * 137;
+    return (
+      <g>
+        <rect x={x} y="76" width="126" height="104" rx="9" fill={s.bg} stroke={s.accent} stroke-width="1.5" />
+        <text x={x + 63} y="98" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="800">{s.label}</text>
+        <text x={x + 63} y="130" text-anchor="middle" fill={s.accent} font-family={FONT} font-size="15" font-weight="800">{s.value}</text>
+        <text x={x + 63} y="154" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{s.note}</text>
+        {i !== steps.length - 1 && (
+          <path d={`M${x + 130} 128 L ${x + 133} 128`} stroke={C.border} stroke-width="1.6" marker-end="url(#wbc-arrow-muted)" />
+        )}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="198" width="672" height="52" rx="10" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="44" y="220" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{`The trap: ${fmtSmart(amps)} A looks like a 15 A circuit`}</text>
+  <text x="44" y="238" fill={C.muted} font-family={FONT} font-size="9.5">{`A 15 A breaker may only carry ${fmt(15 * 0.8, 0)} A continuously. The same rule, stated as the "80% rule" — and it is why a ${WATTS.toLocaleString("en-US")} W heater trips a 15 A circuit that "should" hold it.`}</text>
+</svg>

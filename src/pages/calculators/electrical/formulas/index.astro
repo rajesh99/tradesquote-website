@@ -1,0 +1,488 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+
+const title = "Electrical Formula Reference — Every Formula Explained | TradesQuote";
+const description =
+  "Complete electrical formula reference: Ohm's law, single- and three-phase power, voltage drop, ampacity derating, conduit and box fill, NEC 220.82 and 220.87 load calculations, grounding, and contractor pricing. Each with variable definitions, typical values, and a free calculator.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/formulas";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Formula Reference", item: pageUrl },
+  ],
+};
+
+const sections = [
+  {
+    title: "Conductors & Circuits",
+    color: "blue",
+    formulas: [
+      {
+        name: "Required Ampacity (continuous load)",
+        formula: "Required A = (continuous load × 1.25) + (non-continuous load × 1.00)",
+        vars: [
+          { sym: "continuous load", desc: "Any load expected to operate for 3 hours or more (210.20(A))" },
+          { sym: "1.25", desc: "The 125% adder — the same rule stated backwards as the '80% rule'" },
+          { sym: "non-continuous", desc: "Cycling loads: ranges, dryers, ovens, most receptacle circuits" },
+        ],
+        normal: "EV charging is continuous by rule (625.41). A 48 A charger → 60 A of required ampacity",
+        calc: { href: "/calculators/electrical/electrical-breaker-size-calculator", label: "Breaker Size Calculator" },
+      },
+      {
+        name: "Voltage Drop (circular-mil method)",
+        formula: "VD = 2 × K × I × L ÷ CM        (3φ: replace 2 with 1.732)\ndrop % = VD ÷ circuit volts × 100",
+        vars: [
+          { sym: "K", desc: "Resistivity: 12.9 copper, 21.2 aluminum (ohm-cmil per foot)" },
+          { sym: "I", desc: "Load in amps actually drawn — not the breaker rating" },
+          { sym: "L", desc: "One-way run length in feet; the 2 accounts for the return path" },
+          { sym: "CM", desc: "Conductor area in circular mils (Chapter 9, Table 8)" },
+        ],
+        normal:
+          "3% branch / 5% total is recommended in Informational Notes to 210.19(A) and 215.2(A) — guidance, not enforceable code",
+        calc: { href: "/calculators/electrical/electrical-voltage-drop-calculator", label: "Voltage Drop Calculator" },
+      },
+      {
+        name: "Maximum Run Length at a Drop Target",
+        formula: "L_max = (limit% ÷ 100 × V × CM) ÷ (2 × K × I)",
+        vars: [
+          { sym: "limit%", desc: "Target drop, normally 3 for a branch circuit" },
+          { sym: "V", desc: "Circuit voltage — doubling it doubles the reach" },
+          { sym: "CM", desc: "Circular mils; doubling the area doubles the distance" },
+        ],
+        normal: "12 AWG copper at a full 20 A: ~45 ft on 120 V, ~91 ft on 240 V",
+        calc: { href: "/calculators/electrical/electrical-voltage-drop-calculator", label: "Voltage Drop Calculator" },
+      },
+      {
+        name: "Derated Ampacity",
+        formula: "Derated A = base A (90 °C column) × ambient factor × bundling factor\nusable A = min(derated, 75 °C column value)",
+        vars: [
+          { sym: "base A", desc: "Table 310.16 at the conductor's insulation rating, normally 90 °C" },
+          { sym: "ambient factor", desc: "310.15(B)(1), 1.00 at 30 °C, 0.91 at 40 °C for 90 °C wire" },
+          { sym: "bundling factor", desc: "310.15(C)(1): 0.80 for 4–6, 0.70 for 7–9, 0.50 for 10–20 conductors" },
+          { sym: "75 °C cap", desc: "110.14(C) — the termination limit the result is checked against" },
+        ],
+        normal:
+          "12 AWG THHN, 40 °C, 6 conductors: 30 × 0.91 × 0.80 = 21.8 A — still covers a 20 A breaker because derating started at 90 °C",
+        calc: { href: "/calculators/electrical/electrical-ampacity-calculator", label: "Ampacity Calculator" },
+      },
+      {
+        name: "Wire Size — the governing test",
+        formula: "size = larger of (ampacity-governed size, voltage-drop-governed size)",
+        vars: [
+          { sym: "ampacity-governed", desc: "Smallest conductor whose Table 310.16 value ≥ required ampacity" },
+          { sym: "drop-governed", desc: "Smallest conductor whose drop over the run stays within target" },
+        ],
+        normal: "Ampacity governs short runs; voltage drop governs long ones. The crossover is often near 100 ft",
+        calc: { href: "/calculators/electrical/electrical-wire-size-calculator", label: "Wire Size Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Load & Service",
+    color: "indigo",
+    formulas: [
+      {
+        name: "Dwelling Load — Optional Method (220.82)",
+        formula:
+          "general = (3 VA/ft² × area) + (1,500 VA × small-appliance circuits) + (1,500 VA × laundry) + Σ appliance VA\ndemand = 10,000 at 100% + (general − 10,000) × 0.40\ntotal = demand + largest of heating or cooling\namps = total ÷ 240",
+        vars: [
+          { sym: "3 VA/ft²", desc: "General lighting unit load; excludes garages, open porches, unfinished space" },
+          { sym: "10,000 VA", desc: "The first tier, taken at 100% under 220.82(B)" },
+          { sym: "0.40", desc: "Demand factor on everything above the first tier" },
+          { sym: "220.82(C)", desc: "A/C and heat pumps at 100%, central electric heat at 65%" },
+        ],
+        normal: "2,000 ft² all-electric house: 33,200 VA connected → 24,280 VA calculated → 101.2 A",
+        calc: { href: "/calculators/electrical/electrical-load-calculator", label: "Load Calculator" },
+      },
+      {
+        name: "Existing Load from Measured Demand (220.87)",
+        formula: "existing = highest 12-month recorded demand × 1.25\ntotal = existing + new load (× 1.25 if continuous)",
+        vars: [
+          { sym: "12-month demand", desc: "From the utility; 30 days of recorded data where a year is unavailable" },
+          { sym: "1.25", desc: "220.87's safety factor on measured demand" },
+        ],
+        normal: "44 A peak → 55 A existing; add a 32 A charger at 125% (40 A) and a 100 A service still fits",
+        calc: {
+          href: "/calculators/electrical/electrical-existing-load-calculator",
+          label: "Existing Load Calculator",
+        },
+      },
+      {
+        name: "Dwelling Service Conductors — the 83% rule",
+        formula: "required ampacity = service rating × 0.83",
+        vars: [
+          { sym: "0.83", desc: "Table 310.12, for a dwelling service or a feeder carrying the entire dwelling load" },
+          { sym: "scope", desc: "Does NOT reach an ordinary subpanel feeder — that uses Table 310.16" },
+        ],
+        normal: "200 A × 0.83 = 166 A → 2/0 copper or 4/0 aluminum, one size below straight 310.16 sizing",
+        calc: {
+          href: "/calculators/electrical/electrical-service-wire-size-calculator",
+          label: "Service & Feeder Wire Size",
+        },
+      },
+      {
+        name: "Generator Sizing",
+        formula:
+          "running = Σ running watts × (1 + margin)\nstarting = Σ running watts − largest motor running + largest motor starting\nrequired = max(running, starting)",
+        vars: [
+          { sym: "margin", desc: "Typically 25%, so a standby set is not run flat out continuously" },
+          { sym: "largest motor starting", desc: "Inrush, commonly 2–4× running watts; 1× with a soft starter" },
+        ],
+        normal: "9,200 W of essential loads with a 3× compressor surge → 19,200 W → a 20 kW set",
+        calc: {
+          href: "/calculators/electrical/electrical-generator-sizing-calculator",
+          label: "Generator Sizing Calculator",
+        },
+      },
+    ],
+  },
+  {
+    title: "Power & Conversions",
+    color: "emerald",
+    formulas: [
+      {
+        name: "Ohm's Law and the Power Wheel",
+        formula: "V = I × R      I = V ÷ R      R = V ÷ I\nP = V × I = I² × R = V² ÷ R",
+        vars: [
+          { sym: "V", desc: "Volts — electrical potential difference" },
+          { sym: "I", desc: "Amperes — current" },
+          { sym: "R", desc: "Ohms — resistance" },
+          { sym: "P", desc: "Watts — real power" },
+        ],
+        normal: "Know any two and the other two follow. P = I²R is why a loose connection heats up",
+        calc: { href: "/calculators/electrical/electrical-ohms-law-calculator", label: "Ohm's Law Calculator" },
+      },
+      {
+        name: "Watts to Amps",
+        formula: "DC:  I = W ÷ V\n1φ:  I = W ÷ (V × PF)\n3φ:  I = W ÷ (1.732 × V × PF)",
+        vars: [
+          { sym: "PF", desc: "Power factor, 0–1. Use 1.0 for resistive loads, 0.8–0.9 for motors" },
+          { sym: "1.732", desc: "√3 — the line-to-line factor in balanced three-phase" },
+        ],
+        normal: "48 A × 240 V = 11,520 W for a Level 2 charger. 10 kW at 480 V 3φ, PF 0.9 → 13.4 A",
+        calc: { href: "/calculators/electrical/electrical-watts-to-amps-calculator", label: "Watts to Amps" },
+      },
+      {
+        name: "Apparent, Real & Reactive Power",
+        formula: "S (kVA) = V × I ÷ 1,000        (3φ: × 1.732)\nP (kW) = S × PF\nQ (kVAR) = P × tan(arccos PF)",
+        vars: [
+          { sym: "S", desc: "Apparent power in kVA — what the conductors and transformer must carry" },
+          { sym: "P", desc: "Real power in kW — what does work and what the energy meter bills" },
+          { sym: "Q", desc: "Reactive power in kVAR — what capacitor correction cancels" },
+        ],
+        normal: "Generators and transformers are rated in kVA precisely because PF is the customer's variable",
+        calc: { href: "/calculators/electrical/electrical-kva-calculator", label: "kVA Calculator" },
+      },
+      {
+        name: "Power Factor Correction",
+        formula: "Qc = P × (tan φ₁ − tan φ₂)        φ = arccos(PF)",
+        vars: [
+          { sym: "Qc", desc: "Capacitor bank size in kVAR" },
+          { sym: "PF₁ / PF₂", desc: "Existing and target power factor" },
+        ],
+        normal: "Correcting 0.75 → 0.95 on 100 kW needs about 55 kVAR and cuts the kVA demand charge",
+        calc: {
+          href: "/calculators/electrical/electrical-power-factor-calculator",
+          label: "Power Factor Calculator",
+        },
+      },
+      {
+        name: "Running Cost",
+        formula: "kWh = (W ÷ 1,000) × hours\ncost = kWh × $/kWh",
+        vars: [
+          { sym: "hours", desc: "Real run time — thermostatted loads cycle rather than running continuously" },
+          { sym: "$/kWh", desc: "Take it from a bill: total charge ÷ kWh delivered, to capture taxes and fees" },
+        ],
+        normal: "US residential averages near $0.17/kWh, ranging from about $0.11 to over $0.30 by state",
+        calc: { href: "/calculators/electrical/electrical-kwh-cost-calculator", label: "kWh Cost Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Raceway & Boxes",
+    color: "teal",
+    formulas: [
+      {
+        name: "Conduit Fill",
+        formula: "Σ conductor areas ≤ raceway area × fill limit\nfill % = Σ conductor areas ÷ raceway area × 100",
+        vars: [
+          { sym: "conductor area", desc: "Chapter 9, Table 5 — including insulation" },
+          { sym: "raceway area", desc: "Chapter 9, Table 4 — 100% internal area by type and trade size" },
+          { sym: "fill limit", desc: "Table 1: 53% for one conductor, 31% for two, 40% for three or more" },
+        ],
+        normal:
+          "Everything in the raceway counts toward fill, grounds included. Nipples ≤ 24 in go to 60% (Note 4)",
+        calc: {
+          href: "/calculators/electrical/electrical-conduit-fill-calculator",
+          label: "Conduit Fill Calculator",
+        },
+      },
+      {
+        name: "Box Fill",
+        formula:
+          "volume = (conductors × V_size)\n       + (1 × V_largest if any internal clamps)\n       + (2 × V_largest per device yoke)\n       + (1 × V_largest_EGC for all grounds together)",
+        vars: [
+          { sym: "V_size", desc: "314.16(B): 2.00 in³ for 14 AWG, 2.25 for 12, 2.50 for 10, 3.00 for 8" },
+          { sym: "device yoke", desc: "Counts as TWO allowances at the largest conductor connected to it" },
+          { sym: "counts zero", desc: "Pigtails wholly inside the box, external clamps, wire connectors" },
+        ],
+        normal: "Two 12/2 cables + clamps + one duplex = 18.00 in³, which needs a 20.3 in³ box or larger",
+        calc: { href: "/calculators/electrical/electrical-box-fill-calculator", label: "Box Fill Calculator" },
+      },
+    ],
+  },
+  {
+    title: "Grounding",
+    color: "cyan",
+    formulas: [
+      {
+        name: "Equipment Grounding Conductor",
+        formula: "EGC = Table 250.122 by OCPD rating\nif conductors upsized: EGC × (new CM ÷ required CM)",
+        vars: [
+          { sym: "keyed to", desc: "The overcurrent device rating — not the conductor size" },
+          { sym: "250.122(A)", desc: "Never required to be larger than the circuit conductors" },
+          { sym: "250.122(B)", desc: "Upsize proportionally when phase conductors are enlarged" },
+          { sym: "250.122(C)", desc: "One EGC shared by several circuits is sized to the largest OCPD" },
+        ],
+        normal: "20 A → 12 AWG Cu · 60 A → 10 AWG · 100 A → 8 AWG · 200 A → 6 AWG. There is no 30 A row",
+        calc: {
+          href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+          label: "Ground Wire Size Calculator",
+        },
+      },
+      {
+        name: "Grounding Electrode Conductor",
+        formula: "GEC = Table 250.66 by largest service conductor, then capped by electrode",
+        vars: [
+          { sym: "250.66(A)", desc: "To a rod, pipe or plate — need not exceed 6 AWG copper" },
+          { sym: "250.66(B)", desc: "To a concrete-encased electrode — capped at 4 AWG copper" },
+          { sym: "250.66(C)", desc: "To a ground ring — no larger than the ring conductor itself" },
+          { sym: "water pipe", desc: "No cap; the full table size applies" },
+        ],
+        normal: "A 200 A service on 2/0 copper: table says 4 AWG, but rods cap it at 6 AWG copper",
+        calc: {
+          href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+          label: "Ground Wire Size Calculator",
+        },
+      },
+    ],
+  },
+  {
+    title: "Pricing & Business",
+    color: "rose",
+    formulas: [
+      {
+        name: "Loaded Labor Rate",
+        formula:
+          "total cost = (wage × paid hours × (1 + burden)) + annual overhead\nloaded cost = total cost ÷ (paid hours × billable %)\nbill rate = loaded cost ÷ (1 − margin)",
+        vars: [
+          { sym: "burden", desc: "Payroll tax, workers' comp, insurance, PTO — typically 30–40%" },
+          { sym: "billable %", desc: "The strongest lever in the whole calculation; 75% is a fair assumption" },
+          { sym: "margin", desc: "Applied by DIVIDING by (1 − margin), not multiplying" },
+        ],
+        normal: "A $32/hr wage supports a $105.62/hr bill rate — a 3.30× multiplier, not 2×",
+        calc: { href: "/calculators/electrical/electrical-labor-rate-calculator", label: "Labor Rate Calculator" },
+      },
+      {
+        name: "Job Price — Margin, not Markup",
+        formula:
+          "break-even = (labor + material + fixtures) × (1 + overhead %)\nprice = break-even ÷ (1 − margin)      ← margin\nprice = break-even × (1 + markup)      ← markup, a different number",
+        vars: [
+          { sym: "margin", desc: "A percentage of the selling price — what shows on your accounts" },
+          { sym: "markup", desc: "A percentage of cost. A 25% markup is only a 20% margin" },
+        ],
+        normal: "$2,979 break-even at 25%: margin gives $3,971, markup gives $3,723 — $248 of lost profit",
+        calc: { href: "/calculators/electrical/electrical-estimate-calculator", label: "Estimate Calculator" },
+      },
+    ],
+  },
+];
+
+const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "")}`;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Electrical Formula Reference — Every Formula Explained" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Electrical Formula Reference | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Formula Reference"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600"
+            >
+              Electrical Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Electrical Formula Reference
+            </h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every formula used in electrical field work and design — organised by workflow. Each entry gives the
+              formula, what each variable means, typical values, and a link to the free calculator that does the
+              arithmetic. Code citations throughout so you can check any of it against the book.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            {
+              sections.map((s) => (
+                <a
+                  href={`#${sectionId(s.title)}`}
+                  class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-sky-500 hover:text-sky-600 transition"
+                >
+                  {s.title}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14 space-y-20">
+        {
+          sections.map((section) => (
+            <div id={sectionId(section.title)}>
+              <div
+                class={`inline-block rounded-lg px-4 py-1.5 text-sm font-bold mb-4
+                ${section.color === "blue" ? "bg-blue-100 text-blue-700" : ""}
+                ${section.color === "indigo" ? "bg-indigo-100 text-indigo-700" : ""}
+                ${section.color === "emerald" ? "bg-emerald-100 text-emerald-700" : ""}
+                ${section.color === "teal" ? "bg-teal-100 text-teal-700" : ""}
+                ${section.color === "cyan" ? "bg-cyan-100 text-cyan-700" : ""}
+                ${section.color === "rose" ? "bg-rose-100 text-rose-700" : ""}
+              `}
+              >
+                {section.title}
+              </div>
+
+              <div class="space-y-8">
+                {section.formulas.map((f) => (
+                  <div
+                    class={`rounded-2xl border-l-4 border bg-white p-6 shadow-sm
+                    ${section.color === "blue" ? "border-l-blue-500 border-blue-100" : ""}
+                    ${section.color === "indigo" ? "border-l-indigo-500 border-indigo-100" : ""}
+                    ${section.color === "emerald" ? "border-l-emerald-500 border-emerald-100" : ""}
+                    ${section.color === "teal" ? "border-l-teal-500 border-teal-100" : ""}
+                    ${section.color === "cyan" ? "border-l-cyan-500 border-cyan-100" : ""}
+                    ${section.color === "rose" ? "border-l-rose-500 border-rose-100" : ""}
+                  `}
+                  >
+                    <h3 class="text-lg font-bold text-slate-900">{f.name}</h3>
+
+                    <div class="mt-3 rounded-xl bg-slate-900 px-5 py-4 font-mono text-sm text-slate-100 whitespace-pre-wrap overflow-x-auto">
+                      {f.formula}
+                    </div>
+
+                    <div class="mt-4">
+                      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Variables</p>
+                      <dl class="space-y-1">
+                        {f.vars.map((v) => (
+                          <div class="flex gap-2 text-sm">
+                            <dt class="font-mono font-bold text-slate-700 shrink-0">{v.sym}</dt>
+                            <dd class="text-slate-600">— {v.desc}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+
+                    <div class="mt-4 rounded-lg bg-slate-50 px-4 py-3">
+                      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                        Normal range / typical values
+                      </p>
+                      <p class="text-sm text-slate-600">{f.normal}</p>
+                    </div>
+
+                    {f.calc && (
+                      <div class="mt-4">
+                        <a
+                          href={f.calc.href}
+                          class="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-600 hover:text-sky-700 transition"
+                        >
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                          </svg>
+                          {f.calc.label} →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <p class="text-sm text-slate-600 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> NEC (NFPA 70) 2023 — 110.14(C), 210.19(A), 210.20(A),
+            215.2(A), 220.12, 220.82, 220.87, 240.4(D), 240.6(A), Table 250.66 and 250.66(A)–(C), Table 250.122
+            and 250.122(A)–(C), Table 310.12, Table 310.16, 310.15(B)(1), 310.15(C)(1), 314.16 and 314.16(B),
+            Chapter 9 Tables 1, 4, 5 and 8, 625.41, Articles 445 and 702. The 3% and 5% voltage-drop figures come
+            from Informational Notes and are recommendations rather than enforceable requirements. Pricing formulas
+            are standard contracting practice, not code. Local amendments override the model code, and a licensed
+            electrician plus the AHJ have final say on anything installed.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Let the calculator do the arithmetic</h2>
+          <p class="mt-3 text-slate-600">
+            Every formula on this page has a free interactive calculator — and they all read the same NEC tables.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href="/calculators/electrical"
+              class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-6 py-3 text-sm font-bold text-white hover:bg-sky-700 transition"
+            >
+              Browse all electrical calculators →
+            </a>
+            <a
+              href="/calculators/electrical/nec-tables"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-sky-500 hover:text-sky-600 transition"
+            >
+              NEC tables reference →
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

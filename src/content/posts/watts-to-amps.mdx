@@ -1,0 +1,172 @@
+---
+title: "Watts to Amps: The Formula for DC, Single-Phase, and Three-Phase"
+meta_title: "Watts to Amps: Formula for DC, 1φ and 3φ (With Worked Examples) | TradesQuote"
+description: "Amps = watts ÷ volts on DC, ÷ (volts × power factor) on single-phase, ÷ (1.732 × volts × PF) on three-phase. Plus the part that actually matters: why the amps you get are not the breaker size."
+image: /images/posts/watts-to-amps-hero.svg
+date: 2026-08-04T10:00:00Z
+categories: ["electrical"]
+tags: ["watts to amps","power factor","three phase","branch circuit","nec"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import WattsToAmpsFormulaDiagram from "@/components/blog/watts-amps/WattsToAmpsFormulaDiagram.astro";
+import SameWattsSupplyDiagram from "@/components/blog/watts-amps/SameWattsSupplyDiagram.astro";
+import WattsToBreakerChainDiagram from "@/components/blog/watts-amps/WattsToBreakerChainDiagram.astro";
+
+The conversion is one line:
+
+- **DC:** amps = watts ÷ volts
+- **AC single-phase:** amps = watts ÷ (volts × power factor)
+- **AC three-phase:** amps = watts ÷ (1.732 × volts × power factor)
+
+That's it, and you can stop reading if the number is all you needed. But almost nobody converts watts to amps out of curiosity — they do it to pick a breaker or a wire size, and **the amps you just calculated are not the breaker size**. That step is where the mistakes happen, so most of this article is about it.
+
+## The Three Forms
+
+<BlogInfographic
+  title="One conversion, three divisors"
+  caption="Only the denominator changes. Everything hard about the conversion lives in the power factor and the √3."
+>
+  <WattsToAmpsFormulaDiagram />
+</BlogInfographic>
+
+**Direct current** has no power factor — voltage and current are steady, so all the power is real power. 100 W of solar array at 12 V is 8.33 A.
+
+**Single-phase AC** needs a power factor because voltage and current can be out of step. Use **1.0 for anything resistive**: heaters, water heaters, ovens, toasters, incandescent lamps, resistance duct heaters. Those loads are the majority of what a residential electrician converts, so in practice the residential form is just watts ÷ volts. Use **0.8–0.9 for motors**, and read the next section before you do.
+
+**Three-phase** divides by √3 as well, because the three line currents are 120° apart and the maths of a balanced load works out that way. The result is the current in **one line conductor**, which is what you size wire and breakers from.
+
+## Watts Are Not Always Watts
+
+This is the part that separates a correct answer from a plausible one.
+
+**On a motor, the nameplate "watts" is usually output, not input.** A 1 HP motor produces 745.7 W of mechanical work at the shaft. It draws more than that from the supply, because it is not 100% efficient — so the honest form of the conversion for a motor is:
+
+```
+I = (HP × 745.7) ÷ (V × PF × efficiency)
+```
+
+At 120 V with a 0.85 power factor and 0.85 efficiency, that 1 HP motor lands near 8.6 A. But even that is not the number you build the circuit from. **NEC 430.6(A) requires motor conductors to be sized from the Table 430.248 / 430.250 full-load current, not from the nameplate.** The nameplate is used for overload protection; the table is used for conductors and the branch-circuit protective device. So on motor work the conversion is a sanity check, not the answer.
+
+**On anything with a switching power supply — LED drivers, computer gear, inverters — the "watts" figure is real power** and the volt-amperes drawn can be noticeably higher. The conductor carries the volt-amperes.
+
+**On a nameplate that reads VA, don't apply power factor at all.** VA is already the apparent power: amps = VA ÷ volts (÷ 1.732 × volts on three-phase). Applying PF to a VA figure double-counts it. The reverse direction of this conversion, and the VA-versus-watts distinction it turns on, is worked through in **[Amps to Watts](/blog/amps-to-watts)**.
+
+## Voltage and Phase Change Everything
+
+<BlogInfographic
+  title="The same 10,000 W on four different supplies"
+  caption="Unity power factor throughout, so only voltage and phase configuration change."
+>
+  <SameWattsSupplyDiagram />
+</BlogInfographic>
+
+Ten kilowatts is 83.33 A at 120 V, 41.67 A at 240 V, and 12.03 A on three-phase 480 V. Two things follow that are worth internalising:
+
+**Doubling the voltage halves the current.** This is the entire reason ranges, dryers, water heaters and EV chargers are 240 V circuits — 12 kW at 120 V would need 100 A and 3 AWG conductors. It's also why voltage drop is a much smaller problem on a 240 V circuit: the same wire reaches twice as far, because the allowable drop in volts doubles while the drop per foot stays the same. That relationship is worked out in **[Voltage Drop: How to Calculate It](/blog/voltage-drop-calculation)**.
+
+**Three-phase carries the same power on 42.3% less current**, because 1 ÷ √3 = 0.5774. Combined with a higher voltage, that's why commercial equipment above roughly 10 kW is three-phase wherever three-phase is available: the conductors, the raceway and the breaker all get dramatically smaller.
+
+One caution on three-phase: 208 V and 240 V are not interchangeable. A heating element rated 240 V run at 208 V produces about 25% less heat (power scales with V²), and the same nameplate watts at 208 V draws proportionally more current — 10 kW at 480 V three-phase is 13.36 A, but at 208 V it's 30.84 A.
+
+## From Amps to the Circuit
+
+<BlogInfographic
+  title="From watts to the breaker and wire that actually go in"
+  caption="An 1,800 W space heater on 120 V. The conversion says 15 A, and a 15 A circuit is not allowed to carry it."
+>
+  <WattsToBreakerChainDiagram />
+</BlogInfographic>
+
+An 1,800 W space heater on 120 V converts to exactly 15.00 A. That looks like a 15 A circuit, and it isn't one.
+
+A space heater runs for three hours or more at a stretch, which makes it a **continuous load**. NEC 210.20(A) requires the overcurrent device to be rated for 125% of the continuous load, so the required ampacity is 15.00 × 1.25 = **18.75 A**, rounded up to the next standard rating in 240.6(A) — a **20 A breaker on 12 AWG copper**.
+
+You will also hear this as the "80% rule": don't load a breaker past 80% of its rating continuously. It is the same arithmetic inverted (1 ÷ 1.25 = 0.80), and it explains the single most common household complaint about space heaters — a 15 A circuit may only carry 12 A continuously, so 15 A of heater on it will eventually trip.
+
+The full sequence, once you have the amps:
+
+1. **Is it continuous?** Three hours or more of operation at a time. If yes, × 1.25.
+2. **Round up to a standard OCPD rating** from 240.6(A): 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100 A and up.
+3. **Pick the conductor** whose Table 310.16 ampacity meets the breaker rating — 75 °C column for ordinary terminations, per 110.14(C).
+4. **Check 240.4(D)** — 14 AWG copper is capped at 15 A, 12 AWG at 20 A, 10 AWG at 30 A regardless of what the table says.
+5. **Check voltage drop** over the run, using the *actual load current*, not the breaker rating.
+
+Steps 2 to 5 are what the **[What Size Breaker Do I Need](/blog/what-size-breaker-do-i-need)** and **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** guides cover in full.
+
+## Worked Examples
+
+Every figure below is the calculator's own output, including the 240.6(A) breaker and the 75 °C copper conductor.
+
+| Load | Supply | Amps | Continuous? | Breaker | Conductor |
+| --- | --- | --- | --- | --- | --- |
+| 1,500 W hair dryer | 120 V | 12.50 A | No | 15 A | 14 AWG Cu |
+| 1,800 W space heater | 120 V | 15.00 A | Yes | 20 A | 12 AWG Cu |
+| 4,500 W water heater | 240 V | 18.75 A | Yes | 25 A | 10 AWG Cu |
+| 5,000 W dryer | 240 V | 20.83 A | No | 25 A | 10 AWG Cu |
+| 12,000 W range | 240 V | 50.00 A | No | 50 A | 8 AWG Cu |
+| 11,520 W EV charger (48 A) | 240 V | 48.00 A | Yes, by rule | 60 A | 6 AWG Cu |
+| 10,000 W motor, PF 0.85 | 240 V 1φ | 49.02 A | — | 50 A | 8 AWG Cu |
+| 10,000 W, PF 0.9 | 480 V 3φ | 13.36 A | No | 15 A | 14 AWG Cu |
+| 10,000 W, PF 0.9 | 208 V 3φ | 30.84 A | No | 35 A | 8 AWG Cu |
+| 1,000 W inverter input | 48 V DC | 20.83 A | — | 25 A | 10 AWG Cu |
+
+Three rows in that table need a footnote, because the conversion is not the whole rule:
+
+**The 12 kW range.** Table 220.55 lets a single 12 kW household range be *calculated* at 8,000 VA, and 210.19(C) permits the branch circuit to be sized to that demand — which is why 40 A on 8 AWG is the conventional range circuit rather than the 50 A the raw conversion suggests. The demand factors are worked through in **[Residential Load Calculation](/blog/residential-electrical-load-calculation)**.
+
+**The dryer.** 220.54 puts a floor of 5,000 VA on a dryer regardless of nameplate, and 30 A on 10 AWG is the standard circuit.
+
+**The EV charger.** NEC 625.41 makes EVSE continuous **by rule** — you don't have to judge whether it runs for three hours, because the code decided. That's why a 48 A charger needs a 60 A circuit, worked through fully in **[What Size Wire and Breaker for an EV Charger](/blog/what-size-wire-for-ev-charger)**.
+
+## Common Mistakes
+
+- **Treating the converted amps as the breaker size.** Continuous loads need × 1.25 first, then rounding up.
+- **Applying the 80% rule twice.** × 1.25 and ÷ 0.80 are the same rule. Do one.
+- **Applying power factor to a VA rating.** VA is already apparent power; PF only converts between watts and VA.
+- **Using nameplate watts on a motor.** That's usually mechanical output. Use Table 430.248 / 430.250 full-load current for the circuit.
+- **Forgetting √3 on three-phase.** Omitting it overstates the current by 73%, which is an expensive way to buy wire.
+- **Using the breaker rating in the voltage-drop formula.** Drop is caused by the current actually flowing, not the protection.
+- **Assuming 208 V behaves like 240 V.** It's 13% lower, and heating elements lose about a quarter of their output.
+- **Adding up every wattage in the house and dividing by 240 to size a service.** That's connected load. The calculated load uses demand factors, and it's much smaller — see **[What Size Electrical Service Do I Need](/blog/what-size-electrical-service-do-i-need)**.
+
+## Do the Conversion
+
+> **[Watts to Amps Calculator](/calculators/electrical/electrical-watts-to-amps-calculator)** — enter watts, pick DC, single-phase or three-phase, set the voltage and power factor, and flag the load as continuous. Returns the amps, the required ampacity, the 240.6(A) breaker and the 75 °C copper conductor.
+
+Every figure in this article came out of that calculator. Going the other way, use the **[Amps to Watts Calculator](/calculators/electrical/electrical-amps-to-watts-calculator)**; for the V, I, R and P relationships behind all of it, the **[Ohm's Law Calculator](/calculators/electrical/electrical-ohms-law-calculator)**; and for the whole set of formulas on one page, the **[Electrical Formulas Cheat Sheet](/blog/electrical-formulas-cheat-sheet)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 110.14(C), 210.20(A), 220.54, 220.55, Table 220.55, 240.4(D), 240.6(A), Table 310.16, 430.6(A), Tables 430.248 and 430.250, 625.41. Local amendments override the model code, and the AHJ has final say.*
+
+---
+
+## FAQ
+
+### How do I convert watts to amps?
+
+Divide watts by volts on a DC circuit. On AC single-phase, divide by volts × power factor; on balanced three-phase, divide by 1.732 × volts × power factor. Use a power factor of 1.0 for resistive loads such as heaters and elements, and 0.8–0.9 for motors.
+
+### How many amps is 1,500 watts?
+
+12.5 A at 120 V, or 6.25 A at 240 V, at unity power factor. On a 120 V circuit that fits a 15 A breaker on 14 AWG copper — but only if the load is not continuous. If it runs for three hours or more, 1,500 W needs a 20 A circuit.
+
+### How many amps is 1,800 watts at 120 volts?
+
+Exactly 15.00 A, which is the whole problem: a space heater is a continuous load, so NEC 210.20(A) requires 125% — 18.75 A — and the next standard breaker is 20 A on 12 AWG copper. A 15 A circuit may only carry 12 A continuously, so it will eventually trip.
+
+### Do I need power factor to convert watts to amps?
+
+Only on AC, and only when the load is not purely resistive. Heaters, water heaters, ovens and resistance elements are power factor 1.0, so the conversion is just watts ÷ volts. Motors and some electronics run 0.8–0.9. Power factor never applies to DC, and it must not be applied to a nameplate already given in VA.
+
+### Why do you divide by 1.732 for three-phase?
+
+1.732 is √3, and it comes out of the geometry of three line voltages 120° apart. The practical consequence is that three-phase moves the same power with 42.3% less current in each line conductor, which is why large equipment is three-phase wherever three-phase is available.
+
+### Is the amps figure the breaker size?
+
+No. Continuous loads — anything running three hours or more, and EV charging by rule — get multiplied by 1.25 first, then rounded up to a standard rating in 240.6(A). The conductor then has to meet that breaker rating, subject to the 240.4(D) caps on 14, 12 and 10 AWG.
+
+### How many watts can a 20 amp circuit handle?
+
+2,400 W at 120 V on paper, but only 1,920 W of continuous load, because a breaker may not carry more than 80% of its rating continuously. That's the reverse conversion — see **[Amps to Watts](/blog/amps-to-watts)** for the full set of circuit capacities.

@@ -1,0 +1,568 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { fmtInt } from "@/lib/nec";
+
+const title = "Receptacle & Circuit Calculator — Outlets per Circuit | TradesQuote";
+const description =
+  "Free outlets-per-circuit calculator. Non-dwelling counts at 180 VA per strap under NEC 220.14(I); dwellings have no NEC limit at all under 220.14(J) — this tool says which applies and shows the real load limits.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-receptacle-circuit-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Receptacle & Circuit Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Receptacle & Circuit Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online calculator for how many outlets or fixtures a branch circuit may serve. Applies NEC 220.14(I) at 180 VA per strap for non-dwelling occupancies, reports that no count limit exists in dwellings under 220.14(J), and shows the 210.23(A) connected-load limits.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many outlets can I put on a 20 amp circuit?",
+    answer:
+      "In a <strong>dwelling</strong>, the NEC sets no maximum. 220.14(J) deems the general lighting load computed at 3 VA per square foot to already include every general-use receptacle outlet of 20 A or less, so there is no per-receptacle figure to divide by. In a <strong>non-dwelling</strong> occupancy, 220.14(I) assigns 180 VA to each strap, so a 20 A 120 V circuit at 2,400 VA permits <strong>13 outlets</strong>. Most electricians install 8–10 either way as a working habit.",
+  },
+  {
+    question: "Is there really no limit in a house?",
+    answer:
+      "Correct — no limit on the <em>count</em>. It surprises people, but it follows from how dwelling loads are calculated: charging 3 VA for every square foot already accounts for the receptacles, and assigning each one an individual load would count the same thing twice. What the code does regulate in dwellings is <em>where</em> receptacles go (210.52 spacing, the 6-foot rule, countertop spacing) and which circuits must be dedicated.",
+  },
+  {
+    question: "Does a duplex receptacle count as one outlet or two?",
+    answer:
+      "One. 220.14(I) assigns 180 VA to each single or multiple receptacle <strong>on one strap or yoke</strong>, and a standard duplex is a single strap. A four-plex assembled from two duplexes sits on two straps and therefore counts as 360 VA — worth watching in commercial work where the counts are real.",
+  },
+  {
+    question: "What actually limits a circuit if not the outlet count?",
+    answer:
+      "The connected load, under <strong>210.23(A)</strong>. A single piece of cord-and-plug equipment not fastened in place may not exceed <strong>80% of the circuit rating</strong> — 16 A on a 20 A circuit. Equipment <em>fastened in place</em> is limited to <strong>50%</strong> — 10 A — where the circuit also supplies lighting or ordinary receptacles. Those are the real ceilings, and they apply in dwellings and commercial work alike.",
+  },
+  {
+    question: "How many lights can I put on one circuit?",
+    answer:
+      "Change the VA per outlet to the fixture's actual load and the same arithmetic applies. With LEDs the answer is usually far higher than expected: a 15 A 120 V circuit gives 1,440 VA of usable capacity as a continuous load, and at 12 VA per LED trim that is over a hundred fixtures — so the practical limit becomes the switch and dimmer rating, not the circuit. For non-dwelling <em>lighting</em> loads, note that 220.12 unit loads by occupancy govern the calculation rather than 180 VA per outlet.",
+  },
+  {
+    question: "Why does my circuit trip if the count is unlimited?",
+    answer:
+      "Because the breaker responds to current, not to receptacle count. \"No limit\" is a statement about load <em>calculation</em>, not simultaneous use. Two power tools, or a 12.5 A space heater plus a vacuum, will exceed 20 A regardless of how many receptacles are on the circuit. The fix is more circuits, not fewer outlets.",
+  },
+  {
+    question: "Which circuits must be dedicated in a dwelling?",
+    answer:
+      "Three, and they cannot be shared: at least <strong>two 20 A small-appliance circuits</strong> for the kitchen and dining areas (210.11(C)(1), with 210.52(B) restricting what else they may serve), one <strong>20 A laundry circuit</strong> (210.11(C)(2)), and one <strong>20 A bathroom circuit</strong> (210.11(C)(3)). Everywhere else, general lighting and receptacles may share.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Circuits planned? Quote the rough-in in seconds.";
+const ctaDescription =
+  "Device counts drive rough-in pricing — boxes, devices, plates, wire, and labor per outlet. TradesQuote turns the count into a detailed line-item estimate with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "Match the OCPD to the load on the circuit.",
+  },
+  {
+    href: "/calculators/electrical/electrical-recessed-lighting-calculator",
+    title: "Recessed Lighting Calculator",
+    description: "Fixture count and spacing for a room.",
+  },
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "How many circuits the service can support.",
+  },
+  {
+    href: "/calculators/electrical/electrical-box-fill-calculator",
+    title: "Box Fill Calculator",
+    description: "Check the box is big enough for the devices.",
+  },
+];
+
+/** Non-dwelling counts at 180 VA per strap, computed so the table matches the tool. */
+const VA_PER_STRAP = 180;
+const circuitRows = [
+  { amps: 15, volts: 120 },
+  { amps: 20, volts: 120 },
+  { amps: 20, volts: 208 },
+  { amps: 30, volts: 120 },
+].flatMap((c) =>
+  [false, true].map((cont) => {
+    const circuitVa = c.amps * c.volts;
+    const usable = cont ? circuitVa * 0.8 : circuitVa;
+    return {
+      ...c,
+      continuous: cont,
+      circuitVa,
+      usable,
+      count: Math.floor(usable / VA_PER_STRAP),
+    };
+  }),
+);
+
+const styles = electricalAccentStyles.rose;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Receptacle & Circuit Calculator — Outlets per Circuit" />
+    <meta
+      property="og:description"
+      content="How many outlets a branch circuit may serve — 180 VA per strap in commercial work, and no NEC limit at all in dwellings."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Receptacle & Circuit Calculator" />
+    <meta name="twitter:description" content="Outlets per circuit, and the limits that actually apply. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Receptacle & Circuit Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM9 9v2m6-2v2m-4 4h2" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Receptacle &amp; Circuit Calculator <span class="text-rose-600">— Outlets per Circuit</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This question has two correct answers, and which one applies depends on the occupancy. In a
+              <strong>dwelling the NEC sets no limit at all</strong>; in commercial work it is 180 VA per strap and
+              the number is firm. Rather than split the difference and invent a figure, this tool tells you which
+              rule governs — and what actually limits the circuit either way.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM9 9v2m6-2v2m-4 4h2"
+              ></path>
+            </svg>
+            Work out the circuit
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <label for="rc-occupancy" class="text-sm font-semibold text-slate-800">Occupancy</label>
+                <select
+                  id="rc-occupancy"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                >
+                  <option value="non-dwelling" selected>Non-dwelling — 220.14(I), 180 VA each</option>
+                  <option value="dwelling">Dwelling unit — 220.14(J), no count limit</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="rc-rating" class="text-sm font-semibold text-slate-800">Circuit</label>
+                  <select
+                    id="rc-rating"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="15">15 A</option>
+                    <option value="20" selected>20 A</option>
+                    <option value="30">30 A</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="rc-volts" class="text-sm font-semibold text-slate-800">Voltage</label>
+                  <select
+                    id="rc-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="120" selected>120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240">240 V</option>
+                    <option value="277">277 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="rc-continuous" class="text-sm font-semibold text-slate-800">Continuous?</label>
+                  <select
+                    id="rc-continuous"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    <option value="no" selected>No — ×1.00</option>
+                    <option value="yes">Yes — ×0.80</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="rc-va" class="text-sm font-semibold text-slate-800">VA per outlet or fixture</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="rc-va"
+                      type="number"
+                      min="1"
+                      max="2000"
+                      value="180"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">VA</span>
+                  </div>
+                </div>
+                <input
+                  id="rc-va-range"
+                  type="range"
+                  min="5"
+                  max="600"
+                  step="5"
+                  value="180"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5 VA</span><span>600 VA</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                180 VA is the 220.14(I) figure for a general-use receptacle. For lighting, enter the fixture's
+                actual VA — an LED trim is often 10–15 VA, which is why LED counts run so high.
+              </p>
+
+              <button
+                id="rc-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-rose-100 bg-rose-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Maximum outlets</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="rc-count" class="text-5xl font-extrabold tracking-tight text-rose-600">13</span>
+                <span id="rc-count-label" class="text-lg font-semibold text-slate-700">outlets</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Circuit capacity</p>
+                  <p id="rc-circuit-va" class="mt-1 text-2xl font-bold text-slate-900">2,400 VA</p>
+                </div>
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Usable</p>
+                  <p id="rc-usable-va" class="mt-1 text-2xl font-bold text-slate-900">2,400 VA</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-rose-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Circuit capacity</span><span id="rc-bd-circuit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Continuous factor</span><span id="rc-bd-continuous" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Usable VA</span><span id="rc-bd-usable" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Per outlet</span><span id="rc-bd-per-outlet" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Count</span><span id="rc-bd-count" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">210.23(A) limits</span><span id="rc-bd-limits" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="rc-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                A 20 A, 120 V circuit is 2,400 VA. At 180 VA per strap under 220.14(I) that permits 13 outlets.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The rules, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Dwelling units — 220.14(J)</div>
+            <div>general-use receptacles are inside the 3 VA/ft² load&nbsp;→&nbsp;<span class="text-rose-300">no count limit</span></div>
+            <div class="mt-4 text-cyan-300"># Non-dwelling — 220.14(I)</div>
+            <div>circuit VA&nbsp;=&nbsp;amps × volts</div>
+            <div>usable&nbsp;=&nbsp;circuit VA × 0.80 if continuous</div>
+            <div>count&nbsp;=&nbsp;usable ÷ <span class="text-rose-300">180 VA</span> per strap</div>
+            <div class="mt-4 text-cyan-300"># What actually limits either — 210.23(A)</div>
+            <div>one portable appliance ≤ 80% of the circuit&nbsp;&nbsp;·&nbsp;&nbsp;fastened-in-place ≤ 50%</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">"No limit" is a real answer</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It is not a dodge. Charging 3 VA per square foot already accounts for the receptacles, so
+                assigning each one a load would double-count it.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Count straps, not receptacles</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A duplex is one strap and 180 VA no matter that two things plug in. A four-plex on two straps is
+                360 VA.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Spacing is regulated, quantity isn't</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                210.52 is prescriptive about <em>where</em> receptacles go — the 6-foot rule, 24 inches on
+                countertops — and silent on how many share a circuit.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Some jurisdictions do cap it</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The model code's silence does not bind your AHJ. A local amendment capping outlets per circuit is
+                not unusual — worth one phone call.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">The same 20-amp circuit answered three different ways.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Office receptacles — 13 outlets</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Non-dwelling, 20 A, 120 V, non-continuous. The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              20 A × 120 V = 2,400 VA<br />
+              2,400 ÷ 180 VA per strap = 13.3 → <span class="font-bold text-rose-700">13 outlets</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 13 duplex receptacles. Treat the circuit as
+              a continuous load instead and 2,400 × 0.8 = 1,920 VA drops it to 10.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">The same circuit in a house — no limit</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Switch the occupancy to dwelling; nothing else changes.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              220.14(J): receptacles already counted in 3 VA/ft²<br />
+              → <span class="font-bold text-rose-700">no NEC maximum</span>; convention is 8–10<br />
+              load limits still apply: 16 A portable, 10 A fastened
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> twenty receptacles in bedrooms is legal.
+              Six in a workshop where a saw and a shop vac run together is already optimistic — the load is what
+              matters, not the count.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">LED downlights — the count stops mattering</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">15 A, 120 V, continuous, 12 VA per LED trim.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              15 × 120 = 1,800 VA → × 0.80 = 1,440 VA usable<br />
+              1,440 ÷ 12 = <span class="font-bold text-rose-700">120 fixtures</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the circuit is no longer the constraint —
+              the switch and dimmer ratings are. Confirm the dimmer is rated for the total load and for LED
+              drivers, which is where these installations actually fail.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Non-dwelling outlet counts</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            At {fmtInt(VA_PER_STRAP)} VA per strap under 220.14(I). These counts apply to non-dwelling occupancies
+            only — in a dwelling there is no maximum.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Circuit</th>
+                  <th class="py-3 px-4 font-semibold">Load type</th>
+                  <th class="py-3 px-4 font-semibold">Capacity</th>
+                  <th class="py-3 px-4 font-semibold">Usable</th>
+                  <th class="py-3 px-4 font-semibold">Outlets</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  circuitRows.map((row, index) => (
+                    <tr class={index === circuitRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.amps} A · {row.volts} V</td>
+                      <td class="py-3 px-4">{row.continuous ? "Continuous" : "Non-continuous"}</td>
+                      <td class="py-3 px-4">{fmtInt(row.circuitVa)} VA</td>
+                      <td class="py-3 px-4">{fmtInt(row.usable)} VA</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.count}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — <strong>220.14(I)</strong> 180 VA per receptacle outlet
+            on one strap or yoke, <strong>220.14(J)</strong> dwelling receptacles included in the general lighting
+            load, <strong>220.12</strong> general lighting unit loads, <strong>210.23(A)(1)</strong> and
+            <strong>210.23(A)(2)</strong> connected-load limits, <strong>210.11(C)(1)–(3)</strong> required
+            dedicated dwelling circuits, <strong>210.52</strong> receptacle placement, <strong>210.19(A)</strong>
+            and <strong>210.20(A)</strong> continuous load. Some jurisdictions impose an outlet-count limit by
+            local amendment even though the model code does not; local amendments override and the AHJ has final
+            say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about how many outlets a circuit may serve."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalReceptacleCircuitCalculator } from "@/scripts/calculators/electrical-receptacle-circuit-calculator";
+    initElectricalReceptacleCircuitCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

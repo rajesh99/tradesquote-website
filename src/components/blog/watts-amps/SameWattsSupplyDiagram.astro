@@ -1,0 +1,53 @@
+---
+import { SQRT3, fmt, fmtSmart, wattsToAmps } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same 10,000 W on four different supplies. Doubling the voltage halves the
+ * current; going three-phase removes a further 42%. Every figure is computed.
+ */
+const WATTS = 10000;
+
+const rows = [
+  { label: "1φ 120 V", mode: "1ph" as const, volts: 120, pf: 1 },
+  { label: "1φ 240 V", mode: "1ph" as const, volts: 240, pf: 1 },
+  { label: "3φ 240 V", mode: "3ph" as const, volts: 240, pf: 1 },
+  { label: "3φ 480 V", mode: "3ph" as const, volts: 480, pf: 1 },
+].map((r) => ({ ...r, amps: wattsToAmps(WATTS, r.mode, r.volts, r.pf) }));
+
+const peak = Math.max(...rows.map((r) => r.amps));
+const BAR_MAX = 372;
+const bars = rows.map((r) => ({ ...r, width: Math.max(30, Math.round((r.amps / peak) * BAR_MAX)) }));
+
+const reduction = (1 - 1 / SQRT3) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>The same 10,000 watts on four different supplies</title>
+  <desc>
+    Ten thousand watts at unity power factor draws 83.33 amps on single-phase 120 volts, 41.67 amps on
+    single-phase 240 volts, 24.06 amps on three-phase 240 volts, and 12.03 amps on three-phase 480 volts.
+    Doubling the voltage halves the current, and going three-phase cuts it by a further 42.3 percent because of
+    the square-root-of-three factor.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`${WATTS.toLocaleString("en-US")} W is not a number of amps until you say how it is supplied`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Unity power factor throughout, so only voltage and phase configuration change.</text>
+
+  {bars.map((r, i) => {
+    const y = 74 + i * 38;
+    const accent = i === 0 ? C.red : i === 1 ? C.orange : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r.label}</text>
+        <rect x="120" y={y + 4} width={r.width} height="26" rx="7" fill={accent} opacity="0.14" />
+        <rect x="120" y={y + 4} width={r.width} height="26" rx="7" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={120 + r.width - 12} y={y + 22} text-anchor="end" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{`${fmtSmart(r.amps)} A`}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="228" width="672" height="0.8" fill={C.border} />
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">{`Three-phase carries the same power on ${fmt(reduction, 1)}% less line current — 1 ÷ √3 = ${fmt(1 / SQRT3, 4)}. It is why every large load above about 10 kW is three-phase where three-phase exists.`}</text>
+</svg>

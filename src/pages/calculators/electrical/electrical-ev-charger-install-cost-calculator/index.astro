@@ -1,0 +1,617 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { usd } from "@/lib/nec";
+
+const title = "EV Charger Installation Cost Calculator — Level 2 | TradesQuote";
+const description =
+  "Free EV charger installation cost calculator. Price a Level 2 install line by line — conductor run, wiring method, panel work, permit, and labor — with a regional multiplier and a quoting band.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-ev-charger-install-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "EV Charger Installation Cost", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "EV Charger Installation Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online EV charger installation cost calculator returning a line-item total from charger amperage, conductor run length, wiring method, panel work required, permit fee, labor, and a regional cost multiplier.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to install an EV charger?",
+    answer:
+      "Typically <strong>$500 to $2,500</strong> in the US for a Level 2 install, with a straightforward job landing near <strong>$1,300</strong> — roughly $280 of conductor for a 40-foot surface run, $180 of hardware, $120 for a breaker, $150 permit, and $570 of labor. The two things that move it most are the distance from the panel and whether any panel work is needed.",
+  },
+  {
+    question: "Why is my quote so much higher than the average?",
+    answer:
+      "Almost always one of three things. A <strong>long run</strong> — conductor is charged by the foot and a trenched run costs well over twice a surface run per foot. <strong>Panel work</strong> — a subpanel adds around $900 and a service upgrade around $3,060, which dwarfs everything else. Or <strong>region</strong>, which swings the whole total by up to 50%. None of those are padding; they are real scope.",
+  },
+  {
+    question: "Do I need a service upgrade for an EV charger?",
+    answer:
+      'Often not, and this is worth checking before you accept a quote that includes one. <strong>NEC 220.87</strong> lets you establish the existing load from the utility\'s highest recorded demand over 12 months × 125% — real houses draw far less than they calculate. Run it through the <a href="/calculators/electrical/electrical-existing-load-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Existing Load Calculator</a> first. A load-management system under Article 750 is the other route.',
+  },
+  {
+    question: "Is a 48 amp charger worth it over a 32 amp?",
+    answer:
+      "Usually not, for a car that parks overnight. A 32 A charger delivers about 7.7 kW — roughly 25–30 miles of range per hour, so ten hours adds 250+ miles. A 48 A charger needs a 60 A circuit on heavier conductor, and far more often triggers panel work. <strong>Specifying 32 A instead of 48 A is frequently the whole difference between a $1,300 install and a $4,000 one.</strong>",
+  },
+  {
+    question: "Hardwired or plug-in on a 14-50 receptacle?",
+    answer:
+      "Hardwiring is required above 48 A and is generally the more robust choice — no receptacle to overheat, and it permits the full continuous rating. A NEMA 14-50 receptacle install is convenient and portable between homes, but the receptacle becomes a wear point and cheap ones are a known failure mode. Either way <strong>625.41</strong> treats EVSE as a continuous load, so the circuit is sized at 125%.",
+  },
+  {
+    question: "Does the charger hardware cost count in this?",
+    answer:
+      "No — this prices the <em>installation</em>. The charger itself typically runs $400–$800 for a reputable Level 2 unit and is usually bought separately by the homeowner. The hardware line here covers the receptacle or hardwire kit, box, and any disconnecting means, not the EVSE.",
+  },
+  {
+    question: "Are there rebates for EV charger installation?",
+    answer:
+      "Frequently, from utilities and some states, and occasionally federal programmes — they change often enough that any figure quoted here would go stale. Check your utility's website and your state energy office before quoting, since some require pre-approval or a specific charger model, and some pay the contractor directly rather than the homeowner.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Install priced? Send the quote in seconds.";
+const ctaDescription =
+  "EV charger work is high-volume, competitive, and won on turnaround. TradesQuote turns the scope into a detailed line-item estimate — conductor, devices, panel work, and labor — with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-ev-charger-calculator",
+    title: "EV Charger Circuit Calculator",
+    description: "Size the circuit, breaker, and conductor first.",
+  },
+  {
+    href: "/calculators/electrical/electrical-existing-load-calculator",
+    title: "Existing Load Calculator",
+    description: "Prove the service has room — NEC 220.87.",
+  },
+  {
+    href: "/calculators/electrical/electrical-panel-upgrade-cost-calculator",
+    title: "Panel Upgrade Cost",
+    description: "Price the upgrade if one is genuinely needed.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Estimate Calculator",
+    description: "Add overhead and margin to reach a sell price.",
+  },
+];
+
+/**
+ * The same 40 ft run priced across the four panel-work scenarios, computed inline so
+ * the table always matches the script.
+ */
+const RUN_FT = 40;
+const PER_FT = 7;
+const HARDWARE = 180;
+const PERMIT = 150;
+const LABOR = 6 * 95;
+const scenarioRows = [
+  { scenario: "Spare breaker space already free", panel: 0, extraHours: 0 },
+  { scenario: "New breaker fitted", panel: 120, extraHours: 0 },
+  { scenario: "Subpanel added", panel: 900, extraHours: 3 },
+  { scenario: "Service upgrade to 200 A", panel: 3060, extraHours: 4 },
+].map((r) => {
+  const labor = LABOR + r.extraHours * 95;
+  const total = RUN_FT * PER_FT + HARDWARE + r.panel + PERMIT + labor;
+  return { ...r, labor, total };
+});
+
+const styles = electricalAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="EV Charger Installation Cost Calculator — Level 2" />
+    <meta
+      property="og:description"
+      content="Price a Level 2 EV charger install line by line — conductor, wiring method, panel work, permit, and labor."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EV Charger Installation Cost Calculator" />
+    <meta name="twitter:description" content="What a Level 2 EV charger install really costs. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="EV Charger Installation Cost"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              EV Charger Installation Cost <span class="text-emerald-600">— Level 2</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Level 2 installs run roughly <strong>$500 to $2,500</strong>, and the spread is almost entirely
+              about two things: how far the charger is from the panel, and whether the panel needs work. Price it
+              line by line here — and note that specifying a 32 A charger instead of 48 A often removes the panel
+              work altogether.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              ></path>
+            </svg>
+            Price the install
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ec-distance" class="text-sm font-semibold text-slate-800">Distance from panel</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ec-distance"
+                      type="number"
+                      min="0"
+                      max="300"
+                      value="40"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="ec-distance-range"
+                  type="range"
+                  min="5"
+                  max="200"
+                  step="5"
+                  value="40"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-emerald-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5 ft</span><span>200 ft</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="ec-amps" class="text-sm font-semibold text-slate-800">Charger output</label>
+                  <select
+                    id="ec-amps"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="32">32 A — 40 A circuit</option>
+                    <option value="40">40 A — 50 A circuit</option>
+                    <option value="48" selected>48 A — 60 A circuit</option>
+                    <option value="60">60 A — 80 A circuit</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ec-method" class="text-sm font-semibold text-slate-800">Wiring method</label>
+                  <select
+                    id="ec-method"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="surface" selected>Surface / exposed — 1.0×</option>
+                    <option value="fished">Fished in finished walls — 1.6×</option>
+                    <option value="trenched">Trenched / underground — 2.4×</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="ec-panel" class="text-sm font-semibold text-slate-800">Panel work needed</label>
+                <select
+                  id="ec-panel"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="none">None — spare space already free</option>
+                  <option value="breaker" selected>New breaker fitted</option>
+                  <option value="subpanel">Subpanel added</option>
+                  <option value="upgrade">Service upgrade to 200 A</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="ec-permit" class="text-sm font-semibold text-slate-800">Permit $</label>
+                  <input
+                    id="ec-permit"
+                    type="number"
+                    min="0"
+                    max="2000"
+                    value="150"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ec-hours" class="text-sm font-semibold text-slate-800">Labor hours</label>
+                  <input
+                    id="ec-hours"
+                    type="number"
+                    min="0"
+                    max="60"
+                    step="0.5"
+                    value="6"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ec-rate" class="text-sm font-semibold text-slate-800">Rate $/h</label>
+                  <input
+                    id="ec-rate"
+                    type="number"
+                    min="0"
+                    max="400"
+                    value="95"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label for="ec-region" class="text-sm font-semibold text-slate-800">Cost region</label>
+                <select
+                  id="ec-region"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="0.85">Low cost — 0.85×</option>
+                  <option value="1" selected>Average — 1.00×</option>
+                  <option value="1.25">High-cost metro — 1.25×</option>
+                  <option value="1.5">Very high cost — 1.50×</option>
+                </select>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                This prices the installation, not the charger. A reputable Level 2 unit is typically $400–$800 and
+                is usually supplied by the homeowner.
+              </p>
+
+              <button
+                id="ec-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Installed cost</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ec-total" class="text-5xl font-extrabold tracking-tight text-emerald-600">$1,300</span>
+              </div>
+              <p id="ec-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Inside the $500–$2,500 range typically published for US residential EV charger installation in 2026.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Quoting low</p>
+                  <p id="ec-low" class="mt-1 text-2xl font-bold text-slate-900">$1,105</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Quoting high</p>
+                  <p id="ec-high" class="mt-1 text-2xl font-bold text-slate-900">$1,495</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor</span><span id="ec-bd-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Hardware</span><span id="ec-bd-hardware" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Panel work</span><span id="ec-bd-panel" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Permit</span><span id="ec-bd-permit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Labor</span><span id="ec-bd-labor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Subtotal</span><span id="ec-bd-subtotal" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Region adjusted</span><span id="ec-bd-region" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                2026 US market ranges. Installation only — the charger itself is separate. Utility and state
+                rebates change often; check before quoting.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            What drives the price, in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># The build-up</div>
+            <div>conductor&nbsp;=&nbsp;feet × $/ft × method multiplier</div>
+            <div>subtotal&nbsp;=&nbsp;conductor + hardware + panel work + permit + labor</div>
+            <div>total&nbsp;=&nbsp;subtotal × region</div>
+            <div class="mt-4 text-cyan-300"># Circuit size follows the charger (625.41 — continuous)</div>
+            <div>32 A → 40 A circuit&nbsp;·&nbsp;48 A → 60 A circuit&nbsp;·&nbsp;60 A → 80 A circuit</div>
+            <div class="mt-4 text-cyan-300"># The lever that matters most</div>
+            <div>a smaller charger often removes the <span class="text-emerald-300">panel work</span> entirely</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Distance is charged by the foot</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A garage on the other side of the house is not a small change. Trenching to a detached garage more
+                than doubles the per-foot cost on top of the extra length.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Panel work dominates when needed</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A breaker is $120. A subpanel is $900. A service upgrade is around $3,060 and swamps every other
+                line — so it is worth proving whether it is really needed.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">32 A is enough for most people</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                7.7 kW adds 25–30 miles of range an hour. Ten hours on a driveway is 250+ miles. Very few
+                households genuinely need 48 A.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Check 220.87 before quoting an upgrade</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Measured demand times 125% frequently shows the existing service has room. It is one phone call to
+                the utility and it can remove $3,000 of scope.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">Three installs, from the easy case to the one that needs a service upgrade.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">48 A in an attached garage — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">40 ft surface run, breaker fitted, average-cost region.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              conductor: 40 ft × $7 × 1.00 = $280<br />
+              hardware $180 + breaker $120 + permit $150 + labor 6 h × $95 = $570<br />
+              total = <span class="font-bold text-emerald-700">$1,300</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the common case, and comfortably mid-range.
+              Labor is the largest single line.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Detached garage, 120 ft trenched</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Same 48 A charger, same panel work — just further away.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              conductor: 120 ft × $7 × 2.40 = $2,016<br />
+              + $180 + $120 + $150 + labor 10 h × $95 = $950<br />
+              total = <span class="font-bold text-emerald-700">$3,416</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> distance and method alone nearly tripled it.
+              Note that a run this long may also need upsizing for voltage drop, which adds again.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">The same easy job, but the service is full</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">40 ft surface run, but a 200 A service upgrade is required.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              $280 conductor + $180 hardware + <span class="font-bold">$3,060 service upgrade</span><br />
+              + $150 permit + labor 10 h × $95 = $950<br />
+              total = <span class="font-bold text-emerald-700">$4,620</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the upgrade is 66% of the job. This is
+              exactly the case to test against NEC 220.87 first — and to price a 32 A charger as the alternative.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Cost by panel work required</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A 48 A charger on a {RUN_FT} ft surface run at ${PER_FT}/ft, average-cost region, with labor adjusted
+            for the extra work each scenario carries. Panel work is what separates a routine install from an
+            expensive one.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Scenario</th>
+                  <th class="py-3 px-4 font-semibold">Panel work</th>
+                  <th class="py-3 px-4 font-semibold">Labor</th>
+                  <th class="py-3 px-4 font-semibold">Installed total</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  scenarioRows.map((row, index) => (
+                    <tr class={index === scenarioRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.scenario}</td>
+                      <td class="py-3 px-4">{row.panel === 0 ? "—" : usd(row.panel)}</td>
+                      <td class="py-3 px-4">{usd(row.labor)}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{usd(row.total)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: cost figures are 2026 US market ranges and vary substantially by region,
+            utility, and site conditions — planning aids, not quotes. The service-upgrade figure matches the
+            <a
+              href="/calculators/electrical/electrical-panel-upgrade-cost-calculator"
+              class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600"
+              >Panel Upgrade Cost Calculator</a
+            > default so the two tools agree. Code references: NEC (NFPA 70) 2023 — <strong>Article 625</strong>
+            electric vehicle power transfer system, <strong>625.41</strong> EVSE as a continuous load,
+            <strong>625.42</strong> rating, <strong>210.20(A)</strong> continuous load, <strong>220.87</strong>
+            determining existing loads, Article 750 energy management systems. Local amendments override the model
+            code, and the AHJ has final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about EV charger installation cost."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalEvChargerInstallCostCalculator } from "@/scripts/calculators/electrical-ev-charger-install-cost-calculator";
+    initElectricalEvChargerInstallCostCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -1,0 +1,674 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import {
+  AMBIENT_CORRECTION,
+  BOX_FILL_VOLUME,
+  BUNDLING_ADJUSTMENT,
+  CONDUCTOR_SIZES,
+  CONDUIT_AREA,
+  CONDUIT_TRADE_SIZES,
+  STANDARD_BOX_VOLUMES,
+  STANDARD_OCPD,
+  TABLE_250_66,
+  TABLE_250_122,
+  TABLE_310_12,
+  THHN_AREA,
+  XHHW_AREA,
+  conduitFillLimit,
+  sizeLabel,
+} from "@/lib/nec";
+
+/**
+ * Every table on this page is imported from src/lib/nec.ts — the same module the
+ * calculators read. There are no transcribed copies here, so this page and the tools
+ * cannot drift apart.
+ */
+const title = "NEC Tables Reference — 310.16, Chapter 9, 250.122 & More | TradesQuote";
+const description =
+  "Free NEC lookup tables: Table 310.16 conductor ampacity, Table 310.12 dwelling services, 240.6(A) standard OCPD ratings, ambient and bundling derating factors, Chapter 9 conduit fill, 314.16 box fill, and the 250.66/250.122 grounding tables.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/nec-tables";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "NEC Tables", item: pageUrl },
+  ],
+};
+
+const jumpLinks = [
+  { id: "table-310-16", label: "310.16 Ampacity" },
+  { id: "table-310-12", label: "310.12 Dwelling Services" },
+  { id: "derating", label: "Derating Factors" },
+  { id: "table-240-6", label: "240.6(A) OCPD" },
+  { id: "chapter-9", label: "Ch. 9 Conduit Fill" },
+  { id: "table-314-16", label: "314.16 Box Fill" },
+  { id: "grounding", label: "250.66 / 250.122" },
+];
+
+const conduitTypes = Object.keys(CONDUIT_AREA);
+const conductorAreaSizes = Object.keys(THHN_AREA);
+const fillTiers = [
+  { count: "1 conductor", pct: conduitFillLimit(1) },
+  { count: "2 conductors", pct: conduitFillLimit(2) },
+  { count: "3 or more", pct: conduitFillLimit(3) },
+];
+
+const dash = "—";
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="NEC Tables Reference — Ampacity, Conduit Fill, Grounding" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="NEC Tables Reference | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb category="Electrical" categoryHref="/calculators/electrical" current="NEC Tables" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600"
+            >
+              Electrical Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">NEC Tables Reference</h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The lookup tables you actually reach for, on one page and free of pop-ups. Ampacity, derating
+              factors, standard breaker ratings, conduit and box fill, and the two grounding tables — every one
+              read from the same source our calculators use, so what you see here is what they compute.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            {
+              jumpLinks.map((l) => (
+                <a
+                  href={`#${l.id}`}
+                  class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-sky-500 hover:text-sky-600 transition"
+                >
+                  {l.label}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-14 space-y-20">
+        <!-- TABLE 310.16 -->
+        <div id="table-310-16">
+          <div class="inline-block rounded-lg bg-sky-100 px-4 py-1.5 text-sm font-bold text-sky-700 mb-4">
+            Table 310.16
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Conductor Ampacity</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Allowable ampacities of insulated conductors rated up to 2,000 V, <strong
+              >not more than three current-carrying conductors</strong
+            > in a raceway, cable, or earth, at an ambient of 30 °C (86 °F). Under <strong>110.14(C)</strong> the
+            circuit is limited by the lowest-rated termination — usually 75 °C — so the 90 °C column is a derating
+            starting point rather than a usable answer.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500">
+                  <th class="py-3 px-4 font-semibold" rowspan="2">Size</th>
+                  <th class="py-3 px-4 font-semibold border-l border-slate-200" colspan="3">Copper</th>
+                  <th class="py-3 px-4 font-semibold border-l border-slate-200" colspan="3">Aluminum</th>
+                  <th class="py-3 px-4 font-semibold border-l border-slate-200" rowspan="2">Circular mils</th>
+                </tr>
+                <tr class="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
+                  <th class="py-2 px-4 font-semibold border-l border-slate-200">60 °C</th>
+                  <th class="py-2 px-4 font-semibold">75 °C</th>
+                  <th class="py-2 px-4 font-semibold">90 °C</th>
+                  <th class="py-2 px-4 font-semibold border-l border-slate-200">60 °C</th>
+                  <th class="py-2 px-4 font-semibold">75 °C</th>
+                  <th class="py-2 px-4 font-semibold">90 °C</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  CONDUCTOR_SIZES.map((s, i) => (
+                    <tr class={i === CONDUCTOR_SIZES.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-2.5 px-4 font-semibold text-slate-900">{sizeLabel(s.label)}</td>
+                      <td class="py-2.5 px-4 border-l border-slate-100">{s.copper[60] ?? dash}</td>
+                      <td class="py-2.5 px-4 font-semibold text-slate-900">{s.copper[75] ?? dash}</td>
+                      <td class="py-2.5 px-4">{s.copper[90] ?? dash}</td>
+                      <td class="py-2.5 px-4 border-l border-slate-100">{s.aluminum[60] ?? dash}</td>
+                      <td class="py-2.5 px-4 font-semibold text-slate-900">{s.aluminum[75] ?? dash}</td>
+                      <td class="py-2.5 px-4">{s.aluminum[90] ?? dash}</td>
+                      <td class="py-2.5 px-4 border-l border-slate-100 text-slate-500">
+                        {s.cmil.toLocaleString("en-US")}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-sm text-slate-700">
+              <strong>240.4(D) caps small conductors</strong> below these figures: 15 A for 14 AWG copper, 20 A
+              for 12 AWG, 30 A for 10 AWG — and 15 A for 12 AWG aluminum, 25 A for 10 AWG. That is why 12 AWG
+              copper reads 25 A here and still sits on a 20-amp breaker.
+            </p>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-wire-size-calculator"
+              class="text-sm font-semibold text-sky-600 hover:text-sky-700">Wire Size Calculator →</a
+            >
+            <a
+              href="/calculators/electrical/electrical-ampacity-calculator"
+              class="text-sm font-semibold text-sky-600 hover:text-sky-700">Ampacity &amp; Derating Calculator →</a
+            >
+            <a href="/blog/wire-size-chart-amps" class="text-sm font-semibold text-sky-600 hover:text-sky-700"
+              >How to read this table →</a
+            >
+          </div>
+        </div>
+
+        <!-- TABLE 310.12 -->
+        <div id="table-310-12">
+          <div class="inline-block rounded-lg bg-teal-100 px-4 py-1.5 text-sm font-bold text-teal-700 mb-4">
+            Table 310.12
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Dwelling Services &amp; Feeders</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            For a dwelling <strong>service</strong>, or a feeder carrying the <strong>entire load</strong> of a
+            one-family dwelling, conductors may be sized at <strong>83%</strong> of the rating. This does not
+            reach an ordinary subpanel feeder — that sizes from Table 310.16 above.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 bg-slate-50 text-slate-500">
+                  <th class="py-3 px-5 font-semibold">Service or feeder rating</th>
+                  <th class="py-3 px-4 font-semibold">Copper</th>
+                  <th class="py-3 px-4 font-semibold">Aluminum / copper-clad</th>
+                  <th class="py-3 px-4 font-semibold">83% of rating</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  TABLE_310_12.map((r, i) => (
+                    <tr class={i === TABLE_310_12.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-2.5 px-5 font-semibold text-slate-900">{r.rating} A</td>
+                      <td class="py-2.5 px-4">{sizeLabel(r.copper)}</td>
+                      <td class="py-2.5 px-4">{sizeLabel(r.aluminum)}</td>
+                      <td class="py-2.5 px-4 text-slate-500">{(r.rating * 0.83).toFixed(1)} A</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-service-wire-size-calculator"
+              class="text-sm font-semibold text-teal-600 hover:text-teal-700">Service &amp; Feeder Wire Size →</a
+            >
+            <a href="/blog/200-amp-service-wire-size" class="text-sm font-semibold text-teal-600 hover:text-teal-700"
+              >The 83% rule explained →</a
+            >
+          </div>
+        </div>
+
+        <!-- DERATING -->
+        <div id="derating">
+          <div class="inline-block rounded-lg bg-cyan-100 px-4 py-1.5 text-sm font-bold text-cyan-700 mb-4">
+            310.15(B)(1) &amp; 310.15(C)(1)
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Derating Factors</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Both factors are applied to the ampacity from the conductor's <em>insulation</em> temperature column —
+            normally 90 °C — and the result is then checked against the 75 °C termination limit. Starting from the
+            90 °C column is often what saves a conductor size.
+          </p>
+
+          <div class="mt-8 grid lg:grid-cols-2 gap-6">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+                <p class="text-sm font-bold text-slate-900">Ambient temperature correction</p>
+                <p class="text-xs text-slate-500">310.15(B)(1) — base ambient 30 °C</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs text-slate-500">
+                    <th class="py-2.5 px-4 font-semibold">Ambient</th>
+                    <th class="py-2.5 px-3 font-semibold">60 °C</th>
+                    <th class="py-2.5 px-3 font-semibold">75 °C</th>
+                    <th class="py-2.5 px-3 font-semibold">90 °C</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    AMBIENT_CORRECTION.map((r, i) => (
+                      <tr class={i === AMBIENT_CORRECTION.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2 px-4 text-xs font-medium text-slate-900">{r.label}</td>
+                        <td class="py-2 px-3">{r.f60 === 0 ? dash : r.f60.toFixed(2)}</td>
+                        <td class="py-2 px-3">{r.f75 === 0 ? dash : r.f75.toFixed(2)}</td>
+                        <td class="py-2 px-3 font-semibold text-slate-900">{r.f90 === 0 ? dash : r.f90.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+                <p class="text-sm font-bold text-slate-900">Conductor bundling adjustment</p>
+                <p class="text-xs text-slate-500">310.15(C)(1) — current-carrying conductors only</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Conductors in the raceway</th>
+                    <th class="py-2.5 px-4 font-semibold">Factor</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    BUNDLING_ADJUSTMENT.map((r, i) => (
+                      <tr class={i === BUNDLING_ADJUSTMENT.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 font-medium text-slate-900">{r.label}</td>
+                        <td class="py-2.5 px-4 font-semibold text-slate-900">{r.factor.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+              <div class="px-5 py-4 border-t border-slate-200 bg-slate-50">
+                <p class="text-xs text-slate-600">
+                  Equipment grounding conductors never count. A neutral counts where it carries current. A nipple
+                  no longer than 24 in is exempt under Chapter 9, Table 1, Note 4.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-ampacity-calculator"
+              class="text-sm font-semibold text-cyan-600 hover:text-cyan-700">Ampacity &amp; Derating Calculator →</a
+            >
+            <a href="/blog/12-gauge-wire-amps" class="text-sm font-semibold text-cyan-600 hover:text-cyan-700"
+              >Why derating starts at 90 °C →</a
+            >
+          </div>
+        </div>
+
+        <!-- 240.6 -->
+        <div id="table-240-6">
+          <div class="inline-block rounded-lg bg-red-100 px-4 py-1.5 text-sm font-bold text-red-700 mb-4">
+            240.6(A)
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Standard OCPD Ratings</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The only ratings fuses and inverse-time breakers come in. A calculation landing between two of them
+            rounds <strong>up</strong> — there is no 33-amp breaker.
+          </p>
+
+          <div class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex flex-wrap gap-2">
+              {
+                STANDARD_OCPD.map((r) => (
+                  <span
+                    class="inline-flex min-w-[3.75rem] justify-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800"
+                  >
+                    {r} A
+                  </span>
+                ))
+              }
+            </div>
+            <p class="mt-4 text-xs text-slate-500">
+              240.6(A) also lists additional standard fuse ratings of 1, 3, 6, 10 and 601 A and above, rarely seen
+              on branch circuits.
+            </p>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-breaker-size-calculator"
+              class="text-sm font-semibold text-red-600 hover:text-red-700">Breaker Size Calculator →</a
+            >
+            <a href="/blog/what-size-breaker-do-i-need" class="text-sm font-semibold text-red-600 hover:text-red-700"
+              >How to size an OCPD →</a
+            >
+          </div>
+        </div>
+
+        <!-- CHAPTER 9 -->
+        <div id="chapter-9">
+          <div class="inline-block rounded-lg bg-teal-100 px-4 py-1.5 text-sm font-bold text-teal-700 mb-4">
+            Chapter 9, Tables 1, 4 &amp; 5
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Conduit Fill</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three tables working together: <strong>Table 1</strong> gives the allowable percentage by conductor
+            count, <strong>Table 4</strong> the raceway's internal area, and <strong>Table 5</strong> each
+            conductor's area including insulation.
+          </p>
+
+          <div class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p class="text-sm font-bold text-slate-900">Table 1 — maximum percent fill</p>
+            <div class="mt-4 grid sm:grid-cols-3 gap-4">
+              {
+                fillTiers.map((t) => (
+                  <div class="rounded-xl border border-teal-100 bg-teal-50 p-4">
+                    <p class="text-xs font-medium text-slate-600">{t.count}</p>
+                    <p class="mt-1 text-2xl font-extrabold text-teal-700">{Math.round(t.pct * 100)}%</p>
+                  </div>
+                ))
+              }
+            </div>
+            <p class="mt-4 text-xs text-slate-500">
+              Two conductors is stricter than three — that is the code, not a typo, and it means the maximum count
+              cannot be found by a single division. A nipple of 24 in or less goes to 60% under Note 4, and the
+              310.15(C)(1) adjustment factors do not apply to it.
+            </p>
+          </div>
+
+          <div class="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+              <p class="text-sm font-bold text-slate-900">Table 4 — raceway internal area, in²</p>
+              <p class="text-xs text-slate-500">Total (100%) area by type and trade size</p>
+            </div>
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-xs text-slate-500">
+                  <th class="py-2.5 px-5 font-semibold">Trade size</th>
+                  {conduitTypes.map((t) => <th class="py-2.5 px-4 font-semibold">{t}</th>)}
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  CONDUIT_TRADE_SIZES.map((trade, i) => (
+                    <tr class={i === CONDUIT_TRADE_SIZES.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-2.5 px-5 font-semibold text-slate-900">{trade}</td>
+                      {
+                        conduitTypes.map((type) => (
+                          <td class="py-2.5 px-4">{CONDUIT_AREA[type][trade]?.toFixed(3) ?? dash}</td>
+                        ))
+                      }
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+              <p class="text-sm font-bold text-slate-900">Table 5 — conductor area, in²</p>
+              <p class="text-xs text-slate-500">Including insulation</p>
+            </div>
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-xs text-slate-500">
+                  <th class="py-2.5 px-5 font-semibold">Size</th>
+                  <th class="py-2.5 px-4 font-semibold">THHN / THWN-2</th>
+                  <th class="py-2.5 px-4 font-semibold">XHHW-2</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  conductorAreaSizes.map((s, i) => (
+                    <tr class={i === conductorAreaSizes.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-2.5 px-5 font-semibold text-slate-900">{sizeLabel(s)}</td>
+                      <td class="py-2.5 px-4">{THHN_AREA[s].toFixed(4)}</td>
+                      <td class="py-2.5 px-4">{XHHW_AREA[s]?.toFixed(4) ?? dash}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-sm text-slate-700">
+              <strong>Note 7</strong> permits rounding up where a calculation for conductors <em>all of the same
+              size</em> produces a decimal of 0.8 or larger. Annex C bakes that in, which is why a pre-computed
+              Annex C count can read one higher than a strict area calculation. Our conduit fill calculator computes
+              strictly, so it is conservative by one at those boundaries.
+            </p>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-conduit-fill-calculator"
+              class="text-sm font-semibold text-teal-600 hover:text-teal-700">Conduit Fill Calculator →</a
+            >
+            <a href="/blog/how-to-calculate-conduit-fill" class="text-sm font-semibold text-teal-600 hover:text-teal-700"
+              >The method, step by step →</a
+            >
+            <a href="/blog/conduit-fill-chart" class="text-sm font-semibold text-teal-600 hover:text-teal-700"
+              >Pre-computed fill charts →</a
+            >
+          </div>
+        </div>
+
+        <!-- 314.16 -->
+        <div id="table-314-16">
+          <div class="inline-block rounded-lg bg-violet-100 px-4 py-1.5 text-sm font-bold text-violet-700 mb-4">
+            314.16
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Box Fill</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Each conductor entering and terminating counts once. All internal cable clamps together count as one,
+            at the largest conductor present. Each device yoke counts as <strong>two</strong>. All equipment
+            grounding conductors together count as one. A conductor that both begins and ends inside the box — a
+            pigtail — counts zero.
+          </p>
+
+          <div class="mt-8 grid lg:grid-cols-2 gap-6">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+                <p class="text-sm font-bold text-slate-900">314.16(B) — volume per conductor</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Conductor size</th>
+                    <th class="py-2.5 px-4 font-semibold">Free space required</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    Object.keys(BOX_FILL_VOLUME).map((s, i, arr) => (
+                      <tr class={i === arr.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 font-semibold text-slate-900">{sizeLabel(s)}</td>
+                        <td class="py-2.5 px-4">{BOX_FILL_VOLUME[s].toFixed(2)} in³</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+                <p class="text-sm font-bold text-slate-900">Common box volumes</p>
+                <p class="text-xs text-slate-500">Table 314.16(A) plus trade sizes</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Box</th>
+                    <th class="py-2.5 px-4 font-semibold">Volume</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    STANDARD_BOX_VOLUMES.map((b, i) => (
+                      <tr class={i === STANDARD_BOX_VOLUMES.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 font-medium text-slate-900">{b.label}</td>
+                        <td class="py-2.5 px-4 font-semibold text-slate-900">{b.volume.toFixed(1)} in³</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-box-fill-calculator"
+              class="text-sm font-semibold text-violet-600 hover:text-violet-700">Box Fill Calculator →</a
+            >
+            <a href="/blog/box-fill-calculation" class="text-sm font-semibold text-violet-600 hover:text-violet-700"
+              >What counts and what doesn't →</a
+            >
+          </div>
+        </div>
+
+        <!-- GROUNDING -->
+        <div id="grounding">
+          <div class="inline-block rounded-lg bg-emerald-100 px-4 py-1.5 text-sm font-bold text-emerald-700 mb-4">
+            250.66 &amp; 250.122
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Grounding Conductors</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Two different conductors from two different tables. The <strong>equipment grounding conductor</strong>
+            is keyed to the overcurrent device; the <strong>grounding electrode conductor</strong> is keyed to the
+            largest ungrounded service-entrance conductor, then capped by which electrode it lands on.
+          </p>
+
+          <div class="mt-8 grid lg:grid-cols-2 gap-6">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+                <p class="text-sm font-bold text-slate-900">Table 250.122 — equipment grounding conductor</p>
+                <p class="text-xs text-slate-500">By OCPD rating. Note there is no 30 A row.</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">OCPD up to</th>
+                    <th class="py-2.5 px-4 font-semibold">Copper</th>
+                    <th class="py-2.5 px-4 font-semibold">Aluminum</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    TABLE_250_122.map((r, i) => (
+                      <tr class={i === TABLE_250_122.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 font-semibold text-slate-900">{r.maxOcpd} A</td>
+                        <td class="py-2.5 px-4">{sizeLabel(r.copper)}</td>
+                        <td class="py-2.5 px-4">{sizeLabel(r.aluminum)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="px-5 py-3 border-b border-slate-200 bg-slate-50">
+                <p class="text-sm font-bold text-slate-900">Table 250.66 — grounding electrode conductor</p>
+                <p class="text-xs text-slate-500">By largest service-entrance conductor</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs text-slate-500">
+                    <th class="py-2.5 px-4 font-semibold">Copper service</th>
+                    <th class="py-2.5 px-4 font-semibold">Aluminum service</th>
+                    <th class="py-2.5 px-3 font-semibold">Cu GEC</th>
+                    <th class="py-2.5 px-3 font-semibold">Al GEC</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    TABLE_250_66.map((r, i) => (
+                      <tr class={i === TABLE_250_66.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-4 text-xs">{r.copperRange}</td>
+                        <td class="py-2.5 px-4 text-xs">{r.aluminumRange}</td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-900">{sizeLabel(r.copper)}</td>
+                        <td class="py-2.5 px-3">{sizeLabel(r.aluminum)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+              <div class="px-4 py-4 border-t border-slate-200 bg-slate-50">
+                <p class="text-xs text-slate-600">
+                  Then the caps: to a <strong>rod, pipe or plate</strong> the GEC need not exceed 6 AWG copper
+                  (250.66(A)); to a <strong>concrete-encased electrode</strong>, 4 AWG (250.66(B)); to a
+                  <strong>ground ring</strong>, no larger than the ring itself (250.66(C)). A metal water pipe has
+                  no cap.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/calculators/electrical/electrical-ground-wire-size-calculator"
+              class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">Ground Wire Size Calculator →</a
+            >
+            <a href="/blog/ground-wire-size-chart" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700"
+              >EGC vs GEC explained →</a
+            >
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <p class="text-sm text-slate-600 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> all tables are reproduced from NEC (NFPA 70) 2023 — Table
+            310.16, Table 310.12, 310.15(B)(1), 310.15(C)(1), 240.4(D), 240.6(A), Chapter 9 Tables 1, 4, 5 and 8
+            with Notes 4 and 7, Annex C, 314.16 and Table 314.16(A), Table 250.66 with 250.66(A)–(C), and Table
+            250.122. Baseline is NEC 2023; most states are on the 2020 or 2023 cycle, and NEC 2026 was published in
+            2025. These are planning aids — <strong>local amendments override the model code</strong>, and a
+            licensed electrician plus the AHJ have final say on anything installed.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Let the calculator do the lookup</h2>
+          <p class="mt-3 text-slate-600">
+            Every table on this page is read by one of our free calculators — same numbers, none of the
+            cross-referencing.
+          </p>
+          <a
+            href="/calculators/electrical"
+            class="mt-6 inline-flex items-center gap-2 rounded-xl bg-sky-600 px-6 py-3 text-sm font-bold text-white hover:bg-sky-700 transition"
+          >
+            Browse all electrical calculators →
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

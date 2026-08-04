@@ -1,0 +1,671 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+
+const title = "Electrical Glossary — 70+ Terms Defined | TradesQuote";
+const description =
+  "Plain-English electrical glossary: ampacity, AIC, AFCI, EGC and GEC, THHN, MCA and MOCP, kVA, power factor, derating, continuous load, locked-rotor, knob-and-tube, Ufer, and more — with NEC citations and links to free calculators.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/glossary";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Glossary", item: pageUrl },
+  ],
+};
+
+const terms = [
+  {
+    letter: "A",
+    items: [
+      {
+        term: "AFCI (Arc-Fault Circuit Interrupter)",
+        def: "A device that recognises the high-frequency, erratic current pattern arcing produces and opens the circuit. It protects property from fire, not people from shock — an arc at a loose terminal can smoulder for months at a couple of amps without ever tripping an ordinary breaker. Required by 210.12 on most 120 V, 15 and 20 A dwelling circuits serving living areas.",
+        calc: { href: "/blog/gfci-vs-afci", label: "GFCI vs AFCI" },
+      },
+      {
+        term: "AHJ (Authority Having Jurisdiction)",
+        def: "The inspector, department, or individual empowered to interpret and enforce the code where the work is being done. The AHJ's reading governs — which is why 'the NEC says' is only ever half an answer. Local amendments routinely modify the model code, sometimes substantially.",
+      },
+      {
+        term: "AIC (Ampere Interrupting Capacity)",
+        def: "The maximum fault current a breaker can safely interrupt without destroying itself. It must equal or exceed the available fault current at the point of installation. A breaker with inadequate AIC can fail catastrophically rather than opening cleanly, which is why it is a listing requirement and not a preference.",
+      },
+      {
+        term: "Ampacity",
+        def: "The current a conductor can carry continuously without exceeding its temperature rating. Read from Table 310.16 at the appropriate temperature column, then reduced for ambient temperature and conductor bundling, then capped by the termination rating. It is not a single number for a given wire — it depends on the conditions.",
+        calc: { href: "/calculators/electrical/electrical-ampacity-calculator", label: "Ampacity Calculator" },
+      },
+      {
+        term: "Ambient Temperature Correction",
+        def: "A multiplier from 310.15(B)(1) applied where the surrounding air is hotter or cooler than the 30 °C (86 °F) the ampacity table assumes. An attic at 45 °C costs a 90 °C conductor 13% of its rating; at 55 °C it is down 24%.",
+        calc: { href: "/calculators/electrical/electrical-ampacity-calculator", label: "Ampacity Calculator" },
+      },
+      {
+        term: "Apparent Power (kVA)",
+        def: "Volts times amps, without regard to phase angle — the power the conductors and transformer must physically carry. Distinct from real power (kW), which is what does work. Generators and transformers are rated in kVA precisely because power factor is the customer's variable, not the manufacturer's.",
+        calc: { href: "/calculators/electrical/electrical-kva-calculator", label: "kVA Calculator" },
+      },
+      {
+        term: "Arc Flash",
+        def: "The explosive release of energy when a fault creates a conductive plasma arc between energised parts. Temperatures can exceed those at the surface of the sun, and the pressure wave alone causes injury. Governed for work practices by NFPA 70E rather than the NEC.",
+      },
+      {
+        term: "AWG (American Wire Gauge)",
+        def: "The sizing system for conductors up to 4/0, where a <em>smaller</em> number means a larger conductor — 12 AWG is bigger than 14 AWG. Each three-gauge step roughly doubles the area. Above 4/0 the system switches to thousands of circular mils (kcmil), so 250 kcmil is the next size up from 4/0.",
+        calc: { href: "/calculators/electrical/nec-tables#table-310-16", label: "Table 310.16" },
+      },
+    ],
+  },
+  {
+    letter: "B",
+    items: [
+      {
+        term: "Bonding",
+        def: "Connecting metal parts together so they are at the same potential and can carry fault current. Distinct from grounding, which connects to earth. Bonding is what makes a breaker trip on a ground fault; earth itself is a poor fault-current path and is not relied on for that purpose.",
+        calc: { href: "/blog/ground-wire-size-chart", label: "Ground Wire Size Chart" },
+      },
+      {
+        term: "Box Fill",
+        def: "The calculation in 314.16 that checks whether a box has enough free space for what is inside it. Each conductor entering and terminating counts once, all internal clamps together count once, each device yoke counts twice, and all equipment grounding conductors together count once. A pigtail wholly inside the box counts zero.",
+        calc: { href: "/calculators/electrical/electrical-box-fill-calculator", label: "Box Fill Calculator" },
+      },
+      {
+        term: "Branch Circuit",
+        def: "The conductors between the final overcurrent device and the outlets it serves. Everything upstream of that last breaker is a feeder or a service. The distinction matters because branch circuits, feeders, and services each have their own sizing rules.",
+      },
+      {
+        term: "Bundling Adjustment",
+        def: "The ampacity reduction in 310.15(C)(1) that applies once more than three current-carrying conductors share a raceway or cable: 80% for 4–6, 70% for 7–9, 50% for 10–20. Equipment grounding conductors never count toward the total. It is frequently the limit that binds before conduit fill does.",
+        calc: { href: "/blog/conduit-fill-chart", label: "Conduit Fill Chart" },
+      },
+      {
+        term: "Bonding Jumper",
+        def: "A conductor connecting two metal parts that must be at the same potential. The <em>main</em> bonding jumper connects the neutral to the enclosure and grounding system at the service disconnect — the one and only place they may be joined. A <em>system</em> bonding jumper does the same job at a separately derived system such as a transformer.",
+        calc: { href: "/blog/ground-wire-size-chart", label: "Ground Wire Size Chart" },
+      },
+      {
+        term: "Burden (payroll)",
+        def: "The cost of employing someone beyond their wage — payroll tax, workers' compensation, liability insurance, holiday and sick pay, benefits. Typically 30–40% for electrical work, where workers' comp is not cheap. Omitting it is the most common reason a contractor's rates do not cover their costs.",
+        calc: { href: "/calculators/electrical/electrical-labor-rate-calculator", label: "Labor Rate Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "C",
+    items: [
+      {
+        term: "Circular Mil (cmil)",
+        def: "The area of a circle one thousandth of an inch in diameter — the unit conductor cross-section is expressed in. 12 AWG is 6,530 cmil; 4/0 is 211,600. It appears in the denominator of the voltage-drop formula, which is why doubling conductor area halves the drop.",
+      },
+      {
+        term: "Continuous Load",
+        def: "A load expected to operate for three hours or more. Under 210.20(A) the overcurrent device and conductors must be rated at 125% of it. EV supply equipment is continuous by rule (625.41); ranges, dryers, and ovens are not, because they cycle.",
+        calc: { href: "/calculators/electrical/electrical-breaker-size-calculator", label: "Breaker Size Calculator" },
+      },
+      {
+        term: "Conduit Fill",
+        def: "The percentage of a raceway's internal cross-sectional area occupied by conductors. Chapter 9 Table 1 allows 53% for one conductor, 31% for two, and 40% for three or more — and a nipple no longer than 24 inches goes to 60%. Every conductor counts, grounds included.",
+        calc: { href: "/calculators/electrical/electrical-conduit-fill-calculator", label: "Conduit Fill Calculator" },
+      },
+      {
+        term: "COPALUM",
+        def: "A proprietary crimp connector system used to remediate small-gauge aluminum branch-circuit wiring by permanently joining a copper pigtail to the existing aluminum conductor. One of the two accepted repairs, alongside listed connectors such as AlumiConn. A panel replacement does not address the problem, which lives at every termination in the house.",
+        calc: { href: "/blog/cost-to-rewire-a-house", label: "Cost to Rewire a House" },
+      },
+    ],
+  },
+  {
+    letter: "D",
+    items: [
+      {
+        term: "Demand Factor",
+        def: "A permitted reduction reflecting that not everything runs at once. The code applies them all through Article 220 — Table 220.42 to the lighting group, Table 220.55 to ranges, 220.53 to four or more fixed appliances, and the 100%/40% split in the 220.82 optional method. Ignoring them overstates a load by 30–40%.",
+        calc: { href: "/calculators/electrical/electrical-load-calculator", label: "Load Calculator" },
+      },
+      {
+        term: "Derating",
+        def: "Reducing a conductor's ampacity for ambient temperature and conductor bundling. Applied to the value in the conductor's insulation temperature column — normally 90 °C — and the result then checked against the 75 °C termination limit. Starting from the 90 °C column is often what saves a size.",
+        calc: { href: "/calculators/electrical/electrical-ampacity-calculator", label: "Ampacity Calculator" },
+      },
+      {
+        term: "Duty Cycle (generator ratings)",
+        def: "Whether a generator is rated for standby, prime, or continuous service. A set rated 20 kW standby is not intended to run flat out indefinitely, which is why a running margin belongs in the sizing calculation. Ratings also derate with altitude and sustained heat.",
+        calc: {
+          href: "/calculators/electrical/electrical-generator-sizing-calculator",
+          label: "Generator Sizing Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "E",
+    items: [
+      {
+        term: "EGC (Equipment Grounding Conductor)",
+        def: "The conductor that runs with every circuit to carry fault current back to the source fast enough to trip the breaker. Sized from Table 250.122 by the overcurrent device rating — not by the circuit conductors. Frequently confused with the GEC, which is a different conductor doing a different job.",
+        calc: {
+          href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+          label: "Ground Wire Size Calculator",
+        },
+      },
+      {
+        term: "Effective Ground-Fault Current Path",
+        def: "The low-impedance path a fault current takes back to the source so the overcurrent device opens quickly. It is built from the equipment grounding conductor and bonded metal — <em>not</em> from earth. This is why a ground rod does not substitute for an EGC, and why a detached building needs both its own electrode and an EGC run with the feeder.",
+        calc: { href: "/blog/ground-wire-size-chart", label: "Ground Wire Size Chart" },
+      },
+      {
+        term: "EVSE (Electric Vehicle Supply Equipment)",
+        def: "The correct term for what everyone calls an EV charger — the charger itself is in the car. Governed by Article 625, and treated as a continuous load under 625.41, so the circuit is sized at 125% of its rating. A 48 A unit therefore needs a 60 A circuit.",
+        calc: { href: "/calculators/electrical/electrical-ev-charger-calculator", label: "EV Charger Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "F",
+    items: [
+      {
+        term: "Fault Current (Available)",
+        def: "The current that would flow in a bolted short circuit at a given point — set by the utility transformer, the service conductors, and the distance from them. It matters because every breaker's AIC rating must equal or exceed it. Available fault current falls as you move away from the service, which is why the number is quoted at a specific point.",
+      },
+      {
+        term: "Feeder",
+        def: "Conductors between the service equipment and the final branch-circuit overcurrent device — the run to a subpanel, for instance. Sized from Table 310.16, except where it carries the entire load of a one-family dwelling, in which case Table 310.12's 83% allowance applies.",
+        calc: {
+          href: "/calculators/electrical/electrical-service-wire-size-calculator",
+          label: "Service & Feeder Wire Size",
+        },
+      },
+      {
+        term: "FLA / FLC (Full-Load Amps / Current)",
+        def: "A motor's rated running current. For sizing conductors and overcurrent devices, 430.6(A) directs you to the table value in 430.248 or 430.250 rather than the nameplate — the nameplate is used only for overload protection. This catches people out constantly.",
+      },
+      {
+        term: "Footcandle",
+        def: "One lumen per square foot — the unit of illuminance used to specify light levels. Rough residential targets: hallways 10, living areas 20, bathrooms 30, kitchens and offices 40, workshops 50. Not an NEC requirement; the code governs the wiring, not the light level.",
+        calc: {
+          href: "/calculators/electrical/electrical-recessed-lighting-calculator",
+          label: "Recessed Lighting Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "G",
+    items: [
+      {
+        term: "GEC (Grounding Electrode Conductor)",
+        def: "The conductor connecting the service to the earth electrode — rods, a concrete-encased electrode, a metal water pipe. One per service, not one per circuit. Sized from Table 250.66 by the largest ungrounded service-entrance conductor, then capped by which electrode it lands on: 6 AWG copper to a rod, 4 AWG to a Ufer.",
+        calc: {
+          href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+          label: "Ground Wire Size Calculator",
+        },
+      },
+      {
+        term: "GFCI (Ground-Fault Circuit Interrupter)",
+        def: "A device that compares current leaving on the hot with current returning on the neutral and trips on a 4–6 mA imbalance, because that difference means current is returning by some other route — possibly through a person. It protects people from shock. It needs no equipment ground to function, which is why 406.4(D)(2) permits it as the remedy for an ungrounded receptacle.",
+        calc: { href: "/blog/gfci-vs-afci", label: "GFCI vs AFCI" },
+      },
+      {
+        term: "GFPE (Ground-Fault Protection of Equipment)",
+        def: "A ground-fault device set around 30 mA, intended to protect equipment rather than people. Six times the Class A GFCI threshold and far above what a person can tolerate — so it satisfies equipment-protection requirements but never personnel-protection ones. The two are routinely confused.",
+      },
+      {
+        term: "Grounded vs Grounding Conductor",
+        def: "The grounded conductor is the neutral — a normal current-carrying conductor. A grounding conductor (EGC or GEC) carries no current except during a fault. They are bonded together at exactly one place, the service disconnect; bonding them anywhere downstream puts load current onto the grounding system.",
+        calc: { href: "/blog/ground-wire-size-chart", label: "Ground Wire Size Chart" },
+      },
+    ],
+  },
+  {
+    letter: "H",
+    items: [
+      {
+        term: "Handle Tie",
+        def: "A clip joining two breaker handles so they open together. Required on a multiwire branch circuit by 210.4(B) so both ungrounded conductors are disconnected simultaneously — otherwise someone can switch off one breaker and still be working on a live shared neutral. A two-pole breaker satisfies it inherently.",
+      },
+      {
+        term: "Home Run",
+        def: "The cable from the panel to the first device on a circuit. Counted separately in a takeoff because it is usually the longest single pull and the one that determines whether voltage drop governs the conductor size.",
+        calc: { href: "/blog/how-to-estimate-electrical-jobs", label: "How to Estimate Electrical Jobs" },
+      },
+    ],
+  },
+  {
+    letter: "I",
+    items: [
+      {
+        term: "IC-Rated",
+        def: "A luminaire rated for direct contact with thermal insulation. A non-IC fixture requires clearance — typically 3 inches — and covering it is a genuine fire hazard. Modern LED canless downlights are usually IC-rated and airtight, which is much of their appeal in insulated ceilings.",
+        calc: {
+          href: "/calculators/electrical/electrical-recessed-lighting-calculator",
+          label: "Recessed Lighting Calculator",
+        },
+      },
+      {
+        term: "Inrush / Locked-Rotor Current",
+        def: "The brief surge a motor draws at startup while it overcomes inertia — commonly 2 to 4 times running current, and higher for a hard-starting compressor. It is why a generator often has to be sized for starting rather than running load, and why motor breakers may legitimately exceed conductor ampacity.",
+        calc: {
+          href: "/calculators/electrical/electrical-generator-sizing-calculator",
+          label: "Generator Sizing Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "J",
+    items: [
+      {
+        term: "Junction Box",
+        def: "An enclosure housing splices with no device installed. Still subject to the full 314.16 box fill calculation, and — importantly — it must remain <strong>accessible</strong> under 314.29. Burying a junction box behind finished drywall is a violation people commit without realising, usually while trying to tidy a splice away.",
+        calc: { href: "/calculators/electrical/electrical-box-fill-calculator", label: "Box Fill Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "K",
+    items: [
+      {
+        term: "K (resistivity constant)",
+        def: "The material constant in the circular-mil voltage-drop formula: 12.9 for copper, 21.2 for aluminum, in ohm-circular-mils per foot. The ratio is why an aluminum conductor of the same gauge drops about 64% more voltage than copper.",
+        calc: { href: "/calculators/electrical/electrical-voltage-drop-calculator", label: "Voltage Drop Calculator" },
+      },
+      {
+        term: "Knob-and-Tube",
+        def: "Pre-1950s wiring using individual conductors run through porcelain tubes and supported on knobs, with air as part of the insulation system. Ungrounded and with no cable sheath. Because it relies on air circulation, burying it in attic insulation is not permitted — which is why insulating an old attic often forces a rewire.",
+        calc: { href: "/blog/cost-to-rewire-a-house", label: "Cost to Rewire a House" },
+      },
+      {
+        term: "kWh (Kilowatt-Hour)",
+        def: "One kilowatt drawn for one hour — a unit of energy, not power, and the unit a bill counts. A 1,000 W load for one hour and a 100 W load for ten hours consume exactly the same kWh and cost the same.",
+        calc: { href: "/calculators/electrical/electrical-kwh-cost-calculator", label: "kWh Cost Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "L",
+    items: [
+      {
+        term: "Labor Unit",
+        def: "The hours a given assembly is expected to take — hours per receptacle installed, for example. NECA's Manual of Labor Units is the standard published reference, but it reflects national averages across all conditions. Tracked hours from your own jobs are better data for your crew and market.",
+        calc: { href: "/blog/how-to-estimate-electrical-jobs", label: "How to Estimate Electrical Jobs" },
+      },
+      {
+        term: "Line vs Load",
+        def: "Line is the supply side of a device; load is what it feeds downstream. The distinction is critical on a GFCI receptacle — wiring the supply to the load terminals leaves the device unprotected and often unable to reset, and is the single most common GFCI wiring error.",
+        calc: { href: "/blog/gfci-vs-afci", label: "GFCI vs AFCI" },
+      },
+      {
+        term: "Load Management (Article 750)",
+        def: "A system that sheds or throttles a large load when the rest of the building is busy, so the total never exceeds the service. Frequently the cheapest way to add an EV charger to a service with limited headroom — a fraction of an upgrade's cost.",
+        calc: {
+          href: "/calculators/electrical/electrical-existing-load-calculator",
+          label: "Existing Load Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "M",
+    items: [
+      {
+        term: "Margin vs Markup",
+        def: "Margin is a percentage of the selling price; markup is a percentage of cost. They are not interchangeable — a 25% markup is only a 20% margin, and a 50% markup only a 33% margin. To hit a margin you divide by (1 − margin); multiplying gives you markup and less profit.",
+        calc: { href: "/calculators/electrical/electrical-estimate-calculator", label: "Estimate Calculator" },
+      },
+      {
+        term: "MCA / MOCP",
+        def: "Minimum Circuit Ampacity and Maximum Overcurrent Protection — the two figures on an air-conditioning nameplate. Size the conductor to the MCA and protect it at no more than the MOCP. Because Article 440 governs, the MOCP routinely exceeds the conductor's ampacity, which looks wrong and is correct.",
+      },
+      {
+        term: "Multiwire Branch Circuit",
+        def: "Two ungrounded conductors from different phases sharing one neutral. The neutral carries only the difference between the two legs, which is why it need not be upsized — but the handle-tie or common-trip requirement in 210.4(B) exists so both legs open together, and a shared neutral wired across the wrong phases will trip AFCI and GFCI devices.",
+      },
+    ],
+  },
+  {
+    letter: "N",
+    items: [
+      {
+        term: "NM-B (Romex)",
+        def: "Non-metallic sheathed cable, the standard for residential branch circuits. Its conductors are 90 °C rated, but 334.80 requires ampacity to be taken from the 60 °C column — so 12 AWG NM-B is a 20 A cable and 10 AWG a 30 A cable, full stop. Not rated for wet locations or direct burial.",
+        calc: { href: "/blog/wire-size-chart-amps", label: "Wire Size Chart" },
+      },
+      {
+        term: "NEC (NFPA 70)",
+        def: "The National Electrical Code, revised on a three-year cycle. It is a model code with no force until a jurisdiction adopts it, and jurisdictions amend it freely — so the edition in force and its local amendments matter more than the newest edition. NEC 2026 was published in 2025 while many states remain on 2020 or 2023.",
+      },
+      {
+        term: "Neutral (Grounded Conductor)",
+        def: "The conductor that carries return current at earth potential. It is a working, current-carrying conductor — not a safety conductor — which is why it must never be used as an equipment ground and why it is bonded to the grounding system at only one point. On a feeder it is sized for the maximum <em>unbalanced</em> load per 220.61, so a reduced neutral is normal.",
+        calc: {
+          href: "/calculators/electrical/electrical-service-wire-size-calculator",
+          label: "Service & Feeder Wire Size",
+        },
+      },
+      {
+        term: "Nipple",
+        def: "A raceway no longer than 24 inches between two enclosures. Chapter 9 Table 1 Note 4 permits 60% fill in a nipple, and exempts it from the 310.15(C)(1) bundling adjustment — two allowances at once, which makes short nipples between adjacent panels unusually useful.",
+        calc: {
+          href: "/calculators/electrical/electrical-conduit-fill-calculator",
+          label: "Conduit Fill Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "O",
+    items: [
+      {
+        term: "Outlet",
+        def: "In NEC language, any point where current is taken to supply utilisation equipment — a lighting outlet, a receptacle outlet, a smoke-alarm outlet. It is <em>not</em> a synonym for receptacle, which is the device itself. Worth knowing because 210.52 governs receptacle outlets by location and 220.14 assigns load per outlet.",
+        calc: {
+          href: "/calculators/electrical/electrical-receptacle-circuit-calculator",
+          label: "Receptacle & Circuit Calculator",
+        },
+      },
+      {
+        term: "OCPD (Overcurrent Protective Device)",
+        def: "The breaker or fuse protecting a circuit. Its job is to protect the conductor, not the load — the load has its own protection. Standard ratings are fixed by 240.6(A), so a calculation landing on 33 A gets a 35 A device.",
+        calc: { href: "/calculators/electrical/electrical-breaker-size-calculator", label: "Breaker Size Calculator" },
+      },
+      {
+        term: "Overhead (business)",
+        def: "The cost of being in business regardless of any particular job — vehicle, insurance, licensing, software, tools, accounting, and the estimating time on jobs you do not win. Applied as a percentage of direct cost, derived from your own books. Around 15% is common for a small shop.",
+        calc: { href: "/calculators/electrical/electrical-labor-rate-calculator", label: "Labor Rate Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "P",
+    items: [
+      {
+        term: "Power Factor",
+        def: "The ratio of real power (kW) to apparent power (kVA) — how much of the current is doing useful work. Resistive loads are 1.0; motors are typically 0.8–0.9. A low power factor means the conductors carry current that does no work, and commercial tariffs charge for it through a demand charge.",
+        calc: {
+          href: "/calculators/electrical/electrical-power-factor-calculator",
+          label: "Power Factor Calculator",
+        },
+      },
+      {
+        term: "Panelboard Busbar Rating",
+        def: "What the panel's internal bus can carry, printed on the label inside the door. Often larger than the main breaker — a 225 A busbar with a 200 A main is common, and that headroom is what makes solar interconnection under the 705.12 busbar rules possible. Not the same as the service rating.",
+        calc: {
+          href: "/calculators/electrical/electrical-service-size-calculator",
+          label: "Service Size Calculator",
+        },
+      },
+      {
+        term: "Pigtail",
+        def: "A short conductor spliced inside a box to connect a device, rather than running the circuit conductor to it directly. Relevant to box fill: a conductor that both originates and terminates within the box counts as <strong>zero</strong> volume under 314.16(B)(1), so pigtailing costs you nothing in the calculation.",
+        calc: { href: "/calculators/electrical/electrical-box-fill-calculator", label: "Box Fill Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "R",
+    items: [
+      {
+        term: "Receptacle",
+        def: "The device — the thing you plug into — as distinct from the <em>outlet</em>, which is the point in the wiring system. A duplex receptacle is two contact devices on one strap. Table 210.21(B)(3) governs which receptacle ratings may go on which circuit: notably, 15 A receptacles are permitted on a 20 A circuit.",
+        calc: { href: "/blog/15-amp-vs-20-amp-circuit", label: "15 Amp vs 20 Amp Circuit" },
+      },
+    ],
+  },
+  {
+    letter: "S",
+    items: [
+      {
+        term: "SER / SE Cable",
+        def: "Service-entrance cable. SE is used for service conductors; SER is the round version with a reduced neutral commonly used for feeders — 4/0-4/0-2/0 aluminium is the standard 200 A configuration. The trap: <strong>SER is not rated for wet locations</strong>, so an underground run needs USE-2 or another listed underground method.",
+        calc: {
+          href: "/calculators/electrical/electrical-service-wire-size-calculator",
+          label: "Service & Feeder Wire Size",
+        },
+      },
+      {
+        term: "Service vs Feeder vs Branch Circuit",
+        def: "The service is everything from the utility to the service disconnect. A feeder runs from there to another distribution point. A branch circuit is downstream of the final overcurrent device. Each has its own sizing rules, and mixing them up is how the 83% dwelling-service allowance ends up wrongly applied to a subpanel.",
+        calc: {
+          href: "/calculators/electrical/electrical-service-size-calculator",
+          label: "Service Size Calculator",
+        },
+      },
+      {
+        term: "Small-Conductor Rule (240.4(D))",
+        def: "Caps overcurrent protection on the three smallest common sizes regardless of their table ampacity: 15 A for 14 AWG copper, 20 A for 12 AWG, 30 A for 10 AWG, and 15 A and 25 A for 12 and 10 AWG aluminum. It is why 12 AWG copper reads 25 A in the table and always sits on a 20 A breaker.",
+        calc: { href: "/blog/12-gauge-wire-amps", label: "12 Gauge Wire Amps" },
+      },
+      {
+        term: "Soft Starter",
+        def: "A device that limits motor inrush during startup. On a generator job it can move the governing requirement from the starting path back to the running path, sometimes dropping the set two sizes — frequently cheaper than the next generator up.",
+        calc: {
+          href: "/calculators/electrical/electrical-generator-sizing-calculator",
+          label: "Generator Sizing Calculator",
+        },
+      },
+      {
+        term: "Strap / Yoke",
+        def: "The metal mounting bracket a receptacle is built on. It matters because 220.14(I) assigns 180 VA to each single or multiple receptacle on <em>one strap</em> — so a duplex counts once no matter that two things plug in, while a four-plex on two straps counts as 360 VA.",
+        calc: {
+          href: "/calculators/electrical/electrical-receptacle-circuit-calculator",
+          label: "Receptacle & Circuit Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "T",
+    items: [
+      {
+        term: "Termination Temperature Rule (110.14(C))",
+        def: "A circuit is limited by the lowest temperature rating of any termination in it. Since virtually all breakers and lugs are rated 75 °C, you size conductors from the 75 °C column even when the wire itself is 90 °C rated. The 90 °C rating is still the base that derating is applied to.",
+        calc: { href: "/blog/wire-size-chart-amps", label: "Wire Size Chart" },
+      },
+      {
+        term: "THHN / THWN-2",
+        def: "The building wire used in raceways. THHN is rated 90 °C dry; THWN-2 is rated 90 °C wet and dry, and most modern wire is dual-rated THHN/THWN-2. Do not confuse the conductor's rating with what you may use — 110.14(C) caps you at the termination rating.",
+      },
+      {
+        term: "Tandem Breaker",
+        def: "Two breakers in one panel slot, letting you add circuits without a new panel. Legal only where the panelboard is <em>listed</em> for them and only up to the panel's maximum circuit count, both of which are on the label. Often the correct answer when the complaint is 'the panel is full' — a space problem, not a capacity problem.",
+        calc: {
+          href: "/calculators/electrical/electrical-existing-load-calculator",
+          label: "Existing Load Calculator",
+        },
+      },
+      {
+        term: "Transfer Switch",
+        def: "The device that ensures utility and generator power can never be connected simultaneously — a life-safety requirement for line workers as much as for equipment. An automatic transfer switch starts the set and switches over unattended. Backfeeding a panel through a receptacle is extremely dangerous and never permitted.",
+        calc: {
+          href: "/calculators/electrical/electrical-generator-sizing-calculator",
+          label: "Generator Sizing Calculator",
+        },
+      },
+    ],
+  },
+  {
+    letter: "U",
+    items: [
+      {
+        term: "Ufer Ground (Concrete-Encased Electrode)",
+        def: "A grounding electrode formed by conductor or rebar encased in the concrete of a foundation footing in contact with earth. Generally the best-performing electrode available, and where present it must be used. Its GEC is capped at 4 AWG copper by 250.66(B).",
+        calc: {
+          href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+          label: "Ground Wire Size Calculator",
+        },
+      },
+      {
+        term: "USE-2",
+        def: "Underground service-entrance cable rated for direct burial and wet locations. The distinction that matters on a job: SER cable is <em>not</em> rated for wet locations, so a feeder run underground to a detached building needs USE-2 or another listed underground wiring method.",
+      },
+      {
+        term: "Utilisation (billable percentage)",
+        def: "The share of paid hours that can be billed to a customer. The strongest single lever on a contractor's required rate: at a fixed wage, a shop at 60% billable must charge around $132/hr where one at 90% charges $88/hr for the same margin. Drive time and unpaid estimating are recovered from billable hours whether you plan for it or not.",
+        calc: { href: "/calculators/electrical/electrical-labor-rate-calculator", label: "Labor Rate Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "V",
+    items: [
+      {
+        term: "Voltage Drop",
+        def: "Voltage lost in the conductor between source and load, from the conductor's own resistance. Not limited by enforceable NEC text for ordinary branch circuits — the familiar 3% branch and 5% total figures appear in Informational Notes to 210.19(A) and 215.2(A) and are recommendations. Design to 3% anyway; some jurisdictions adopt it as an amendment.",
+        calc: { href: "/calculators/electrical/electrical-voltage-drop-calculator", label: "Voltage Drop Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "W",
+    items: [
+      {
+        term: "Wet Location",
+        def: "A location subject to saturation with water — underground, in concrete in direct contact with earth, or exposed to weather. It dictates the wiring method: THWN-2 rather than THHN, USE-2 rather than SER, and raceways installed underground are treated as wet locations even where the interior looks dry.",
+      },
+      {
+        term: "Wire Gauge vs Circular Mils",
+        def: "Two ways of expressing the same thing. AWG is an inverse scale for smaller conductors; circular mils is the direct area measure used above 4/0 as kcmil, and the figure that appears in the voltage-drop formula. Converting once — 12 AWG is 6,530 cmil — makes the drop calculation straightforward.",
+        calc: { href: "/calculators/electrical/nec-tables#table-310-16", label: "Table 310.16" },
+      },
+    ],
+  },
+];
+
+const totalTerms = terms.reduce((sum, g) => sum + g.items.length, 0);
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Electrical Glossary — 70+ Terms Defined" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Electrical Glossary | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb category="Electrical" categoryHref="/calculators/electrical" current="Glossary" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600"
+            >
+              Electrical Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">Electrical Glossary</h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              {totalTerms} terms defined in plain English, with the NEC article behind each one where there is one.
+              Weighted toward the terms that actually cause trouble — the pairs people mix up, and the ones where
+              the obvious reading of the code is the wrong one.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-2">
+            {
+              terms.map((g) => (
+                <a
+                  href={`#letter-${g.letter}`}
+                  class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:border-sky-500 hover:text-sky-600 transition"
+                >
+                  {g.letter}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14 space-y-14">
+        {
+          terms.map((group) => (
+            <div id={`letter-${group.letter}`}>
+              <div class="flex items-center gap-4">
+                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-100 text-xl font-extrabold text-sky-700">
+                  {group.letter}
+                </span>
+                <div class="h-px flex-1 bg-slate-200"></div>
+              </div>
+
+              <dl class="mt-6 space-y-6">
+                {group.items.map((item) => (
+                  <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <dt class="text-base font-bold text-slate-900">{item.term}</dt>
+                    <dd class="mt-2 text-sm leading-relaxed text-slate-600" set:html={item.def} />
+                    {item.calc && (
+                      <a
+                        href={item.calc.href}
+                        class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-sky-600 hover:text-sky-700 transition"
+                      >
+                        {item.calc.label} →
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))
+        }
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <p class="text-sm text-slate-600 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> definitions follow NEC (NFPA 70) 2023 usage, including
+            Article 100 definitions and the articles cited in each entry. NFPA 70E governs electrical safety work
+            practices including arc flash. NECA's Manual of Labor Units is a published industry reference. Pricing
+            and business terms are standard contracting practice rather than code. Local amendments override the
+            model code, and a licensed electrician plus the AHJ have final say on anything installed.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Put the terms to work</h2>
+          <p class="mt-3 text-slate-600">
+            Every concept here has a free calculator or a reference table behind it.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href="/calculators/electrical"
+              class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-6 py-3 text-sm font-bold text-white hover:bg-sky-700 transition"
+            >
+              Browse all electrical calculators →
+            </a>
+            <a
+              href="/calculators/electrical/formulas"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-sky-500 hover:text-sky-600 transition"
+            >
+              Formula reference →
+            </a>
+            <a
+              href="/calculators/electrical/nec-tables"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-sky-500 hover:text-sky-600 transition"
+            >
+              NEC tables →
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

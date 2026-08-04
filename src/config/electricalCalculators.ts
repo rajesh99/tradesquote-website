@@ -229,6 +229,51 @@ export const electricalCalculators: ElectricalCalculator[] = [
     accent: "rose",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
   },
+  {
+    slug: "electrical-existing-load-calculator",
+    title: "Existing Load Calculator",
+    description:
+      "The NEC 220.87 method — twelve months of measured utility demand at 125% establishes the existing load, so you can prove a service has room for a new one.",
+    question: "Can I add an EV charger to a 100 amp service?",
+    accent: "violet",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
+  },
+  {
+    slug: "electrical-generator-sizing-calculator",
+    title: "Generator Sizing Calculator",
+    description:
+      "Standby generator kW from the loads you need to keep running — checked against both running capacity and the motor-starting surge that usually governs the size.",
+    question: "What size generator do I need for my house?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "electrical-recessed-lighting-calculator",
+    title: "Recessed Lighting Calculator",
+    description:
+      "Can count, grid layout, and spacing for any room — worked both by the ceiling-height spacing rule and by the lumens the room's use actually needs.",
+    question: "How many recessed lights do I need?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18h6M10 22h4M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0018 8 6 6 0 006 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 018.91 14"/></svg>`,
+  },
+  {
+    slug: "electrical-receptacle-circuit-calculator",
+    title: "Receptacle & Circuit Calculator",
+    description:
+      "How many outlets or fixtures one circuit may serve — 180 VA per strap in commercial work, no NEC count limit at all in dwellings, plus the 210.23(A) load limits.",
+    question: "How many outlets can I put on a 20 amp circuit?",
+    accent: "rose",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM9 9v2m6-2v2m-4 4h2"/></svg>`,
+  },
+  {
+    slug: "electrical-ev-charger-install-cost-calculator",
+    title: "EV Charger Installation Cost",
+    description:
+      "A Level 2 install priced line by line — conductor run, wiring method, panel work, permit, and labor — with a regional multiplier and a quoting band.",
+    question: "How much does it cost to install an EV charger?",
+    accent: "emerald",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
 ];
 
 export type ElectricalCalculatorGroup = {
@@ -256,11 +301,13 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
   {
     label: "Load & Service Sizing",
     description:
-      "Run the whole-house load calculation, turn it into a service rating, and check whether an EV charger fits before anyone quotes a panel upgrade.",
+      "Run the whole-house load calculation, turn it into a service rating, prove what the service already draws from measured demand, and size backup power — before anyone quotes a panel upgrade.",
     slugs: [
       "electrical-load-calculator",
       "electrical-service-size-calculator",
+      "electrical-existing-load-calculator",
       "electrical-ev-charger-calculator",
+      "electrical-generator-sizing-calculator",
     ],
   },
   {
@@ -279,12 +326,22 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
     ],
   },
   {
+    label: "Devices & Lighting",
+    description:
+      "Lay out what goes on the wall and the ceiling — how many outlets a circuit may serve, and the can count and spacing a room needs.",
+    slugs: [
+      "electrical-receptacle-circuit-calculator",
+      "electrical-recessed-lighting-calculator",
+    ],
+  },
+  {
     label: "Cost & Pricing",
     description:
       "Price the work once the circuit is designed — labor, material, overhead, and the margin that has to survive all of it.",
     slugs: [
       "electrical-estimate-calculator",
       "electrical-panel-upgrade-cost-calculator",
+      "electrical-ev-charger-install-cost-calculator",
       "electrical-rewiring-cost-calculator",
       "electrical-labor-rate-calculator",
     ],
@@ -561,6 +618,41 @@ export const electricalCalculatorGuide = [
     tool: "Labor Rate Calculator",
     accent: "rose" as const,
     rule: "(wage + burden + overhead) ÷ billable hours ÷ (1 − margin)",
+  },
+  {
+    question: "Can I add this load without upgrading the service?",
+    slug: "electrical-existing-load-calculator",
+    tool: "Existing Load Calculator",
+    accent: "violet" as const,
+    rule: "220.87 — measured 12-month peak × 1.25, plus the new load at 125% if continuous",
+  },
+  {
+    question: "What size standby generator do I need?",
+    slug: "electrical-generator-sizing-calculator",
+    tool: "Generator Sizing Calculator",
+    accent: "orange" as const,
+    rule: "max(running × margin, running − largest motor + its starting surge)",
+  },
+  {
+    question: "How many outlets can go on one circuit?",
+    slug: "electrical-receptacle-circuit-calculator",
+    tool: "Receptacle & Circuit Calculator",
+    accent: "rose" as const,
+    rule: "220.14(I) 180 VA per strap in non-dwellings; 220.14(J) sets no limit in dwellings",
+  },
+  {
+    question: "How many recessed lights, and how far apart?",
+    slug: "electrical-recessed-lighting-calculator",
+    tool: "Recessed Lighting Calculator",
+    accent: "amber" as const,
+    rule: "spacing ≈ ceiling ÷ 2, checked against area × footcandles ÷ lumens per fixture",
+  },
+  {
+    question: "How much does an EV charger install cost?",
+    slug: "electrical-ev-charger-install-cost-calculator",
+    tool: "EV Charger Installation Cost",
+    accent: "emerald" as const,
+    rule: "conductor × method + hardware + panel work + permit + labor, × region",
   },
 ];
 
