@@ -274,6 +274,51 @@ export const electricalCalculators: ElectricalCalculator[] = [
     accent: "emerald",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
   },
+  {
+    slug: "electrical-motor-fla-calculator",
+    title: "Motor Full Load Amps Calculator",
+    description:
+      "The NEC Table 430.248 / 430.250 full-load current that conductors and the breaker must be sized from — plus the nameplate figure the overload device uses instead.",
+    question: "What is the full load amps of a 10 HP motor?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
+  {
+    slug: "electrical-motor-circuit-calculator",
+    title: "Motor Circuit Calculator",
+    description:
+      "The complete Article 430 branch circuit — conductor at 430.22, protective device from Table 430.52, overload from the nameplate, and the EGC that follows the oversized breaker.",
+    question: "How do I size a motor branch circuit?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "electrical-transformer-sizing-calculator",
+    title: "Transformer Sizing Calculator",
+    description:
+      "Standard kVA from the connected load and a growth margin, primary and secondary full-load current, and the Table 450.3(B) overcurrent ceilings that carry magnetising inrush.",
+    question: "What size transformer do I need?",
+    accent: "red",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 10h8M8 14h8"/></svg>`,
+  },
+  {
+    slug: "electrical-short-circuit-calculator",
+    title: "Available Fault Current Calculator",
+    description:
+      "Symmetrical fault current at a transformer secondary and at the end of a feeder by the point-to-point method, with the interrupting rating NEC 110.9 requires at each point.",
+    question: "How much fault current is available at my panel?",
+    accent: "red",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+  },
+  {
+    slug: "electrical-conductor-resistance-calculator",
+    title: "Conductor Resistance Calculator",
+    description:
+      "Chapter 9 Table 8 resistance with temperature correction and Table 9 reactance, combined into the effective impedance that actually causes voltage drop — plus the I²R heat.",
+    question: "What is the resistance of a conductor run?",
+    accent: "cyan",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12h4l3-8 4 16 3-8h2"/></svg>`,
+  },
 ];
 
 export type ElectricalCalculatorGroup = {
@@ -323,6 +368,18 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
       "electrical-three-phase-power-calculator",
       "electrical-power-factor-calculator",
       "electrical-kwh-cost-calculator",
+    ],
+  },
+  {
+    label: "Motors, Transformers & Fault Current",
+    description:
+      "Commercial and industrial work, where the rules change — table full-load current rather than the nameplate, breakers deliberately larger than the conductor, transformer inrush headroom, and the interrupting rating the equipment actually needs.",
+    slugs: [
+      "electrical-motor-fla-calculator",
+      "electrical-motor-circuit-calculator",
+      "electrical-transformer-sizing-calculator",
+      "electrical-short-circuit-calculator",
+      "electrical-conductor-resistance-calculator",
     ],
   },
   {
@@ -654,6 +711,41 @@ export const electricalCalculatorGuide = [
     accent: "emerald" as const,
     rule: "conductor × method + hardware + panel work + permit + labor, × region",
   },
+  {
+    question: "What is this motor's full load current?",
+    slug: "electrical-motor-fla-calculator",
+    tool: "Motor Full Load Amps Calculator",
+    accent: "orange" as const,
+    rule: "Table 430.248 / 430.250 for the circuit — nameplate only for the overload (430.6(A)(1))",
+  },
+  {
+    question: "How do I size a motor branch circuit?",
+    slug: "electrical-motor-circuit-calculator",
+    tool: "Motor Circuit Calculator",
+    accent: "orange" as const,
+    rule: "conductor 125% (430.22) · device up to 250–300% (T430.52) · overload from nameplate (430.32)",
+  },
+  {
+    question: "What size transformer, and what protects it?",
+    slug: "electrical-transformer-sizing-calculator",
+    tool: "Transformer Sizing Calculator",
+    accent: "red" as const,
+    rule: "kVA × growth → standard size · primary to 250% with secondary protection (T450.3(B))",
+  },
+  {
+    question: "How much fault current is available here?",
+    slug: "electrical-short-circuit-calculator",
+    tool: "Available Fault Current Calculator",
+    accent: "red" as const,
+    rule: "I = FLA ÷ %Z at the secondary, then M = 1 ÷ (1 + f) down the run — checked against 110.9",
+  },
+  {
+    question: "What is the real impedance of this run?",
+    slug: "electrical-conductor-resistance-calculator",
+    tool: "Conductor Resistance Calculator",
+    accent: "cyan" as const,
+    rule: "Ch. 9 T8 resistance + T9 reactance → Ze = R·cos θ + X·sin θ, not √(R² + X²)",
+  },
 ];
 
 export const electricalFaqs = [
@@ -685,7 +777,7 @@ export const electricalFaqs = [
   {
     question: "Do these work for commercial and industrial work?",
     answer:
-      "The load calculators are tuned for dwellings (NEC 220.82 optional method). The conductor, ampacity, breaker, conduit fill, box fill, and grounding calculators are code-general and work for commercial installations at the same voltages, and the three-phase, kVA, and power-factor tools are built for 208 V, 480 V, and 600 V systems. Commercial load calculations, motor circuits, transformer sizing, and available fault current are on the roadmap as separate tools.",
+      "The load calculators are tuned for dwellings (NEC 220.82 optional method). The conductor, ampacity, breaker, conduit fill, box fill, and grounding calculators are code-general and work for commercial installations at the same voltages, and the three-phase, kVA, and power-factor tools are built for 208 V, 480 V, and 600 V systems. For commercial and industrial work specifically, there are now dedicated tools for motor full-load amps, complete motor branch circuits, transformer sizing and NEC 450.3(B) protection, available fault current by the point-to-point method, and conductor impedance from Chapter 9 Tables 8 and 9. Commercial load calculations are still on the roadmap.",
   },
   {
     question: "Do you have calculators for other trades?",

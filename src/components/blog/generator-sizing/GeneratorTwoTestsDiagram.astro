@@ -1,0 +1,56 @@
+---
+import { fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Two independent requirements, computed exactly as the generator sizing calculator
+ * computes them, with the larger governing. On a house with an air conditioner the
+ * starting requirement almost always wins — which is what sizing on running watts misses.
+ */
+const STANDARD_KW = [7.5, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 36, 48, 60];
+
+const RUNNING_TOTAL = 5000 + 1500 + 700 + 1200 + 800;
+const LARGEST_MOTOR = 5000;
+const SURGE = 3;
+const MARGIN = 0.25;
+
+const runningRequirement = RUNNING_TOTAL * (1 + MARGIN);
+const inrush = LARGEST_MOTOR * SURGE;
+const stillRunning = RUNNING_TOTAL - LARGEST_MOTOR;
+const startingRequirement = stillRunning + inrush;
+const required = Math.max(runningRequirement, startingRequirement);
+const selected = STANDARD_KW.find((k) => k >= required / 1000) ?? 60;
+const startingGoverns = startingRequirement > runningRequirement;
+const gap = startingRequirement - runningRequirement;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>The two tests a generator has to pass</title>
+  <desc>
+    The essential loads total 9,200 watts running. The running requirement adds a 25 percent margin for 11,500
+    watts. The starting requirement takes the 4,200 watts still running while the 5,000 watt compressor draws three
+    times its running power as inrush, giving 19,200 watts. The larger governs, so the requirement is 19,200 watts,
+    or 19.2 kilowatts, and the next standard size is a 20 kilowatt set. Motor starting governs, by 7,700 watts.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two requirements, and the larger one wins</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`${fmtInt(RUNNING_TOTAL)} W of essential loads: a 3-ton A/C, a well pump, fridge, lights and a sump pump.`}</text>
+
+  <rect x="24" y="76" width="456" height="58" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="42" y="98" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">1 · RUNNING REQUIREMENT</text>
+  <text x="42" y="120" fill={C.dark} font-family={FONT} font-size="12">{`${fmtInt(RUNNING_TOTAL)} W × ${(1 + MARGIN).toFixed(2)} margin`}</text>
+  <rect x="496" y="76" width="200" height="58" rx="9" fill={C.white} stroke={C.blue} stroke-width="1.4" />
+  <text x="596" y="112" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="19" font-weight="800">{`${fmtInt(runningRequirement)} W`}</text>
+
+  <rect x="24" y="146" width="456" height="58" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="42" y="168" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">2 · STARTING REQUIREMENT</text>
+  <text x="42" y="190" fill={C.dark} font-family={FONT} font-size="12">{`${fmtInt(stillRunning)} W still running + ${fmtInt(LARGEST_MOTOR)} × ${SURGE} inrush`}</text>
+  <rect x="496" y="146" width="200" height="58" rx="9" fill={C.white} stroke={C.orange} stroke-width="2.4" />
+  <text x="596" y="176" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="19" font-weight="800">{`${fmtInt(startingRequirement)} W`}</text>
+  <text x="596" y="194" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{`${fmtInt(gap)} W larger`}</text>
+
+  <rect x="24" y="216" width="672" height="58" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="240" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{`Required: ${fmtInt(required)} W (${fmt(required / 1000, 1)} kW) → a ${selected} kW set`}</text>
+  <text x="44" y="260" fill={C.muted} font-family={FONT} font-size="9.5">{startingGoverns ? `Motor starting governs. Sizing on running watts alone would have bought a 12 kW set — ${fmt((required - runningRequirement) / 1000, 1)} kW short.` : "Running load governs here."}</text>
+</svg>

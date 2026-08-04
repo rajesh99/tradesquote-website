@@ -712,3 +712,432 @@ export function fmtSmart(value: number): string {
   const digits = abs >= 1000 ? 0 : abs >= 100 ? 1 : abs >= 1 ? 2 : 4;
   return value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
+
+/* ------------------------------------------------------------------------- *
+ * Motors — Article 430                                                       *
+ *                                                                            *
+ * The rule that governs everything here is 430.6(A)(1): conductors and the    *
+ * branch-circuit short-circuit and ground-fault protective device are sized   *
+ * from these TABLE values, not from the motor nameplate. Only the overload    *
+ * device (430.32) uses the nameplate full-load amperes.                       *
+ * ------------------------------------------------------------------------- */
+
+export type MotorPhase = "1ph" | "3ph";
+
+export type MotorFlcRow = {
+  /** Horsepower as a number, for sorting and arithmetic */
+  hp: number;
+  /** Display label — "1-1/2" rather than 1.5 */
+  label: string;
+  /** Full-load current in amperes, keyed by nominal system voltage */
+  amps: Record<number, number>;
+};
+
+/**
+ * NEC Table 430.248 — full-load currents of single-phase alternating-current
+ * motors, in amperes, at 115, 200, 208 and 230 volts.
+ */
+export const TABLE_430_248: MotorFlcRow[] = [
+  { hp: 1 / 6, label: "1/6", amps: { 115: 4.4, 200: 2.5, 208: 2.4, 230: 2.2 } },
+  { hp: 1 / 4, label: "1/4", amps: { 115: 5.8, 200: 3.3, 208: 3.2, 230: 2.9 } },
+  { hp: 1 / 3, label: "1/3", amps: { 115: 7.2, 200: 4.1, 208: 4.0, 230: 3.6 } },
+  { hp: 1 / 2, label: "1/2", amps: { 115: 9.8, 200: 5.6, 208: 5.4, 230: 4.9 } },
+  { hp: 3 / 4, label: "3/4", amps: { 115: 13.8, 200: 7.9, 208: 7.6, 230: 6.9 } },
+  { hp: 1, label: "1", amps: { 115: 16, 200: 9.2, 208: 8.8, 230: 8 } },
+  { hp: 1.5, label: "1-1/2", amps: { 115: 20, 200: 11.5, 208: 11.0, 230: 10 } },
+  { hp: 2, label: "2", amps: { 115: 24, 200: 13.8, 208: 13.2, 230: 12 } },
+  { hp: 3, label: "3", amps: { 115: 34, 200: 19.6, 208: 18.7, 230: 17 } },
+  { hp: 5, label: "5", amps: { 115: 56, 200: 32.2, 208: 30.8, 230: 28 } },
+  { hp: 7.5, label: "7-1/2", amps: { 115: 80, 200: 46.0, 208: 44.0, 230: 40 } },
+  { hp: 10, label: "10", amps: { 115: 100, 200: 57.5, 208: 55.0, 230: 50 } },
+];
+
+/**
+ * NEC Table 430.250 — full-load currents of three-phase alternating-current
+ * motors (squirrel-cage and wound-rotor induction), in amperes, at 200, 208,
+ * 230, 460 and 575 volts.
+ */
+export const TABLE_430_250: MotorFlcRow[] = [
+  { hp: 1 / 2, label: "1/2", amps: { 200: 2.5, 208: 2.4, 230: 2.2, 460: 1.1, 575: 0.9 } },
+  { hp: 3 / 4, label: "3/4", amps: { 200: 3.7, 208: 3.5, 230: 3.2, 460: 1.6, 575: 1.3 } },
+  { hp: 1, label: "1", amps: { 200: 4.8, 208: 4.6, 230: 4.2, 460: 2.1, 575: 1.7 } },
+  { hp: 1.5, label: "1-1/2", amps: { 200: 6.9, 208: 6.6, 230: 6.0, 460: 3.0, 575: 2.4 } },
+  { hp: 2, label: "2", amps: { 200: 7.8, 208: 7.5, 230: 6.8, 460: 3.4, 575: 2.7 } },
+  { hp: 3, label: "3", amps: { 200: 11.0, 208: 10.6, 230: 9.6, 460: 4.8, 575: 3.9 } },
+  { hp: 5, label: "5", amps: { 200: 17.5, 208: 16.7, 230: 15.2, 460: 7.6, 575: 6.1 } },
+  { hp: 7.5, label: "7-1/2", amps: { 200: 25.3, 208: 24.2, 230: 22, 460: 11, 575: 9 } },
+  { hp: 10, label: "10", amps: { 200: 32.2, 208: 30.8, 230: 28, 460: 14, 575: 11 } },
+  { hp: 15, label: "15", amps: { 200: 48.3, 208: 46.2, 230: 42, 460: 21, 575: 17 } },
+  { hp: 20, label: "20", amps: { 200: 62.1, 208: 59.4, 230: 54, 460: 27, 575: 22 } },
+  { hp: 25, label: "25", amps: { 200: 78.2, 208: 74.8, 230: 68, 460: 34, 575: 27 } },
+  { hp: 30, label: "30", amps: { 200: 92, 208: 88, 230: 80, 460: 40, 575: 32 } },
+  { hp: 40, label: "40", amps: { 200: 120, 208: 114, 230: 104, 460: 52, 575: 41 } },
+  { hp: 50, label: "50", amps: { 200: 150, 208: 143, 230: 130, 460: 65, 575: 52 } },
+  { hp: 60, label: "60", amps: { 200: 177, 208: 169, 230: 154, 460: 77, 575: 62 } },
+  { hp: 75, label: "75", amps: { 200: 221, 208: 211, 230: 192, 460: 96, 575: 77 } },
+  { hp: 100, label: "100", amps: { 200: 285, 208: 273, 230: 248, 460: 124, 575: 99 } },
+  { hp: 125, label: "125", amps: { 200: 359, 208: 343, 230: 312, 460: 156, 575: 125 } },
+  { hp: 150, label: "150", amps: { 200: 414, 208: 396, 230: 360, 460: 180, 575: 144 } },
+  { hp: 200, label: "200", amps: { 200: 552, 208: 528, 230: 480, 460: 240, 575: 192 } },
+];
+
+export function motorFlcTable(phase: MotorPhase): MotorFlcRow[] {
+  return phase === "1ph" ? TABLE_430_248 : TABLE_430_250;
+}
+
+/** Voltages listed in each table — the only ones a table lookup is valid for. */
+export function motorTableVoltages(phase: MotorPhase): number[] {
+  return phase === "1ph" ? [115, 200, 208, 230] : [200, 208, 230, 460, 575];
+}
+
+/** Table full-load current for a horsepower and nominal voltage, or null if not listed. */
+export function motorFlc(hp: number, phase: MotorPhase, volts: number): number | null {
+  const row = motorFlcTable(phase).find((r) => r.hp === hp);
+  if (!row) return null;
+  return row.amps[volts] ?? null;
+}
+
+export type MotorType =
+  | "squirrelCage"
+  | "designB"
+  | "synchronous"
+  | "woundRotor"
+  | "dc"
+  | "singlePhase";
+
+export type MotorProtectionDevice =
+  | "nonTimeDelayFuse"
+  | "dualElementFuse"
+  | "instantTrip"
+  | "inverseTime";
+
+/**
+ * NEC Table 430.52(C)(1) — maximum rating or setting of motor branch-circuit
+ * short-circuit and ground-fault protective devices, as a percentage of the
+ * motor's table full-load current.
+ */
+export const TABLE_430_52: Record<
+  MotorType,
+  { label: string } & Record<MotorProtectionDevice, number>
+> = {
+  singlePhase: {
+    label: "Single-phase, no code letter",
+    nonTimeDelayFuse: 300,
+    dualElementFuse: 175,
+    instantTrip: 800,
+    inverseTime: 250,
+  },
+  squirrelCage: {
+    label: "AC polyphase squirrel-cage, other than Design B",
+    nonTimeDelayFuse: 300,
+    dualElementFuse: 175,
+    instantTrip: 800,
+    inverseTime: 250,
+  },
+  designB: {
+    label: "Design B energy-efficient squirrel-cage",
+    nonTimeDelayFuse: 300,
+    dualElementFuse: 175,
+    instantTrip: 1100,
+    inverseTime: 250,
+  },
+  synchronous: {
+    label: "Synchronous",
+    nonTimeDelayFuse: 300,
+    dualElementFuse: 175,
+    instantTrip: 800,
+    inverseTime: 250,
+  },
+  woundRotor: {
+    label: "Wound rotor",
+    nonTimeDelayFuse: 150,
+    dualElementFuse: 150,
+    instantTrip: 800,
+    inverseTime: 150,
+  },
+  dc: {
+    label: "DC, constant voltage",
+    nonTimeDelayFuse: 150,
+    dualElementFuse: 150,
+    instantTrip: 250,
+    inverseTime: 150,
+  },
+};
+
+export const MOTOR_DEVICE_LABELS: Record<MotorProtectionDevice, string> = {
+  nonTimeDelayFuse: "Non-time-delay fuse",
+  dualElementFuse: "Dual-element (time-delay) fuse",
+  instantTrip: "Instantaneous-trip breaker",
+  inverseTime: "Inverse-time breaker",
+};
+
+/**
+ * 430.52(C)(1) Exception No. 2 — where the Table 430.52 value is not sufficient
+ * to start the motor, the device may be increased to these percentages. This is
+ * a ceiling, not a recommendation.
+ */
+export function motorOcpdAbsoluteMax(flc: number, device: MotorProtectionDevice): number {
+  if (device === "nonTimeDelayFuse") return flc * 4;
+  if (device === "dualElementFuse") return flc * 2.25;
+  if (device === "inverseTime") return flc * (flc > 100 ? 3 : 4);
+  // 430.52(C)(3) routes instantaneous-trip breakers through a listed combination controller.
+  return flc * 13;
+}
+
+/**
+ * 430.22 — branch-circuit conductors for a single continuous-duty motor are
+ * sized at 125% of the table full-load current.
+ */
+export function motorConductorAmps(flc: number): number {
+  return flc * 1.25;
+}
+
+export type OverloadClass = "serviceFactor115" | "tempRise40" | "other";
+
+export const OVERLOAD_PERCENT: Record<OverloadClass, { label: string; percent: number }> = {
+  serviceFactor115: { label: "Marked service factor 1.15 or greater", percent: 125 },
+  tempRise40: { label: "Marked temperature rise 40 °C or less", percent: 125 },
+  other: { label: "All other motors", percent: 115 },
+};
+
+/**
+ * 430.32(A)(1) — separate overload device rating, as a percentage of the motor's
+ * NAMEPLATE full-load amperes. This is the one place the nameplate is used rather
+ * than the table. 430.32(C) permits an increase to 140% / 130% where the initial
+ * value will not allow the motor to start.
+ */
+export function motorOverloadRating(nameplateFla: number, klass: OverloadClass): number {
+  return (nameplateFla * OVERLOAD_PERCENT[klass].percent) / 100;
+}
+
+export function motorOverloadMax(nameplateFla: number, klass: OverloadClass): number {
+  return (nameplateFla * (klass === "other" ? 130 : 140)) / 100;
+}
+
+/* ------------------------------------------------------------------------- *
+ * Transformers — Article 450                                                 *
+ * ------------------------------------------------------------------------- */
+
+/** Standard single- and three-phase dry-type transformer kVA ratings. */
+export const STANDARD_TRANSFORMER_KVA = [
+  1.5, 3, 5, 7.5, 10, 15, 25, 30, 37.5, 45, 50, 75, 100, 112.5, 150, 167, 225, 300, 500, 750, 1000,
+];
+
+/** Typical nameplate impedance by size — always prefer the actual nameplate. */
+export const TYPICAL_TRANSFORMER_IMPEDANCE: { maxKva: number; percentZ: number }[] = [
+  { maxKva: 75, percentZ: 2.5 },
+  { maxKva: 300, percentZ: 3.5 },
+  { maxKva: 750, percentZ: 4.5 },
+  { maxKva: Infinity, percentZ: 5.75 },
+];
+
+export function typicalPercentZ(kva: number): number {
+  return (
+    TYPICAL_TRANSFORMER_IMPEDANCE.find((r) => kva <= r.maxKva) ?? TYPICAL_TRANSFORMER_IMPEDANCE[0]
+  ).percentZ;
+}
+
+/** Transformer full-load current on either winding. */
+export function transformerFla(kva: number, volts: number, phase: MotorPhase): number {
+  if (volts <= 0) return 0;
+  return (kva * 1000) / (phase === "3ph" ? SQRT3 * volts : volts);
+}
+
+export function nextStandardTransformerKva(kva: number): number {
+  return (
+    STANDARD_TRANSFORMER_KVA.find((k) => k >= kva) ??
+    STANDARD_TRANSFORMER_KVA[STANDARD_TRANSFORMER_KVA.length - 1]
+  );
+}
+
+/**
+ * Table 450.3(B) — maximum overcurrent protection for a transformer of 1000 V or
+ * less. Where secondary protection is provided at no more than 125% of secondary
+ * current, the primary device may go to 250%; with primary protection only, the
+ * ceiling depends on how small the primary current is.
+ */
+export function transformerPrimaryMaxPercent(
+  primaryFla: number,
+  hasSecondaryProtection: boolean,
+): number {
+  if (hasSecondaryProtection) return 250;
+  if (primaryFla < 2) return 300;
+  if (primaryFla < 9) return 167;
+  return 125;
+}
+
+export const TRANSFORMER_SECONDARY_MAX_PERCENT = 125;
+
+/* ------------------------------------------------------------------------- *
+ * Conductor impedance — Chapter 9, Tables 8 and 9                            *
+ * ------------------------------------------------------------------------- */
+
+/**
+ * NEC Chapter 9, Table 8 — direct-current resistance of uncoated stranded
+ * conductors at 75 °C, in ohms per 1000 ft. Verified against the K constants:
+ * R × cmil ÷ 1000 reproduces 12.9 (copper) and 21.2 (aluminum) for every size.
+ */
+export const TABLE_8_DC_RESISTANCE: Record<string, { copper: number; aluminum: number | null }> = {
+  "14": { copper: 3.07, aluminum: null },
+  "12": { copper: 1.93, aluminum: 3.18 },
+  "10": { copper: 1.21, aluminum: 2.0 },
+  "8": { copper: 0.764, aluminum: 1.26 },
+  "6": { copper: 0.491, aluminum: 0.808 },
+  "4": { copper: 0.308, aluminum: 0.508 },
+  "3": { copper: 0.245, aluminum: 0.403 },
+  "2": { copper: 0.194, aluminum: 0.319 },
+  "1": { copper: 0.154, aluminum: 0.253 },
+  "1/0": { copper: 0.122, aluminum: 0.201 },
+  "2/0": { copper: 0.0967, aluminum: 0.159 },
+  "3/0": { copper: 0.0766, aluminum: 0.126 },
+  "4/0": { copper: 0.0608, aluminum: 0.1 },
+  "250 kcmil": { copper: 0.0515, aluminum: 0.0847 },
+  "300 kcmil": { copper: 0.0429, aluminum: 0.0707 },
+  "350 kcmil": { copper: 0.0367, aluminum: 0.0605 },
+  "400 kcmil": { copper: 0.0321, aluminum: 0.0529 },
+  "500 kcmil": { copper: 0.0258, aluminum: 0.0424 },
+  "600 kcmil": { copper: 0.0214, aluminum: 0.0353 },
+};
+
+export type RacewayKind = "nonmagnetic" | "steel";
+
+/**
+ * NEC Chapter 9, Table 9 — inductive reactance for 600 V cables, three single
+ * conductors in a raceway, 60 Hz, in ohms to neutral per 1000 ft. A steel
+ * raceway has the higher reactance.
+ */
+export const TABLE_9_REACTANCE: Record<string, Record<RacewayKind, number>> = {
+  "14": { nonmagnetic: 0.058, steel: 0.073 },
+  "12": { nonmagnetic: 0.054, steel: 0.068 },
+  "10": { nonmagnetic: 0.05, steel: 0.063 },
+  "8": { nonmagnetic: 0.052, steel: 0.065 },
+  "6": { nonmagnetic: 0.051, steel: 0.064 },
+  "4": { nonmagnetic: 0.048, steel: 0.06 },
+  "3": { nonmagnetic: 0.047, steel: 0.059 },
+  "2": { nonmagnetic: 0.045, steel: 0.057 },
+  "1": { nonmagnetic: 0.046, steel: 0.057 },
+  "1/0": { nonmagnetic: 0.044, steel: 0.055 },
+  "2/0": { nonmagnetic: 0.043, steel: 0.054 },
+  "3/0": { nonmagnetic: 0.042, steel: 0.052 },
+  "4/0": { nonmagnetic: 0.041, steel: 0.051 },
+  "250 kcmil": { nonmagnetic: 0.041, steel: 0.052 },
+  "300 kcmil": { nonmagnetic: 0.041, steel: 0.051 },
+  "350 kcmil": { nonmagnetic: 0.04, steel: 0.05 },
+  "400 kcmil": { nonmagnetic: 0.04, steel: 0.049 },
+  "500 kcmil": { nonmagnetic: 0.039, steel: 0.048 },
+  "600 kcmil": { nonmagnetic: 0.039, steel: 0.048 },
+};
+
+/** Temperature coefficient of resistance, per Chapter 9 Table 8's correction note. */
+export const ALPHA_COPPER = 0.00323;
+export const ALPHA_ALUMINUM = 0.0033;
+
+/** Table 8 resistance corrected from its 75 °C basis to another temperature. */
+export function resistanceAtTemp(
+  r75: number,
+  material: ConductorMaterial,
+  tempC: number,
+): number {
+  const alpha = material === "copper" ? ALPHA_COPPER : ALPHA_ALUMINUM;
+  return r75 * (1 + alpha * (tempC - 75));
+}
+
+/**
+ * Effective impedance at a given load power factor: Ze = R·cos θ + X·sin θ.
+ *
+ * This is what actually causes voltage drop, and it reproduces the "Effective Z
+ * at 0.85 PF" column of Chapter 9 Table 9 closely. Note the two limits: at unity
+ * power factor Ze collapses to R, which is why the K-constant approximation is
+ * accurate for resistive loads; and the impedance *magnitude* √(R² + X²) is only
+ * correct for a bolted fault, not for a normal load.
+ */
+export function effectiveImpedance(r: number, x: number, powerFactor: number): number {
+  const pf = Math.min(1, Math.max(0, powerFactor));
+  return r * pf + x * Math.sqrt(1 - pf * pf);
+}
+
+/** Resistance and reactance of one leg of a run, in ohms. */
+export function runImpedance(opts: {
+  label: string;
+  material: ConductorMaterial;
+  lengthFt: number;
+  parallelSets: number;
+  raceway: RacewayKind;
+  tempC: number;
+}): { r: number; x: number; z: number; rPerKft: number; xPerKft: number } | null {
+  const rRow = TABLE_8_DC_RESISTANCE[opts.label];
+  const xRow = TABLE_9_REACTANCE[opts.label];
+  if (!rRow || !xRow) return null;
+  const r75 = opts.material === "copper" ? rRow.copper : rRow.aluminum;
+  if (r75 === null) return null;
+  const sets = Math.max(1, opts.parallelSets);
+  const rPerKft = resistanceAtTemp(r75, opts.material, opts.tempC);
+  const xPerKft = xRow[opts.raceway];
+  const r = (rPerKft * opts.lengthFt) / 1000 / sets;
+  const x = (xPerKft * opts.lengthFt) / 1000 / sets;
+  return { r, x, z: Math.sqrt(r * r + x * x), rPerKft, xPerKft };
+}
+
+/* ------------------------------------------------------------------------- *
+ * Available fault current — the point-to-point method                        *
+ * ------------------------------------------------------------------------- */
+
+/** Common device interrupting ratings, for the AIC comparison. */
+export const STANDARD_AIC_RATINGS = [10000, 22000, 25000, 42000, 65000, 100000, 200000];
+
+/**
+ * Symmetrical RMS short-circuit current at the transformer secondary terminals,
+ * assuming an infinite primary source — the conservative standard assumption.
+ * The NEMA impedance tolerance is plus or minus 10%, and the low-impedance case
+ * is the one that matters for an interrupting-rating check.
+ */
+export function transformerSecondaryFaultCurrent(opts: {
+  kva: number;
+  secondaryVolts: number;
+  phase: MotorPhase;
+  percentZ: number;
+  applyToleranceMargin: boolean;
+}): { fla: number; faultCurrent: number; effectivePercentZ: number } {
+  const fla = transformerFla(opts.kva, opts.secondaryVolts, opts.phase);
+  const nominalZ = Math.max(0.1, opts.percentZ);
+  const effectivePercentZ = opts.applyToleranceMargin ? nominalZ * 0.9 : nominalZ;
+  return { fla, faultCurrent: fla / (effectivePercentZ / 100), effectivePercentZ };
+}
+
+/**
+ * Fault current at the far end of a run. Derived rather than table-driven: the
+ * source impedance implied by the upstream fault current is added to the run's
+ * own impedance, which is algebraically identical to the point-to-point method's
+ * M = 1 ÷ (1 + f) but needs no proprietary conductor constants.
+ *
+ * Three-phase uses the phase voltage against a one-way conductor impedance; a
+ * single-phase line-to-line fault uses the full voltage and both conductors.
+ */
+export function faultCurrentAfterRun(opts: {
+  upstreamFaultCurrent: number;
+  volts: number;
+  phase: MotorPhase;
+  runZ: number;
+}): { sourceZ: number; loopZ: number; totalZ: number; f: number; multiplier: number; faultCurrent: number } {
+  const driving = opts.phase === "3ph" ? opts.volts / SQRT3 : opts.volts;
+  const loopZ = opts.phase === "3ph" ? opts.runZ : opts.runZ * 2;
+  if (opts.upstreamFaultCurrent <= 0) {
+    return { sourceZ: 0, loopZ, totalZ: loopZ, f: 0, multiplier: 0, faultCurrent: 0 };
+  }
+  const sourceZ = driving / opts.upstreamFaultCurrent;
+  const f = sourceZ > 0 ? loopZ / sourceZ : 0;
+  const multiplier = 1 / (1 + f);
+  return {
+    sourceZ,
+    loopZ,
+    totalZ: sourceZ + loopZ,
+    f,
+    multiplier,
+    faultCurrent: opts.upstreamFaultCurrent * multiplier,
+  };
+}
+
+/** Smallest standard interrupting rating that covers the available fault current. */
+export function requiredAicRating(faultCurrent: number): number | null {
+  return STANDARD_AIC_RATINGS.find((r) => r >= faultCurrent) ?? null;
+}

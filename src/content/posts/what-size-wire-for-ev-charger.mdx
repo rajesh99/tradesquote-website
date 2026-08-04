@@ -1,0 +1,158 @@
+---
+title: "What Size Wire and Breaker for an EV Charger?"
+meta_title: "What Size Wire and Breaker for an EV Charger? (NEC 625) | TradesQuote"
+description: "A 48 A charger needs a 60 A breaker on 6 AWG copper — because 625.41 makes EV charging continuous by rule. Plus the two traps: 6/3 Romex is not enough for 60 A, and a 50 A charger costs more than a 48 A one."
+image: /images/posts/what-size-wire-for-ev-charger-hero.svg
+date: 2026-08-04T10:45:00Z
+categories: ["electrical"]
+tags: ["ev charger","625.41","wire size","breaker size","nec"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import EvCircuitChainDiagram from "@/components/blog/ev-wire/EvCircuitChainDiagram.astro";
+import EvSizeLadderDiagram from "@/components/blog/ev-wire/EvSizeLadderDiagram.astro";
+import EvCableTypeDiagram from "@/components/blog/ev-wire/EvCableTypeDiagram.astro";
+
+The short answer for the most common installation: **a 48 A charger needs a 60 A breaker on 6 AWG copper with a 10 AWG equipment grounding conductor.**
+
+The reason is one rule. **NEC 625.41 treats electric vehicle supply equipment as a continuous load by definition**, so the conductors and the overcurrent device are sized at 125% of the charger's rated output. You never have to judge whether a charger runs for three hours — the code already decided it does.
+
+Two things about EV circuits catch experienced installers, and both are covered below: **6/3 NM cable is not legal on a 60 A circuit**, and **a 50 A charger costs materially more to install than a 48 A one**.
+
+## The Sizing Chain
+
+<BlogInfographic
+  title="A 48 A charger is a 60 A circuit — not a 48 A one"
+  caption="EV charging is continuous by rule, so you never have to judge whether it runs for three hours."
+>
+  <EvCircuitChainDiagram />
+</BlogInfographic>
+
+48 A × 1.25 = **60 A** of required ampacity. That's already a standard rating in 240.6(A), so the breaker is 60 A. Table 310.16 gives 6 AWG copper 65 A in the 75 °C column, which covers it, and Table 250.122 puts a 60 A overcurrent device on a 10 AWG copper EGC.
+
+So the cable is commonly described as "6/3 with a 10 ground" — three 6 AWG conductors and a 10 AWG ground. Note that a hardwired EVSE needs only two hots and a ground; the neutral is unused by most Level 2 units, so **6/2 with ground is often the correct cable** and cheaper. Check the unit's installation manual, because a handful of chargers with 120 V internal electronics do need the neutral.
+
+Over a 60 ft run the voltage drop is **1.18%** — comfortably inside the 3% design target. 6 AWG copper carries 48 A about 153 ft before drop becomes the governing constraint rather than ampacity, so on a typical attached-garage installation ampacity always wins. Drop only starts to matter on a detached garage or a long driveway run, and the arithmetic for that is in **[Voltage Drop Calculation](/blog/voltage-drop-calculation)**.
+
+## Every Common Charger Rating
+
+<BlogInfographic
+  title="Every common charger rating, with the circuit it needs"
+  caption="Conductors at the 75 °C column. Reach is the one-way run that keeps voltage drop within 3% at 240 V."
+>
+  <EvSizeLadderDiagram />
+</BlogInfographic>
+
+| Charger | Power at 240 V | × 1.25 | Breaker | Copper | Aluminum |
+| --- | --- | --- | --- | --- | --- |
+| 16 A | 3.84 kW | 20.0 A | 20 A | 12 AWG | 10 AWG |
+| 24 A | 5.76 kW | 30.0 A | 30 A | 10 AWG | 8 AWG |
+| 32 A | 7.68 kW | 40.0 A | 40 A | 8 AWG | 8 AWG |
+| 40 A | 9.60 kW | 50.0 A | 50 A | 8 AWG | 6 AWG |
+| **48 A** | **11.52 kW** | **60.0 A** | **60 A** | **6 AWG** | **4 AWG** |
+| 50 A | 12.00 kW | 62.5 A | 70 A | 4 AWG | 2 AWG |
+| 60 A | 14.40 kW | 75.0 A | 80 A | 4 AWG | 2 AWG |
+| 80 A | 19.20 kW | 100.0 A | 100 A | 3 AWG | 1 AWG |
+
+**Look at the 50 A row.** 50 × 1.25 = 62.5 A, which is not a standard rating — so it rounds up to a **70 A breaker**, and 70 A needs 4 AWG copper rather than 6. Two extra amps of charging capacity buys you a bigger breaker, two conductor sizes, larger lugs and possibly a larger conduit. **48 A is the sweet spot in the whole ladder**, and it's why nearly every hardwired residential unit is rated 48 A rather than 50.
+
+At the other end, **32 A is the value pick**. It's a 40 A circuit on 8 AWG, roughly 7.7 kW, which restores 25–30 miles of range per hour — ample for overnight charging on any realistic commute. Dropping from 48 A to 32 A is frequently the difference between a straightforward job and a service upgrade, which is the single biggest cost lever in the whole installation.
+
+## The Romex Trap
+
+<BlogInfographic
+  title="Romex and conduit are not the same wire size"
+  caption="NEC 334.80 holds NM cable to the 60 °C column. THHN in conduit gets the 75 °C column."
+>
+  <EvCableTypeDiagram />
+</BlogInfographic>
+
+This is the error worth reading the article for. **NEC 334.80 requires NM cable to be used at the ampacity of 60 °C conductors**, regardless of what the conductors inside are rated. In the 60 °C column, 6 AWG copper is only **55 A** — short of the 60 A the circuit requires.
+
+So **6/3 NM on a 48 A charger is a violation.** The legal options are:
+
+- **6 AWG THHN/THWN-2 in conduit** — 65 A at 75 °C. This is what most installers actually run, and it's usually cheaper than the alternative.
+- **4 AWG NM** — 70 A at 60 °C, which works but is stiff, expensive and awkward to terminate.
+
+The same thing happens at 80 A (a 60 A charger): 4 AWG NM is 70 A at 60 °C and falls short, so it's 3 AWG NM or 4 AWG THHN in conduit.
+
+Below 60 A the gap is a cost question rather than a violation. On a **50 A circuit** — a 40 A charger — NM needs 6 AWG where conduit needs only 8, but 6 AWG NM is legal there at 55 A, so nothing is wrong. And at **40 A and below the sizes are identical**: 8/3 NM handles a 32 A charger's circuit exactly, because 8 AWG copper is precisely 40 A at 60 °C. **60 A is where the conventional size becomes illegal**, which is precisely where most Level 2 installations land.
+
+Two related cable notes. **SE cable used inside a building is treated the same way** — 338.10(B)(4)(a) sends you to the 60 °C ampacity where it's installed in thermal insulation. And **aluminum is a legitimate choice** on this circuit: 4 AWG aluminum is 65 A at 75 °C, materially cheaper than 6 AWG copper on a long run, and perfectly reliable with the right terminations and antioxidant compound.
+
+## Hardwire or Receptacle
+
+The industry has largely settled on hardwiring above 40 A, and there's a clean arithmetic reason. A NEMA 14-50 is a **50 A receptacle**, and a continuous load on a 50 A device may not exceed 50 ÷ 1.25 = **40 A**. That's why practically every plug-in EVSE is rated 40 A: it's the largest continuous output a 14-50 can legally serve.
+
+Beyond that:
+
+- **The NEC requires GFCI protection for receptacles supplying EVSE** (Article 625). Stacking a Class A GFCI breaker in front of a charger that already contains its own ground-fault detection is a well-known source of nuisance trips.
+- **A hardwired unit has no such requirement**, which is one practical argument for hardwiring beyond the amperage.
+- **Adjustable-output chargers** are common, and 625.42 lets the circuit be sized to the *setting* rather than the maximum rating — provided the setting is not readily accessible to the user. That is how a 48 A-capable unit is legitimately installed on a 40 A circuit.
+- **Disconnecting means**: 625.43 requires a disconnect within sight for equipment rated over 60 A or over 150 V to ground.
+
+## Before You Size the Wire, Size the Service
+
+The circuit is the easy part. The question that decides the price is whether the existing service has room, and the honest answer is usually yes.
+
+Adding a 48 A charger to the standard 2,000 ft² all-electric house — 24,280 VA calculated under 220.82 — brings it to **35,800 VA, or 149.2 A. That's 74.6% of a 200 A service and fits comfortably.** On a 100 A service the same charger takes it to 149%, which does not fit at all; a 32 A charger takes it to 133%, which also doesn't.
+
+But that calculation is the pessimistic route. **NEC 220.87 lets you establish the existing load from the utility's highest recorded demand over 12 months × 1.25**, which is very often dramatically lower than the 220.82 figure. On the worked example in **[Do I Need a Panel Upgrade](/blog/do-i-need-a-panel-upgrade)**, a 44 A recorded peak becomes 55 A of established load, and a 32 A charger at 125% (40 A) brings the total to **95 A — fitting on a 100 A service with 5 A to spare**. The 48 A version needs 60 A and lands at 115 A, which doesn't.
+
+When it genuinely doesn't fit, **Article 750 load management** is the alternative to an upgrade: a control that sheds or throttles the charger when the rest of the house is drawing hard. It's usually a few hundred dollars against several thousand for a service upgrade — see **[Electrical Panel Upgrade Cost](/blog/electrical-panel-upgrade-cost)** for what that comparison looks like in money, and **[EV Charger Installation Cost](/blog/ev-charger-installation-cost)** for the installed price of the circuit itself.
+
+## Common Mistakes
+
+- **Sizing the circuit to the charger's amps.** 625.41 makes it continuous; multiply by 1.25 first.
+- **Running 6/3 NM on a 60 A circuit.** 334.80 caps NM at 60 °C, where 6 AWG copper is 55 A.
+- **Buying a 50 A charger.** 62.5 A rounds up to a 70 A breaker and 4 AWG. 48 A is the efficient choice.
+- **Pulling a neutral you don't need.** Most Level 2 units are two hots and a ground. Check the manual.
+- **Assuming a 14-50 receptacle supports 48 A.** It supports 40 A of continuous load.
+- **Sizing the EGC from the conductor.** Table 250.122 is keyed to the OCPD — 60 A gives 10 AWG copper.
+- **Jumping to a service upgrade.** Run 220.87 against the utility's recorded demand first.
+- **Ignoring the 3% drop check on a detached garage.** 6 AWG copper reaches about 153 ft at 48 A; a long trench can exceed it.
+
+## Size Your Circuit
+
+> **[EV Charger Circuit Calculator](/calculators/electrical/electrical-ev-charger-calculator)** — enter the charger rating, voltage, conductor material, run length, your existing calculated load and service rating. Returns the 625.41 continuous ampacity, the breaker, the conductor, the EGC, the voltage drop and whether the service has room.
+
+Every figure in this article is that calculator's output. Check whether the service really needs upgrading with the **[Existing Load Calculator](/calculators/electrical/electrical-existing-load-calculator)** (the 220.87 method), price the work with the **[EV Charger Installation Cost Calculator](/calculators/electrical/electrical-ev-charger-install-cost-calculator)**, and for the general case see **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** and **[What Size Breaker Do I Need](/blog/what-size-breaker-do-i-need)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 110.14(C), 220.82, 220.87, 240.6(A), Table 250.122, Table 310.16, 334.80, 338.10(B)(4)(a), 625.41, 625.42, 625.43, 625.44, 625.54, Article 750. Local amendments override the model code, and the AHJ has final say. Have EV charging circuits installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What size wire do I need for a 48 amp EV charger?
+
+6 AWG copper on a 60 A breaker, with a 10 AWG copper equipment grounding conductor — or 4 AWG aluminum. NEC 625.41 makes EV charging a continuous load, so 48 × 1.25 = 60 A of required ampacity. Note that 6 AWG NM cable is not sufficient: NM is limited to its 60 °C ampacity of 55 A, so use THHN/THWN-2 in conduit or step up to 4 AWG NM.
+
+### What size breaker does a Level 2 charger need?
+
+125% of the charger's output, rounded up to a standard rating: 20 A for a 16 A charger, 30 A for 24 A, 40 A for 32 A, 50 A for 40 A, 60 A for 48 A, and 80 A for 60 A. A 50 A charger is the awkward case — 62.5 A rounds up to a 70 A breaker.
+
+### Can I use 6/3 Romex for an EV charger?
+
+Not on a 60 A circuit. NEC 334.80 requires NM cable to be used at the 60 °C ampacity, and 6 AWG copper is only 55 A there — short of the 60 A a 48 A charger needs. Either run 6 AWG THHN/THWN-2 in conduit, which is 65 A at 75 °C, or use 4 AWG NM. Below 60 A, NM is fine: 8/3 NM handles a 40 A circuit exactly.
+
+### Why is 48 amps such a common charger rating?
+
+Because 50 A is the next step up and it's disproportionately expensive. 48 × 1.25 = 60 A, which is a standard breaker rating on 6 AWG copper. 50 × 1.25 = 62.5 A, which isn't standard, so it rounds up to a 70 A breaker on 4 AWG. Two extra amps costs a breaker size and two conductor sizes.
+
+### Do I need a 200 amp service for an EV charger?
+
+Usually not. Start with NEC 220.87 — the utility's highest recorded demand over 12 months × 1.25 — rather than a worst-case calculation. On a typical 100 A service with a 44 A recorded peak, a 32 A charger fits with room to spare. Where it genuinely doesn't fit, Article 750 load management costs a fraction of a service upgrade.
+
+### Should an EV charger be hardwired or plugged in?
+
+Hardwire anything above 40 A, because a NEMA 14-50 receptacle can only serve 40 A of continuous load. Hardwiring also avoids stacking a Class A GFCI breaker in front of the charger's own ground-fault detection, which is a common source of nuisance trips.
+
+### Does an EV charger circuit need a neutral?
+
+Most Level 2 chargers use only two hots and a ground, so 6/2 with ground is typically correct and cheaper than 6/3. A small number of units with 120 V internal electronics do need the neutral — the installation manual is the authority.
+
+### How far can I run the wire to a detached garage?
+
+6 AWG copper carries 48 A about 153 feet before voltage drop reaches 3% on 240 V, so most runs are limited by ampacity rather than distance. Longer runs need the next conductor size up, and a detached structure has its own requirements — a disconnecting means and a grounding electrode at the second building.

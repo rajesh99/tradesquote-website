@@ -1,0 +1,71 @@
+---
+import { usd } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A tornado chart of the five inputs, each swept across its own range with everything
+ * else held at the calculator's defaults. Panel work is roughly four times wider than
+ * the next-biggest driver, which is the whole point of the diagram.
+ */
+const drivers = [
+  { label: "Charger rating", range: "32 A → 60 A", low: 1220, high: 1420, accent: C.blue },
+  { label: "Routing method", range: "surface → trenched", low: 1300, high: 1692, accent: C.blue },
+  { label: "Run length", range: "10 ft → 100 ft", low: 1090, high: 1720, accent: C.orange },
+  { label: "Region", range: "low cost → very high cost", low: 1105, high: 1950, accent: C.orange },
+  { label: "Panel work", range: "spare space → service upgrade", low: 1180, high: 4240, accent: C.red },
+];
+
+const AXIS_MIN = 1000;
+const AXIS_MAX = 4400;
+const PLOT_X = 200;
+const PLOT_W = 480;
+const px = (dollars: number) => PLOT_X + ((dollars - AXIS_MIN) / (AXIS_MAX - AXIS_MIN)) * PLOT_W;
+
+const bars = drivers.map((d) => {
+  const x = px(d.low);
+  const width = Math.max(6, px(d.high) - x);
+  return { ...d, x, width, inside: width > 150 };
+});
+
+const ticks = [1000, 2000, 3000, 4000];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 264" fill="none" aria-hidden="true">
+  <title>What actually moves the price of an EV charger installation</title>
+  <desc>
+    Sweeping each input across its range with everything else held at default: charger rating moves the total from
+    1,220 to 1,420 dollars, routing method from 1,300 to 1,692, run length from 1,090 to 1,720, region from 1,105
+    to 1,950, and panel work from 1,180 to 4,240 dollars. Panel work has roughly four times the influence of the
+    next largest driver.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="248" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Five inputs, swept one at a time</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Each bar is that input's full range with everything else at the default. Longer bar, bigger lever.</text>
+
+  {ticks.map((t) => (
+    <g>
+      <line x1={px(t)} y1="70" x2={px(t)} y2="216" stroke={C.border} stroke-width="0.8" stroke-dasharray="3 4" />
+      <text x={px(t)} y="234" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{usd(t)}</text>
+    </g>
+  ))}
+
+  {bars.map((b, i) => {
+    const y = 82 + i * 27;
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{b.label}</text>
+        <text x="28" y={y + 22} fill={C.muted} font-family={FONT} font-size="7.5">{b.range}</text>
+        <rect x={b.x} y={y} width={b.width} height="19" rx="5" fill={b.accent} opacity="0.2" />
+        <rect x={b.x} y={y} width={b.width} height="19" rx="5" fill="none" stroke={b.accent} stroke-width="1.4" />
+        {b.inside ? (
+          <text x={b.x + b.width / 2} y={y + 13} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{`${usd(b.low)} → ${usd(b.high)}`}</text>
+        ) : (
+          <text x={b.x + b.width + 8} y={y + 13} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{`${usd(b.low)} → ${usd(b.high)}`}</text>
+        )}
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">Specifying a 32 A charger instead of 48 A saves $80 of wire — but it is often what removes the $3,060 upgrade entirely.</text>
+</svg>

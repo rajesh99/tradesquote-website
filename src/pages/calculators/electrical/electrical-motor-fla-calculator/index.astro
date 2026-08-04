@@ -1,0 +1,575 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { TABLE_430_248, TABLE_430_250, fmtSmart } from "@/lib/nec";
+
+const title = "Motor Full Load Amps Calculator — NEC Table 430.248 / 430.250 | TradesQuote";
+const description =
+  "Free motor FLA calculator. Returns the NEC Table 430.248 / 430.250 full-load current that conductors and the breaker must be sized from — and the nameplate figure the overload device uses instead.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-motor-fla-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Motor Full Load Amps Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Motor Full Load Amps Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online motor full-load amps calculator. Looks up NEC Table 430.248 and 430.250 full-load current by horsepower and voltage, gives the 430.22 conductor ampacity, and computes the 430.32 overload rating from the nameplate.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "Why does the NEC make me use a table instead of the motor nameplate?",
+    answer:
+      "Because <strong>NEC 430.6(A)(1)</strong> says so, and there is a good reason. Conductors and the branch-circuit short-circuit device have to work for <em>any</em> motor that might be installed on that circuit over its life, not just the one on the shelf today. The table values are deliberately conservative so a replacement motor of the same horsepower never outgrows the wiring. The nameplate is used for the overload device, which is matched to the actual machine.",
+  },
+  {
+    question: "Which number do I use for the overload device?",
+    answer:
+      "The <strong>nameplate</strong> full-load amperes, per <strong>430.32</strong>. That is the one place in Article 430 where the nameplate governs. A motor with a marked service factor of 1.15 or greater, or a marked temperature rise of 40 °C or less, gets 125% of nameplate; everything else gets 115%. 430.32(C) allows an increase to 140% or 130% if the motor will not start on the lower setting.",
+  },
+  {
+    question: "What if the nameplate reads higher than the table?",
+    answer:
+      "It happens on some older or special-purpose motors. It changes nothing about the method: conductors and the branch-circuit device still come from the table under 430.6(A)(1), and the overload still comes from the nameplate. If the nameplate is dramatically higher, check whether the motor is actually the horsepower you think it is, or whether it is a multispeed, torque, or hermetic-refrigerant motor — those have their own rules in 430.6 and 440.",
+  },
+  {
+    question: "Do these tables cover air conditioners and refrigeration compressors?",
+    answer:
+      "No. A hermetic refrigerant motor-compressor is covered by <strong>Article 440</strong>, and you use the nameplate <strong>rated-load current</strong> or the <strong>branch-circuit selection current</strong> where one is marked — not Table 430.248 or 430.250. In practice you follow the MCA (minimum circuit ampacity) and MOCP (maximum overcurrent protection) marked on the equipment nameplate.",
+  },
+  {
+    question: "How do I convert horsepower to amps if my voltage is not listed?",
+    answer:
+      "The tables only list 115, 200, 208 and 230 V single-phase, and 200, 208, 230, 460 and 575 V three-phase, because those are the nominal system voltages the code recognises for this purpose. For an unlisted voltage you use the nearest listed nominal voltage — a 480 V system uses the 460 V column, and a 600 V system uses the 575 V column. That is the standard convention: the table voltage is the motor's rated voltage, not the system's.",
+  },
+  {
+    question: "Why is 14 AWG allowed on a 10 HP motor?",
+    answer:
+      "Because <strong>240.4(G)</strong> routes motor circuits to 430.52, which means the <strong>240.4(D)</strong> small-conductor caps that limit 14 AWG to 15 A elsewhere do not apply. A 10 HP 460 V motor draws 14 A from the table, so 430.22 needs 17.5 A of ampacity and 14 AWG copper at 75 °C provides 20 A. It is compliant — but 12 AWG is the normal practical minimum, and many specifications and jurisdictions require it.",
+  },
+  {
+    question: "What is service factor and where do I find it?",
+    answer:
+      "Service factor is a multiplier printed on the nameplate as <strong>SF</strong> — how much above rated horsepower the motor can run continuously without damage. A 1.15 service factor means it tolerates 15% overload. It matters here only because 430.32(A)(1) gives motors marked 1.15 or greater the more generous 125% overload setting rather than 115%.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Motor circuit sized? Quote the job in seconds.";
+const ctaDescription =
+  "Motor and control work carries a long bill of materials — starter, disconnect, overloads, conduit, conductors, and commissioning time. TradesQuote turns the scope into a detailed line-item estimate with quantities and totals, checked by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-motor-circuit-calculator",
+    title: "Motor Circuit Calculator",
+    description: "The whole circuit — conductor, OCPD, overload, and EGC.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "Non-motor loads, sized the ordinary way.",
+  },
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "Check the run length on a long motor feed.",
+  },
+  {
+    href: "/calculators/electrical/electrical-amps-to-watts-calculator",
+    title: "Amps to Watts Calculator",
+    description: "Turn motor amps into kW and kVA.",
+  },
+];
+
+/** Rendered straight from the table data, so the page cannot drift from the calculator. */
+const threePhaseRows = TABLE_430_250.filter((r) => r.hp >= 1 && r.hp <= 100);
+const singlePhaseRows = TABLE_430_248;
+
+const styles = electricalAccentStyles.orange;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Motor Full Load Amps Calculator — NEC Table 430.248 / 430.250" />
+    <meta
+      property="og:description"
+      content="The table full-load current your conductors and breaker must use, and the nameplate figure the overload uses instead."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Motor Full Load Amps Calculator" />
+    <meta name="twitter:description" content="NEC Table 430.248 / 430.250 full-load current by horsepower and voltage. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Motor Full Load Amps Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Motor Full Load Amps <span class="text-orange-600">— Table, Not Nameplate</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A motor circuit uses <strong>two different current figures</strong>, and mixing them up is the
+              single most common motor-wiring error. <strong>NEC 430.6(A)(1)</strong> requires conductors and the
+              branch-circuit protective device to be sized from the <em>table</em> full-load current. Only the
+              overload device uses the <em>nameplate</em>. This tool gives you both.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Look up the full-load current
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="mf-phase" class="text-sm font-medium text-slate-700">Supply</label>
+                  <select
+                    id="mf-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="1ph">Single-phase (Table 430.248)</option>
+                    <option value="3ph" selected>Three-phase (Table 430.250)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mf-volts" class="text-sm font-medium text-slate-700">Motor voltage</label>
+                  <select
+                    id="mf-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="115">115 V</option>
+                    <option value="200">200 V</option>
+                    <option value="208">208 V</option>
+                    <option value="230">230 V</option>
+                    <option value="460" selected>460 V</option>
+                    <option value="575">575 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mf-hp" class="text-sm font-medium text-slate-700">Horsepower</label>
+                  <select
+                    id="mf-hp"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="0.16666666666666666">1/6 HP</option>
+                    <option value="0.25">1/4 HP</option>
+                    <option value="0.3333333333333333">1/3 HP</option>
+                    <option value="0.5">1/2 HP</option>
+                    <option value="0.75">3/4 HP</option>
+                    <option value="1">1 HP</option>
+                    <option value="1.5">1-1/2 HP</option>
+                    <option value="2">2 HP</option>
+                    <option value="3">3 HP</option>
+                    <option value="5">5 HP</option>
+                    <option value="7.5">7-1/2 HP</option>
+                    <option value="10" selected>10 HP</option>
+                    <option value="15">15 HP</option>
+                    <option value="20">20 HP</option>
+                    <option value="25">25 HP</option>
+                    <option value="30">30 HP</option>
+                    <option value="40">40 HP</option>
+                    <option value="50">50 HP</option>
+                    <option value="60">60 HP</option>
+                    <option value="75">75 HP</option>
+                    <option value="100">100 HP</option>
+                    <option value="125">125 HP</option>
+                    <option value="150">150 HP</option>
+                    <option value="200">200 HP</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mf-material" class="text-sm font-medium text-slate-700">Conductor material</label>
+                  <select
+                    id="mf-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-200 pt-5">
+                <div>
+                  <label for="mf-nameplate" class="text-sm font-semibold text-slate-800">Nameplate FLA</label>
+                  <input
+                    id="mf-nameplate"
+                    type="number"
+                    min="0"
+                    max="600"
+                    step="0.1"
+                    value="13"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Used only for the overload device.</p>
+                </div>
+                <div>
+                  <label for="mf-overload-class" class="text-sm font-semibold text-slate-800">Nameplate marking</label>
+                  <select
+                    id="mf-overload-class"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="serviceFactor115" selected>Service factor 1.15 or more — 125%</option>
+                    <option value="tempRise40">Temperature rise 40 °C or less — 125%</option>
+                    <option value="other">All other motors — 115%</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="mf-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Table full-load current</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="mf-flc" class="text-5xl font-extrabold tracking-tight text-orange-600">14.00 A</span>
+              </div>
+              <p class="mt-1 text-sm font-semibold text-slate-700">Conductors and the breaker use this</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">430.22 ampacity</p>
+                  <p id="mf-conductor-amps" class="mt-1 text-2xl font-bold text-slate-900">17.50 A</p>
+                </div>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Minimum conductor</p>
+                  <p id="mf-conductor" class="mt-1 text-2xl font-bold text-slate-900">14 AWG</p>
+                </div>
+                <div class="col-span-2 rounded-xl border border-orange-200 bg-white p-4">
+                  <p class="text-xs text-slate-500">430.32 overload, from the nameplate</p>
+                  <p id="mf-overload" class="mt-1 text-2xl font-bold text-slate-900">16.25 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-orange-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Table FLC</span><span id="mf-bd-table" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Nameplate FLA</span><span id="mf-bd-nameplate" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor ampacity</span><span id="mf-bd-conductor-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor</span><span id="mf-bd-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Overload setting</span><span id="mf-bd-overload" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Overload ceiling</span><span id="mf-bd-overload-max" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Apparent power</span><span id="mf-bd-kva" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="mf-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The table value is 7.7% above this nameplate — normal, because Table 430.250 is deliberately
+                conservative.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># The rule that splits the two figures — 430.6(A)(1)</div>
+            <div>conductors&nbsp;+&nbsp;branch-circuit&nbsp;device&nbsp;→&nbsp;<span class="text-orange-300">TABLE</span> 430.248 / 430.250</div>
+            <div>overload&nbsp;device&nbsp;(430.32)&nbsp;→&nbsp;<span class="text-orange-300">NAMEPLATE</span> amperes</div>
+            <div class="mt-4 text-cyan-300"># Conductors — 430.22</div>
+            <div>required&nbsp;ampacity&nbsp;=&nbsp;table&nbsp;FLC&nbsp;×&nbsp;1.25</div>
+            <div class="mt-4 text-cyan-300"># Overload — 430.32(A)(1)</div>
+            <div>SF&nbsp;≥&nbsp;1.15&nbsp;or&nbsp;rise&nbsp;≤&nbsp;40&nbsp;°C&nbsp;→&nbsp;125%&nbsp;of&nbsp;nameplate</div>
+            <div>everything&nbsp;else&nbsp;→&nbsp;115%&nbsp;of&nbsp;nameplate</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why the table is conservative</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The wiring has to suit any motor of that horsepower installed over the life of the circuit, not
+                just today's. A replacement motor never outgrows conductors sized from the table.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">240.4(D) does not apply</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                240.4(G) routes motor circuits to 430.52, so the small-conductor caps that limit 14 AWG to 15 A
+                elsewhere are off. 12 AWG is still the sensible practical minimum.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Compressors are Article 440</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Hermetic refrigerant motor-compressors use the nameplate rated-load current, or the MCA and MOCP
+                marked on the equipment — not these tables.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Use the nearest listed voltage</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A 480 V system takes the 460 V column and a 600 V system the 575 V column. The table voltage is
+                the motor's rating, not the system's nominal.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 10 HP motor, and the three numbers a complete circuit needs.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">10 HP, three-phase, 460 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above, with a 13.0 A nameplate.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 430.250 at 460 V = 14 A<br />
+              conductors: 14 × 1.25 = 17.5 A → 14 AWG Cu (20 A at 75 °C)<br />
+              overload: 13.0 × 125% = <span class="font-bold text-orange-700">16.25 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the table reads 7.7% above the nameplate.
+              Use 14 A for the wiring and 13.0 A for the overload — never the other way round.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">The same motor on 230 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Halve the voltage and the current doubles.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 430.250 at 230 V = 28 A<br />
+              conductors: 28 × 1.25 = 35.0 A → <span class="font-bold text-orange-700">8 AWG Cu</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> two conductor sizes larger for identical
+              mechanical work. This is why industrial motor loads run at 460 V wherever it is available.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">50 HP, three-phase, 460 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Where the numbers get expensive.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 430.250 at 460 V = 65 A<br />
+              conductors: 65 × 1.25 = 81.25 A → <span class="font-bold text-orange-700">4 AWG Cu</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> note that the FLC is not proportional to
+              horsepower — efficiency and power factor both improve with size, so a 50 HP motor draws less than
+              five times a 10 HP motor.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">NEC Table 430.250 — three-phase motors</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Full-load current in amperes for squirrel-cage and wound-rotor induction motors. These are the values
+            conductors and the branch-circuit protective device are sized from.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">HP</th>
+                  <th class="py-3 px-4 font-semibold">200 V</th>
+                  <th class="py-3 px-4 font-semibold">208 V</th>
+                  <th class="py-3 px-4 font-semibold">230 V</th>
+                  <th class="py-3 px-4 font-semibold">460 V</th>
+                  <th class="py-3 px-4 font-semibold">575 V</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  threePhaseRows.map((row, index) => (
+                    <tr class={index === threePhaseRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-4">{row.amps[200]}</td>
+                      <td class="py-3 px-4">{row.amps[208]}</td>
+                      <td class="py-3 px-4">{row.amps[230]}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.amps[460]}</td>
+                      <td class="py-3 px-4">{row.amps[575]}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="mt-12 text-2xl font-extrabold tracking-tight text-slate-900">
+            NEC Table 430.248 — single-phase motors
+          </h3>
+
+          <div class="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">HP</th>
+                  <th class="py-3 px-4 font-semibold">115 V</th>
+                  <th class="py-3 px-4 font-semibold">200 V</th>
+                  <th class="py-3 px-4 font-semibold">208 V</th>
+                  <th class="py-3 px-4 font-semibold">230 V</th>
+                  <th class="py-3 px-4 font-semibold">430.22 at 230 V</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  singlePhaseRows.map((row, index) => (
+                    <tr class={index === singlePhaseRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-4">{row.amps[115]}</td>
+                      <td class="py-3 px-4">{row.amps[200]}</td>
+                      <td class="py-3 px-4">{row.amps[208]}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.amps[230]}</td>
+                      <td class="py-3 px-4">{fmtSmart(row.amps[230] * 1.25)} A</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — <strong>430.6(A)(1)</strong> (table values govern
+            conductors and the branch-circuit device), <strong>430.22</strong> (conductors at 125%),
+            <strong>430.32(A)(1)</strong> and <strong>430.32(C)</strong> (overload from the nameplate),
+            <strong>Table 430.248</strong>, <strong>Table 430.250</strong>, <strong>240.4(G)</strong>,
+            <strong>Table 310.16</strong>, and <strong>Article 440</strong> for hermetic refrigerant
+            motor-compressors. Local amendments override the model code, and the AHJ has final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about motor full-load amperes."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalMotorFlaCalculator } from "@/scripts/calculators/electrical-motor-fla-calculator";
+    initElectricalMotorFlaCalculator();
+  </script>
+</Layout>

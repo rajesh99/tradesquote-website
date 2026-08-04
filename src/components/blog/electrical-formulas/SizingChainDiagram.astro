@@ -1,0 +1,99 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The order the formulas get applied in. Every step here is a place a real circuit
+ * gets sized wrong, so each row carries the mistake as well as the maths.
+ */
+const steps = [
+  {
+    step: "Load",
+    formula: "VA or W from the nameplate",
+    trap: "Motor nameplate watts are output, not input",
+    accent: C.blue,
+  },
+  {
+    step: "Amps",
+    formula: "I = P ÷ (V × PF), ÷ √3 × V × PF on 3φ",
+    trap: "Never apply PF to a VA rating",
+    accent: C.blue,
+  },
+  {
+    step: "Continuous?",
+    formula: "× 1.25 if it runs 3 h or more",
+    trap: "The 80% rule is this, inverted — apply one",
+    accent: C.orange,
+  },
+  {
+    step: "OCPD",
+    formula: "Round up to a 240.6(A) standard rating",
+    trap: "Motors route out via 240.4(G) / 430.52",
+    accent: C.orange,
+  },
+  {
+    step: "Ampacity",
+    formula: "Table 310.16, 75 °C column per 110.14(C)",
+    trap: "240.4(D) caps 14/12/10 AWG at 15/20/30 A",
+    accent: C.orange,
+  },
+  {
+    step: "Derate",
+    formula: "90 °C base × ambient × bundling",
+    trap: "The 90 °C column is a base, never the answer",
+    accent: C.primary,
+  },
+  {
+    step: "Voltage drop",
+    formula: "VD = 2 × K × I × L ÷ CM",
+    trap: "I is the load current, not the breaker",
+    accent: C.primary,
+  },
+  {
+    step: "EGC",
+    formula: "Table 250.122, keyed to the OCPD rating",
+    trap: "Not keyed to the conductor size",
+    accent: C.primary,
+  },
+  {
+    step: "Fill",
+    formula: "Ch. 9 T1/4/5 raceway · 314.16 box",
+    trap: "Grounds count for fill, not for derating",
+    accent: C.primary,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 356" fill="none" aria-hidden="true">
+  <title>The order the formulas are applied in</title>
+  <desc>
+    Sizing a circuit runs in a fixed order: the load in volt-amperes, converted to amps, multiplied by 1.25 if
+    continuous, rounded up to a standard overcurrent device rating, matched to a conductor from Table 310.16 at the
+    75 degree column, derated from the 90 degree base for ambient temperature and bundling, checked for voltage
+    drop at the actual load current, given an equipment grounding conductor from Table 250.122 by overcurrent
+    device rating, and finally checked against raceway and box fill limits.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="340" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The formulas have an order, and it is always this one</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Nine steps from a nameplate to an installed circuit. The right column is where each one goes wrong.</text>
+
+  <text x="72" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">STEP</text>
+  <text x="212" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT YOU COMPUTE</text>
+  <text x="470" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHERE IT GOES WRONG</text>
+
+  {steps.map((s, i) => {
+    const y = 96 + i * 28;
+    return (
+      <g>
+        {i % 2 === 0 && <rect x="24" y={y - 12} width="672" height="26" rx="5" fill={C.white} />}
+        <circle cx="40" cy={y + 1} r="9" fill={s.accent} opacity="0.16" />
+        <text x="40" y={y + 4} text-anchor="middle" fill={s.accent} font-family={FONT} font-size="9" font-weight="800">{i + 1}</text>
+        <text x="60" y={y + 4} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{s.step}</text>
+        <text x="212" y={y + 4} fill={C.dark} font-family={FONT} font-size="10">{s.formula}</text>
+        <text x="470" y={y + 4} fill={C.muted} font-family={FONT} font-size="9">{s.trap}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="340" fill={C.muted} font-family={FONT} font-size="10">Steps 5 and 6 are separate tests and the smaller answer wins; steps 7 onward can each force you back to step 5.</text>
+</svg>

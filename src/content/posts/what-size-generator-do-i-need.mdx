@@ -1,0 +1,182 @@
+---
+title: "What Size Generator Do I Need? Whole-House kW by Load"
+meta_title: "What Size Generator Do I Need? Whole-House kW by Load (2026) | TradesQuote"
+description: "Adding up running watts gets you the wrong answer. A house needing 11.5 kW to run needs 19.2 kW to start its air conditioner — so the set is 20 kW, and a soft starter takes it back to 12 kW."
+image: /images/posts/what-size-generator-do-i-need-hero.svg
+date: 2026-08-04T11:15:00Z
+categories: ["electrical"]
+tags: ["generator sizing","standby generator","motor starting","transfer switch","nec 702"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import GeneratorTwoTestsDiagram from "@/components/blog/generator-sizing/GeneratorTwoTestsDiagram.astro";
+import GeneratorSurgeDiagram from "@/components/blog/generator-sizing/GeneratorSurgeDiagram.astro";
+import GeneratorScenarioLadderDiagram from "@/components/blog/generator-sizing/GeneratorScenarioLadderDiagram.astro";
+
+Nearly every generator sizing guide tells you to add up the running watts of what you want to back up and add a margin. That method is wrong often enough to be dangerous, and here is the arithmetic that shows why.
+
+A house with 9,200 W of essential loads — a 3-ton air conditioner, a well pump, a fridge, lights and a sump pump — needs **11,500 W to run** those loads with a 25% margin. It needs **19,200 W to start them**, because the air-conditioning compressor draws roughly three times its running power for the second or two it takes to spin up, while everything else is already running.
+
+**19,200 W is the requirement. The generator is 20 kW, not 12 kW.** A set sized on running watts would stall or drop out every time the compressor cycled.
+
+## Two Tests, and the Larger One Wins
+
+<BlogInfographic
+  title="Two requirements, and the larger one wins"
+  caption="9,200 W of essential loads: a 3-ton A/C, a well pump, fridge, lights and a sump pump."
+>
+  <GeneratorTwoTestsDiagram />
+</BlogInfographic>
+
+```
+Running requirement  = Σ running watts × (1 + margin)
+Starting requirement = Σ running watts − largest motor running
+                       + largest motor starting
+Required             = the larger of the two
+```
+
+On the example house:
+
+- **Running:** 9,200 × 1.25 = **11,500 W**. The margin exists so the set isn't operated flat out continuously — it protects engine life and leaves room for the load you forgot.
+- **Starting:** 9,200 − 5,000 + (5,000 × 3) = **19,200 W**. The compressor's 5,000 W of running load is *replaced* by its 15,000 W of inrush, while the other 4,200 W keeps running.
+- **Required: 19,200 W = 19.2 kW → a 20 kW set.**
+
+Only the **single largest motor** is assumed to start at once. Two motors starting simultaneously is unlikely enough that standard practice ignores it, and the running margin absorbs the occasional coincidence. If you have two comparably large motors and genuinely can't stagger them, size for both.
+
+Note this is a generator-capacity question, not an NEC load calculation. The code's demand factors in 220.82 model *average* diversity over a service; a generator has to survive the worst *instant*. They're different problems, which is why a 200 A service and a 20 kW generator are not contradictory numbers — see **[Residential Load Calculation](/blog/residential-electrical-load-calculation)** for the other calculation.
+
+## Inrush Is the Strongest Lever
+
+<BlogInfographic
+  title="The same loads, four generator sizes"
+  caption="9,200 W running in every row. Only how hard the 5,000 W compressor starts changes."
+>
+  <GeneratorSurgeDiagram />
+</BlogInfographic>
+
+| Largest motor's starting behaviour | Starting requirement | Generator |
+| --- | --- | --- |
+| 1× — soft starter or inverter compressor | 9,200 W | 12 kW |
+| 2× — easy starting | 14,200 W | 16 kW |
+| 3× — typical motor | 19,200 W | 20 kW |
+| 4× — hard-starting compressor | 24,200 W | 26 kW |
+
+Identical loads, and the answer spans **12 kW to 26 kW**. That makes the surge assumption the most consequential number in the whole calculation, and the one most worth checking rather than guessing.
+
+Where to get a better number than a multiplier:
+
+- **The nameplate LRA** (locked-rotor amps) on the condenser is the real figure. LRA × voltage is the worst-case inrush, and it's often 4–6× the running current — though a modern scroll compressor with a start capacitor typically draws less in practice.
+- **The generator manufacturer's own sizing tool** will ask for the compressor's LRA or RLA for exactly this reason.
+- **Inverter-driven equipment ramps instead of starting**, so a modern variable-speed heat pump or mini-split behaves like the 1× row. That single fact often removes a generator size.
+
+**And it's why a soft starter is the best-value part in the job.** Adding one to the compressor drops this house from a 20 kW set to a 12 kW set — a saving of several thousand dollars on the generator, the transfer switch and the gas line, for a part that costs a few hundred. Very few installers lead with this, and it's the most useful thing in the article.
+
+## Sizing by What You Back Up
+
+<BlogInfographic
+  title="The air conditioner is the step change"
+  caption="25% running margin and a 3× surge on the largest motor throughout. Sizes are standard air-cooled and liquid-cooled ratings."
+>
+  <GeneratorScenarioLadderDiagram />
+</BlogInfographic>
+
+| What you back up | Running | Starting | Generator |
+| --- | --- | --- | --- |
+| Fridge, lights, sump pump | 2,700 W | 4,300 W | 7.5 kW |
+| Essentials + well pump | 4,200 W | 7,200 W | 7.5 kW |
+| Essentials + 3-ton A/C | 9,200 W | 19,200 W | 20 kW |
+| Whole house, gas heat | 27,200 W | 37,200 W | 48 kW |
+| Whole house, all-electric | 37,200 W | 47,200 W | 48 kW |
+
+The ladder isn't linear, and the discontinuity is the air conditioner. Backing up the true essentials takes a 7.5 kW set — the smallest standard size — and adding a well pump doesn't change it, because the starting requirement is still under 7.5 kW. **Add central air and it triples.**
+
+That's the honest answer to "is a 20 kW generator enough for my house?" A 20 kW set covers the essentials plus air conditioning very comfortably, and it is what the industry markets as "whole house" — but a genuinely whole-house all-electric backup is a 48 kW liquid-cooled machine with a very different price, pad, gas line and noise profile.
+
+Which leads to the alternative almost everybody should consider first.
+
+## Load Management Beats a Bigger Generator
+
+A standby generator installed under **NEC Article 702 (optional standby systems) does not have to carry the whole house.** 702.4(B)(2) explicitly permits a system that is not capable of the full load, provided automatic load management is in place or the load is manually selected and there's a means to prevent overload.
+
+In practice that means:
+
+- **A managed transfer switch or load-shed controller** that sheds the air conditioner, the range and the dryer when the generator is near capacity. A 14–16 kW set with load management often outperforms a 22 kW set without it, because the money went into control rather than displacement.
+- **The alternative to a 48 kW machine** for an all-electric house is nearly always a smaller set plus shedding the heat strips and the range. Nobody bakes during an outage.
+- **Article 750 load management** applies the same logic to services generally, which is the same tool that avoids panel upgrades for EV chargers — see **[Do I Need a Panel Upgrade](/blog/do-i-need-a-panel-upgrade)**.
+
+## Reading the Spec Sheet
+
+Four things on a generator spec sheet routinely surprise people:
+
+**kW vs kVA.** Single-phase residential air-cooled sets are normally rated at unity power factor, so their kW and kVA figures match. **Three-phase sets are usually rated at 0.8 power factor**, so a "20 kW" three-phase machine is a 25 kVA machine — and a load of motors at 0.8 PF fills it up at 20 kW of real work. The distinction is worked through in **[Amps to Watts](/blog/amps-to-watts)**.
+
+**Natural gas derates against propane.** Air-cooled sets typically produce a few percent less on natural gas than on LP because of the lower energy density per unit volume, and the spec sheet lists both numbers. Size against the fuel you'll actually run — and confirm the gas meter and piping can deliver the required BTU/h, which is a common late-stage surprise.
+
+**Altitude and temperature derate the engine.** Manufacturers publish deration curves; roughly 3% per 1,000 ft of elevation is a common rule of thumb, and it matters above about 3,000 ft.
+
+**Standby, not prime.** Residential standby ratings assume intermittent duty with a limited number of hours per year. A set run for a week straight during a long outage is being used at the edge of its rating.
+
+## Portable Generators and the One Rule That Matters
+
+A portable set is a legitimate choice for the bottom two rows of the ladder, and the sizing arithmetic is identical — but the connection method is where people get killed.
+
+**Never backfeed a panel through a dryer or range receptacle with a double-male cord.** It energises the utility conductors outside the house, the generator neutral bonding is wrong, and there is no protection against the utility returning while you're connected. NEC 702.5 requires transfer equipment, and the two legal options are a **transfer switch** or a **listed interlock kit** that makes it physically impossible to close the generator breaker and the main at the same time.
+
+One genuine gotcha worth knowing: **the neutral bonding has to match the transfer switch.** A switch that transfers the neutral needs a bonded-neutral generator; a solid-neutral switch (neutral not switched) needs a floating-neutral generator, or you end up with an unintended neutral-to-ground bond downstream of the service. Most portable generators ship bonded and need modification — or the right switch — and this is a decision for the installing electrician, not a store clerk.
+
+## Common Mistakes
+
+- **Sizing on running watts alone.** The starting requirement usually governs, and by a wide margin.
+- **Assuming every motor starts at once.** Standard practice counts only the largest.
+- **Guessing the surge multiplier.** Read the condenser's LRA; the answer spans four generator sizes.
+- **Not pricing a soft starter.** On the worked example it saves 8 kW of generator for a few hundred dollars.
+- **Buying "20 kW because it's whole-house".** It's the essentials-plus-air-conditioning tier. Check your own list.
+- **Ignoring load management.** Article 702.4(B)(2) permits a smaller set with controls, and it's usually cheaper.
+- **Reading a three-phase kW rating as kVA.** At 0.8 PF a 20 kW set is 25 kVA.
+- **Sizing on the propane figure and running natural gas.** NG is normally the lower number.
+- **Backfeeding through a receptacle.** Use a transfer switch or a listed interlock kit. Nothing else.
+
+## Size Your Generator
+
+> **[Generator Sizing Calculator](/calculators/electrical/electrical-generator-sizing-calculator)** — enter the running watts of each load you want backed up, the largest motor's running watts, its surge multiplier and your running margin. Returns both requirements, tells you which one governs, and selects the next standard generator size.
+
+Every figure in this article is that calculator's output. Air conditioning is the load that decides the answer, so get its real draw from the **[HVAC amp draw calculator](/calculators/hvac/hvac-amp-draw-calculator)**; check what the house actually draws with the **[Existing Load Calculator](/calculators/electrical/electrical-existing-load-calculator)** (NEC 220.87); and see **[What Size Electrical Service Do I Need](/blog/what-size-electrical-service-do-i-need)** for the parallel question about the service itself.
+
+*Generator kW figures are standard air-cooled and liquid-cooled ratings; surge multipliers are planning assumptions and a nameplate LRA is always better. Sources & standards: NEC (NFPA 70) 2023 — 220.82, 220.87, 250.34, 445.18, Article 702 (702.4, 702.5), Article 750. Local amendments override the model code, and the AHJ has final say. Have standby generators and transfer equipment installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What size generator do I need for my house?
+
+It depends far more on what starts than on what runs. Backing up a fridge, lights and a sump pump takes a 7.5 kW set; adding a well pump still takes 7.5 kW; adding a 3-ton air conditioner jumps it to 20 kW because of compressor inrush. A genuinely whole-house all-electric backup is around 48 kW, though load management usually makes a smaller set workable.
+
+### Is a 20 kW generator enough for a whole house?
+
+It comfortably covers essentials plus central air conditioning, which is what "whole house" means in most marketing. It is not enough for an all-electric house with electric heat, a range and a dryer all available — that calculates to about 37 kW of starting requirement with gas heat and 47 kW all-electric, unless load management sheds those loads.
+
+### Why does the generator need to be bigger than my running watts?
+
+Because motors draw several times their running power for the moment they start. On a house with 9,200 W of running load, the running requirement with margin is 11,500 W but the starting requirement is 19,200 W — the air-conditioning compressor's inrush replaces its running draw while everything else keeps going. The larger figure governs.
+
+### How do I calculate starting watts?
+
+Take the total running watts, subtract the largest motor's running watts, then add that motor's starting watts. Starting watts are commonly 2–4× running, but the accurate source is the locked-rotor amps on the equipment nameplate multiplied by the voltage. Inverter-driven equipment ramps rather than starting, so it behaves as roughly 1×.
+
+### Will a soft starter let me buy a smaller generator?
+
+Usually yes, and it's the best-value change available. On the worked example, soft-starting the compressor drops the requirement from 19,200 W to 11,500 W — a 12 kW set instead of a 20 kW one. The part costs a few hundred dollars against several thousand of generator, transfer switch and gas line.
+
+### Can I use a portable generator instead?
+
+For the essentials tier, yes — the sizing arithmetic is identical. The connection is what matters: NEC 702.5 requires transfer equipment, so use a transfer switch or a listed panel interlock kit. Never backfeed through a dryer or range receptacle; it energises the utility conductors and there's no protection when power returns.
+
+### Does a generator have to power the whole house?
+
+No. NEC Article 702 covers optional standby systems and 702.4(B)(2) permits a generator that can't carry the full load, provided automatic load management is fitted or loads are selected with a means to prevent overload. A smaller set plus a load-shed controller is frequently cheaper and better than a larger set alone.
+
+### Why is a three-phase 20 kW generator only 25 kVA?
+
+Because three-phase sets are normally rated at 0.8 power factor: 20 kW ÷ 0.8 = 25 kVA. Single-phase residential air-cooled sets are typically rated at unity, so their kW and kVA figures are the same number. Check the spec sheet before sizing against a motor load.

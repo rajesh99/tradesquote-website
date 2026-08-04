@@ -1,0 +1,73 @@
+---
+import { fmt, usd } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The calculator's default install, itemised: a 48 A charger, 40 ft surface run,
+ * new breaker in existing panel space, $150 permit, 6 h at $95. Stacked-bar offsets
+ * are precomputed here rather than in the template.
+ */
+const items = [
+  { label: "Conductor & raceway", amount: 280, note: "40 ft × $7/ft × 1.00 surface", accent: C.blue },
+  { label: "Hardware", amount: 180, note: "hardwire kit or receptacle, box, disconnect", accent: C.orange },
+  { label: "Panel work", amount: 120, note: "new 60 A breaker in existing space", accent: C.red },
+  { label: "Permit & inspection", amount: 150, note: "varies widely by jurisdiction", accent: C.muted },
+  { label: "Labor", amount: 570, note: "6 h × $95/h", accent: C.primary },
+];
+
+const total = items.reduce((sum, i) => sum + i.amount, 0);
+
+const BAR_X = 40;
+const BAR_W = 640;
+
+let cursor = BAR_X;
+const segments = items.map((i) => {
+  const width = (i.amount / total) * BAR_W;
+  const seg = { ...i, x: cursor, width, share: (i.amount / total) * 100 };
+  cursor += width;
+  return seg;
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>Where $1,300 of EV charger installation goes</title>
+  <desc>
+    A typical 48 amp installation on a 40 foot surface run totals 1,300 dollars: 280 dollars of conductor and
+    raceway, 180 dollars of hardware, 120 dollars for a new breaker, 150 dollars of permit, and 570 dollars of
+    labour at six hours times 95 dollars an hour. Labour is 43.8 percent of the job, the largest single line.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Where ${usd(total)} of installation actually goes`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">48 A charger, 40 ft surface run, breaker fitted in existing panel space, 6 h at $95.</text>
+
+  {segments.map((s) => (
+    <g>
+      <rect x={s.x} y="72" width={s.width} height="36" fill={s.accent} opacity="0.22" />
+      <rect x={s.x} y="72" width={s.width} height="36" fill="none" stroke={s.accent} stroke-width="1.2" />
+      {s.width > 72 && (
+        <text x={s.x + s.width / 2} y="95" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{usd(s.amount)}</text>
+      )}
+    </g>
+  ))}
+
+  {items.map((item, i) => {
+    const y = 140 + i * 22;
+    const share = (item.amount / total) * 100;
+    return (
+      <g>
+        <rect x={40} y={y - 9} width="11" height="11" rx="3" fill={item.accent} opacity="0.35" />
+        <rect x={40} y={y - 9} width="11" height="11" rx="3" fill="none" stroke={item.accent} stroke-width="1.2" />
+        <text x={60} y={y} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{item.label}</text>
+        <text x={214} y={y} fill={C.muted} font-family={FONT} font-size="9">{item.note}</text>
+        <text x={562} y={y} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{usd(item.amount)}</text>
+        <text x={640} y={y} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9.5">{`${fmt(share, 1)}%`}</text>
+      </g>
+    );
+  })}
+
+  <line x1="40" y1="258" x2="640" y2="258" stroke={C.border} stroke-width="1" />
+  <text x="60" y="276" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">Total</text>
+  <text x="562" y="276" text-anchor="end" fill={C.primary} font-family={FONT} font-size="13" font-weight="800">{usd(total)}</text>
+  <text x="640" y="276" text-anchor="end" fill={C.muted} font-family={FONT} font-size="9.5">{`${usd(total * 0.85)}–${usd(total * 1.15)}`}</text>
+</svg>
