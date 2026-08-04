@@ -1,0 +1,51 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same scope priced in four cost regions — the calculator's 0.85/1.0/1.25/1.5
+ * multipliers applied to the $3,060 baseline subtotal. Computed, not hardcoded.
+ */
+const SUBTOTAL = 3060;
+const regions = [
+  { label: "Low cost", mult: 0.85, note: "rural, low labour cost", accent: C.green },
+  { label: "Average", mult: 1.0, note: "the national baseline", accent: C.primary },
+  { label: "High-cost metro", mult: 1.25, note: "major metros", accent: C.orange },
+  { label: "Very high cost", mult: 1.5, note: "coastal metros, permit-heavy", accent: C.red },
+];
+
+const rows = regions.map((r) => ({ ...r, total: Math.round(SUBTOTAL * r.mult) }));
+const peak = Math.max(...rows.map((r) => r.total));
+const BAR_MAX = 380;
+const bars = rows.map((r) => ({ ...r, width: Math.round((r.total / peak) * BAR_MAX) }));
+
+const usd = (v: number) => `$${v.toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>The same panel upgrade priced across four cost regions</title>
+  <desc>
+    The same 200 amp upgrade scope priced in four regions. At a low-cost multiplier of 0.85 it comes to about
+    2,601 dollars; at the average baseline of 1.0, about 3,060; in a high-cost metro at 1.25, about 3,825; and in
+    a very high cost area at 1.5, about 4,590. That is a swing of nearly 2,000 dollars for identical work.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Identical scope, four regions</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Why a national average is close to useless for budgeting your own job</text>
+
+  {bars.map((r, i) => {
+    const y = 76 + i * 46;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r.label}</text>
+        <text x="28" y={y + 35} fill={C.muted} font-family={FONT} font-size="8.5">{r.note}</text>
+        <rect x="180" y={y + 5} width={r.width} height="30" rx="7" fill={C.white} stroke={r.accent} stroke-width="1.6" />
+        <rect x="180" y={y + 5} width={r.width} height="30" rx="7" fill={r.accent} opacity="0.14" />
+        <text x="192" y={y + 25} fill={r.accent} font-family={FONT} font-size="11" font-weight="800">{`× ${r.mult.toFixed(2)}`}</text>
+        <text x={180 + r.width - 12} y={y + 25} text-anchor="end" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{usd(r.total)}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="268" fill={C.muted} font-family={FONT} font-size="10">Get three local quotes. A published national figure tells you almost nothing about what your own job costs.</text>
+</svg>

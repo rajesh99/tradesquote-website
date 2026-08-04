@@ -1,0 +1,63 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The 1,800 ft² worked example, computed here so it can't drift from the prose or the
+ * rewiring-cost calculator: 1800 × $7 → ×1.1 age → + $3,000 panel + $500 permit.
+ */
+const SQFT = 1800;
+const RATE = 7;
+const AGE_MULT = 1.1;
+const PANEL = 3000;
+const PERMIT = 500;
+
+const base = SQFT * RATE;
+const wiring = base * AGE_MULT;
+const total = wiring + PANEL + PERMIT;
+const perSqft = total / SQFT;
+
+const steps = [
+  { label: `${SQFT.toLocaleString("en-US")} ft² × $${RATE}/ft²`, detail: "average access", value: base },
+  { label: `× ${AGE_MULT} midcentury`, detail: "cloth wiring, more remediation", value: wiring },
+  { label: "+ new panel", detail: "a rewire almost always includes one", value: wiring + PANEL },
+  { label: "+ permit", detail: "multi-stage inspection", value: total },
+];
+
+const usd = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Whole house rewiring cost buildup for an 1,800 square foot house</title>
+  <desc>
+    An 1,800 square foot midcentury house with average wall access: 1,800 square feet at 7 dollars each gives a
+    base of 12,600 dollars; the 1.1 midcentury multiplier brings it to 13,860; adding a new panel at 3,000 gives
+    16,860; and a 500 dollar permit brings the total to 17,360 dollars, or 9.64 per square foot. Allowing for
+    quoting variation the band is roughly 13,888 to 20,832 dollars.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">An 1,800 ft² rewire, built up</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Average access · midcentury construction · single storey · panel included</text>
+
+  {steps.map((s, i) => {
+    const y = 74 + i * 38;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="33" rx="6" fill={C.white} stroke={C.border} stroke-width="0.9" />
+        <text x="42" y={y + 15} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{s.label}</text>
+        <text x="42" y={y + 27} fill={C.muted} font-family={FONT} font-size="9">{s.detail}</text>
+        <text x="676" y={y + 21} text-anchor="end" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{usd(s.value)}</text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="230" x2="696" y2="230" stroke={C.dark} stroke-width="1.2" />
+
+  <rect x="24" y="240" width="330" height="52" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="260" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`${usd(total)} — $${perSqft.toFixed(2)}/ft²`}</text>
+  <text x="44" y="278" fill={C.muted} font-family={FONT} font-size="9.5">Inside the $5–$17/ft² band published for 2026</text>
+
+  <rect x="366" y="240" width="330" height="52" rx="10" fill={C.white} stroke={C.border} stroke-width="1.4" />
+  <text x="386" y="260" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">Quoting band</text>
+  <text x="386" y="278" fill={C.muted} font-family={FONT} font-size="13" font-weight="700">{`${usd(total * 0.8)} – ${usd(total * 1.2)}`}</text>
+</svg>

@@ -1,0 +1,58 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * THHN/THWN-2 counts for EMT, matching Annex C. Values were computed from the
+ * Chapter 9 Table 4 and Table 5 figures in src/lib/nec.ts and cross-checked against
+ * published Annex C Table C.1 entries. Cells showing 1 or 2 fall in the 53%/31%
+ * tiers rather than the 40% tier.
+ */
+const trades = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"'];
+const rows = [
+  { awg: "14", counts: [12, 22, 35, 61, 84, 138] },
+  { awg: "12", counts: [9, 16, 26, 45, 61, 101] },
+  { awg: "10", counts: [5, 10, 16, 28, 38, 63] },
+  { awg: "8", counts: [3, 6, 9, 16, 22, 36] },
+  { awg: "6", counts: [1, 4, 7, 12, 16, 26] },
+  { awg: "4", counts: [1, 2, 4, 7, 10, 16] },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Conduit fill chart for THHN conductors in EMT</title>
+  <desc>
+    Maximum THHN or THWN-2 conductors permitted in EMT. In half-inch EMT: 12 of 14 AWG, 9 of 12 AWG, 5 of 10
+    AWG, 3 of 8 AWG. In three-quarter inch: 22, 16, 10 and 6. In one inch: 35, 26, 16 and 9. In one and a
+    quarter inch: 61, 45, 28 and 16. In one and a half inch: 84, 61, 38 and 22. In two inch: 138, 101, 63 and
+    36. Six AWG allows 1, 4, 7, 12, 16 and 26 respectively, and 4 AWG allows 1, 2, 4, 7, 10 and 16.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">THHN conductors in EMT — maximum count</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Chapter 9 Tables 1, 4 and 5, matching Annex C. Fill is only half the limit — check derating too.</text>
+
+  <!-- Header row -->
+  <text x="40" y="86" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">AWG</text>
+  {trades.map((t, i) => (
+    <text x={128 + i * 96} y="86" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">{t}</text>
+  ))}
+  <line x1="24" y1="94" x2="696" y2="94" stroke={C.border} />
+
+  {rows.map((r, ri) => {
+    const y = 102 + ri * 31;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="27" rx="6" fill={C.white} stroke={C.border} stroke-width="0.8" />
+        <text x="40" y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{r.awg}</text>
+        {r.counts.map((n, ci) => (
+          <g>
+            <rect x={128 + ci * 96 - 28} y={y + 4} width="56" height="19" rx="5" fill={C.primaryLight} stroke={C.primary} stroke-width="0.9" />
+            <text x={128 + ci * 96} y={y + 18} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{n}</text>
+          </g>
+        ))}
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="9.5">Cells showing 1 or 2 conductors use the 53% and 31% limits from Table 1 rather than the 40% figure that applies to three or more.</text>
+</svg>

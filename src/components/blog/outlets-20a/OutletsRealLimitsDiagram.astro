@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The count isn't limited in a dwelling, but what you connect is. 210.23(A)(1) caps
+ * a single portable appliance at 80% of the circuit; 210.23(A)(2) caps fastened-in-
+ * place equipment at 50% where the circuit also serves lighting or receptacles.
+ */
+const limits = [
+  {
+    title: "One portable appliance",
+    figure: "16 A max",
+    accent: C.primary,
+    bg: C.primaryLight,
+    rule: "210.23(A)(1)",
+    detail: ["Cord-and-plug equipment not", "fastened in place may not exceed", "80% of the circuit rating."],
+  },
+  {
+    title: "Fastened-in-place equipment",
+    figure: "10 A max",
+    accent: C.blue,
+    bg: C.blueLight,
+    rule: "210.23(A)(2)",
+    detail: ["Capped at 50% where the circuit", "also feeds lighting or ordinary", "receptacles."],
+  },
+  {
+    title: "Working convention",
+    figure: "8–10 outlets",
+    accent: C.orange,
+    bg: C.orangeLight,
+    rule: "Not code",
+    detail: ["What most electricians actually", "install per 20 A circuit — a", "habit, not a requirement."],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>What actually limits a 20 amp circuit</title>
+  <desc>
+    The number of outlets is unlimited in a dwelling, but what you connect is limited. Under 210.23(A)(1) a
+    single cord-and-plug appliance not fastened in place may not exceed 80 percent of the circuit rating, or
+    16 amps on a 20 amp circuit. Under 210.23(A)(2) equipment fastened in place is capped at 50 percent, or
+    10 amps, where the circuit also supplies lighting or ordinary receptacles. Separately, most electricians
+    install 8 to 10 outlets per 20 amp circuit as a working convention rather than a code rule.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The count isn't limited — the load is</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Two real code limits on what connects, plus the habit most of the trade follows</text>
+
+  {limits.map((l, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="152" rx="10" fill={l.bg} stroke={l.accent} stroke-width="1.5" />
+        <text x={x + 16} y="96" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{l.title}</text>
+        <text x={x + 16} y="130" fill={l.accent} font-family={FONT} font-size="23" font-weight="800">{l.figure}</text>
+        <rect x={x + 16} y="140" width="90" height="19" rx="5" fill={C.white} stroke={l.accent} stroke-width="1" />
+        <text x={x + 61} y="153" text-anchor="middle" fill={l.accent} font-family={FONT} font-size="9" font-weight="700">{l.rule}</text>
+        <text x={x + 16} y="180" fill={C.muted} font-family={FONT} font-size="9.5">
+          {l.detail.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

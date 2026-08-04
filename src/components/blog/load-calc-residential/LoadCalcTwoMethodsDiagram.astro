@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The two legal routes to a dwelling load calculation. Both are valid; the optional
+ * method is simpler and usually yields a smaller number, which is why most
+ * residential work uses it.
+ */
+const methods = [
+  {
+    name: "Standard method",
+    article: "Part III · 220.40–220.61",
+    accent: C.blue,
+    bg: C.blueLight,
+    steps: [
+      "Each load category gets its own",
+      "demand factor: Table 220.42 for",
+      "lighting, 220.55 for ranges,",
+      "220.54 for dryers, 220.53 for",
+      "fixed appliances, 220.60 for",
+      "noncoincident heating/cooling.",
+    ],
+    verdict: "More steps, usually a bigger answer",
+  },
+  {
+    name: "Optional method",
+    article: "220.82",
+    accent: C.primary,
+    bg: C.primaryLight,
+    steps: [
+      "One demand factor for almost",
+      "everything: add the whole",
+      "connected load, take the first",
+      "10 kVA at 100% and the rest at",
+      "40%, then add the largest of",
+      "heating or cooling.",
+    ],
+    verdict: "Fewer steps, usually a smaller answer",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>The two NEC methods for a dwelling load calculation</title>
+  <desc>
+    Two legal routes exist. The standard method in Part III, articles 220.40 through 220.61, applies a
+    separate demand factor to each load category — Table 220.42 for lighting, 220.55 for ranges, 220.54 for
+    dryers, 220.53 for fixed appliances and 220.60 for noncoincident heating and cooling. The optional method
+    in 220.82 applies one demand factor to nearly everything: the first 10 kilovolt-amperes at 100 percent
+    and the remainder at 40 percent, plus the largest of heating or cooling. Both are valid and the optional
+    method usually produces a smaller result.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two legal methods — you may use either</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">They give different answers on the same house. Nothing obliges you to use the one that comes out higher.</text>
+
+  {methods.map((m, i) => {
+    const x = 24 + i * 340;
+    return (
+      <g>
+        <rect x={x} y="72" width="324" height="196" rx="10" fill={m.bg} stroke={m.accent} stroke-width="1.6" />
+        <text x={x + 20} y="98" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{m.name}</text>
+        <rect x={x + 20} y="108" width="150" height="20" rx="5" fill={C.white} stroke={m.accent} stroke-width="1" />
+        <text x={x + 95} y="122" text-anchor="middle" fill={m.accent} font-family={FONT} font-size="9.5" font-weight="700">{m.article}</text>
+        <text x={x + 20} y="148" fill={C.muted} font-family={FONT} font-size="9.5">
+          {m.steps.map((line, li) => (
+            <tspan x={x + 20} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+        <rect x={x + 20} y="232" width="284" height="26" rx="7" fill={C.white} stroke={m.accent} stroke-width="1.3" />
+        <text x={x + 162} y="249" text-anchor="middle" fill={m.accent} font-family={FONT} font-size="10.5" font-weight="800">{m.verdict}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,49 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Typical nameplate VA for the loads that decide the question. These are nameplate
+ * figures — the 220.82 demand factors then discount most of them, and 220.82(C)
+ * takes only the largest of heating or cooling.
+ */
+const loads = [
+  { name: "Electric range", va: 12000, note: "the single biggest appliance" },
+  { name: "EV charger, 48 A", va: 11520, note: "continuous — 625.41" },
+  { name: "Hot tub, 40 A", va: 9600, note: "often the deciding load" },
+  { name: "Heat pump", va: 7000, note: "or central A/C" },
+  { name: "Electric dryer", va: 5000, note: "gas dryer ≈ 600 VA" },
+  { name: "Water heater", va: 4500, note: "tankless runs far higher" },
+];
+
+const BAR_MAX = 380;
+const peak = Math.max(...loads.map((l) => l.va));
+const bars = loads.map((l) => ({ ...l, width: Math.round((l.va / peak) * BAR_MAX) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>The loads that push a house past 100 amps</title>
+  <desc>
+    Typical nameplate volt-amperes for the loads that decide between a 100 and 200 amp service: an electric
+    range at 12,000, a 48 amp electric vehicle charger at 11,520, a 40 amp hot tub at 9,600, a heat pump at
+    about 7,000, an electric dryer at 5,000, and an electric water heater at 4,500. These are nameplate
+    figures before the 220.82 demand factors are applied.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The loads that decide it — nameplate VA</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Two or three of these together is what takes a house past 100 A</text>
+
+  {bars.map((l, i) => {
+    const y = 74 + i * 38;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{l.name}</text>
+        <text x="28" y={y + 29} fill={C.muted} font-family={FONT} font-size="9">{l.note}</text>
+        <rect x="216" y={y + 2} width={l.width} height="26" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={216 + l.width - 10} y={y + 20} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${l.va.toLocaleString("en-US")} VA`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="308" fill={C.muted} font-family={FONT} font-size="10">220.82 then discounts most of this — first 10 kVA at 100%, the rest at 40% — and counts only the larger of heating or cooling.</text>
+</svg>

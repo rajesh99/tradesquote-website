@@ -1,0 +1,47 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Chapter 9, Table 1. The limit depends on the conductor COUNT, which is why a
+ * two-conductor fill is stricter than a three-conductor one — and why max-count has
+ * to be worked out by iteration rather than a single division.
+ */
+const tiers = [
+  { count: "1 conductor", pct: 53, accent: C.blue, bg: C.blueLight, note: "A single conductor gets the most room" },
+  { count: "2 conductors", pct: 31, accent: C.red, bg: C.redLight, note: "The strictest tier — tighter than three" },
+  { count: "3 or more", pct: 40, accent: C.primary, bg: C.primaryLight, note: "The one that applies to almost all work" },
+  { count: "Nipple ≤ 24 in", pct: 60, accent: C.green, bg: C.greenLight, note: "Note 4 — no bundling derating" },
+];
+
+const BAR_MAX = 300;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>NEC Chapter 9 Table 1 conduit fill limits</title>
+  <desc>
+    Fill limits depend on the number of conductors. One conductor may occupy 53 percent of the raceway area,
+    two conductors only 31 percent, and three or more 40 percent. A nipple no longer than 24 inches is
+    permitted 60 percent fill under Note 4, and the 310.15(C)(1) bundling adjustment factors do not apply to
+    it. Because the limit itself changes with the count, the maximum number of conductors has to be found by
+    iteration rather than a single division.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The limit depends on how many conductors — Table 1</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Note that two conductors is stricter than three. That's not a typo in the code.</text>
+
+  {tiers.map((t, i) => {
+    const y = 76 + i * 46;
+    const width = Math.round((t.pct / 60) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 24} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{t.count}</text>
+        <rect x="164" y={y + 5} width={width} height="30" rx="7" fill={t.bg} stroke={t.accent} stroke-width="1.4" />
+        <text x="176" y={y + 25} fill={t.accent} font-family={FONT} font-size="15" font-weight="800">{`${t.pct}%`}</text>
+        <text x={164 + width + 12} y={y + 25} fill={C.muted} font-family={FONT} font-size="9.5">{t.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="268" fill={C.muted} font-family={FONT} font-size="9.5">Because the percentage moves with the count, finding the maximum means testing counts one at a time — a single division gets it wrong at the 2-to-3 boundary.</text>
+</svg>

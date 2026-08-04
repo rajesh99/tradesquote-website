@@ -1,0 +1,83 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Three buckets: where 20 A is mandated by 210.11(C), where 15 A remains perfectly
+ * compliant, and where 20 A is merely the better choice.
+ */
+const buckets = [
+  {
+    heading: "Must be 20 A",
+    accent: C.red,
+    bg: C.redLight,
+    items: [
+      "Kitchen small-appliance",
+      "circuits — two minimum,",
+      "210.11(C)(1)",
+      "Laundry receptacles —",
+      "210.11(C)(2)",
+      "Bathroom receptacles —",
+      "210.11(C)(3)",
+    ],
+  },
+  {
+    heading: "15 A is fine",
+    accent: C.blue,
+    bg: C.blueLight,
+    items: [
+      "Bedroom receptacles",
+      "and lighting",
+      "Living and dining room",
+      "general circuits",
+      "Hallways and stairs",
+      "Lighting-only circuits",
+      "",
+    ],
+  },
+  {
+    heading: "20 A by choice",
+    accent: C.primary,
+    bg: C.primaryLight,
+    items: [
+      "Garage and workshop —",
+      "power tools stack up",
+      "Home office — space",
+      "heaters are 12.5 A",
+      "Basements and utility",
+      "spaces",
+      "",
+    ],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Where 20 amp circuits are required, optional, or unnecessary</title>
+  <desc>
+    Twenty amp circuits are mandatory for the two kitchen small-appliance circuits under 210.11(C)(1), the
+    laundry receptacle circuit under 210.11(C)(2), and the bathroom receptacle circuit under 210.11(C)(3).
+    Fifteen amp circuits remain fully compliant for bedroom receptacles and lighting, living and dining room
+    general circuits, hallways, and lighting-only circuits. Twenty amps is a sensible upgrade by choice in
+    garages and workshops, home offices, and basements.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where each one belongs</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Three of these are code requirements. The rest is judgment.</text>
+
+  {buckets.map((b, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="164" rx="10" fill={b.bg} stroke={b.accent} stroke-width="1.5" />
+        <text x={x + 16} y="96" fill={b.accent} font-family={FONT} font-size="12.5" font-weight="800">{b.heading}</text>
+        <line x1={x + 16} y1="106" x2={x + 192} y2="106" stroke={b.accent} stroke-opacity="0.35" />
+        <text x={x + 16} y="126" fill={C.muted} font-family={FONT} font-size="9.5">
+          {b.items.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "14"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

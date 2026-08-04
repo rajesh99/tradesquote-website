@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * How far 12 AWG copper reaches before 3% voltage drop, at several loads and
+ * voltages. Same circular-mil method as the voltage-drop calculator:
+ * L = (0.03 × V × 6530) ÷ (2 × 12.9 × I).
+ */
+const K = 12.9;
+const CMIL = 6530;
+const cases = [
+  { amps: 20, volts: 120, tag: "Full 20 A load" },
+  { amps: 16, volts: 120, tag: "80% continuous load" },
+  { amps: 10, volts: 120, tag: "Light load" },
+  { amps: 20, volts: 240, tag: "Full load, 240 V" },
+];
+
+const computed = cases.map((c) => ({
+  ...c,
+  feet: Math.floor((0.03 * c.volts * CMIL) / (2 * K * c.amps)),
+}));
+
+const BAR_MAX = 380;
+const peak = Math.max(...computed.map((c) => c.feet));
+const bars = computed.map((c) => ({ ...c, width: Math.round((c.feet / peak) * BAR_MAX) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>How far 12 AWG copper runs before 3 percent voltage drop</title>
+  <desc>
+    Maximum one-way run for 12 AWG copper at 3 percent voltage drop: about 45 feet carrying a full 20
+    amps on 120 volts, about 56 feet at a 16 amp continuous load, about 91 feet at a 10 amp light load,
+    and about 91 feet carrying a full 20 amps on a 240 volt circuit. Distance is inversely proportional to
+    current and directly proportional to voltage.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">How far 12 AWG actually reaches — 3% drop limit</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Ampacity never changes with distance. This does.</text>
+
+  {bars.map((c, i) => {
+    const y = 76 + i * 40;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{`${c.amps} A · ${c.volts} V`}</text>
+        <rect x="132" y={y + 6} width={c.width} height="26" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x="142" y={y + 24} fill={C.muted} font-family={FONT} font-size="9.5">{c.tag}</text>
+        <text x={132 + c.width + 10} y={y + 24} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{`${c.feet} ft`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="232" fill={C.muted} font-family={FONT} font-size="10">Halve the current or double the voltage and the reach doubles — the two cheapest fixes for a long run.</text>
+</svg>

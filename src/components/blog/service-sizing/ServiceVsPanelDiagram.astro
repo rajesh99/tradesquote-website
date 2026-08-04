@@ -1,0 +1,70 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("svp");
+
+/**
+ * Three ratings that get conflated. They are independent, and the smallest of them
+ * is what actually limits the installation.
+ */
+const parts = [
+  {
+    name: "Service rating",
+    accent: C.blue,
+    bg: C.blueLight,
+    what: ["What the service-entrance", "conductors and utility drop", "can carry. Set by 230.42", "and Table 310.12."],
+  },
+  {
+    name: "Main breaker",
+    accent: C.orange,
+    bg: C.orangeLight,
+    what: ["The service disconnect that", "protects those conductors.", "230.79(C) requires at least", "100 A on a dwelling."],
+  },
+  {
+    name: "Panel busbar",
+    accent: C.primary,
+    bg: C.primaryLight,
+    what: ["What the panelboard itself is", "rated to carry — stamped on", "the label. Often larger than", "the main breaker."],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>Service rating versus main breaker versus panel busbar rating</title>
+  <desc>
+    Three independent ratings that are often confused. The service rating is what the service-entrance
+    conductors and utility drop can carry, set by 230.42 and Table 310.12. The main breaker is the service
+    disconnect protecting those conductors, and 230.79(C) requires at least 100 amps on a one-family dwelling.
+    The panel busbar rating is what the panelboard itself can carry, stamped on its label, and is often larger
+    than the main breaker. The smallest of the three is what limits the installation.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three ratings people treat as one</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A 200 A panel fed by 100 A conductors is a 100 A service — the smallest number wins</text>
+
+  {parts.map((p, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="74" width="208" height="132" rx="10" fill={p.bg} stroke={p.accent} stroke-width="1.5" />
+        <text x={x + 16} y="100" fill={p.accent} font-family={FONT} font-size="12.5" font-weight="800">{p.name}</text>
+        <line x1={x + 16} y1="110" x2={x + 192} y2="110" stroke={p.accent} stroke-opacity="0.35" />
+        <text x={x + 16} y="130" fill={C.muted} font-family={FONT} font-size="9.5">
+          {p.what.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+
+  <path d="M232 140 L 244 140" stroke={C.border} stroke-width="1.5" marker-end="url(#svp-arrow-muted)" />
+  <path d="M456 140 L 468 140" stroke={C.border} stroke-width="1.5" marker-end="url(#svp-arrow-muted)" />
+
+  <rect x="24" y="220" width="672" height="50" rx="9" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="44" y="242" fill={C.red} font-family={FONT} font-size="11.5" font-weight="800">Upgrading the panel alone upgrades nothing</text>
+  <text x="44" y="260" fill={C.muted} font-family={FONT} font-size="9.5">A new 200 A panelboard on the old 100 A service conductors is still a 100 A service. All three have to move together.</text>
+</svg>

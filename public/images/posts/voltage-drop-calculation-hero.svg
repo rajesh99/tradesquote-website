@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="none" role="img" aria-labelledby="vdHeroTitle vdHeroDesc">
+  <title id="vdHeroTitle">Voltage drop calculation</title>
+  <desc id="vdHeroDesc">Abstract hero graphic with soft gradients showing voltage falling along a conductor run from source to load, with a percentage marker.</desc>
+
+  <defs>
+    <linearGradient id="vdBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0F9FF"/>
+      <stop offset="45%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#ECFEFF"/>
+    </linearGradient>
+    <linearGradient id="vdSky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="vdTeal" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#01AD9F" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#14B8A6" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="vdFade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#EA580C" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="vdAccentBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#01AD9F"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <filter id="vdBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+    <filter id="vdGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1000" height="500" fill="url(#vdBg)"/>
+  <ellipse cx="790" cy="130" rx="200" ry="160" fill="url(#vdSky)" filter="url(#vdBlur)"/>
+  <ellipse cx="670" cy="390" rx="180" ry="140" fill="url(#vdTeal)" filter="url(#vdBlur)"/>
+
+  <rect x="48" y="72" width="400" height="356" rx="24" fill="#FFFFFF" fill-opacity="0.42" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.8"/>
+  <text x="80" y="196" fill="#152035" font-family="system-ui, -apple-system, sans-serif" font-size="40" font-weight="700" letter-spacing="-0.02em">
+    <tspan x="80" dy="0">Voltage drop</tspan>
+    <tspan x="80" dy="50" fill="#0284C7">and the 3% rule</tspan>
+  </text>
+  <text x="80" y="298" fill="#64748B" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="500">What the NEC actually says</text>
+  <rect x="80" y="322" width="56" height="4" rx="2" fill="url(#vdAccentBar)"/>
+
+  <!-- Source panel -->
+  <rect x="520" y="180" width="54" height="92" rx="8" fill="#FFFFFF" fill-opacity="0.9" stroke="#7DD3FC" stroke-width="2"/>
+  <text x="547" y="232" text-anchor="middle" fill="#0369A1" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="800">240V</text>
+
+  <!-- Conductor run, fading toward the load -->
+  <rect x="574" y="204" width="290" height="12" rx="6" fill="url(#vdFade)"/>
+  <rect x="574" y="238" width="290" height="12" rx="6" fill="url(#vdFade)"/>
+
+  <!-- Load -->
+  <rect x="864" y="180" width="54" height="92" rx="8" fill="#FFF7ED" fill-opacity="0.95" stroke="#EA580C" stroke-width="2"/>
+  <text x="891" y="226" text-anchor="middle" fill="#C2410C" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800">232V</text>
+  <text x="891" y="243" text-anchor="middle" fill="#C2410C" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600">at load</text>
+
+  <!-- Falling curve -->
+  <path d="M574 330 C 660 332, 760 344, 864 366" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.8" filter="url(#vdGlow)"/>
+  <circle cx="864" cy="366" r="7" fill="#EA580C" opacity="0.9"/>
+
+  <!-- Badge -->
+  <g font-family="system-ui, -apple-system, sans-serif">
+    <rect x="574" y="290" width="120" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.92" stroke="#5EEAD4" stroke-width="1.5"/>
+    <text x="634" y="310" text-anchor="middle" fill="#0F766E" font-size="12" font-weight="700" letter-spacing="1">3.26% drop</text>
+  </g>
+  <text x="574" y="398" fill="#64748B" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600">100 ft of 8 AWG at 50 A</text>
+
+  <rect x="0" y="496" width="1000" height="4" fill="#01AD9F"/>
+</svg>

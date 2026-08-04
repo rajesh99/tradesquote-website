@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The estimate calculator's default job, computed here so the diagram, the prose and
+ * the tool cannot disagree: 12 h @ $95 + $600 fixtures + $850 material, 15% overhead,
+ * 25% margin.
+ */
+const HOURS = 12;
+const RATE = 95;
+const FIXTURES = 600;
+const MATERIAL = 850;
+const OVERHEAD_PCT = 0.15;
+const MARGIN_PCT = 0.25;
+
+const labor = HOURS * RATE;
+const direct = labor + FIXTURES + MATERIAL;
+const overhead = direct * OVERHEAD_PCT;
+const breakEven = direct + overhead;
+const price = breakEven / (1 - MARGIN_PCT);
+const profit = price - breakEven;
+
+const rows = [
+  { label: `Labor — ${HOURS} h × $${RATE}`, value: labor, accent: C.blue },
+  { label: "Fixtures", value: FIXTURES, accent: C.blue },
+  { label: "Material", value: MATERIAL, accent: C.blue },
+  { label: "Direct cost", value: direct, accent: C.dark, bold: true },
+  { label: `Overhead — ${OVERHEAD_PCT * 100}% of direct`, value: overhead, accent: C.orange },
+  { label: "Break-even", value: breakEven, accent: C.dark, bold: true },
+];
+
+const usd = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" fill="none" aria-hidden="true">
+  <title>A worked electrical estimate</title>
+  <desc>
+    Labor of 12 hours at 95 dollars is 1,140 dollars; fixtures 600; material 850 — a direct cost of 2,590.
+    Overhead at 15 percent of direct adds 389, giving a break-even of 2,979. Dividing by 0.75 for a 25 percent
+    margin gives a price of 3,971 dollars, leaving 993 of profit.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="324" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A job, priced properly</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">12 hours, one fixture package, 15% overhead, 25% target margin</text>
+
+  {rows.map((r, i) => {
+    const y = 74 + i * 32;
+    return (
+      <g>
+        <rect
+          x="24"
+          y={y}
+          width="672"
+          height="27"
+          rx="6"
+          fill={r.bold ? C.primaryLight : C.white}
+          stroke={r.bold ? C.primary : C.border}
+          stroke-width={r.bold ? "1.4" : "0.8"}
+        />
+        <text x="44" y={y + 18} fill={C.dark} font-family={FONT} font-size="11" font-weight={r.bold ? "800" : "600"}>{r.label}</text>
+        <text x="676" y={y + 18} text-anchor="end" fill={r.accent} font-family={FONT} font-size="12" font-weight="800">{usd(r.value)}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="290" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`Break-even ÷ (1 − 0.25) = ${usd(breakEven)} ÷ 0.75`}</text>
+
+  <rect x="24" y="298" width="330" height="26" rx="7" fill={C.greenLight} stroke={C.green} stroke-width="1.6" />
+  <text x="44" y="316" fill={C.green} font-family={FONT} font-size="12.5" font-weight="800">{`Price ${usd(price)}`}</text>
+
+  <rect x="366" y="298" width="330" height="26" rx="7" fill={C.white} stroke={C.border} stroke-width="1.2" />
+  <text x="386" y="316" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{`Profit ${usd(profit)}`}</text>
+</svg>

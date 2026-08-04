@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The line items behind a typical 100→200 A upgrade, using the same figures the
+ * panel-upgrade cost calculator carries for 2026. Offsets for the stacked bar are
+ * precomputed here rather than in the template.
+ */
+const items = [
+  { label: "Panel + breakers", value: 900, fill: C.primary },
+  { label: "Labor (10 h × $95)", value: 950, fill: C.blue },
+  { label: "Conductors (30 ft × $12)", value: 360, fill: C.orange },
+  { label: "Meter socket", value: 250, fill: C.green },
+  { label: "Mast / riser", value: 350, fill: C.muted },
+  { label: "Permit", value: 250, fill: C.red },
+];
+
+const total = items.reduce((s, i) => s + i.value, 0);
+const BAR_W = 640;
+
+let cursor = 28;
+const segments = items.map((i) => {
+  const w = Math.round((i.value / total) * BAR_W);
+  const seg = { ...i, x: cursor, w };
+  cursor += w;
+  return seg;
+});
+
+const usd = (v: number) => `$${v.toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>Line items in a typical 100 to 200 amp panel upgrade</title>
+  <desc>
+    A typical 200 amp upgrade at average regional cost: panel and breakers 900 dollars, labor of 10 hours at 95
+    dollars an hour totalling 950, service conductors of 30 feet at 12 dollars a foot totalling 360, a meter
+    socket at 250, a mast or riser at 350, and a permit at 250 — 3,060 dollars in total. Allowing for quoting
+    variation the band is roughly 2,601 to 3,519 dollars.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where the money goes — 200 A upgrade</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Average-cost region, overhead service, 30 ft run, meter replaced</text>
+
+  <!-- Stacked bar -->
+  {segments.map((s) => (
+    <rect x={s.x} y="74" width={s.w} height="30" fill={s.fill} opacity="0.85" />
+  ))}
+  <rect x="28" y="74" width={BAR_W} height="30" rx="4" fill="none" stroke={C.border} />
+
+  <!-- Legend rows -->
+  {items.map((i, idx) => {
+    const col = idx % 2;
+    const row = Math.floor(idx / 2);
+    const x = 28 + col * 336;
+    const y = 130 + row * 32;
+    return (
+      <g>
+        <rect x={x} y={y} width="14" height="14" rx="3" fill={i.fill} opacity="0.85" />
+        <text x={x + 24} y={y + 12} fill={C.dark} font-family={FONT} font-size="11" font-weight="600">{i.label}</text>
+        <text x={x + 300} y={y + 12} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{usd(i.value)}</text>
+      </g>
+    );
+  })}
+
+  <line x1="28" y1="238" x2="692" y2="238" stroke={C.dark} stroke-width="1.2" />
+
+  <rect x="28" y="248" width="320" height="60" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="46" y="270" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Typical total</text>
+  <text x="46" y="296" fill={C.primary} font-family={FONT} font-size="26" font-weight="800">{usd(total)}</text>
+
+  <rect x="372" y="248" width="320" height="60" rx="10" fill={C.white} stroke={C.border} stroke-width="1.4" />
+  <text x="390" y="270" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Quoting band</text>
+  <text x="390" y="294" fill={C.muted} font-family={FONT} font-size="16" font-weight="700">{`${usd(Math.round(total * 0.85))} – ${usd(Math.round(total * 1.15))}`}</text>
+</svg>

@@ -1,0 +1,137 @@
+---
+title: "How Many Outlets on a 20 Amp Circuit? The Real NEC Answer"
+meta_title: "How Many Outlets on a 20 Amp Circuit? (The Real Answer) | TradesQuote"
+description: "In a dwelling the NEC sets no limit on receptacles per circuit — 220.14(J) already counts them. In commercial work it's 180 VA each, so 13 on a 20 amp circuit. Plus the load limits that actually apply and the 8–10 working convention."
+image: /images/posts/how-many-outlets-on-a-20-amp-circuit-hero.svg
+date: 2026-08-03T14:30:00Z
+categories: ["electrical"]
+tags: ["20 amp circuit","receptacles","220.14","branch circuit","nec"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import OutletsDwellingVsCommercialDiagram from "@/components/blog/outlets-20a/OutletsDwellingVsCommercialDiagram.astro";
+import OutletsMathDiagram from "@/components/blog/outlets-20a/OutletsMathDiagram.astro";
+import OutletsRealLimitsDiagram from "@/components/blog/outlets-20a/OutletsRealLimitsDiagram.astro";
+
+Ask this online and you'll get "10" from one person, "13" from the next, and "8, because of the 80% rule" from a third. All three are quoting something real, and none of them is quite the answer.
+
+**In a dwelling, the NEC places no limit on the number of general-use receptacles on a branch circuit.** None. You could legally put twenty on one 20-amp circuit. In a commercial building the answer is a firm 13. Here's why they differ, and what actually constrains you in practice.
+
+<BlogInfographic
+  title="Two different rules, two different answers"
+  caption="The split is occupancy: dwellings count receptacles inside the general lighting load, commercial buildings count them individually."
+>
+  <OutletsDwellingVsCommercialDiagram />
+</BlogInfographic>
+
+## In a Dwelling: No Limit
+
+The reason is how dwelling loads are calculated. **220.14(J)** says that in dwelling units, the general lighting load computed at **3 VA per square foot** under 220.12 is *deemed to include* all general-use receptacle outlets of 20 amps or less, along with lighting outlets.
+
+In other words, the code already accounted for your receptacles when it charged you 3 VA for every square foot of the house. Assigning each one an individual load would be counting the same thing twice. And with no per-receptacle load, there's no arithmetic that produces a maximum count.
+
+What the NEC regulates in dwellings is **where** receptacles go, not how many share a circuit:
+
+- **210.52(A)** — the "6-foot rule": no point along the floor line of any wall space may be more than 6 feet from a receptacle, and every wall space 2 feet or wider needs one
+- **210.52(C)** — kitchen countertops: no point more than 24 inches from a receptacle
+- **210.11(C)(1)** — at least **two 20-amp small-appliance circuits** for the kitchen and dining areas, and 210.52(B) restricts what else they may serve
+- **210.11(C)(2)** — a dedicated 20-amp laundry circuit
+- **210.11(C)(3)** — a dedicated 20-amp bathroom circuit
+- **210.8** — GFCI protection; **210.12** — AFCI protection
+
+So the code is prescriptive about coverage and about which rooms get dedicated circuits. Quantity per circuit it leaves to you.
+
+## In Commercial Work: 13
+
+Non-dwelling occupancies use a different load rule. **220.14(I)** assigns **180 VA to each receptacle outlet** — specifically, to each single or multiple receptacle on one strap or yoke.
+
+<BlogInfographic
+  title="The 180 VA calculation"
+  caption="A duplex receptacle counts once. A four-plex on two straps counts twice."
+>
+  <OutletsMathDiagram />
+</BlogInfographic>
+
+A 20-amp, 120-volt circuit is 2,400 VA. Divide by 180 and you get 13.33, so **13 outlets**. On a 15-amp circuit it's 1,800 ÷ 180 = **10 outlets**.
+
+Where the circuit is treated as a continuous load, apply the 125% rule first — 2,400 × 0.8 = 1,920 VA — and a 20-amp circuit comes down to **10 outlets**, a 15-amp circuit to 8.
+
+That "counts once per strap" detail matters. A standard duplex receptacle is one strap, so it's 180 VA no matter that two things plug into it. A four-plex assembled from two duplexes on two straps is 360 VA.
+
+## What Actually Limits You
+
+The number isn't the constraint. The **load** is, and there are two real code limits people rarely quote:
+
+<BlogInfographic
+  title="The limits that do apply"
+  caption="210.23(A) caps what you connect: 80% of the circuit for one portable appliance, 50% for fastened-in-place equipment."
+>
+  <OutletsRealLimitsDiagram />
+</BlogInfographic>
+
+**210.23(A)(1)** — a single piece of cord-and-plug equipment *not fastened in place* may not exceed **80% of the branch-circuit rating**. On a 20-amp circuit that's 16 amps, which is why a 20-amp circuit can't legally serve a single 18-amp portable appliance.
+
+**210.23(A)(2)** — equipment *fastened in place* is limited to **50% of the circuit rating** where that circuit also supplies lighting outlets or ordinary receptacles. So 10 amps on a 20-amp circuit for something like a hardwired fan or a small water heater sharing a general circuit.
+
+Beyond those, it's judgment. Twenty receptacles in bedrooms where nothing draws more than a phone charger is fine. Six in a workshop where a table saw and a shop vac might run together is already optimistic — a 15-amp saw plus a 10-amp vac is 25 amps on a 20-amp circuit, and the breaker will tell you about it.
+
+## The 8–10 Convention
+
+Most electricians install **8 to 10 receptacles** per 20-amp general-purpose circuit, and 8 on a 15-amp circuit. This isn't code — it's a habit built on a rough allowance of 1.5 amps (180 VA) per outlet, which conveniently matches the commercial figure: 16 usable amps ÷ 1.5 ≈ 10.
+
+It's a sound default. It leaves headroom, it keeps a single tripped breaker from taking out half a floor, and it means the next person to add a circuit isn't starting from a fully-loaded one. Some jurisdictions have adopted a limit as a **local amendment**, so it's worth asking your AHJ rather than assuming the model code's silence applies where you work.
+
+## Room by Room
+
+- **Bedrooms and living areas** — 20-amp circuit, 8–10 receptacles is comfortable. AFCI required (210.12).
+- **Kitchen** — two 20-amp small-appliance circuits minimum (210.11(C)(1)), serving only the areas 210.52(B) permits. Countertop receptacles are GFCI. Split them so a toaster and a kettle aren't on the same one.
+- **Bathroom** — dedicated 20-amp circuit (210.11(C)(3)), GFCI. A hair dryer alone can be 12–15 amps.
+- **Laundry** — dedicated 20-amp circuit (210.11(C)(2)) for the receptacle outlets, separate from the dryer's own 30-amp circuit.
+- **Garage and workshop** — be generous with circuits, not outlets. Power tools stack up fast, and 210.8 requires GFCI.
+- **Home office** — computers and monitors are light, but space heaters are 12.5 amps and are the usual cause of a tripped office circuit.
+
+## Common Mistakes
+
+- **Believing a hard limit exists in a dwelling.** It doesn't; 220.14(J) is why.
+- **Applying the commercial 180 VA rule to a house.** Correct rule, wrong occupancy.
+- **Counting receptacles instead of straps.** A duplex is one outlet for load purposes.
+- **Putting the kitchen counter receptacles on a general circuit.** They need the dedicated small-appliance circuits.
+- **Adding outlets to an already-loaded circuit.** Legal, and still a nuisance-tripping complaint waiting to happen.
+- **Assuming the number is the safety question.** What's plugged in is what matters — see 210.23(A).
+
+## Check the Circuit
+
+> **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** — add up what will actually run on the circuit and see whether 20 amps covers it.
+
+The receptacle count isn't a calculation, but the load on the circuit is. The **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** checks whether your intended load fits a 20-amp circuit, including the 125% continuous adder. For the whole-house picture — how many circuits the service can actually support — use the **[Load Calculator](/calculators/electrical/electrical-load-calculator)**. Sizing the conductor for a long run is in **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)**, and the 15-versus-20 decision in **[15 Amp vs 20 Amp Circuit](/blog/15-amp-vs-20-amp-circuit)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 220.12, 220.14(I), 220.14(J), 210.8, 210.11(C)(1)–(3), 210.12, 210.23(A)(1), 210.23(A)(2), 210.52(A), 210.52(B), 210.52(C). Local amendments override the model code, and the AHJ has final say.*
+
+---
+
+## FAQ
+
+### How many outlets can I put on a 20 amp circuit?
+
+In a dwelling, the NEC sets no maximum — 220.14(J) already includes general-use receptacles in the 3 VA per square foot general lighting load, so there's no per-receptacle figure to divide by. In a commercial occupancy, 220.14(I) assigns 180 VA each, giving 13 outlets on a 20-amp 120-volt circuit. Most electricians install 8–10 in either case.
+
+### Is there a 10 outlet rule?
+
+Not in the NEC for dwellings. The figure comes from allowing roughly 1.5 amps per outlet against 16 usable amps, and it matches the commercial 180 VA calculation on a 15-amp circuit. It's a good working default and some jurisdictions adopt it as a local amendment, but the model code doesn't impose it.
+
+### How many outlets on a 15 amp circuit?
+
+Same answer: no NEC limit in a dwelling. Commercially, 1,800 VA ÷ 180 = 10 outlets, dropping to 8 if the circuit is treated as continuous. The usual convention is 8.
+
+### Does a duplex receptacle count as one outlet or two?
+
+One. 220.14(I) assigns 180 VA to each single or multiple receptacle on one strap or yoke, and a standard duplex is a single strap. A four-plex built from two duplexes sits on two straps and counts as 360 VA.
+
+### Can I mix lights and outlets on the same circuit?
+
+Yes, in a dwelling — general lighting and general-use receptacles may share a branch circuit. The exceptions are the circuits the code requires to be dedicated: the kitchen small-appliance circuits, the laundry circuit, and the bathroom circuit. Note that 210.23(A)(2) then limits fastened-in-place equipment on that circuit to 50% of its rating.
+
+### Why does my 20 amp circuit trip if the NEC allows unlimited outlets?
+
+Because the breaker responds to current, not to receptacle count. Unlimited outlets is a statement about load *calculation*, not about simultaneous use. Two power tools or a space heater plus a vacuum will exceed 20 amps regardless of how many receptacles are on the circuit — the fix is more circuits, not fewer outlets.

@@ -1,0 +1,52 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Spec-for-spec comparison. Max continuous load is the rating ÷ 1.25, which happens
+ * to equal the 210.23(A)(1) 80% cap on a single portable appliance. Reach figures use
+ * the circular-mil method at 120 V and a 3% target, at full rated load.
+ */
+const rows = [
+  { spec: "Breaker rating", fifteen: "15 A", twenty: "20 A" },
+  { spec: "Minimum copper conductor", fifteen: "14 AWG", twenty: "12 AWG" },
+  { spec: "Conductor area", fifteen: "4,110 cmil", twenty: "6,530 cmil" },
+  { spec: "Max continuous load", fifteen: "12 A", twenty: "16 A" },
+  { spec: "One portable appliance max", fifteen: "12 A", twenty: "16 A" },
+  { spec: "Reach at full load, 120 V", fifteen: "38 ft", twenty: "45 ft" },
+  { spec: "Receptacles permitted", fifteen: "15 A only", twenty: "15 A or 20 A" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" fill="none" aria-hidden="true">
+  <title>15 amp versus 20 amp circuit specifications</title>
+  <desc>
+    A 15 amp circuit uses a 15 amp breaker with 14 AWG copper at 4,110 circular mils, carries 12 amps of
+    continuous load, limits a single portable appliance to 12 amps, reaches about 38 feet at full load on 120
+    volts, and accepts only 15 amp receptacles. A 20 amp circuit uses a 20 amp breaker with 12 AWG copper at
+    6,530 circular mils, carries 16 amps continuous, limits a portable appliance to 16 amps, reaches about 45
+    feet, and accepts either 15 or 20 amp receptacles.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="324" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">15 A vs 20 A, spec for spec</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The conductor is the real difference — the breaker just reflects it</text>
+
+  <rect x="330" y="70" width="176" height="28" rx="7" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="418" y="89" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="12" font-weight="800">15 amp</text>
+  <rect x="514" y="70" width="182" height="28" rx="7" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="605" y="89" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="12" font-weight="800">20 amp</text>
+
+  {rows.map((r, i) => {
+    const y = 106 + i * 31;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="27" rx="6" fill={C.white} stroke={C.border} stroke-width="0.8" />
+        <text x="40" y={y + 18} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.spec}</text>
+        <text x="418" y={y + 18} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r.fifteen}</text>
+        <text x="605" y={y + 18} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{r.twenty}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="326" fill={C.muted} font-family={FONT} font-size="10">Max continuous load is the rating ÷ 1.25 — the same figure as the 210.23(A)(1) 80% cap on one portable appliance.</text>
+</svg>

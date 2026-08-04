@@ -1,0 +1,80 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The NEC 220.82 optional method on a 2,000 ft² house with all-electric appliances.
+ * Mirrors the load calculator's own worked example so the numbers agree exactly:
+ * 33,200 VA subtotal → 10,000 at 100% + 23,200 at 40% → +5,000 A/C → 24,280 VA → 101.2 A.
+ */
+const SQFT = 2000;
+const general = SQFT * 3;
+const sac = 2 * 1500;
+const laundry = 1 * 1500;
+const appliances = 12000 + 5000 + 4500 + 1200;
+const subtotal = general + sac + laundry + appliances;
+const firstTier = Math.min(subtotal, 10000);
+const remainder = subtotal - firstTier;
+const remainderApplied = remainder * 0.4;
+const hvac = 5000;
+const total = firstTier + remainderApplied + hvac;
+const amps = total / 240;
+
+const lines = [
+  { label: `General lighting — ${SQFT.toLocaleString("en-US")} ft² × 3 VA`, value: general },
+  { label: "Small-appliance circuits — 2 × 1,500 VA", value: sac },
+  { label: "Laundry circuit — 1 × 1,500 VA", value: laundry },
+  { label: "Range 12,000 + dryer 5,000 + WH 4,500 + DW 1,200", value: appliances },
+];
+
+const fmt = (n: number) => n.toLocaleString("en-US");
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" fill="none" aria-hidden="true">
+  <title>NEC 220.82 load calculation for a 2,000 square foot house</title>
+  <desc>
+    A 2,000 square foot house with electric appliances: general lighting at 3 volt-amperes per square foot is
+    6,000, two small-appliance circuits add 3,000, the laundry circuit adds 1,500, and the range, dryer, water
+    heater and dishwasher add 22,700 — a subtotal of 33,200 volt-amperes. Applying 220.82(B), the first 10,000
+    counts at 100 percent and the remaining 23,200 at 40 percent, or 9,280, giving 19,280. Adding the 5,000
+    volt-ampere air conditioner at 100 percent under 220.82(C) gives 24,280 volt-amperes, which divided by 240
+    volts is 101.2 amps — just over a 100 amp service.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="364" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A 2,000 ft² all-electric house — NEC 220.82</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The optional method most residential work uses</text>
+
+  {lines.map((l, i) => {
+    const y = 74 + i * 28;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="24" rx="5" fill={C.white} stroke={C.border} stroke-width="0.8" />
+        <text x="40" y={y + 16} fill={C.muted} font-family={FONT} font-size="10.5">{l.label}</text>
+        <text x="676" y={y + 16} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${fmt(l.value)} VA`}</text>
+      </g>
+    );
+  })}
+
+  <!-- Subtotal -->
+  <line x1="24" y1="196" x2="696" y2="196" stroke={C.dark} stroke-width="1.2" />
+  <text x="40" y="214" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Subtotal</text>
+  <text x="676" y="214" text-anchor="end" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{`${fmt(subtotal)} VA`}</text>
+
+  <!-- 220.82(B) demand factors -->
+  <rect x="24" y="226" width="330" height="52" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="40" y="246" fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">First 10,000 VA at 100%</text>
+  <text x="340" y="246" text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${fmt(firstTier)} VA`}</text>
+  <text x="40" y="268" fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">{`Remaining ${fmt(remainder)} at 40%`}</text>
+  <text x="340" y="268" text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${fmt(remainderApplied)} VA`}</text>
+
+  <rect x="366" y="226" width="330" height="52" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="382" y="246" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">Largest HVAC at 100% — 220.82(C)</text>
+  <text x="682" y="246" text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${fmt(hvac)} VA`}</text>
+  <text x="382" y="268" fill={C.muted} font-family={FONT} font-size="9.5">A/C or heat pump, whichever is larger</text>
+
+  <!-- Result -->
+  <rect x="24" y="290" width="672" height="66" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="316" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`Total ${fmt(total)} VA ÷ 240 V`}</text>
+  <text x="44" y="340" fill={C.muted} font-family={FONT} font-size="10">Next standard service is 125 A — but 200 A is what leaves room for an EV or heat pump</text>
+  <text x="676" y="332" text-anchor="end" fill={C.primary} font-family={FONT} font-size="30" font-weight="800">{`${amps.toFixed(1)} A`}</text>
+</svg>

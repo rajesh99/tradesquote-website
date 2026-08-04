@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * All three published figures for 12 AWG copper are real; each belongs to a
+ * different question. 20 A is what you may protect it at (240.4(D)), 25 A is the
+ * 75 °C termination ceiling, 30 A is the 90 °C derating base.
+ */
+const numbers = [
+  {
+    amps: "20 A",
+    accent: C.primary,
+    bg: C.primaryLight,
+    heading: "What you protect it at",
+    source: "240.4(D)",
+    detail: ["The small-conductor rule caps", "the breaker at 20 A. This is the", "field answer, every time."],
+  },
+  {
+    amps: "25 A",
+    accent: C.blue,
+    bg: C.blueLight,
+    heading: "The termination ceiling",
+    source: "75 °C column + 110.14(C)",
+    detail: ["The most a derated 12 AWG may", "ever be credited with, because", "the lugs are 75 °C rated."],
+  },
+  {
+    amps: "30 A",
+    accent: C.orange,
+    bg: C.orangeLight,
+    heading: "The derating base",
+    source: "90 °C column",
+    detail: ["Where derating math starts for", "THHN. Never a usable final", "answer on its own."],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 270" fill="none" aria-hidden="true">
+  <title>The three ampacity figures for 12 AWG copper</title>
+  <desc>
+    All three published numbers for 12 AWG copper are correct in different contexts. 20 amps is what you
+    may protect it at, from the 240.4(D) small conductor rule, and is the field answer. 25 amps is the 75
+    degree Celsius column value and the termination ceiling under 110.14(C), the most a derated 12 AWG
+    may be credited with. 30 amps is the 90 degree column value, used only as the base that derating
+    factors are applied to.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="254" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three numbers, three different questions</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">All three are real. Only one of them is the breaker.</text>
+
+  {numbers.map((n, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="174" rx="10" fill={n.bg} stroke={n.accent} stroke-width="1.5" />
+        <text x={x + 16} y="112" fill={n.accent} font-family={FONT} font-size="30" font-weight="800">{n.amps}</text>
+        <text x={x + 16} y="136" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{n.heading}</text>
+        <rect x={x + 16} y="146" width="140" height="20" rx="5" fill={C.white} stroke={n.accent} stroke-width="1" />
+        <text x={x + 86} y="160" text-anchor="middle" fill={n.accent} font-family={FONT} font-size="9.5" font-weight="700">{n.source}</text>
+        <text x={x + 16} y="188" fill={C.muted} font-family={FONT} font-size="9.5">
+          {n.detail.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

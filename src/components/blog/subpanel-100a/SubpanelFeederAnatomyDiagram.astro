@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The four conductors in a 100 A subpanel feeder, sized for the ordinary-subpanel
+ * case (Table 310.16). The EGC comes from Table 250.122 keyed to the 100 A OCPD.
+ */
+const conductors = [
+  { name: "Hot (L1)", size: "3 AWG Cu", color: C.dark, note: "Table 310.16, 75 °C" },
+  { name: "Hot (L2)", size: "3 AWG Cu", color: C.dark, note: "Table 310.16, 75 °C" },
+  { name: "Neutral", size: "3 AWG Cu", color: C.muted, note: "220.61 unbalanced load" },
+  { name: "Ground (EGC)", size: "8 AWG Cu", color: C.green, note: "Table 250.122 at 100 A" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Four wire 100 amp subpanel feeder</title>
+  <desc>
+    A 100 amp subpanel feeder runs four conductors: two hots and a neutral at 3 AWG copper from Table
+    310.16, plus an 8 AWG copper equipment grounding conductor from Table 250.122 keyed to the 100 amp
+    overcurrent device. At the subpanel the neutral bar and ground bar must remain separate, with the
+    bonding screw removed — the neutral is bonded to ground only at the service disconnect.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A 100 A subpanel feeder is four conductors</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Ordinary-subpanel sizing, copper. Three-wire feeders to a separate structure are no longer permitted.</text>
+
+  <!-- Main panel -->
+  <rect x="24" y="88" width="86" height="150" rx="8" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="67" y="112" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">Main panel</text>
+  <rect x="36" y="124" width="62" height="24" rx="4" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+  <text x="67" y="140" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">100 A</text>
+  <text x="67" y="168" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">N–G bonded</text>
+  <text x="67" y="180" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">here only</text>
+
+  <!-- Conductors -->
+  {conductors.map((c, i) => {
+    const y = 100 + i * 34;
+    return (
+      <g>
+        <line x1="110" y1={y} x2="470" y2={y} stroke={c.color} stroke-width="4" stroke-linecap="round" />
+        <text x="120" y={y - 8} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{c.name}</text>
+        <text x="300" y={y - 8} fill={c.color} font-family={FONT} font-size="11.5" font-weight="800">{c.size}</text>
+        <text x="400" y={y - 8} fill={C.muted} font-family={FONT} font-size="9">{c.note}</text>
+      </g>
+    );
+  })}
+
+  <!-- Subpanel -->
+  <rect x="470" y="88" width="86" height="150" rx="8" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="513" y="112" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">Subpanel</text>
+  <rect x="482" y="124" width="62" height="20" rx="4" fill={C.panelBg} stroke={C.muted} stroke-width="1" />
+  <text x="513" y="138" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">neutral bar</text>
+  <rect x="482" y="150" width="62" height="20" rx="4" fill={C.greenLight} stroke={C.green} stroke-width="1" />
+  <text x="513" y="164" text-anchor="middle" fill={C.green} font-family={FONT} font-size="8.5">ground bar</text>
+  <text x="513" y="192" text-anchor="middle" fill={C.red} font-family={FONT} font-size="9" font-weight="800">SEPARATE</text>
+  <text x="513" y="204" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">bond screw out</text>
+
+  <!-- Warning -->
+  <rect x="576" y="88" width="120" height="150" rx="9" fill={C.redLight} stroke={C.red} stroke-width="1.5" />
+  <text x="636" y="112" text-anchor="middle" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">Don't bond</text>
+  <text x="588" y="134" fill={C.muted} font-family={FONT} font-size="9">
+    <tspan x="588" dy="0">Bonding the neutral</tspan>
+    <tspan x="588" dy="13">at the subpanel puts</tspan>
+    <tspan x="588" dy="13">normal return current</tspan>
+    <tspan x="588" dy="13">on the ground path</tspan>
+    <tspan x="588" dy="13">and on any metal it</tspan>
+    <tspan x="588" dy="13">touches. Very common</tspan>
+    <tspan x="588" dy="13">DIY mistake.</tspan>
+  </text>
+
+  <text x="24" y="266" fill={C.muted} font-family={FONT} font-size="10">The neutral may be reduced to the maximum unbalanced load per 220.61, but never below the EGC size from Table 250.122.</text>
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="10">Feeding a detached structure adds a grounding electrode at that building (250.32) — the EGC still runs with the feeder.</text>
+</svg>

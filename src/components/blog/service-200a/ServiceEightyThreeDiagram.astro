@@ -1,0 +1,58 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("s83");
+
+/**
+ * The 83% math, and what it saves. 200 × 0.83 = 166 A of required ampacity, which
+ * 2/0 copper (175 A at 75 °C) and 4/0 aluminum (180 A) both satisfy — one trade size
+ * below what straight Table 310.16 sizing would demand.
+ */
+const steps = [
+  { label: "Service rating", value: "200 A", note: "the panel and main breaker", accent: C.dark, bg: C.white },
+  { label: "× 0.83", value: "166 A", note: "Table 310.12 allowance", accent: C.blue, bg: C.blueLight },
+  { label: "Smallest that fits", value: "2/0 Cu", note: "175 A at 75 °C ✓", accent: C.primary, bg: C.primaryLight },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The 83 percent rule for a 200 amp dwelling service</title>
+  <desc>
+    Table 310.12 lets dwelling service conductors be sized at 83 percent of the service rating. For a 200
+    amp service that is 166 amps of required ampacity, which 2/0 copper at 175 amps or 4/0 aluminum at 180
+    amps satisfies. Sizing the same service from Table 310.16 at the full 200 amps would instead require
+    3/0 copper or 250 kcmil aluminum — one trade size larger in each material.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why a 200 A service takes 2/0, not 3/0</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A dwelling service never actually draws its full rating for long, so the code allows 83%</text>
+
+  {steps.map((s, i) => {
+    const x = 24 + i * 200;
+    return (
+      <g>
+        <rect x={x} y="78" width="176" height="94" rx="10" fill={s.bg} stroke={s.accent} stroke-width="1.6" />
+        <text x={x + 88} y="104" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{s.label}</text>
+        <text x={x + 88} y="138" text-anchor="middle" fill={s.accent} font-family={FONT} font-size="24" font-weight="800">{s.value}</text>
+        <text x={x + 88} y="158" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{s.note}</text>
+      </g>
+    );
+  })}
+
+  <path d="M204 125 L 220 125" stroke={C.border} stroke-width="1.6" marker-end="url(#s83-arrow-muted)" />
+  <path d="M404 125 L 420 125" stroke={C.border} stroke-width="1.6" marker-end="url(#s83-arrow-muted)" />
+
+  <!-- Comparison -->
+  <text x="24" y="204" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">What each table gives you</text>
+
+  <rect x="24" y="216" width="330" height="58" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="40" y="238" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">Table 310.12 — dwelling service, 83%</text>
+  <text x="40" y="262" fill={C.dark} font-family={FONT} font-size="14" font-weight="800">2/0 copper · 4/0 aluminum</text>
+
+  <rect x="366" y="216" width="330" height="58" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="382" y="238" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">Table 310.16 — everything else, 100%</text>
+  <text x="382" y="262" fill={C.dark} font-family={FONT} font-size="14" font-weight="800">3/0 copper · 250 kcmil aluminum</text>
+</svg>

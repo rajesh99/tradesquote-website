@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Two columns: conditions that genuinely require an upgrade versus the ones people
+ * mistake for requiring one. The right-hand column is the money-saving half.
+ */
+const columns = [
+  {
+    heading: "You probably do need one",
+    accent: C.red,
+    bg: C.redLight,
+    items: [
+      "Calculated load exceeds the",
+      "service rating",
+      "60 A service or a fuse box",
+      "Obsolete or hazardous panel —",
+      "FPE Stab-Lok, Zinsco, Challenger",
+      "Scorching, melted insulation, a",
+      "burning smell, warm deadfront",
+      "Panel full AND no capacity left",
+    ],
+  },
+  {
+    heading: "You probably don't",
+    accent: C.green,
+    bg: C.greenLight,
+    items: [
+      "Panel full but service has spare",
+      "capacity → subpanel or tandems",
+      "One new circuit that fits inside",
+      "the existing calculated load",
+      "220.87 measured demand shows",
+      "plenty of headroom",
+      "A breaker that trips — find the",
+      "cause, don't resize the service",
+    ],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>When a panel upgrade is and is not necessary</title>
+  <desc>
+    An upgrade is genuinely needed when the calculated load exceeds the service rating, when the service is 60
+    amps or a fuse box, when the panel is an obsolete or hazardous type such as Federal Pacific Stab-Lok,
+    Zinsco or Challenger, when there is scorching or melted insulation or a burning smell, or when the panel is
+    full and no service capacity remains. It is usually not needed when the panel is full but the service has
+    spare capacity, which a subpanel or tandem breakers can solve; when a single new circuit fits inside the
+    existing calculated load; when 220.87 measured demand shows headroom; or when a breaker simply trips, which
+    calls for finding the cause rather than resizing the service.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Do you actually need one?</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The right-hand column is where most of the money gets saved</text>
+
+  {columns.map((col, i) => {
+    const x = 24 + i * 340;
+    return (
+      <g>
+        <rect x={x} y="72" width="324" height="152" rx="10" fill={col.bg} stroke={col.accent} stroke-width="1.6" />
+        <text x={x + 18} y="96" fill={col.accent} font-family={FONT} font-size="12.5" font-weight="800">{col.heading}</text>
+        <line x1={x + 18} y1="106" x2={x + 306} y2="106" stroke={col.accent} stroke-opacity="0.35" />
+        <text x={x + 18} y="126" fill={C.muted} font-family={FONT} font-size="9.5">
+          {col.items.map((line, li) => (
+            <tspan x={x + 18} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,166 @@
+---
+title: "Residential Load Calculation: NEC 220.82 Step by Step"
+meta_title: "Residential Electrical Load Calculation (NEC 220.82 & Standard) | TradesQuote"
+description: "Both legal methods worked on the same house: the 220.82 optional calculation and the standard Part III method with its per-category demand factors. Why a 12 kW range counts as 8 kW, and why the two methods land 21 amps apart."
+image: /images/posts/residential-electrical-load-calculation-hero.svg
+date: 2026-08-03T16:00:00Z
+categories: ["electrical"]
+tags: ["load calculation","nec 220.82","demand factors","service size","nec"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import LoadCalcTwoMethodsDiagram from "@/components/blog/load-calc-residential/LoadCalcTwoMethodsDiagram.astro";
+import LoadCalcStandardStepsDiagram from "@/components/blog/load-calc-residential/LoadCalcStandardStepsDiagram.astro";
+import LoadCalcMethodComparisonDiagram from "@/components/blog/load-calc-residential/LoadCalcMethodComparisonDiagram.astro";
+
+A load calculation answers one question — how many amps does this house actually need — and it is the number that decides the service size, the panel, and the service conductors. Get it wrong high and you sell an upgrade nobody needed. Get it wrong low and the service is illegal.
+
+The wrinkle is that the NEC gives you **two** ways to do it, they produce different answers on the same house, and **you are free to use either**. Most people only ever learn one.
+
+<BlogInfographic
+  title="Two legal methods"
+  caption="The standard method factors each category separately; the optional method uses one factor for nearly everything."
+>
+  <LoadCalcTwoMethodsDiagram />
+</BlogInfographic>
+
+Throughout this article I'll use the same house so the two methods can be compared directly: **2,000 ft²**, electric **range 12 kW**, **dryer 5 kW**, **water heater 4.5 kW**, **dishwasher 1.2 kW**, **A/C 5 kVA**, two small-appliance circuits and one laundry circuit.
+
+## The Optional Method — 220.82
+
+The simpler route, and what most residential work uses.
+
+**Step 1 — add up the general load:**
+
+- General lighting: **3 VA per ft²** (220.12). Floor area comes from outside dimensions and excludes open porches, garages, and unfinished space not adaptable for future use. → 2,000 × 3 = **6,000 VA**
+- Small-appliance branch circuits: **1,500 VA each**, minimum two → **3,000 VA**
+- Laundry circuit: **1,500 VA** → **1,500 VA**
+- Nameplate VA of every fastened-in-place appliance: 12,000 + 5,000 + 4,500 + 1,200 = **22,700 VA**
+
+Subtotal: **33,200 VA**
+
+**Step 2 — apply the 220.82(B) demand factors:** first 10,000 VA at 100%, the remainder at 40%.
+
+10,000 + (23,200 × 0.40) = 10,000 + 9,280 = **19,280 VA**
+
+**Step 3 — add heating or cooling per 220.82(C):** the largest of the listed options at its stated percentage. A/C and heat pumps count at 100%; central electric space heating at 65%.
+
+19,280 + 5,000 = **24,280 VA**
+
+**Step 4 — convert to amps:** 24,280 ÷ 240 = **101.2 A**
+
+Note what the demand factors did: 33,200 VA of connected load became 24,280 VA calculated, because the code accepts you'll never run the range, dryer, water heater and dishwasher flat out at once.
+
+## The Standard Method — Part III
+
+More work, and each category carries its own demand factor.
+
+<BlogInfographic
+  title="Standard method, category by category"
+  caption="The lighting group gets Table 220.42; ranges, dryers, and appliances each get their own table."
+>
+  <LoadCalcStandardStepsDiagram />
+</BlogInfographic>
+
+**The lighting group.** General lighting, small-appliance and laundry circuits are added together — 6,000 + 3,000 + 1,500 = **10,500 VA** — then reduced by **Table 220.42**: the first 3,000 VA at 100%, from 3,001 to 120,000 at 35%.
+
+3,000 + (7,500 × 0.35) = 3,000 + 2,625 = **5,625 VA**
+
+**The range — Table 220.55.** This is the one that surprises people. A single range **not over 12 kW** is calculated at **8 kW**, not its nameplate. Column C of Table 220.55 says so directly. For ranges over 12 kW but not over 27 kW, Note 1 adds 5% to the 8 kW figure for each kilowatt above 12.
+
+So a 12 kW range → **8,000 VA**.
+
+**The dryer — Table 220.54.** **5,000 VA or the nameplate, whichever is larger**, for each dryer. One to four dryers count at 100%. → **5,000 VA**
+
+**Fixed appliances — 220.53.** Where there are **four or more** fastened-in-place appliances *other than* ranges, dryers, space heating and A/C, you may apply a **75% demand factor**. This house has two — water heater and dishwasher — so no reduction: 4,500 + 1,200 = **5,700 VA**
+
+That threshold is worth remembering. Add a disposal and a built-in microwave and you'd have four, and the whole group would drop to 75%.
+
+**Heating or cooling — 220.60.** Noncoincident loads: where two loads won't run simultaneously, use only the larger. Heating and cooling qualify. → **5,000 VA**
+
+**Motors — 220.50.** Where present, motor loads follow 430.24: 125% of the largest motor plus the others at 100%. Nothing here needs it, but a well pump or pool pump would.
+
+**Total:** 5,625 + 8,000 + 5,000 + 5,700 + 5,000 = **29,325 VA** ÷ 240 = **122.2 A**
+
+## Same House, 21 Amps Apart
+
+<BlogInfographic
+  title="Standard vs optional on identical inputs"
+  caption="122.2 A against 101.2 A — yet both round up to the same 125 A service."
+>
+  <LoadCalcMethodComparisonDiagram />
+</BlogInfographic>
+
+**122.2 A** by the standard method, **101.2 A** by the optional method — a 21% difference from the same house and the same appliances.
+
+The optional method is usually, though not always, the kinder of the two for a typical modern dwelling. That's largely because 220.82 discounts the entire appliance group at 40% while the standard method makes you carry the range at 8 kW and the dryer at 5 kW at full value.
+
+Here's the practical part: on **this** house it doesn't matter. Both results round up to the same **125 A** standard service, so the method you choose changes nothing you'd install. The choice only bites when your result sits near a rating boundary — and then it can be the difference between passing on an existing service and quoting an upgrade. When you're close, run both.
+
+## Don't Forget the Neutral
+
+Sizing the ungrounded conductors doesn't size the grounded (neutral) conductor. **220.61** sizes it for the **maximum unbalanced load** — the current that would flow with all the 120-volt load on one leg. Straight 240-volt loads like a water heater or A/C contribute nothing to it.
+
+**220.61(B)** then permits a further reduction: for the portion of the load consisting of ranges, wall ovens, cooktops and dryers, you may take **70%** of that neutral load. This is why a reduced neutral in service-entrance cable is normal rather than a shortcut. **220.61(C)** blocks reductions where nonlinear loads dominate on a 3-phase 4-wire wye system — not a residential concern, but worth knowing exists.
+
+## EV Charging
+
+**220.57** requires EV supply equipment to be calculated at **7,200 VA or the nameplate rating, whichever is larger**. And **625.41** makes it a continuous load, so the *circuit* gets the 125% treatment.
+
+One genuine ambiguity: whether the EVSE figure then receives the 220.82(B) 40% remainder discount under the optional method is interpreted differently by different inspectors. Where you're near a service boundary, run it at 100% and ask your AHJ rather than assuming the discount. The **[100 Amp vs 200 Amp Service](/blog/100-amp-vs-200-amp-service)** post works both readings through.
+
+## For an Existing House, Try 220.87 First
+
+If the job is *adding* load to a house that already exists, neither method above is your best starting point.
+
+**220.87** lets you determine the existing load from **measured data**: the maximum demand recorded over the previous 12 months, multiplied by **125%**. Where a year of data isn't available, 30 days of recorded demand data may be used. Real houses draw far less than they calculate, so this routinely proves an existing service is adequate when the paper calculation says otherwise.
+
+**220.83** is the companion optional method for additional loads in an existing dwelling. Between them they're the difference between a $200 circuit and a $4,000 upgrade — see **[Do I Need a Panel Upgrade](/blog/do-i-need-a-panel-upgrade)**.
+
+## Common Mistakes
+
+- **Adding up nameplate ratings with no demand factors.** You'll overshoot by 30–40% and sell upgrades that aren't needed.
+- **Using the range nameplate.** Table 220.55 says a 12 kW range is 8 kW.
+- **Missing the 5,000 VA dryer floor.** A 4.5 kW dryer still counts as 5,000.
+- **Applying the 75% appliance factor with only three appliances.** 220.53 needs four or more.
+- **Counting both heating and cooling.** 220.60 takes the larger only.
+- **Including garage and porch area in the square footage.** Excluded from the 3 VA/ft² calculation.
+- **Only ever running one method.** When you're near a boundary, the other one may save the job.
+- **Forgetting the neutral has its own rule.** 220.61, not the same size as the hots by default.
+
+## Run the Calculation
+
+> **[Load Calculator](/calculators/electrical/electrical-load-calculator)** — the 220.82 optional method with every line of the breakdown shown, ending in calculated VA, amps, and the minimum standard service.
+
+The **[Load Calculator](/calculators/electrical/electrical-load-calculator)** implements the optional method and is the source of the 101.2 A figure above — the standard method's per-category tables are a manual exercise for now. Once you have the amps, the **[Service Size Calculator](/calculators/electrical/electrical-service-size-calculator)** picks the rating and will also take a 220.87 measured figure, and the **[Service & Feeder Wire Size Calculator](/calculators/electrical/electrical-service-wire-size-calculator)** sizes the conductors — see **[200 Amp Service Wire Size](/blog/200-amp-service-wire-size)** for how the 83% allowance applies there.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 220.12, Table 220.42, 220.50, 220.53, Table 220.54, Table 220.55, 220.57, 220.60, 220.61, 220.82, 220.83, 220.87, 430.24, 625.41. Local amendments override the model code, and the AHJ has final say.*
+
+---
+
+## FAQ
+
+### How do you calculate residential electrical load?
+
+The optional method in 220.82 is the usual route: add 3 VA per square foot for general lighting, 1,500 VA for each small-appliance circuit and the laundry circuit, and the nameplate VA of every fastened appliance; take the first 10,000 VA at 100% and the remainder at 40%; add the larger of heating or cooling; divide by 240 for amps. The standard method in Part III applies a separate demand factor to each category instead.
+
+### What is the difference between the standard and optional load calculation?
+
+The standard method factors each category separately — Table 220.42 for the lighting group, Table 220.55 for ranges, Table 220.54 for dryers, 220.53 for fixed appliances. The optional method applies a single demand factor to almost everything: 100% of the first 10 kVA, 40% of the rest. Both are legal, and on a typical modern house the optional method usually gives the smaller result.
+
+### Why does a 12 kW range count as 8 kW?
+
+Because Table 220.55, Column C, calculates a single range not over 12 kW at 8 kW. A range never has every element and the oven at full power simultaneously for long, so the code builds that diversity into the table. Above 12 kW, Note 1 adds 5% to the 8 kW figure per kilowatt over 12.
+
+### How many amps does a 2,000 square foot house need?
+
+It depends entirely on the appliances, not the area. The 2,000 ft² house in this article — electric range, dryer, water heater, dishwasher and a 5 kVA A/C — calculates to 101.2 A by the optional method and 122.2 A by the standard method, both requiring a 125 A minimum service. Swap those appliances for gas and the same house calculates far lower.
+
+### Do I include the garage in the square footage?
+
+No. The general lighting calculation uses floor area from outside dimensions and excludes open porches, garages, and unfinished spaces not adaptable for future use. A basement you intend to finish later does count.
+
+### Can I use the 75% demand factor on my appliances?
+
+Only with four or more fastened-in-place appliances, and not counting ranges, clothes dryers, space-heating equipment or air conditioners. With a water heater and dishwasher alone you have two, so they count at full value. Add a disposal and a built-in microwave and the group of four drops to 75%.

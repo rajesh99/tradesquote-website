@@ -1,0 +1,176 @@
+---
+title: "Box Fill Calculation: Counting Conductors per NEC 314.16"
+meta_title: "Box Fill Calculation: Counting Conductors (NEC 314.16) | TradesQuote"
+description: "How to calculate box fill: the Table 314.16(B) volume allowances, what counts as one, what counts as two, what counts as nothing, and a worked single-gang example that lands on 18.00 cubic inches."
+image: /images/posts/box-fill-calculation-hero.svg
+date: 2026-08-03T16:00:00Z
+categories: ["electrical"]
+tags: ["box fill","314.16","device box","rough-in","nec"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import BoxFillWhatCountsDiagram from "@/components/blog/box-fill/BoxFillWhatCountsDiagram.astro";
+import BoxFillVolumesDiagram from "@/components/blog/box-fill/BoxFillVolumesDiagram.astro";
+import BoxFillWorkedDiagram from "@/components/blog/box-fill/BoxFillWorkedDiagram.astro";
+
+Box fill is the calculation that gets skipped, and it's why so many device boxes are a wrestling match at trim-out. An overfilled box isn't just awkward — it damages insulation as you fold conductors in, and it traps heat around a device that was tested with room around it.
+
+The rule is **314.16**, and the arithmetic is genuinely easy once you know the four things that count differently from how they look.
+
+## Step 1: The Volume Allowances
+
+Every allowance in a box fill calculation is a multiple of one number from **Table 314.16(B)**:
+
+<BlogInfographic
+  title="Volume allowance per conductor"
+  caption="Table 314.16(B). Note the jump from 3.00 to 5.00 between 8 and 6 AWG."
+>
+  <BoxFillVolumesDiagram />
+</BlogInfographic>
+
+| Conductor | Allowance |
+| --- | --- |
+| 18 AWG | 1.50 in³ |
+| 16 AWG | 1.75 in³ |
+| 14 AWG | 2.00 in³ |
+| 12 AWG | 2.25 in³ |
+| 10 AWG | 2.50 in³ |
+| 8 AWG | 3.00 in³ |
+| 6 AWG | 5.00 in³ |
+
+## Step 2: Count Correctly
+
+<BlogInfographic
+  title="What counts — and what doesn't"
+  caption="Clamps count once no matter how many. All grounds count once. Each device counts twice."
+>
+  <BoxFillWhatCountsDiagram />
+</BlogInfographic>
+
+**Each conductor gets one allowance — 314.16(B)(1)** if it either enters the box and terminates or is spliced there, or passes through without splicing. Both cases are one allowance.
+
+**All internal cable clamps together get one allowance — 314.16(B)(2)**, based on the **largest conductor** in the box. One clamp or four, it's one allowance. Clamps mounted *outside* the box count nothing.
+
+**Each fixture stud or hickey gets one — 314.16(B)(3)**, again at the largest conductor.
+
+**Each yoke or strap holding a device gets two — 314.16(B)(4)**, based on the largest conductor connected to that device. This is the one people forget, and it's the biggest single line in most calculations. A device wider than a single gang counts two allowances **per gang** it occupies.
+
+**All equipment grounding conductors together get one — 314.16(B)(5)**, based on the largest EGC present. Four grounds in the box is still one allowance. If there's a separate isolated grounding system, that gets one more.
+
+### What counts as nothing
+
+- **Wire connectors** and wirenuts
+- **Pigtails** that begin and end inside the box — they never cross the box wall, so they add no allowance
+- **Locknuts, bushings** and similar small fittings
+- **External cable clamps**
+
+## Worked Example
+
+<BlogInfographic
+  title="A single-gang receptacle box"
+  caption="Two 12/2 cables, internal clamps, one duplex — 18.00 in³ minimum."
+>
+  <BoxFillWorkedDiagram />
+</BlogInfographic>
+
+A single-gang box with **two 12/2 NM cables** (one in, one out), **internal clamps**, and **one duplex receptacle**. All conductors are 12 AWG, so every allowance is 2.25 in³.
+
+| Item | Count | Volume |
+| --- | --- | --- |
+| Insulated conductors — 2 hots + 2 neutrals | 4 × 2.25 | 9.00 in³ |
+| All equipment grounds together | 1 × 2.25 | 2.25 in³ |
+| All internal clamps together | 1 × 2.25 | 2.25 in³ |
+| Receptacle yoke — double | 2 × 2.25 | 4.50 in³ |
+| **Minimum box volume** | | **18.00 in³** |
+
+So this needs a box of at least **18.00 in³**. A 3" × 2" × 3-1/2" device box is exactly 18.0 in³ and just makes it; a shallow 12.5 or 14 in³ device box does not. In practice most people reach for a 20.3 or 22.5 in³ single-gang plastic box here and have room to work.
+
+### A three-way switch box
+
+Three 14/2 cables, internal clamps, one switch. All 14 AWG, so 2.00 in³ each:
+
+- 6 conductors (3 hots, 3 neutrals): 6 × 2.00 = **12.00**
+- All grounds: 1 × 2.00 = **2.00**
+- All clamps: 1 × 2.00 = **2.00**
+- Switch yoke: 2 × 2.00 = **4.00**
+- **Total: 20.00 in³**
+
+That 18 in³ device box no longer works — you need a 20.3 in³ box or larger. One extra cable added 4 in³ and pushed it up a box size.
+
+## Mixed Conductor Sizes
+
+Where a box holds more than one size, the rule is: **conductor allowances use each conductor's own size, but the clamp, device, and ground allowances use the largest conductor** relevant to them.
+
+A box with four 12 AWG and two 10 AWG conductors, clamps, and a receptacle connected to the 10 AWG:
+
+- 4 × 2.25 (12 AWG) = 9.00
+- 2 × 2.50 (10 AWG) = 5.00
+- Grounds — largest is 10 AWG: 1 × 2.50 = 2.50
+- Clamps — largest conductor is 10 AWG: 1 × 2.50 = 2.50
+- Device connected to 10 AWG: 2 × 2.50 = 5.00
+- **Total: 24.00 in³**
+
+## Finding the Box Volume
+
+**314.16(A)** requires the volume to be the box's marked volume, or from Table 314.16(A) for standard boxes. Metal boxes are typically stamped inside; plastic boxes have the volume moulded in, often on the back.
+
+Common volumes:
+
+| Box | Volume |
+| --- | --- |
+| 3" × 2" × 2-1/2" device box | 12.5 in³ |
+| 3" × 2" × 3-1/2" device box | 18.0 in³ |
+| Single-gang plastic (typical) | 20.3–22.5 in³ |
+| 4" square × 1-1/2" | 21.0 in³ |
+| 4" square × 2-1/8" | 30.3 in³ |
+| 4-11/16" square × 2-1/8" | 42.0 in³ |
+
+**Plaster rings, extension rings and box extenders add their own marked volume**, and that's a legitimate way to solve a box that's marginally over — an extension ring is far cheaper than opening the wall.
+
+## Common Mistakes
+
+- **Forgetting the device counts double.** It's the largest line in most calculations.
+- **Counting each ground separately.** All EGCs together are one allowance.
+- **Counting each clamp separately.** All internal clamps together are one.
+- **Counting pigtails.** A jumper wholly inside the box is free.
+- **Using the smallest conductor for clamp, device or ground allowances.** They use the largest.
+- **Missing the per-gang rule on wide devices.** A device spanning two gangs counts two allowances per gang.
+- **Ignoring the ring.** A plaster or extension ring adds volume you're allowed to use.
+- **Assuming the raceway calculation covers it.** Box fill and conduit fill are separate — see **[How to Calculate Conduit Fill](/blog/how-to-calculate-conduit-fill)**.
+
+## Calculate It
+
+> **[Box Fill Calculator](/calculators/electrical/electrical-box-fill-calculator)** — enter conductors by size, clamps, devices and grounds; get the minimum volume and the smallest standard box that holds it.
+
+The **[Box Fill Calculator](/calculators/electrical/electrical-box-fill-calculator)** applies the grouping rules automatically, which is where hand calculations usually go wrong. For the raceway feeding the box, use the **[Conduit Fill Calculator](/calculators/electrical/electrical-conduit-fill-calculator)** and the **[Conduit Fill Chart](/blog/conduit-fill-chart)**; to size the conductors themselves, the **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 314.16(A), Table 314.16(A), 314.16(B)(1) through (B)(5), Table 314.16(B). Local amendments override the model code, and the AHJ has final say.*
+
+---
+
+## FAQ
+
+### How do you calculate box fill?
+
+Assign each conductor a volume allowance from Table 314.16(B) — 2.25 in³ for 12 AWG, 2.00 for 14 AWG. Add one allowance for all internal clamps together, two for each device yoke, and one for all equipment grounding conductors together, each based on the largest relevant conductor. The total is the minimum box volume required.
+
+### Does the ground wire count in box fill?
+
+Yes, but all equipment grounding conductors together count as a single allowance based on the largest of them — not one each. A box with four 12 AWG grounds gets one 2.25 in³ allowance for the lot. A separate isolated grounding conductor adds one more.
+
+### How many wires can be in a 18 cubic inch box?
+
+It depends what else is in it. With 12 AWG conductors, internal clamps and one device, an 18 in³ box holds exactly four insulated conductors plus the grounds — that's two 12/2 cables and a receptacle, totalling 18.00 in³. Without clamps or a device you'd fit eight conductors.
+
+### Do wire nuts count toward box fill?
+
+No. Wire connectors, wirenuts, locknuts and bushings count nothing. Neither do pigtails that begin and end inside the box, since they don't cross the box wall.
+
+### Why does a receptacle count as two conductors?
+
+314.16(B)(4) assigns a double volume allowance to each yoke or strap holding a device, reflecting the physical space the device body occupies and the room needed to fold conductors behind it. It's based on the largest conductor connected to that device, and a device wider than one gang counts double per gang.
+
+### Can I use a plaster ring to solve an overfilled box?
+
+Yes. Plaster rings, extension rings and box extenders add their marked volume to the box volume, and that added volume counts. On a box that's marginally over, fitting a ring is a legitimate fix and far cheaper than replacing the box.

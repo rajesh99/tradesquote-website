@@ -1,0 +1,72 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Which protection each area of a dwelling needs. Rooms needing both are why
+ * dual-function devices exist. Deliberately labelled as the general pattern — the
+ * 2023 appliance expansions in 210.8(D) are amended locally in several states.
+ */
+const areas = [
+  { area: "Kitchen countertop receptacles", gfci: true, afci: true },
+  { area: "Bathroom", gfci: true, afci: false },
+  { area: "Bedrooms", gfci: false, afci: true },
+  { area: "Living / family / dining", gfci: false, afci: true },
+  { area: "Laundry area", gfci: true, afci: true },
+  { area: "Garage & accessory buildings", gfci: true, afci: false },
+  { area: "Outdoors", gfci: true, afci: false },
+  { area: "Unfinished basement", gfci: true, afci: false },
+  { area: "Hallways & closets", gfci: false, afci: true },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" fill="none" aria-hidden="true">
+  <title>Where GFCI and AFCI protection are required in a dwelling</title>
+  <desc>
+    Kitchen countertop receptacles need both ground-fault and arc-fault protection. Bathrooms, garages and
+    accessory buildings, outdoors, and unfinished basements need ground-fault protection. Bedrooms, living,
+    family and dining rooms, hallways and closets need arc-fault protection. Laundry areas need both. Areas
+    requiring both are why dual-function devices exist.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="384" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Which protection goes where — the general pattern</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">210.8 drives GFCI, 210.12 drives AFCI. Where both apply, use a dual-function device.</text>
+
+  <text x="44" y="88" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">AREA</text>
+  <text x="466" y="88" fill={C.blue} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">GFCI</text>
+  <text x="576" y="88" fill={C.orange} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">AFCI</text>
+  <line x1="24" y1="96" x2="696" y2="96" stroke={C.border} />
+
+  {areas.map((a, i) => {
+    const y = 106 + i * 31;
+    const both = a.gfci && a.afci;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="26" rx="6" fill={both ? C.primaryLight : C.white} stroke={both ? C.primary : C.border} stroke-width={both ? "1.4" : "0.8"} />
+        <text x="44" y={y + 18} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={both ? "700" : "600"}>{a.area}</text>
+
+        {a.gfci ? (
+          <g>
+            <rect x="452" y={y + 4} width="52" height="18" rx="5" fill={C.blueLight} stroke={C.blue} stroke-width="1.1" />
+            <text x="478" y={y + 17} text-anchor="middle" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">yes</text>
+          </g>
+        ) : (
+          <text x="478" y={y + 18} text-anchor="middle" fill={C.border} font-family={FONT} font-size="12" font-weight="700">—</text>
+        )}
+
+        {a.afci ? (
+          <g>
+            <rect x="562" y={y + 4} width="52" height="18" rx="5" fill={C.orangeLight} stroke={C.orange} stroke-width="1.1" />
+            <text x="588" y={y + 17} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">yes</text>
+          </g>
+        ) : (
+          <text x="588" y={y + 18} text-anchor="middle" fill={C.border} font-family={FONT} font-size="12" font-weight="700">—</text>
+        )}
+
+        {both && <text x="636" y={y + 18} fill={C.primary} font-family={FONT} font-size="9" font-weight="800">both</text>}
+      </g>
+    );
+  })}
+
+  <text x="24" y="386" fill={C.muted} font-family={FONT} font-size="9.5">A general pattern, not a substitute for the code text — recent appliance-specific GFCI rules are amended locally in several states.</text>
+</svg>

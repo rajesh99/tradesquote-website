@@ -1,0 +1,72 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("vdf");
+
+/**
+ * Anatomy of the circular-mil voltage-drop approximation. Each term is called out
+ * so the reader can see which lever actually moves the result.
+ */
+const terms = [
+  { sym: "2", x: 128, label: "Out and back", note: ["The current makes a round", "trip. Use 1.732 (√3) for", "three-phase instead."], accent: C.blue },
+  { sym: "K", x: 258, label: "Material", note: ["12.9 for copper,", "21.2 for aluminum —", "ohm-cmil per foot."], accent: C.primary },
+  { sym: "I", x: 388, label: "Load", note: ["Amps actually drawn,", "not the breaker rating.", "Drop scales with it."], accent: C.orange },
+  { sym: "L", x: 518, label: "Distance", note: ["One-way run in feet.", "The tool doubles it —", "don't pre-double."], accent: C.red },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Anatomy of the voltage drop formula</title>
+  <desc>
+    Voltage drop equals 2 times K times I times L divided by circular mils. The 2 accounts for current
+    travelling out and back, replaced by 1.732 for three-phase. K is the material constant, 12.9 for
+    copper and 21.2 for aluminum. I is the load in amps actually drawn rather than the breaker rating. L
+    is the one-way run in feet. Circular mils is the conductor area, in the denominator, so a bigger
+    conductor reduces drop.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What each term in the formula does</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Four things on top push drop up; one thing underneath pulls it down</text>
+
+  <!-- The equation -->
+  <text x="24" y="106" fill={C.dark} font-family={FONT} font-size="22" font-weight="800">VD =</text>
+  <text x="128" y="106" fill={C.blue} font-family={FONT} font-size="26" font-weight="800">2</text>
+  <text x="168" y="106" fill={C.muted} font-family={FONT} font-size="20">×</text>
+  <text x="258" y="106" fill={C.primary} font-family={FONT} font-size="26" font-weight="800">K</text>
+  <text x="298" y="106" fill={C.muted} font-family={FONT} font-size="20">×</text>
+  <text x="388" y="106" fill={C.orange} font-family={FONT} font-size="26" font-weight="800">I</text>
+  <text x="424" y="106" fill={C.muted} font-family={FONT} font-size="20">×</text>
+  <text x="518" y="106" fill={C.red} font-family={FONT} font-size="26" font-weight="800">L</text>
+  <text x="560" y="106" fill={C.muted} font-family={FONT} font-size="20">÷</text>
+  <text x="600" y="106" fill={C.green} font-family={FONT} font-size="26" font-weight="800">CM</text>
+
+  <!-- Callouts for the numerator terms -->
+  {terms.map((t) => (
+    <g>
+      <path d={`M${t.x + 8} 118 L ${t.x + 8} 148`} stroke={t.accent} stroke-width="1.4" marker-end={`url(#vdf-arrow-${t.accent === C.blue ? "blue" : t.accent === C.primary ? "primary" : "orange"})`} />
+      <rect x={t.x - 34} y="154" width="104" height="92" rx="8" fill={C.white} stroke={t.accent} stroke-width="1.4" />
+      <text x={t.x + 18} y="174" text-anchor="middle" fill={t.accent} font-family={FONT} font-size="11" font-weight="800">{t.label}</text>
+      <text x={t.x - 26} y="194" fill={C.muted} font-family={FONT} font-size="9.5">
+        {t.note.map((line, li) => (
+          <tspan x={t.x - 26} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+        ))}
+      </text>
+    </g>
+  ))}
+
+  <!-- Denominator callout -->
+  <rect x="592" y="154" width="104" height="92" rx="8" fill={C.greenLight} stroke={C.green} stroke-width="1.4" />
+  <text x="644" y="174" text-anchor="middle" fill={C.green} font-family={FONT} font-size="11" font-weight="800">Conductor area</text>
+  <text x="600" y="194" fill={C.muted} font-family={FONT} font-size="9.5">
+    <tspan x="600" dy="0">Circular mils, from</tspan>
+    <tspan x="600" dy="13">Chapter 9 Table 8.</tspan>
+    <tspan x="600" dy="13">Double it, halve</tspan>
+    <tspan x="600" dy="13">the drop.</tspan>
+  </text>
+
+  <text x="24" y="278" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Then: drop % = VD ÷ circuit voltage × 100</text>
+  <text x="24" y="298" fill={C.muted} font-family={FONT} font-size="10">Note the voltage itself never appears in the VD formula — it only sets the percentage you compare against.</text>
+</svg>

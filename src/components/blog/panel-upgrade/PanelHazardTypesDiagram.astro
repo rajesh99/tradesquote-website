@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Panel types inspectors and insurers treat as replace-on-sight. Deliberately worded
+ * without claiming federal recalls — the FPE CPSC investigation closed in 1983
+ * without ordering one, and the concerns rest on subsequent test findings.
+ */
+const panels = [
+  {
+    name: "FPE Stab-Lok",
+    era: "1950s–1980s",
+    accent: C.red,
+    bg: C.redLight,
+    detail: ["Independent testing found high", "failure-to-trip rates. No federal", "recall was ever ordered, but most", "inspectors and insurers treat it", "as replace-on-sight."],
+  },
+  {
+    name: "Zinsco / Sylvania",
+    era: "1950s–1970s",
+    accent: C.orange,
+    bg: C.orangeLight,
+    detail: ["Breakers can fail to trip and the", "aluminum bus is prone to burning", "and pitting at the stab, so", "breakers stop seating properly."],
+  },
+  {
+    name: "Fuse box · 60 A service",
+    era: "pre-1960s",
+    accent: C.blue,
+    bg: C.blueLight,
+    detail: ["Not inherently unsafe, but below", "the 230.79(C) 100 A minimum and", "with no room for AFCI or GFCI", "protection anywhere."],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Panel types commonly flagged for replacement</title>
+  <desc>
+    Three categories of panel commonly flagged for replacement. Federal Pacific Stab-Lok panels from the 1950s
+    to 1980s: independent testing found high failure-to-trip rates, no federal recall was ever ordered, but most
+    inspectors and insurers treat them as replace-on-sight. Zinsco and Sylvania panels from the 1950s to 1970s:
+    breakers can fail to trip and the aluminum bus is prone to burning and pitting where breakers seat. Fuse
+    boxes and 60 amp services from before the 1960s: not inherently unsafe but below the 230.79(C) 100 amp
+    minimum and with no way to add arc-fault or ground-fault protection.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Panels that get replaced regardless of load</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Here the reason to upgrade is the equipment itself, not the calculated demand</text>
+
+  {panels.map((p, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="152" rx="10" fill={p.bg} stroke={p.accent} stroke-width="1.5" />
+        <text x={x + 16} y="94" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{p.name}</text>
+        <rect x={x + 16} y="102" width="88" height="18" rx="5" fill={C.white} stroke={p.accent} stroke-width="1" />
+        <text x={x + 60} y="114" text-anchor="middle" fill={p.accent} font-family={FONT} font-size="8.5" font-weight="700">{p.era}</text>
+        <text x={x + 16} y="136" fill={C.muted} font-family={FONT} font-size="9.5">
+          {p.detail.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

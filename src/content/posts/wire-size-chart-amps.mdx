@@ -1,0 +1,132 @@
+---
+title: "Wire Size Chart: Amps to AWG for Copper and Aluminum"
+meta_title: "Wire Size Chart: Amps to AWG (Copper & Aluminum) | TradesQuote"
+description: "The full NEC Table 310.16 wire size chart — copper and aluminum ampacity at 60, 75, and 90 °C, which column actually applies to your job, and the 240.4(D) breaker caps that override it."
+image: /images/posts/wire-size-chart-amps-hero.svg
+date: 2026-08-03T13:00:00Z
+categories: ["electrical"]
+tags: ["wire size chart","ampacity","awg","table 310.16","nec"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import WireChartColumnsDiagram from "@/components/blog/wire-chart/WireChartColumnsDiagram.astro";
+import WireChartLadderDiagram from "@/components/blog/wire-chart/WireChartLadderDiagram.astro";
+import WireChartCapsDiagram from "@/components/blog/wire-chart/WireChartCapsDiagram.astro";
+
+This is the chart everyone looks up, reproduced in full below. But a wire size chart is only as good as your understanding of which of its three columns applies to the job in front of you — pick the wrong one and you'll get a confidently wrong answer from correct data.
+
+So: the table first, then the four things that change what you're allowed to do with it.
+
+## NEC Table 310.16 — Allowable Ampacity
+
+Ampacities for insulated conductors rated up to 2,000 V, **not more than three current-carrying conductors** in a raceway, cable, or direct-buried, at an ambient of 30 °C (86 °F).
+
+| Size | Cu 60 °C | Cu 75 °C | Cu 90 °C | Al 60 °C | Al 75 °C | Al 90 °C |
+| --- | --- | --- | --- | --- | --- | --- |
+| 14 AWG | 15 | 20 | 25 | — | — | — |
+| 12 AWG | 20 | 25 | 30 | 15 | 20 | 25 |
+| 10 AWG | 30 | 35 | 40 | 25 | 30 | 35 |
+| 8 AWG | 40 | 50 | 55 | 35 | 40 | 45 |
+| 6 AWG | 55 | 65 | 75 | 40 | 50 | 55 |
+| 4 AWG | 70 | 85 | 95 | 55 | 65 | 75 |
+| 3 AWG | 85 | 100 | 115 | 65 | 75 | 85 |
+| 2 AWG | 95 | 115 | 130 | 75 | 90 | 100 |
+| 1 AWG | 110 | 130 | 145 | 85 | 100 | 115 |
+| 1/0 | 125 | 150 | 170 | 100 | 120 | 135 |
+| 2/0 | 145 | 175 | 195 | 115 | 135 | 150 |
+| 3/0 | 165 | 200 | 225 | 130 | 155 | 175 |
+| 4/0 | 195 | 230 | 260 | 150 | 180 | 205 |
+| 250 kcmil | 215 | 255 | 290 | 170 | 205 | 230 |
+| 300 kcmil | 240 | 285 | 320 | 195 | 230 | 260 |
+| 350 kcmil | 260 | 310 | 350 | 210 | 250 | 280 |
+| 400 kcmil | 280 | 335 | 380 | 225 | 270 | 305 |
+| 500 kcmil | 320 | 380 | 430 | 260 | 310 | 350 |
+| 600 kcmil | 350 | 420 | 475 | 285 | 340 | 385 |
+
+<BlogInfographic
+  title="Ampacity at 75 °C, copper vs aluminum"
+  caption="The 75 °C column governs most work. Aluminum trails copper by roughly 20% at every size."
+>
+  <WireChartLadderDiagram />
+</BlogInfographic>
+
+## Which Column Applies
+
+<BlogInfographic
+  title="Picking the right temperature column"
+  caption="60 °C for NM-B, 75 °C for almost everything else, and 90 °C only ever as a derating starting point."
+>
+  <WireChartColumnsDiagram />
+</BlogInfographic>
+
+**The 75 °C column is the working answer for most installations.** Under **110.14(C)**, a circuit is limited by the lowest temperature rating among its terminations, and breakers, lugs, and receptacles in ordinary residential and light commercial gear are rated 75 °C. Your THHN may be 90 °C wire, but it lands on 75 °C hardware, so 75 °C is what you may use.
+
+**Use the 60 °C column for NM-B cable.** This one catches people out. **334.80** requires NM-B ampacity to be taken from the 60 °C column, even though the conductors inside are 90 °C rated. That's why 12/2 Romex is a 20-amp cable and 10/2 is a 30-amp cable, full stop.
+
+**You never finish on the 90 °C column** — but don't dismiss it, because derating starts there. When you apply ambient correction or bundling adjustment, you apply it to the 90 °C base and then check the result against the 75 °C termination limit. Starting from 90 °C is often what saves a size on a hot roof or in a crowded raceway. The **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** does exactly this sequence.
+
+## The Breaker Caps That Override the Table
+
+Small conductors carry a separate restriction. **240.4(D)** limits overcurrent protection to 15 A for 14 AWG copper, 20 A for 12 AWG copper, and 30 A for 10 AWG copper — 15 A and 25 A for 12 and 10 AWG aluminum — regardless of the table figures.
+
+<BlogInfographic
+  title="Where the chart and the breaker disagree"
+  caption="240.4(D) caps the breaker below the conductor's table ampacity on 14, 12, and 10 AWG."
+>
+  <WireChartCapsDiagram />
+</BlogInfographic>
+
+This is why 12 AWG copper reads 25 A in the chart yet always sits on a 20-amp breaker in the field, and it's the single most-asked question about this table — unpacked properly in **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)**.
+
+## Three Things That Shrink These Numbers
+
+The table figures assume three current-carrying conductors, 30 °C ambient, and no length penalty. Break any of those assumptions and the usable figure drops.
+
+**Ambient temperature.** Above 30 °C you multiply by a correction factor from **310.15(B)(1)**. An attic at 45 °C costs a 90 °C conductor 13% of its rating; at 55 °C it's down 24%.
+
+**More than three current-carrying conductors.** **310.15(C)(1)** applies an adjustment factor: 80% for 4–6 conductors, 70% for 7–9, 50% for 10–20. Neutrals count when they carry current; equipment grounds never do.
+
+**Length.** The table says nothing about distance. A conductor that passes ampacity can still lose too much voltage over a long run — the second half of sizing, covered in **[Voltage Drop](/blog/voltage-drop-calculation)** and **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)**.
+
+## The Dwelling Service Exception
+
+One place the chart legitimately doesn't apply: **Table 310.12** permits conductors for a dwelling **service**, or for the single feeder carrying the entire load of a one-family dwelling, to be sized at 83% of the rating. A 200-amp service takes 2/0 copper under 310.12 where 310.16 would demand 3/0.
+
+The scope is narrow — it is not a general permission to shrink feeders. Details in **[200 Amp Service Wire Size](/blog/200-amp-service-wire-size)**, and the subpanel case where it does *not* apply in **[What Size Wire for a 100 Amp Sub Panel](/blog/what-size-wire-for-100-amp-subpanel)**.
+
+## Look It Up Automatically
+
+> **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** — reads this table for you, applies the 240.4(D) caps, and checks voltage drop for your run length.
+
+The **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** and the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** both read from this same table, so the numbers you see there match the numbers above. Use the ampacity tool when you know the conductor and want its derated rating; use the wire-size tool when you know the load and want the conductor.
+
+*Sources & standards: NEC (NFPA 70) 2023 — Table 310.16, Table 310.12, 110.14(C), 240.4(D), 310.15(B)(1), 310.15(C)(1), 334.80. Local amendments override the model code, and the AHJ has final say.*
+
+---
+
+## FAQ
+
+### How many amps can 12 gauge wire carry?
+
+Table 310.16 lists 12 AWG copper at 20 A in the 60 °C column, 25 A at 75 °C, and 30 A at 90 °C. But 240.4(D) caps the breaker at 20 A, so in practice 12 AWG copper is a 20-amp conductor. In aluminum, 12 AWG is capped at 15 A.
+
+### Which temperature column should I use?
+
+75 °C for most installations, because that's the rating of ordinary breakers and lugs and 110.14(C) limits you to the lowest-rated termination. Use 60 °C for NM-B cable, as 334.80 requires. The 90 °C column is only a starting point for derating, never a final answer.
+
+### Is this chart the same for THHN and Romex?
+
+The conductors are both 90 °C rated, but the cable assembly changes what you may use. THHN in a raceway lands on 75 °C terminations, so you read the 75 °C column. NM-B is restricted to the 60 °C column by 334.80 regardless of the wire inside it, so 12 AWG Romex is a 20-amp cable rather than 25.
+
+### Why is aluminum wire rated lower than copper?
+
+Aluminum has roughly 61% of copper's conductivity, so the same cross-section carries less current before reaching the same temperature. That works out to about 20% less ampacity at any given size, which is why aluminum runs one to two trade sizes larger for the same load.
+
+### Do these numbers change if I have more than three wires in a conduit?
+
+Yes. Table 310.16 assumes at most three current-carrying conductors. Beyond that, 310.15(C)(1) applies an adjustment: 80% for 4–6 conductors, 70% for 7–9, and 50% for 10–20. Equipment grounding conductors don't count toward the total.
+
+### What size wire do I need for 100 amps?
+
+3 AWG copper or 1 AWG aluminum by Table 310.16 at 75 °C. If it's a dwelling service or the single feeder carrying an entire house, Table 310.12 allows 4 AWG copper or 2 AWG aluminum instead — but that allowance doesn't extend to an ordinary subpanel.
