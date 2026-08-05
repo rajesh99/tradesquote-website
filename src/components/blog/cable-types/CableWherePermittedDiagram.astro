@@ -1,0 +1,92 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The ampacity column is the numeric difference; permitted locations are the
+ * practical one. Also settles the most-confused detail in the topic: AC cable's
+ * armour is a recognised ground-fault path, standard MC's is not.
+ */
+const methods = [
+  {
+    accent: C.red,
+    name: "NM-B",
+    article: "Article 334",
+    rows: [
+      ["Dwellings", "yes — the default"],
+      ["Wet or damp", "no"],
+      ["Type I / II construction", "no"],
+      ["Exposed to damage", "needs protection"],
+      ["Ground path", "insulated EGC in cable"],
+    ],
+  },
+  {
+    accent: C.blue,
+    name: "MC",
+    article: "Article 330",
+    rows: [
+      ["Dwellings", "yes"],
+      ["Wet or damp", "only if listed + jacketed"],
+      ["Type I / II construction", "yes"],
+      ["Exposed to damage", "generally yes"],
+      ["Ground path", "green EGC — not the armour"],
+    ],
+  },
+  {
+    accent: C.primary,
+    name: "THHN in conduit",
+    article: "Ch. 3 raceways",
+    rows: [
+      ["Dwellings", "yes"],
+      ["Wet or damp", "yes as THWN-2"],
+      ["Type I / II construction", "yes"],
+      ["Exposed to damage", "yes — RMC or EMT"],
+      ["Ground path", "EGC, or the raceway itself"],
+    ],
+  },
+];
+
+const COL_X = [200, 372, 544];
+const COL_W = 152;
+const LABELS = ["Dwellings", "Wet or damp", "Type I / II construction", "Exposed to damage", "Ground path"];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Where each wiring method is permitted</title>
+  <desc>
+    NM-B cable is the dwelling default but is not permitted in wet or damp locations or in Type I and II construction,
+    and needs protection where exposed to damage. MC cable is permitted in all of those, in wet locations only if
+    listed and jacketed. THHN in conduit is permitted everywhere, and is wet-rated as THWN-2. NM-B and MC both carry
+    an insulated equipment grounding conductor; standard MC cable's armour is not itself a recognised ground-fault
+    path, unlike AC cable's.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Ampacity is the numeric difference; location is the practical one</text>
+
+  {methods.map((m, j) => (
+    <g>
+      <rect x={COL_X[j]} y="50" width={COL_W} height="26" rx="7" fill={m.accent} opacity="0.12" />
+      <text x={COL_X[j] + COL_W / 2} y="63" text-anchor="middle" fill={m.accent} font-family={FONT} font-size="11" font-weight="800">{m.name}</text>
+      <text x={COL_X[j] + COL_W / 2} y="73" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5">{m.article}</text>
+    </g>
+  ))}
+
+  {LABELS.map((label, i) => {
+    const y = 88 + i * 34;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{label}</text>
+        {methods.map((m, j) => (
+          <g>
+            <rect x={COL_X[j]} y={y + 2} width={COL_W} height="26" rx="6" fill={C.white} stroke={C.border} />
+            <text x={COL_X[j] + COL_W / 2} y={y + 19} text-anchor="middle" fill={m.rows[i][1].startsWith("no") ? C.red : C.dark} font-family={FONT} font-size="8.5" font-weight={m.rows[i][1].startsWith("no") ? 700 : 500}>
+              {m.rows[i][1]}
+            </text>
+          </g>
+        ))}
+      </g>
+    );
+  })}
+
+  <text x="24" y="270" fill={C.muted} font-family={FONT} font-size="10">AC cable is the exception: its armour plus bonding strip IS a recognised ground path. Standard MC's is not.</text>
+</svg>

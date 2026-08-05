@@ -1,0 +1,178 @@
+---
+title: "Grounding vs Bonding: What Each One Actually Does"
+meta_title: "Grounding vs Bonding: What Each One Actually Does (2026) | TradesQuote"
+description: "A fault through a 25 Ω ground rod passes 4.8 A at 120 V — it will never trip a 20 A breaker. Bonding clears faults; grounding handles surges. The NEC says so outright in 250.4(A)(5)."
+image: /images/posts/grounding-vs-bonding-hero.svg
+date: 2026-08-04T14:30:00Z
+categories: ["electrical"]
+tags: ["grounding vs bonding","nec 250.4","equipment grounding conductor","main bonding jumper","ground rod"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import GroundingEarthMathDiagram from "@/components/blog/grounding-bonding/GroundingEarthMathDiagram.astro";
+import GroundingPathDiagram from "@/components/blog/grounding-bonding/GroundingPathDiagram.astro";
+import GroundingTermsDiagram from "@/components/blog/grounding-bonding/GroundingTermsDiagram.astro";
+
+Almost everyone learns this backwards: that the ground wire's job is to send fault current into the earth, and that the ground rod is what makes a system safe.
+
+**One line of arithmetic disposes of that.** NEC 250.53(A)(2) treats 25 ohms as the resistance at which a single ground rod is acceptable. A 120 V fault through 25 ohms passes **4.8 amps** — less than a quarter of a 20 A breaker's rating. It will not trip the breaker. It will not trip it in an hour. The case stays energised and the earth carries a trickle.
+
+**Bonding is what clears faults. Grounding is for something else entirely.** The code states it plainly in 250.4(A)(5): the earth *shall not be considered* an effective ground-fault current path.
+
+## The Arithmetic
+
+<BlogInfographic
+  title="Why the ground rod cannot clear a fault"
+  caption="A 120 V line-to-case fault on a 20 A circuit. Bars are logarithmic — the spread is that wide."
+>
+  <GroundingEarthMathDiagram />
+</BlogInfographic>
+
+| Return path | Fault current | Result |
+| --- | --- | --- |
+| 25 Ω ground rod | 4.8 A | 0.24× the rating — never trips |
+| 5 Ω engineered electrode | 24.0 A | 1.20× the rating — far too slow |
+| Bonded EGC, ~0.1 Ω | ~1,200 A | 60× the rating — trips instantly |
+
+Even an unusually good 5-ohm grounding system only just reaches the breaker's rating, and a breaker at 1.2× its rating may take minutes to open, or never. What clears a fault is **hundreds of amps returning through metal**, and only a bonded conductor back to the source delivers that.
+
+This is why **250.4(A)(5)** requires an "effective ground-fault current path" that is permanent, electrically continuous, capable of carrying the maximum fault current likely to be imposed, and of sufficiently low impedance to facilitate operation of the overcurrent device. Earth fails every one of those tests except permanence.
+
+## What the Two Things Actually Do
+
+**Bonding** connects metal parts together so that fault current has a low-impedance path back to the source, and so that everything a person can touch simultaneously sits at the same potential. That's the safety function.
+
+**Grounding** connects the system to earth. Per 250.4(A)(1) it exists to limit voltage imposed by **lightning, line surges, and unintentional contact with higher-voltage lines**, and to stabilise the voltage to earth during normal operation. Those are real jobs — a system floating with no earth reference can drift to dangerous potentials, and lightning needs somewhere to go.
+
+**Neither substitutes for the other.** A beautifully grounded system with a broken EGC is lethal. A perfectly bonded system with no electrode survives ordinary faults and is exposed to surges.
+
+## The Loop That Clears a Fault
+
+<BlogInfographic
+  title="The loop that clears the fault never touches earth"
+  caption="Source, hot conductor, fault, case, EGC, main bonding jumper, neutral, back to the source."
+>
+  <GroundingPathDiagram />
+</BlogInfographic>
+
+Follow the current on a line-to-case fault:
+
+1. It leaves the transformer on the **ungrounded conductor**.
+2. It reaches the appliance and jumps to the **metal case**.
+3. It returns on the **equipment grounding conductor** to the panel.
+4. It crosses the **main bonding jumper** onto the neutral bar, and returns to the transformer.
+
+**The main bonding jumper is the component that makes the entire system work,** and it's a green screw. It's the only intentional connection between the equipment grounding system and the grounded (neutral) conductor, and without it step 4 doesn't happen — the loop stays open, no current flows, the breaker never trips, and the case sits at 120 V waiting.
+
+The grounding electrode conductor hangs off this loop and carries none of it.
+
+**250.24(A)(5) then prohibits any further neutral-to-ground connection downstream of the service.** That's why every subpanel isolates its neutral bar and lands equipment grounds on a separate bonded bar. Bond the neutral twice and load current starts returning through the grounding conductors — **objectionable current**, addressed in 250.6, and a leading cause of shared-neutral GFCI and AFCI trips. Which panel gets the bond is covered in **[Main Breaker vs Main Lug Panels](/blog/main-breaker-vs-main-lug)**.
+
+## Five Conductors, Five Jobs
+
+<BlogInfographic
+  title="Grounded, grounding, bonding — five conductors, five jobs"
+  caption="Only one of the five carries current in normal use."
+>
+  <GroundingTermsDiagram />
+</BlogInfographic>
+
+| Conductor | Job | Sized by |
+| --- | --- | --- |
+| **EGC** — equipment grounding conductor | Carries fault current from equipment to the source | Table 250.122, by **OCPD rating** |
+| **GEC** — grounding electrode conductor | Connects the system to the earth electrode | Table 250.66, by **service conductor size** |
+| **MBJ** — main bonding jumper | Ties EGC system to neutral at the service | 250.28, by service conductor size |
+| **Grounded conductor** (neutral) | Carries unbalanced load current, continuously | Load calculation, 250.24(C) minimum |
+| **Bonding jumper** | Ties metal parts together | 250.104 |
+
+**"Grounded" and "grounding" differ by one letter and by everything else.** The grounded conductor is the neutral: it carries current all day, it's a circuit conductor, and it's white. The grounding conductor carries nothing until something breaks.
+
+The EGC/GEC distinction is the other one worth internalising, because they're sized from different tables keyed to different things — and the GEC is then capped by electrode type: 6 AWG copper for a rod or pipe under 250.66(A), 4 AWG for concrete-encased under (B), no larger than the ring under (C), and uncapped for a water pipe. Both tables are worked in **[Ground Wire Size Chart](/blog/ground-wire-size-chart)**.
+
+One memorable consequence: **Table 250.122 has no 30 A row.** A 30 A circuit falls in the ≤60 A row, so 10 AWG copper is the EGC for every device from 25 A to 60 A — see **[10 Gauge Wire Amps](/blog/10-gauge-wire-amps)**.
+
+## What Has to Be Bonded
+
+**Grounding electrode system — 250.50.** All electrodes *present* at the building must be bonded together: metal underground water pipe in contact with earth for 10 ft or more (250.52(A)(1)), the concrete-encased electrode or "Ufer" (A)(3), a ground ring (A)(4), rods and pipes (A)(5), plates (A)(7). **250.53(A)(2) requires a second rod** unless a single rod is shown to be 25 ohms or less — and since almost nobody measures, two rods 6 feet apart is the default.
+
+Note the logic there: the code's response to a poor earth connection is a *second rod*, not a bigger conductor. That tells you how little it expects of earth.
+
+**Metal water piping — 250.104(A).** The interior metal water piping system must be bonded to the service, sized from Table 250.66. This is bonding, not grounding, even where the pipe also serves as an electrode.
+
+**Structural metal — 250.104(C).** Structural steel likely to become energised must be bonded.
+
+**Gas piping — 250.104(B).** Here the rule is subtler than people expect: metal gas piping likely to become energised is considered bonded **by the equipment grounding conductor of the circuit that may energise it** — typically the furnace or water heater circuit. A separate bonding jumper to the gas line is usually not required, though CSST (corrugated stainless steel tubing) has its own manufacturer bonding requirements that generally *do* call for a direct bond, and those are enforceable through the listing.
+
+**Pools and spas — 680.26.** Equipotential bonding is a different concept again: an 8 AWG solid copper grid tying the shell, the deck, the ladders and the water together so that nobody standing in a pool experiences a voltage gradient. It is not about clearing faults at all; it's about eliminating differences in potential.
+
+**Separately derived systems — 250.30.** A transformer creates a new system, and it needs its own **system bonding jumper** (the SBJ, the MBJ's equivalent) plus a grounding electrode conductor. Getting this wrong on a generator or a transformer is common.
+
+## Where This Goes Wrong in Practice
+
+**A subpanel with the neutral bonded.** The single most common bonding error. Load current divides between the neutral and the EGC, the EGC carries current it wasn't intended to, and GFCIs and AFCIs on that panel trip unpredictably. Diagnosis is in **[AFCI and GFCI Nuisance Tripping](/blog/afci-gfci-nuisance-tripping)**.
+
+**A "ground rod fixed my problem."** Driving a rod at a detached building or a subpanel does not create a fault path and does not replace an EGC. A feeder to a detached structure needs an EGC run with it; the rod at the structure is in addition, not instead.
+
+**Relying on a metal raceway that isn't continuous.** EMT is a recognised EGC, but a coupling that isn't tight or a run interrupted by a flexible section breaks the path. Standard MC cable's armour is *not* a recognised EGC — that's what the green wire inside is for, as covered in **[THHN vs NM-B vs MC Cable](/blog/thhn-vs-nm-b-vs-mc-cable)**.
+
+**Using a GFCI to replace a missing ground.** This one is actually permitted, and it's worth knowing precisely: **406.4(D)(2)** allows a non-grounding receptacle to be replaced with a GFCI receptacle marked "No Equipment Ground" where no EGC exists. It works because a GFCI compares current on the hot and neutral and needs no ground reference at all. It provides shock protection; it does not provide an equipment ground, and equipment needing one still doesn't have it. See **[GFCI vs AFCI](/blog/gfci-vs-afci)**.
+
+**Bonding the neutral at a generator with a switched-neutral transfer switch.** Produces an unintended second bond. The transfer switch type and the generator's bonding must match, as noted in **[What Size Generator Do I Need](/blog/what-size-generator-do-i-need)**.
+
+## Common Mistakes
+
+- **Believing fault current returns through the earth.** 4.8 A through a 25 Ω rod. 250.4(A)(5) forbids relying on it.
+- **Omitting the main bonding jumper at the service.** Without it the fault loop never closes.
+- **Bonding the neutral in a subpanel.** Exactly one bond, at the service. 250.24(A)(5).
+- **Confusing grounded with grounding.** The neutral carries current; the EGC does not.
+- **Sizing the EGC from the conductor size.** Table 250.122 is keyed to the OCPD rating.
+- **Sizing the GEC from the OCPD.** Table 250.66 is keyed to the largest service-entrance conductor.
+- **Driving a rod instead of running an EGC.** A rod is not a fault path.
+- **Assuming a separate gas bond is always required.** 250.104(B) is satisfied by the appliance circuit's EGC — but check CSST manufacturer requirements.
+- **Treating pool equipotential bonding as grounding.** 680.26 is about eliminating voltage gradients.
+- **Forgetting the system bonding jumper on a separately derived system.** 250.30 needs its own bond and electrode.
+
+## Size the Conductors
+
+> **[Ground Wire Size Calculator](/calculators/electrical/electrical-ground-wire-size-calculator)** — returns the EGC from Table 250.122 by overcurrent device rating and the GEC from Table 250.66 by service conductor size, applying the electrode-type caps in 250.66(A) through (C) so the two never get confused.
+
+See **[Ground Wire Size Chart](/blog/ground-wire-size-chart)** for both tables in full, **[GFCI vs AFCI](/blog/gfci-vs-afci)** for the protective devices, and the **[NEC Tables reference](/calculators/electrical/nec-tables#grounding)** for the underlying data.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 250.4(A)(1) and (A)(5), 250.6, 250.24(A)(5), 250.24(C), 250.28, 250.30, 250.50, 250.52(A), 250.53(A)(2), Table 250.66 and 250.66(A)–(C), 250.104(A)–(C), Table 250.122, 406.4(D)(2), 680.26. CSST bonding requirements come from manufacturer listings. Local amendments override the model code and the AHJ has final say. Have grounding and bonding systems designed and installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What is the difference between grounding and bonding?
+
+Bonding connects metal parts together to create a low-impedance path that carries fault current back to the source and keeps touchable metal at the same potential. Grounding connects the system to the earth, which under 250.4(A)(1) limits voltage from lightning, surges and high-voltage crossover and stabilises voltage to earth. Bonding clears faults; grounding does not.
+
+### Does fault current go into the ground rod?
+
+Almost none of it. A 120 V fault through a 25 ohm ground rod — the threshold in 250.53(A)(2) — passes 4.8 amps, which will never trip a 20 A breaker. Fault current returns through the equipment grounding conductor and across the main bonding jumper to the neutral. NEC 250.4(A)(5) explicitly states that the earth shall not be considered an effective ground-fault current path.
+
+### What does the ground rod actually do?
+
+It references the system to earth. Under 250.4(A)(1) that limits the voltage imposed by lightning strikes, utility line surges and accidental contact between the service and a higher-voltage line, and it stabilises voltage to earth in normal operation. Those are genuine functions — they're just not fault clearing.
+
+### Why is the neutral bonded to ground only at the service?
+
+Because a second bond gives load current an alternative return path through the equipment grounding conductors — objectionable current, addressed in 250.6. It makes grounding conductors carry current they weren't intended to carry, and it causes unpredictable GFCI and AFCI tripping. 250.24(A)(5) prohibits grounded-conductor-to-equipment connections on the load side of the service disconnect.
+
+### What is a main bonding jumper?
+
+The connection between the equipment grounding system and the grounded (neutral) conductor at the service — usually a green screw or a strap in the panel. It's the component that closes the fault-current loop, so without it a line-to-case fault has no return path and the breaker never trips. It's required in service equipment and must be absent from every panel downstream.
+
+### What is the difference between an EGC and a GEC?
+
+The equipment grounding conductor carries fault current from equipment back to the source and is sized from Table 250.122 by the **overcurrent device rating**. The grounding electrode conductor connects the system to the earth electrode and is sized from Table 250.66 by the **largest service-entrance conductor**, then capped by electrode type — 6 AWG copper for a rod, 4 AWG for concrete-encased, and no cap for a water pipe.
+
+### Do I need to bond my gas line?
+
+Usually not with a separate jumper. 250.104(B) considers metal gas piping likely to become energised to be bonded by the equipment grounding conductor of the circuit that may energise it — typically the furnace or water heater circuit. CSST (corrugated stainless steel tubing) is different: manufacturer listings generally require a direct bond, and those requirements are enforceable.
+
+### Can a GFCI replace a missing ground wire?
+
+For shock protection, yes — 406.4(D)(2) permits replacing a non-grounding receptacle with a GFCI marked "No Equipment Ground" where no EGC exists. It works because a GFCI compares hot and neutral current and needs no ground reference. But it does not create an equipment ground, so equipment that requires one still doesn't have it, and surge protectors in particular need a real ground to function.

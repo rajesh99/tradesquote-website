@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The decision, plus the bonding consequence that goes with it. The detached
+ * building row is the one people get wrong: 225.31 requires a disconnect at the
+ * separate structure, so an MLO panel out there needs a disconnect ahead of it.
+ */
+const rows = [
+  {
+    where: "Service panel, disconnect inside",
+    answer: "Main breaker",
+    accent: C.blue,
+    neutral: "Neutral bonded — install the MBJ",
+    why: "The main breaker is the service disconnect (230.70)",
+  },
+  {
+    where: "Service panel, meter-main outside",
+    answer: "MLO is fine",
+    accent: C.primary,
+    neutral: "Neutral isolated — remove the MBJ",
+    why: "The disconnect already exists at the meter-main",
+  },
+  {
+    where: "Subpanel, same building",
+    answer: "MLO is fine",
+    accent: C.primary,
+    neutral: "Neutral isolated — remove the MBJ",
+    why: "The feeder breaker upstream protects the busbar",
+  },
+  {
+    where: "Subpanel, detached building",
+    answer: "Main breaker",
+    accent: C.orange,
+    neutral: "Neutral isolated — remove the MBJ",
+    why: "225.31 requires a disconnect at the structure",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>When you need a main breaker and when main lugs will do</title>
+  <desc>
+    A service panel with the disconnect inside needs a main breaker and its neutral bonded with the main bonding
+    jumper installed. A service panel fed from a meter-main outside may be main lug only with the neutral isolated. A
+    subpanel in the same building may be main lug only with the neutral isolated. A subpanel in a detached building
+    needs a main breaker, because 225.31 requires a disconnect at the separate structure, and its neutral is still
+    isolated.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Which panel, and what happens to the neutral</text>
+
+  <text x="28" y="60" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHERE IT GOES</text>
+  <text x="266" y="60" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PANEL TYPE</text>
+  <text x="410" y="60" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NEUTRAL–GROUND</text>
+
+  {rows.map((r, i) => {
+    const y = 70 + i * 44;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="38" rx="8" fill={C.white} stroke={r.accent} stroke-width="1.4" />
+        <text x="38" y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.where}</text>
+        <text x="38" y={y + 30} fill={C.muted} font-family={FONT} font-size="8">{r.why}</text>
+        <rect x="266" y={y + 10} width="128" height="19" rx="5" fill={r.accent} opacity="0.15" />
+        <text x="330" y={y + 23} text-anchor="middle" fill={r.accent} font-family={FONT} font-size="9.5" font-weight="800">{r.answer}</text>
+        <text x="410" y={y + 23} fill={C.dark} font-family={FONT} font-size="9">{r.neutral}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">Exactly one place in the system bonds neutral to ground: the service. Everywhere downstream keeps them apart.</text>
+</svg>

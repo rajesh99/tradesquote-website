@@ -1,0 +1,66 @@
+---
+import { findSizeByAmpacity, ampacityOf, CONDUCTOR_SIZES, sizeLabel } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The size ladder, computed rather than transcribed. One AWG size apart at
+ * branch-circuit ratings, two from 100 A up — and exactly level at 40 A, where
+ * aluminum 8 AWG happens to land on 40 A on the nose.
+ */
+const rows = [30, 40, 50, 60, 100, 150, 200].map((amps) => {
+  const cu = findSizeByAmpacity(amps, "copper", 75)!;
+  const al = findSizeByAmpacity(amps, "aluminum", 75)!;
+  return {
+    amps,
+    cu: cu.label,
+    al: al.label,
+    cuAmps: ampacityOf(cu, "copper", 75)!,
+    alAmps: ampacityOf(al, "aluminum", 75)!,
+    apart: CONDUCTOR_SIZES.indexOf(al) - CONDUCTOR_SIZES.indexOf(cu),
+    ratio: al.cmil / cu.cmil,
+  };
+});
+
+const tie = rows.find((r) => r.apart === 0);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Aluminum size needed to match copper, rating by rating</title>
+  <desc>
+    At 30 amps copper is 10 AWG and aluminum 8 AWG. At 40 amps both are 8 AWG. At 50 amps copper is 8 and aluminum 6,
+    at 60 amps copper 6 and aluminum 4, at 100 amps copper 3 and aluminum 1, at 150 amps copper 1/0 and aluminum 3/0,
+    and at 200 amps copper 3/0 and aluminum 250 kcmil. The gap is one AWG size at branch-circuit ratings and two from
+    100 amps upward, and aluminum needs about 1.59 times the circular mils throughout.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Aluminum needs a bigger conductor — but how much bigger changes</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Smallest size meeting each rating in the 75 °C column, with 240.4(D) applied.</text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RATING</text>
+  <text x="132" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">COPPER</text>
+  <text x="300" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ALUMINUM</text>
+  <text x="500" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">AWG SIZES APART</text>
+  <text x="628" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CMIL</text>
+
+  {rows.map((r, i) => {
+    const y = 90 + i * 27;
+    const level = r.apart === 0;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="23" rx="6" fill={level ? C.greenLight : C.white} stroke={level ? C.green : C.border} stroke-width={level ? 1.8 : 1} />
+        <text x="38" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.amps} A`}</text>
+        <text x="132" y={y + 16} fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">{sizeLabel(r.cu)}</text>
+        <text x="212" y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">{`${r.cuAmps} A`}</text>
+        <text x="300" y={y + 16} fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">{sizeLabel(r.al)}</text>
+        <text x="410" y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">{`${r.alAmps} A`}</text>
+        <text x="500" y={y + 16} fill={level ? C.green : C.dark} font-family={FONT} font-size="10" font-weight={level ? 800 : 600}>
+          {level ? "same size" : `${r.apart} up`}
+        </text>
+        <text x="628" y={y + 16} fill={C.muted} font-family={FONT} font-size="9">{`${r.ratio.toFixed(2)}×`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="10">{`${tie?.amps} A is the one rating where both land on ${sizeLabel(tie!.al)} — aluminum's 75 °C ampacity there is exactly ${tie?.alAmps} A.`}</text>
+</svg>

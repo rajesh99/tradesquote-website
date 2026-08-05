@@ -1,0 +1,165 @@
+---
+title: "THHN vs NM-B vs MC Cable: Which Wiring Method Goes Where"
+meta_title: "THHN vs NM-B (Romex) vs MC Cable: Which Goes Where (2026) | TradesQuote"
+description: "NM cable is held to the 60 °C column, MC and THHN in conduit to 75 °C. That gap costs a conductor size at five common ratings — and makes 6/3 Romex on a 60 A circuit a violation."
+image: /images/posts/thhn-vs-nm-b-vs-mc-cable-hero.svg
+date: 2026-08-04T12:45:00Z
+categories: ["electrical"]
+tags: ["nm-b cable","mc cable","thhn","romex","wiring methods"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import CableColumnDiagram from "@/components/blog/cable-types/CableColumnDiagram.astro";
+import CableSizeLadderDiagram from "@/components/blog/cable-types/CableSizeLadderDiagram.astro";
+import CableWherePermittedDiagram from "@/components/blog/cable-types/CableWherePermittedDiagram.astro";
+
+The conductors inside NM-B cable, MC cable and a conduit full of THHN are frequently *identical* — the same 90 °C copper from the same mill. What changes is which column of Table 310.16 the NEC lets you read, and that single difference decides conductor sizes on larger circuits.
+
+Here is the case that makes it concrete. A 48 A EV charger needs a 60 A circuit. Reach for **6/3 Romex** — the obvious choice, and what a lot of people install — and you have a code violation, because 6 AWG copper is only **55 A** in the 60 °C column that NEC 334.80 holds NM cable to. The same 6 AWG as THWN-2 in conduit is 65 A and perfectly legal.
+
+## Which Column Each Method Gets
+
+<BlogInfographic
+  title="The wiring method picks the column, not the wire"
+  caption="6 AWG copper in every row. Only the permitted column changes."
+>
+  <CableColumnDiagram />
+</BlogInfographic>
+
+| Method | Rule | Column | 6 AWG copper |
+| --- | --- | --- | --- |
+| NM-B cable (Romex) | 334.80 | 60 °C | 55 A |
+| MC cable | 330.80 with 110.14(C) | 75 °C | 65 A |
+| THHN / THWN-2 in conduit | 110.14(C) | 75 °C | 65 A |
+| *Derating base for all three* | 310.15 | *90 °C* | *75 A* |
+
+**NM-B is the only one of the three that gives up the 75 °C column.** MC cable and conduit-and-wire both land at 75 °C for the same reason: their conductors are 90 °C rated, and 110.14(C) then caps them at the temperature rating of the terminations, which on ordinary breakers and lugs is 75 °C.
+
+The last row is the one people get wrong in the conservative direction. **All three methods derate from the 90 °C column.** 334.80 says so explicitly for NM: the 90 °C rating may be used for correction and adjustment calculations provided the final derated ampacity doesn't exceed the 60 °C value. So six bundled 10 AWG conductors at 40 °C compute to 40 × 0.91 × 0.80 = 29.12 A whether they're in NM cable or in EMT. Identical arithmetic. The method is in **[Wire Derating Explained](/blog/wire-derating-nec)**.
+
+What NM loses is the *undereated* ceiling, and that's what changes sizes.
+
+## Where the Gap Actually Costs You
+
+<BlogInfographic
+  title="Where the 60 °C ceiling costs you a conductor size"
+  caption="Minimum copper size for each circuit rating, with the 240.4(D) small-conductor limits applied."
+>
+  <CableSizeLadderDiagram />
+</BlogInfographic>
+
+| Circuit | NM-B | MC / conduit | Difference |
+| --- | --- | --- | --- |
+| 20 A | 12 AWG | 12 AWG | none |
+| 30 A | 10 AWG | 10 AWG | none |
+| 40 A | 8 AWG | 8 AWG | none |
+| 50 A | 6 AWG | 8 AWG | 1 size larger in NM |
+| 60 A | 4 AWG | 6 AWG | 1 size larger in NM |
+| 70 A | 4 AWG | 4 AWG | none |
+| 80 A | 3 AWG | 4 AWG | 1 size larger in NM |
+| 100 A | 1 AWG | 3 AWG | 2 sizes larger in NM |
+| 125 A | 1/0 AWG | 1 AWG | 1 size larger in NM |
+
+**Below 50 A the choice is about cost and labour, not legality** — every common branch circuit sizes identically in all three methods, which is why the distinction almost never comes up in ordinary residential work.
+
+From 50 A up it starts to matter, and the pattern is not a steady widening. The 70 A row closes the gap again because 4 AWG happens to satisfy both columns, then 100 A opens it to two sizes. You cannot interpolate; you have to look.
+
+The two rows that show up most often in real work:
+
+**60 A** — the EV charger case. 4 AWG NM, or 6 AWG in conduit. The full charger ladder is in **[What Size Wire for an EV Charger](/blog/what-size-wire-for-ev-charger)**.
+
+**100 A** — a subpanel feeder. 1 AWG NM against 3 AWG in conduit is a substantial difference in both cost and pulling effort, and it's why 100 A subpanel feeders in cable are usually SER rather than NM. Note that **neither of those is the widely-quoted "4 AWG for a 100 A subpanel"** — that answer comes from Table 310.12's 83% allowance, which applies to a *service* or a feeder carrying an entire dwelling load, not an ordinary garage or shop subpanel. That trap is the subject of **[What Size Wire for a 100 Amp Sub Panel](/blog/what-size-wire-for-100-amp-subpanel)**.
+
+## Where Each Is Permitted
+
+<BlogInfographic
+  title="Ampacity is the numeric difference; location is the practical one"
+  caption="Permitted uses under Articles 334 and 330 and the Chapter 3 raceway articles."
+>
+  <CableWherePermittedDiagram />
+</BlogInfographic>
+
+**NM-B** — Article 334. Permitted in one- and two-family dwellings, multifamily dwellings, and other structures permitted to be of Type III, IV or V construction. **Not permitted** in wet or damp locations, embedded in concrete, or generally in Type I and II construction — which is what rules it out of most commercial buildings. Where exposed to physical damage it needs protection. Cheap, fast, and the default for houses for good reason.
+
+**MC cable** — Article 330. Permitted almost everywhere NM is plus everywhere NM isn't: commercial construction, exposed runs, and wet locations *provided* the cable is jacketed and the conductors are listed for wet locations. It's the workhorse of commercial branch circuitry because it's flexible, fast to install, and doesn't need a raceway.
+
+**THHN/THWN-2 in conduit** — the Chapter 3 raceway articles. Permitted anywhere the right raceway is permitted, which is everywhere. Wet locations need THWN-2 (the W is what matters). It's the most expensive and slowest to install, and it buys two things nothing else does: **physical protection** and the ability to **pull new conductors later** without opening walls.
+
+### The detail that's most often wrong: MC's armour is not a ground
+
+This confuses experienced people, so it's worth stating plainly.
+
+**AC cable** (Type AC, the old "BX") has an armour *plus an internal aluminium bonding strip*, and that combination is a recognised equipment grounding path. It contains no separate green wire and doesn't need one.
+
+**Standard MC cable's armour is not a recognised ground-fault path.** MC therefore contains a separate insulated green equipment grounding conductor, and that conductor is the ground. Cutting corners on it — or assuming the metal jacket does the job — leaves you without an effective ground-fault current path.
+
+There are listed exceptions (MC-AP and similar types where the armour is qualified as an EGC), but the default assumption should be the opposite. The distinction between grounding and bonding generally is covered in **[Grounding vs Bonding](/blog/grounding-vs-bonding)**, and EGC sizing in **[Ground Wire Size Chart](/blog/ground-wire-size-chart)**.
+
+## Choosing in Practice
+
+**Use NM-B** for branch circuits inside a dwelling where nothing is wet, exposed or above 40 A. It is dramatically cheaper and faster than the alternatives and there is no technical reason to avoid it. This is most residential work.
+
+**Use MC** in commercial construction, in plenums and exposed ceilings, and anywhere NM isn't permitted but a full raceway is overkill. Also worth it in a dwelling for exposed basement or garage runs where NM would need protecting.
+
+**Use conduit** where you want future flexibility (a shop, a garage, a panel feed you may upsize), where physical protection is required, in wet or underground locations, and on larger feeders where the 75 °C column saves you a conductor size or two. On a 100 A feeder that saving can pay for a good part of the conduit.
+
+**Use SE/SER cable** for services and large feeders in cable form — a different article (338) with its own ampacity rules, and the usual answer for a 100 A or 200 A feeder when conduit isn't wanted.
+
+One economic point worth making explicitly: on circuits at 50 A and above, **the conduit method's larger permitted ampacity partly offsets its higher labour**, because you buy less copper. On 20 A circuits it offsets nothing, which is why nobody runs pipe for lighting in a house.
+
+## Common Mistakes
+
+- **6/3 Romex on a 60 A circuit.** 6 AWG is 55 A at 60 °C. NM needs 4 AWG; conduit takes 6 AWG.
+- **Assuming NM derates worse.** All three methods derate from the 90 °C column. Only the ceiling differs.
+- **Deriving NM's factors from the 60 °C column.** Needlessly conservative — 334.80 permits 90 °C for the calculation.
+- **Reading THHN's 90 °C ampacity as usable.** 110.14(C) caps you at the termination rating, normally 75 °C.
+- **Treating MC's armour as the ground.** Standard MC has a separate green EGC. AC cable's armour-plus-strip is the recognised path.
+- **Using THHN in a wet location.** You need THWN-2. Conduit underground or outdoors counts as wet, including the interior of the raceway.
+- **Running NM in a commercial building.** Type I and II construction generally rules it out.
+- **Applying the "4 AWG for 100 A" answer to a subpanel.** That's Table 310.12, which covers services and whole-dwelling feeders.
+- **Interpolating the size gap.** It closes at 70 A and doubles at 100 A. Look it up.
+
+## Size a Circuit in Any Method
+
+> **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** — enter load, voltage, length, material and temperature rating. Setting the termination and insulation rating is what switches between the 60 °C and 75 °C columns, so it answers the NM-versus-conduit question directly.
+
+Every figure in this article comes from the same NEC tables the calculators read. Use the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** for derating, the **[Conduit Fill Calculator](/calculators/electrical/electrical-conduit-fill-calculator)** when you choose the raceway route, and see **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** and the **[Wire Size Chart](/blog/wire-size-chart-amps)** for the underlying method. **[Copper vs Aluminum Wire](/blog/copper-vs-aluminum-wire)** covers the other material question.
+
+*Sources & standards: NEC (NFPA 70) 2023 — Article 330 (330.10, 330.12, 330.80), Article 334 (334.10, 334.12, 334.80), Article 320 for Type AC cable, Article 338 for SE/SER, Table 310.16, Table 310.12, 110.14(C), 240.4(D), 310.15. Local amendments override the model code and the AHJ has final say. Have electrical work designed and installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What is the difference between THHN and NM-B?
+
+THHN is an individual conductor with a 90 °C insulation, pulled into a raceway. NM-B is a cable assembly containing conductors plus a ground in a plastic sheath. The conductors inside can be identical; what differs is that NEC 334.80 limits NM-B's ampacity to the 60 °C column while THHN in conduit reaches the 75 °C column. For 6 AWG copper that's 55 A versus 65 A.
+
+### Can I use 6/3 Romex for a 60 amp circuit?
+
+No. 6 AWG copper is rated 55 A in the 60 °C column that NEC 334.80 holds NM cable to, so it cannot serve a 60 A circuit. Use 4 AWG NM cable, or 6 AWG THWN-2 in conduit where the 75 °C column's 65 A applies. This catches a lot of 48 A EV charger installations.
+
+### Is MC cable better than Romex?
+
+It's permitted in more places and reaches a higher ampacity column, but it costs more and installs more slowly. MC is required rather than preferred in most commercial construction, since NM is generally not permitted in Type I and II construction. In a house where nothing is wet or exposed, NM-B is the right answer and MC buys you very little.
+
+### Does MC cable need a separate ground wire?
+
+Standard MC cable already contains one — an insulated green equipment grounding conductor — and that conductor is the ground. The metal armour on standard MC is *not* a recognised ground-fault path. This is the opposite of Type AC cable, whose armour plus internal aluminium bonding strip is recognised and which contains no green wire.
+
+### Do all three wiring methods derate the same?
+
+Yes, and this surprises people. All three may use the 90 °C column as the base for ambient correction and bundling adjustment — 334.80 says so explicitly for NM cable. Six bundled 10 AWG conductors at 40 °C give 29.12 A in any of the three. What differs is the ceiling on the *undereated* ampacity: 60 °C for NM, 75 °C for MC and conduit.
+
+### When does the cable type actually change the wire size?
+
+At 50 A and above. Every circuit from 15 A to 40 A sizes identically in all three methods, which is why the distinction rarely comes up in residential branch circuits. From 50 A the 60 °C ceiling costs NM a size at 50, 60, 80 and 125 A, and two sizes at 100 A — but not at 70 A, where 4 AWG satisfies both columns.
+
+### Can I use THHN outdoors or underground?
+
+Not as plain THHN. Outdoor and underground raceways are wet locations, including the inside of the conduit, so you need a wet-rated insulation — THWN-2 is the usual choice and most conductors sold today are dual-marked THHN/THWN-2. Check the print on the insulation rather than assuming.
+
+### Which is cheapest?
+
+NM-B by a wide margin, in both material and labour, which is why it dominates residential work. Conduit and wire is the most expensive to install but partly claws it back on larger circuits, because the 75 °C column lets you buy a smaller conductor — on a 100 A feeder that's 3 AWG instead of 1 AWG. It also lets you re-pull later without opening walls, which has real value on a garage or shop feed.

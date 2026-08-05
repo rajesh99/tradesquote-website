@@ -1,0 +1,64 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The arithmetic that settles the whole argument. 250.53(A)(2) treats 25 Ω as
+ * the threshold at which a single rod is acceptable; at 120 V that passes under
+ * 5 A, which is a fraction of what a 20 A breaker needs to clear promptly. Earth
+ * is not a fault path, and this is why the code says so outright.
+ */
+const VOLTS = 120;
+const BREAKER = 20;
+
+const paths = [
+  { name: "Through a 25 Ω ground rod", ohms: 25, detail: "the 250.53(A)(2) threshold for a single electrode", accent: C.red },
+  { name: "Through a 5 Ω engineered electrode", ohms: 5, detail: "an unusually good grounding system", accent: C.orange },
+  { name: "Through a bonded EGC", ohms: 0.1, detail: "copper back to the source, typical order of magnitude", accent: C.green },
+];
+
+const rows = paths.map((p) => {
+  const amps = VOLTS / p.ohms;
+  return { ...p, amps, multiple: amps / BREAKER, clears: amps >= BREAKER * 5 };
+});
+
+const peak = Math.max(...rows.map((r) => Math.log10(r.amps)));
+const BAR_X = 262;
+const BAR_MAX = 300;
+const bars = rows.map((r) => ({ ...r, width: Math.max(30, Math.round((Math.log10(r.amps) / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Why earth cannot clear a ground fault</title>
+  <desc>
+    A 120 volt fault through a 25 ohm ground rod passes 4.8 amps, which is a quarter of a 20 amp breaker's rating and
+    will never trip it. Through an unusually good 5 ohm electrode it passes 24 amps, barely at the rating and far too
+    slow. Through a bonded equipment grounding conductor of roughly a tenth of an ohm it passes about 1,200 amps,
+    which clears the breaker instantly. Bar lengths are logarithmic.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why the ground rod cannot clear a fault</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`A ${VOLTS} V line-to-case fault on a ${BREAKER} A circuit. Bars are logarithmic — the spread is that wide.`}</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RETURN PATH</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">FAULT CURRENT</text>
+
+  {bars.map((r, i) => {
+    const y = 88 + i * 42;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.name}</text>
+        <text x="28" y={y + 27} fill={C.muted} font-family={FONT} font-size="7.5">{r.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={r.width} height="22" rx="5" fill={r.accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={r.width} height="22" rx="5" fill="none" stroke={r.accent} stroke-width={r.clears ? 2.2 : 1.5} />
+        <text x={BAR_X + 9} y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${fmt(r.amps, r.amps < 100 ? 1 : 0)} A`}</text>
+        <text x={BAR_X + r.width + 9} y={y + 18} fill={r.accent} font-family={FONT} font-size="8.5" font-weight="700">
+          {r.clears ? `${fmt(r.multiple, 0)}× the rating — trips instantly` : `${fmt(r.multiple, 2)}× the rating — never trips`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="234" fill={C.muted} font-family={FONT} font-size="10">250.4(A)(5) says it outright: the earth shall not be considered an effective ground-fault current path.</text>
+</svg>

@@ -1,0 +1,205 @@
+---
+title: "Wire Derating Explained: Ambient Temperature and Conductor Bundling"
+meta_title: "Wire Derating (NEC): Ambient Temperature and Bundling Explained (2026) | TradesQuote"
+description: "Six 12 AWG conductors at 40 °C derate to 21.84 A and hold a 20 A breaker. Start from the wrong temperature column and you get 17.60 A — and upsize a circuit that was already legal."
+image: /images/posts/wire-derating-nec-hero.svg
+date: 2026-08-04T12:00:00Z
+categories: ["electrical"]
+tags: ["wire derating","ampacity","nec 310.15","conductor bundling","ambient temperature"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import DeratingBaseColumnDiagram from "@/components/blog/derating/DeratingBaseColumnDiagram.astro";
+import DeratingCountLadderDiagram from "@/components/blog/derating/DeratingCountLadderDiagram.astro";
+import DeratingGridDiagram from "@/components/blog/derating/DeratingGridDiagram.astro";
+
+Derating is where most wire sizing goes wrong, and it usually goes wrong in the *conservative* direction — which sounds harmless until you realise it means paying for a conductor size you never needed on every circuit in the job.
+
+Here is the case that separates people who understand the rule from people who have memorised a table. Six 12 AWG copper THHN conductors share a raceway in a 40 °C attic, on 20 A breakers. Is that legal?
+
+**Yes: 30 × 0.91 × 0.80 = 21.84 A, which comfortably holds 20 A.** Get the starting number wrong and the same circuit computes to 17.60 A, fails, and sends you to 10 AWG for nothing.
+
+## Start at the Conductor's Column, Not the Terminal's
+
+<BlogInfographic
+  title="Derate from the conductor's column, not the terminal's"
+  caption="Six current-carrying 12 AWG copper THHN in one raceway, 40 °C ambient, on a 20 A breaker."
+>
+  <DeratingBaseColumnDiagram />
+</BlogInfographic>
+
+The 90 °C column of Table 310.16 is not an ampacity you are allowed to load a conductor to. It is a **derating base**. That distinction is the whole rule:
+
+- **310.15 derates from the conductor's own insulation rating.** THHN, THWN-2 and XHHW-2 are 90 °C insulations, so their correction and adjustment factors apply to the 90 °C column — 30 A for 12 AWG copper.
+- **110.14(C) then caps the finished number** at the temperature rating of the terminations, which for ordinary breakers and lugs is 75 °C. For 12 AWG copper that ceiling is 25 A.
+- **240.4(D) separately caps the overcurrent device** for 14, 12 and 10 AWG regardless of any of the above.
+
+So there are two limits and they do different jobs. You derate *from* 90 and you are capped *at* 75. Applying the 75 °C figure as the starting point double-counts the termination limit, and that is the single commonest derating error in the trade.
+
+One nuance worth knowing about that termination cap: 110.14(C)(1)(a) actually defaults circuits rated 100 A or less to the **60 °C** column unless the equipment is listed and identified for a higher temperature. Virtually all modern breakers, panelboards and receptacles are marked 60/75 °C, which is why 75 °C is the practical number — but it is a marking on the equipment, not an assumption, and on genuinely old gear it may not be there.
+
+## The Two Corrections
+
+Two independent factors reduce ampacity, and they multiply.
+
+**Ambient temperature correction** — Table 310.15(B)(1)(1). Table 310.16 assumes 30 °C (86 °F). Hotter than that and you multiply down; colder and you may actually multiply *up*.
+
+| Ambient | 60 °C | 75 °C | 90 °C |
+| --- | --- | --- | --- |
+| ≤ 10 °C | 1.29 | 1.20 | 1.15 |
+| 21–25 °C | 1.08 | 1.05 | 1.04 |
+| 26–30 °C | 1.00 | 1.00 | 1.00 |
+| 31–35 °C | 0.91 | 0.94 | 0.96 |
+| 36–40 °C | 0.82 | 0.88 | 0.91 |
+| 41–45 °C | 0.71 | 0.82 | 0.87 |
+| 46–50 °C | 0.58 | 0.75 | 0.82 |
+| 51–55 °C | 0.41 | 0.67 | 0.76 |
+| 56–60 °C | — | 0.58 | 0.71 |
+
+Notice that the 90 °C column is punished least. A conductor with more thermal headroom loses proportionally less of it, which is the second reason 90 °C insulation is worth specifying even when the terminals cap you at 75.
+
+**Conductor bundling adjustment** — Table 310.15(C)(1). More than three current-carrying conductors in a raceway, or cables bundled together for more than 24 inches, and heat can no longer escape freely.
+
+| Current-carrying conductors | Factor |
+| --- | --- |
+| 1–3 | 1.00 |
+| 4–6 | 0.80 |
+| 7–9 | 0.70 |
+| 10–20 | 0.50 |
+| 21–30 | 0.45 |
+| 31–40 | 0.40 |
+| 41 or more | 0.35 |
+
+The jump from 0.70 to 0.50 at ten conductors is brutal and catches people out — going from nine to ten conductors costs you 29% of what was left, not 3%.
+
+## How Far the Bundle Actually Goes
+
+<BlogInfographic
+  title="Where a 20 A circuit stops surviving the bundle"
+  caption="12 AWG copper THHN at 40 °C, derated from its 30 A base at 90 °C. The dashed line is the 20 A breaker."
+>
+  <DeratingCountLadderDiagram />
+</BlogInfographic>
+
+| Current-carrying conductors | Factor | Adjusted ampacity | 20 A? |
+| --- | --- | --- | --- |
+| 3 | 1.00 | 27.30 A | holds |
+| 6 | 0.80 | 21.84 A | holds |
+| 9 | 0.70 | 19.11 A | fails |
+| 12 | 0.50 | 13.65 A | fails |
+| 24 | 0.45 | 12.29 A | fails |
+| 40 | 0.40 | 10.92 A | fails |
+
+**Six current-carrying conductors is the practical ceiling for 20 A circuits in a hot raceway** — three circuits with individual neutrals. That is a far more useful number than the fill capacity of the conduit, because it binds first: 3/4-inch EMT accepts sixteen 12 AWG conductors on fill, and derating stops you at a fraction of that. The full comparison is in **[How to Calculate Conduit Fill](/blog/how-to-calculate-conduit-fill)**.
+
+Notice too that nine conductors *do* pass at 30 °C — 30 × 1.00 × 0.70 = 21.00 A. The 40 °C ambient is what pushes them under. Which is the next problem.
+
+## Both Corrections at Once
+
+<BlogInfographic
+  title="Neither correction means anything on its own"
+  caption="12 AWG copper THHN, 30 A at 90 °C, against a 20 A breaker. Green holds; red does not."
+>
+  <DeratingGridDiagram />
+</BlogInfographic>
+
+|  | 30 °C | 40 °C | 50 °C |
+| --- | --- | --- | --- |
+| **3 conductors** | 30.00 A | 27.30 A | 24.60 A |
+| **6 conductors** | 24.00 A | 21.84 A | 19.68 A |
+| **9 conductors** | 21.00 A | 19.11 A | 17.22 A |
+
+The failure boundary runs diagonally. Six conductors are fine at 30 °C and 40 °C and fail at 50 °C — by 0.32 A. Nine conductors are fine only at 30 °C. That is why "four to six conductors is fine" is not a rule you can carry around, and why the honest answer to "how many circuits can I put in this pipe?" always starts with "how hot does it get?"
+
+For reference, common ambients that beat 30 °C: a vented attic in a hot climate runs 50–60 °C in summer, an unconditioned garage or industrial ceiling 35–45 °C, and direct sun on a wall-mounted raceway anywhere with a real summer.
+
+## What Counts as Current-Carrying
+
+This is the other half of getting the answer right, and the rules are not intuitive.
+
+- **The equipment grounding conductor never counts.** It carries no current except during a fault. Neither does an isolated bonding jumper.
+- **A neutral that carries only unbalanced current does not count.** In a two-pole 120/240 V multiwire branch circuit — two hots sharing one neutral — you count **two**, not three. The neutral only ever carries the difference.
+- **A neutral in a 4-wire three-phase wye feeder with significant nonlinear load does count.** Triplen harmonics from electronic ballasts, LED drivers, VFDs and computer power supplies add in the neutral rather than cancelling, so 310.15(E)(2) makes you count it.
+- **Everything else that carries load current counts,** including a conductor sitting idle on a de-energised circuit if it's part of a live circuit.
+
+Contrast this with conduit fill, where **everything in the pipe counts including the ground.** The two calculations count different things, which is why running them from the same number is wrong.
+
+## The Exemptions Worth Knowing
+
+Three real escape hatches:
+
+**Short nipples.** A raceway not exceeding 24 inches in length is exempt from the bundling adjustment altogether — and Chapter 9 Table 1, Note 4 simultaneously allows it to be filled to **60%**. Both concessions at once, which is why a short nipple between two adjacent panels can be packed in a way a 40-foot run never could.
+
+**Cables not bundled for more than 24 inches.** The adjustment applies to cables "bundled together for more than 24 inches without maintaining spacing." Cables fanning out from a panel, or crossing each other, are not bundled. Cables strapped together along a joist for ten feet are.
+
+**Underground and outdoor entries.** Conductors entering from outside are exempt from the adjustment for the length inside where they are not bundled with others.
+
+There is also a rule that used to exist and often still gets quoted: the **rooftop temperature adder**. Older code cycles added up to 33 °C to the ambient for a raceway exposed on a roof. That adder was largely removed in the 2017 cycle, so whether it applies to you depends on which cycle your jurisdiction has adopted — see **[NEC Adoption by State](/blog/nec-adoption-by-state)**.
+
+## Where This Actually Bites
+
+Two cases from real work where derating changes the answer:
+
+**A 30 A circuit fails where a 20 A circuit passes.** Six 10 AWG copper THHN conductors at 40 °C give 40 × 0.91 × 0.80 = **29.12 A**, which does *not* hold a 30 A breaker — it misses by less than an amp. The 12 AWG on 20 A in the same raceway passes with 1.84 A to spare. The proportions are not the same at every size, so you cannot reason from one circuit to another.
+
+**With NM cable the penalty is the ceiling, not the derating.** This one is widely got wrong in both directions. NEC 334.80 holds NM cable's ampacity to the **60 °C** column — but it explicitly permits the **90 °C rating to be used for the correction and adjustment calculations**, provided the final derated ampacity doesn't exceed the 60 °C value.
+
+So six 10 AWG NM conductors at 40 °C derate exactly like THHN: 40 × 0.91 × 0.80 = **29.12 A**, then capped at the 60 °C figure of 30 A, which doesn't bind. Identical arithmetic. What differs is the *undereated* ceiling — NM's 10 AWG stops at 30 A where THHN in conduit reaches 35 A — and that gap is what changes conductor sizes on larger circuits. The ladder is worked through in **[THHN vs NM-B vs MC Cable](/blog/thhn-vs-nm-b-vs-mc-cable)**.
+
+## Common Mistakes
+
+- **Derating from the 75 °C column.** Start at the conductor's insulation rating; 110.14(C) caps the answer separately.
+- **Counting the ground.** It never counts for derating. It always counts for fill.
+- **Counting the neutral of a multiwire branch circuit.** Two hots and a shared neutral is two current-carrying conductors, not three.
+- **Not counting the neutral on a wye feeder with electronic loads.** Harmonics don't cancel; 310.15(E)(2) makes you count it.
+- **Forgetting the 0.70 → 0.50 cliff at ten conductors.** One extra conductor can cost 29%.
+- **Applying only one factor.** Ambient and bundling multiply. Six conductors at 50 °C fails; either condition alone passes.
+- **Assuming fill capacity is the limit.** Derating almost always binds first in a hot raceway.
+- **Ignoring the 24-inch nipple exemption.** It exempts you from bundling *and* allows 60% fill.
+- **Reasoning from one wire size to another.** 12 AWG on 20 A survives six bundled conductors at 40 °C; 10 AWG on 30 A does not.
+- **Deriving NM cable's factors from the 60 °C column.** 334.80 caps the *result* at 60 °C but lets you compute from 90 °C. Starting at 60 °C is needlessly conservative.
+
+## Run the Numbers
+
+> **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** — pick a size, material, insulation rating, ambient temperature and conductor count. It applies Table 310.15(B)(1)(1) and Table 310.15(C)(1) to the correct base column, imposes the 110.14(C) termination cap and the 240.4(D) small-conductor limit, and shows each step.
+
+Every figure in this article is that calculator's output. For the sizing question that comes before derating, start with **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** and the **[Wire Size Chart](/blog/wire-size-chart-amps)**; for the 12 AWG case in detail see **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)**; and for the other constraint that grows conductors on long runs, **[Voltage Drop](/blog/voltage-drop-calculation)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 110.14(C), 240.4(D), 310.15(B)(1) and Table 310.15(B)(1)(1), 310.15(C)(1) and Table 310.15(C)(1), 310.15(E), Table 310.16, 334.80, Chapter 9 Table 1 Note 4. Local amendments override the model code and the AHJ has final say. Have electrical work designed and installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What is wire derating?
+
+It is reducing a conductor's table ampacity to account for conditions hotter than the table assumes. Table 310.16 is based on a 30 °C ambient with no more than three current-carrying conductors together. A hotter ambient gets a correction factor from Table 310.15(B)(1)(1), and more than three conductors gets an adjustment factor from Table 310.15(C)(1). The two multiply.
+
+### Do I derate from the 75 °C or the 90 °C column?
+
+From the column matching the conductor's insulation, which for THHN, THWN-2 and XHHW-2 is 90 °C. The 75 °C termination rating is applied afterwards as a ceiling on the finished number under 110.14(C). Deriving the factors from the 75 °C column double-counts that limit — on six 12 AWG conductors at 40 °C it turns a legal 21.84 A into a failing 17.60 A.
+
+### How many current-carrying conductors can I put in one conduit?
+
+For 20 A circuits on 12 AWG THHN in a 40 °C ambient, six — which is three circuits with individual neutrals. Six conductors derate to 21.84 A and hold 20 A; nine derate to 19.11 A and do not. At a 30 °C ambient nine just pass at 21.00 A. The conduit's fill capacity is usually much higher than this, so derating is normally the binding limit.
+
+### Does the ground wire count for derating?
+
+No. Equipment grounding conductors and bonding jumpers are not counted, because they carry no current except during a fault. They *do* count for conduit fill, which is a different calculation with different rules — everything physically in the raceway counts for fill.
+
+### Does the neutral count as a current-carrying conductor?
+
+It depends on the circuit. In a 120/240 V multiwire branch circuit with two hots sharing one neutral, no — the neutral carries only the unbalance. In a 4-wire three-phase wye feeder supplying significant nonlinear load such as LED drivers or VFDs, yes — triplen harmonics add rather than cancel in the neutral, and 310.15(E)(2) requires it to be counted.
+
+### When do I not have to apply the bundling adjustment?
+
+Three main cases: a raceway nipple not exceeding 24 inches in length, cables that are not bundled together for more than 24 inches without maintaining spacing, and conductors entering a building from outside for the portion where they are not bundled. The 24-inch nipple also gets 60% fill under Chapter 9 Table 1, Note 4.
+
+### Does Romex derate worse than THHN in conduit?
+
+No — the derating arithmetic is identical, and this is widely misunderstood. NEC 334.80 caps NM cable's ampacity at the 60 °C column but explicitly permits the 90 °C rating to be used for the correction and adjustment calculations. Six 10 AWG NM conductors at 40 °C give 40 × 0.91 × 0.80 = 29.12 A, exactly as THHN does, then get capped at the 60 °C figure of 30 A, which doesn't bind. What NM loses is the *undereated* ceiling: 10 AWG NM stops at 30 A where THHN in conduit reaches 35 A.
+
+### Can derating factors ever be greater than 1?
+
+Yes, for ambient correction below 30 °C. At 10 °C or under, a 90 °C conductor gets 1.15 and a 60 °C conductor 1.29. It is legitimate and occasionally useful for cold-climate outdoor and unheated-space runs, though the 110.14(C) termination cap and the 240.4(D) small-conductor limits still apply and usually absorb the gain.

@@ -1,0 +1,59 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Three different claims travel under the name "the 80% rule". Only one of them
+ * is in the code. Separating them is the whole value of the article, because the
+ * panel-capacity myth in particular sells unnecessary service upgrades.
+ */
+const claims = [
+  {
+    accent: C.green,
+    verdict: "IN THE CODE",
+    claim: "Continuous load ≤ 80% of the device",
+    detail: "210.20(A) and 215.3 require the device to be sized at 125% of continuous load. Same rule, inverted.",
+  },
+  {
+    accent: C.red,
+    verdict: "NOT A CODE RULE",
+    claim: "Never load a panel past 80% of its rating",
+    detail: "No such requirement exists. Article 220 sizes the service; a correctly calculated 200 A service may carry 200 A.",
+  },
+  {
+    accent: C.red,
+    verdict: "NOT A CODE RULE",
+    claim: "Never load any circuit past 80%",
+    detail: "Non-continuous loads may use 100% of the rating. Most dwelling circuits have no continuous load at all.",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Three claims called the 80 percent rule, only one of them real</title>
+  <desc>
+    The requirement that continuous load not exceed 80 percent of the device rating is in the code, as the inverse of
+    the 125 percent factor in 210.20(A) and 215.3. The claim that a panel must never be loaded past 80 percent of its
+    rating is not a code rule — Article 220 sizes the service and a correctly calculated 200 amp service may carry
+    200 amps. The claim that no circuit may be loaded past 80 percent is also wrong, because non-continuous loads may
+    use the full rating.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three different claims share the name. One is real.</text>
+
+  {claims.map((c, i) => {
+    const y = 54 + i * 62;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="54" rx="9" fill={c.accent} opacity="0.07" />
+        <rect x="24" y={y} width="672" height="54" rx="9" fill="none" stroke={c.accent} stroke-width="1.6" />
+        <rect x="38" y={y + 11} width="112" height="18" rx="5" fill={c.accent} />
+        <text x="94" y={y + 24} text-anchor="middle" fill={C.white} font-family={FONT} font-size="8" font-weight="800">{c.verdict}</text>
+        <text x="164" y={y + 25} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{c.claim}</text>
+        <text x="38" y={y + 45} fill={C.muted} font-family={FONT} font-size="9">{c.detail}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">The panel myth is the expensive one — it talks people into service upgrades they don't need.</text>
+</svg>

@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same 6 in offset at five angles, showing the trade: a shallow angle needs
+ * a long run of conduit but loses almost nothing to shrink, and a steep angle is
+ * compact but eats length. Also flags where the printed shrink table understates
+ * the real figure, which is at 45° and 60°.
+ */
+const OFFSET_IN = 6;
+const ANGLES = [10, 22.5, 30, 45, 60];
+const PRINTED_SHRINK: Record<number, string> = { 10: "1/16", 22.5: "3/16", 30: "1/4", 45: "3/8", 60: "1/2" };
+const PRINTED_VALUE: Record<number, number> = { 10: 0.0625, 22.5: 0.1875, 30: 0.25, 45: 0.375, 60: 0.5 };
+
+const rad = (d: number) => (d * Math.PI) / 180;
+const rows = ANGLES.map((deg) => {
+  const csc = 1 / Math.sin(rad(deg));
+  const cot = 1 / Math.tan(rad(deg));
+  const shrinkPerIn = csc - cot;
+  return {
+    deg,
+    between: OFFSET_IN * csc,
+    shrink: OFFSET_IN * shrinkPerIn,
+    shrinkPerIn,
+    printed: PRINTED_SHRINK[deg],
+    understated: shrinkPerIn - PRINTED_VALUE[deg] > 0.02,
+  };
+});
+
+const peak = Math.max(...rows.map((r) => r.between));
+const BAR_X = 132;
+const BAR_MAX = 300;
+const bars = rows.map((r) => ({ ...r, width: Math.round((r.between / peak) * BAR_MAX) }));
+const understated = rows.filter((r) => r.understated).map((r) => `${r.deg}°`).join(" and ");
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>A six inch offset at five bend angles</title>
+  <desc>
+    A 6 inch offset needs bend marks 34.55 inches apart at 10 degrees, 15.68 at 22.5 degrees, 12.00 at 30 degrees,
+    8.49 at 45 degrees and 6.93 at 60 degrees. Shrink runs the other way — 0.52 inches at 10 degrees rising to 3.46
+    inches at 60 degrees. The printed shrink table understates the true figure at 45 and 60 degrees.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`The same ${OFFSET_IN} in offset, five ways`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Bar is the distance between bend marks. Shallow angles need length; steep angles eat it.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ANGLE</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DISTANCE BETWEEN MARKS</text>
+  <text x="530" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SHRINK</text>
+
+  {bars.map((r, i) => {
+    const y = 86 + i * 32;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.deg}°`}</text>
+        <rect x={BAR_X} y={y + 3} width={r.width} height="19" rx="5" fill={C.primary} opacity="0.16" />
+        <rect x={BAR_X} y={y + 3} width={r.width} height="19" rx="5" fill="none" stroke={C.primary} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`${r.between.toFixed(2)} in`}</text>
+        <text x="530" y={y + 16} fill={r.understated ? C.orange : C.dark} font-family={FONT} font-size="10" font-weight="700">{`${r.shrink.toFixed(2)} in`}</text>
+        <text x="592" y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">{`table ${r.printed}"/in${r.understated ? " — low" : ""}`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="266" fill={C.muted} font-family={FONT} font-size="10">{`The printed shrink table is optimistic at ${understated}. csc θ − cot θ is the exact figure.`}</text>
+</svg>

@@ -1,0 +1,168 @@
+---
+title: "10 Gauge Wire Amps: Ratings, Breaker Match, and Max Run Length"
+meta_title: "10 Gauge Wire Amps: 30 A, 35 A, or 40 A? (2026) | TradesQuote"
+description: "10 AWG copper is rated 30, 35 and 40 A in the three columns of Table 310.16. You may load it to 30 A — and at 30 A on 120 V it only reaches 48 feet before voltage drop stops you."
+image: /images/posts/10-gauge-wire-amps-hero.svg
+date: 2026-08-04T12:15:00Z
+categories: ["electrical"]
+tags: ["10 gauge wire","ampacity","nec 240.4","voltage drop","30 amp circuit"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import TenGaugeThreeAnswersDiagram from "@/components/blog/ten-gauge/TenGaugeThreeAnswersDiagram.astro";
+import TenGaugeReachDiagram from "@/components/blog/ten-gauge/TenGaugeReachDiagram.astro";
+import TenGaugeLoadsDiagram from "@/components/blog/ten-gauge/TenGaugeLoadsDiagram.astro";
+
+**10 AWG copper carries 30 amps on a breaker.** That is the answer you need in almost every case, and you can stop reading if that's all you came for.
+
+But you will also find 10 AWG listed at 35 A and at 40 A, both from the same NEC table, and both correct. Those two larger numbers exist for specific purposes, and knowing which is which is the difference between sizing a circuit properly and either failing an inspection or over-buying wire on every run.
+
+The number that actually catches people out isn't the ampacity at all. It's that **30 A on a 120 V circuit runs out of voltage budget at 48 feet.**
+
+## Three Ratings, One Breaker Limit
+
+<BlogInfographic
+  title="Three ratings, and only one sets the breaker"
+  caption="NEC Table 310.16 gives 10 AWG a different number in each column. Each is right for a different job."
+>
+  <TenGaugeThreeAnswersDiagram />
+</BlogInfographic>
+
+| Column | Copper | Aluminum | What it's for |
+| --- | --- | --- | --- |
+| 60 °C | 30 A | 25 A | The ceiling for NM cable (Romex) under 334.80 |
+| 75 °C | 35 A | 30 A | The usable ampacity on ordinary 75 °C lugs |
+| 90 °C | 40 A | 35 A | A derating base only — never a load limit |
+| **240.4(D) cap** | **30 A** | **25 A** | **The maximum breaker, whatever the above says** |
+
+The reason the 35 A figure never becomes a 35 A breaker is **240.4(D)**, the small-conductor rule. It caps overcurrent protection at 15 A for 14 AWG, 20 A for 12 AWG and 30 A for 10 AWG copper — 25 A for 10 AWG aluminum — regardless of what the ampacity table permits. The rule exists because small conductors are the ones that get nicked, over-tightened and damaged in ways that a larger conductor shrugs off.
+
+So the 35 A number is not useless. It's the *conductor's ampacity*, and you use it whenever the question is "does this conductor carry the load?" rather than "what breaker goes on it?" Those separate cleanly in two situations below.
+
+### The one legitimate way to see 10 AWG on a 35 A breaker
+
+**240.4(G)** routes specific loads out of the small-conductor rule entirely, and air conditioning is the common one. A condenser nameplate gives you two figures: a **minimum circuit ampacity (MCA)** and a **maximum overcurrent protective device (MOCP)**. A unit with an MCA of 23 A and an MOCP of 35 A is legally wired with 10 AWG copper on a 35 A breaker, because:
+
+- The conductor only has to carry the MCA — 23 A, well inside 10 AWG's 35 A at 75 °C.
+- The breaker follows the MOCP, which 440.22 sizes for compressor inrush rather than for conductor protection.
+- The compressor's own internal overload protects the conductor, which is what makes it safe.
+
+This looks wrong to anyone who has memorised 240.4(D) and it is entirely correct. The same logic governs motor circuits, where the disparity gets far more dramatic — see **[Motor Circuit Sizing](/blog/motor-circuit-sizing)**.
+
+### The other place the 35 A figure matters
+
+Derating. When you correct 10 AWG for a hot ambient or for bundling, you start from the **90 °C** column — 40 A — because that's the insulation's rating. And here is a case worth remembering:
+
+**Six 10 AWG copper conductors in a 40 °C attic derate to 40 × 0.91 × 0.80 = 29.12 A, which does not hold a 30 A breaker.** It misses by 0.88 A. Meanwhile 12 AWG in the same raceway on 20 A passes with room to spare. The proportions are not the same at every size, which is why you cannot reason from one circuit to the next. The full method is in **[Wire Derating Explained](/blog/wire-derating-nec)**.
+
+## Where 10 AWG Actually Runs Out
+
+<BlogInfographic
+  title="Ampacity is generous; reach is not"
+  caption="Longest one-way run within 3% drop (solid) and 5% (dashed outline), single-phase copper unless marked."
+>
+  <TenGaugeReachDiagram />
+</BlogInfographic>
+
+| Circuit | 3% limit | 5% limit |
+| --- | --- | --- |
+| 30 A, 120 V, copper | 48 ft | 80 ft |
+| 30 A, 240 V, copper | 97 ft | 161 ft |
+| 24 A, 240 V, copper | 121 ft | 201 ft |
+| 30 A, 120 V, aluminum | 29 ft | 49 ft |
+| 30 A, 240 V, aluminum | 59 ft | 98 ft |
+
+**Forty-eight feet is not very far.** A 30 A 120 V circuit to a detached garage, a shop receptacle at the back of a basement, or a well pump in an outbuilding will blow through it easily — and the wire will still be "the right size" by the ampacity table the whole time.
+
+Two things follow. First, **doubling the voltage doubles the reach**, which is the single strongest reason to run 240 V to anything distant that can take it. Second, when you do exceed the limit, the fix is 8 AWG — bought for voltage drop, not for ampacity, and that is a legitimate reason to upsize. The full treatment, including the point that the 3% figure lives in *informational notes* to 210.19(A) and 215.2(A) and is **not enforceable code**, is in **[Voltage Drop](/blog/voltage-drop-calculation)**.
+
+## What Runs on 10 AWG
+
+<BlogInfographic
+  title="What actually runs on 10 AWG"
+  caption="Design current after any 125% continuous factor, against the 30 A ceiling on 10 AWG copper."
+>
+  <TenGaugeLoadsDiagram />
+</BlogInfographic>
+
+| Load | Design current | Breaker | Fits 10 AWG? |
+| --- | --- | --- | --- |
+| Electric dryer, 5,000 VA | 20.83 A | 30 A | yes |
+| Water heater, 4.5 kW | 23.44 A | 30 A | yes |
+| EV charger, 24 A | 30.00 A | 30 A | exactly at the cap |
+| Baseboard heat, 3.5 kW | 18.23 A | 20 A | yes |
+| Well pump, 2 HP | 15.00 A | 30 A | yes |
+
+Three of these deserve a note.
+
+**The dryer.** A 30 A circuit is the near-universal convention, and 5,000 VA at 240 V is only 20.83 A, so there's real headroom. 220.54 gives dryers a **5,000 VA floor** for load-calculation purposes even if the nameplate is lower.
+
+**The water heater.** A 4.5 kW element is 18.75 A, and because storage water heating is treated as a continuous load it gets the 125% factor: 23.44 A. Strictly that only needs a 25 A breaker, but 30 A is conventional and legal on 10 AWG. Don't let the arithmetic push you to 8 AWG — nothing here requires it.
+
+**The EV charger.** A 24 A charger is 24 × 1.25 = **30.00 A exactly**, landing precisely on 10 AWG's cap. It works, and it's the largest charger 10 AWG will ever serve. Ask for 32 A and you're on 8 AWG and a 40 A breaker. That whole ladder — and the reason 48 A is the sweet spot — is in **[What Size Wire for an EV Charger](/blog/what-size-wire-for-ev-charger)**.
+
+## 10 AWG as a Ground Wire
+
+You'll see 10 AWG far more often as an equipment grounding conductor than as a circuit conductor, and there's a tidy reason: **Table 250.122 has no 30 A row.** The table jumps from 20 A to 60 A, so 10 AWG copper is the required EGC for every overcurrent device from 25 A through 60 A — covering 30 A dryer circuits, 40 A ranges, 50 A welders and 60 A subpanel feeders alike.
+
+That is also why a 6/3 cable for a 60 A circuit carries a 10 AWG ground rather than a 6 AWG one, which looks undersized and isn't. The distinction between that EGC and the entirely separate grounding electrode conductor is covered in **[Ground Wire Size Chart](/blog/ground-wire-size-chart)**.
+
+## Aluminum 10 AWG
+
+Rated 25 A at 75 °C, capped at **25 A** by 240.4(D), and reaching only 29 feet at 30 A on 120 V. In practice you will rarely specify it: at branch-circuit sizes aluminum saves very little, and the termination requirements are the same work as on a large feeder. Aluminum earns its place at feeder and service sizes, which is the subject of **[Copper vs Aluminum Wire](/blog/copper-vs-aluminum-wire)**.
+
+## Common Mistakes
+
+- **Putting a 35 A breaker on 10 AWG.** 240.4(D) caps it at 30 A. The only exceptions are 240.4(G) loads like A/C and motors.
+- **Assuming 40 A is a usable ampacity.** It's a derating base. Nothing gets loaded to it.
+- **Treating aluminum 10 AWG as a 30 A conductor.** Its cap is 25 A.
+- **Ignoring the 48-foot limit at 120 V.** Long 30 A 120 V runs exceed 3% drop with perfectly legal wire.
+- **Upsizing an A/C circuit because the breaker exceeds the wire.** Check MCA against the conductor and MOCP against the breaker; they're separate tests.
+- **Forgetting derating on bundled 10 AWG.** Six conductors at 40 °C give 29.12 A and fail a 30 A breaker.
+- **Using NM cable's 60 °C column as the derating base.** 334.80 caps the *result* at 60 °C but permits deriving from 90 °C.
+- **Thinking a 10 AWG ground is undersized in a 6 AWG cable.** Table 250.122 keys the EGC to the breaker, and 10 AWG covers everything to 60 A.
+
+## Check a Specific Run
+
+> **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** — enter size, material, insulation rating, ambient temperature and conductor count. It returns the ampacity from the correct column, applies both derating factors, and imposes the 110.14(C) termination and 240.4(D) small-conductor limits.
+
+Every figure here is that calculator's output. Pair it with the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)** for the reach figures, and see **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** or the **[Wire Size Chart](/blog/wire-size-chart-amps)** to work the other direction from a load. For the size below this one, **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — Table 310.16, 310.15(B)(1) and (C)(1), 110.14(C), 240.4(D), 240.4(G), 334.80, 440.22, Table 250.122, 220.54, and the informational notes to 210.19(A) and 215.2(A). Local amendments override the model code and the AHJ has final say. Have electrical work designed and installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### How many amps can 10 gauge wire carry?
+
+30 amps on a breaker for copper, 25 amps for aluminum, because 240.4(D) caps small conductors regardless of the ampacity table. The conductor's actual ampacity is 35 A at 75 °C, and 40 A at 90 °C, but those figures are used for derating and for load checks such as an air conditioner's minimum circuit ampacity — not for choosing the breaker.
+
+### Can I put a 40 amp breaker on 10 gauge wire?
+
+Not on a general-purpose circuit. 240.4(D) limits 10 AWG copper to 30 A. The exception is 240.4(G) loads — air conditioners and motors — where the breaker is sized by the equipment's maximum overcurrent protective device rating under 440.22 or Table 430.52 and the conductor only has to carry the minimum circuit ampacity. A 35 A breaker on 10 AWG feeding a condenser is legal; a 35 A breaker on a 10 AWG receptacle circuit is not.
+
+### Is 10 gauge wire good for 30 amps?
+
+Yes, and 30 A is exactly its limit in copper. Watch the length rather than the ampacity: at 30 A on a 120 V circuit, 10 AWG copper reaches only 48 feet before exceeding a 3% voltage drop. At 240 V the same circuit reaches 97 feet.
+
+### What size breaker for 10 gauge wire?
+
+30 A for copper, 25 A for aluminum. Smaller is always fine — 10 AWG on a 20 A breaker is common where voltage drop drove the size up. Larger is only permitted for 240.4(G) loads such as air conditioning and motors.
+
+### How far can I run 10 gauge wire?
+
+Within a 3% voltage drop: 48 feet at 30 A on 120 V, 97 feet at 30 A on 240 V, and 121 feet at 24 A on 240 V. Aluminum reaches about 39% less — 29 feet and 59 feet respectively. Doubling the voltage doubles the reach, so running 240 V to a distant load is usually cheaper than upsizing the conductor.
+
+### Is 10 gauge wire enough for a 4,500 watt water heater?
+
+Yes. 4,500 W at 240 V is 18.75 A, and because water heating counts as a continuous load the 125% factor makes it 23.44 A. That needs a 25 A breaker minimum; 30 A is conventional and legal on 10 AWG. There is no reason to go to 8 AWG unless the run is long enough for voltage drop to matter.
+
+### Why is the ground wire only 10 AWG in a 6 AWG cable?
+
+Because Table 250.122 sizes the equipment grounding conductor by the overcurrent device rating, not by the circuit conductors — and the table has no 30 A row, so 10 AWG copper covers every device from 25 A up to 60 A. A 6/3 cable on a 60 A breaker correctly carries a 10 AWG ground. The EGC only carries current during a fault, and briefly.
+
+### How many 10 AWG conductors can share a conduit?
+
+On 30 A breakers, fewer than you'd expect. Six current-carrying 10 AWG conductors in a 40 °C ambient derate to 29.12 A and fail a 30 A breaker; at a 30 °C ambient six give 32.00 A and pass. Four is safe in most conditions. Conduit fill capacity is far higher than this, so derating is the binding limit.

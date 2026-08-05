@@ -1,0 +1,66 @@
+---
+import { ampacityOf, smallConductorCap, CONDUCTOR_SIZES } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * "10 gauge wire amps" has three defensible answers and one usable one. The
+ * three columns of Table 310.16 are each correct for a different purpose, and
+ * 240.4(D) then overrides all of them for the overcurrent device.
+ */
+const SIZE = CONDUCTOR_SIZES.find((s) => s.label === "10")!;
+
+const columns = ([60, 75, 90] as const).map((t) => ({
+  temp: t,
+  copper: ampacityOf(SIZE, "copper", t)!,
+  aluminum: ampacityOf(SIZE, "aluminum", t)!,
+  role:
+    t === 60
+      ? "NM cable ceiling (334.80)"
+      : t === 75
+        ? "the usable ampacity on 75 °C lugs"
+        : "the derating base only",
+}));
+
+const capCu = smallConductorCap("10", "copper")!;
+const capAl = smallConductorCap("10", "aluminum")!;
+
+const COL_X = [188, 358, 528];
+const COL_W = 156;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The three ampacities of 10 AWG and the one that limits the breaker</title>
+  <desc>
+    10 AWG copper is rated 30 amps in the 60 degree column, 35 amps at 75 degrees and 40 amps at 90 degrees, and
+    aluminum is 25, 30 and 35 amps. Section 240.4(D) then caps the overcurrent device at 30 amps for copper and 25
+    amps for aluminum regardless of which column applies, so the practical answer to how many amps 10 gauge wire
+    carries is 30 amps on copper.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three ratings, and only one sets the breaker</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">NEC Table 310.16 gives 10 AWG a different number in each column. Each is right for a different job.</text>
+
+  {columns.map((col, j) => (
+    <g>
+      <rect x={COL_X[j]} y="74" width={COL_W} height="106" rx="9" fill={j === 1 ? C.blueLight : C.white} stroke={j === 1 ? C.blue : C.border} stroke-width={j === 1 ? 1.8 : 1.2} />
+      <text x={COL_X[j] + COL_W / 2} y="94" text-anchor="middle" fill={j === 1 ? C.blue : C.muted} font-family={FONT} font-size="10" font-weight="800">{`${col.temp} °C COLUMN`}</text>
+      <text x={COL_X[j] + COL_W / 2} y="124" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="22" font-weight="800">{`${col.copper} A`}</text>
+      <text x={COL_X[j] + COL_W / 2} y="142" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{`aluminum ${col.aluminum} A`}</text>
+      <text x={COL_X[j] + COL_W / 2} y="166" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{col.role}</text>
+    </g>
+  ))}
+
+  <text x="28" y="122" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">10 AWG copper</text>
+  <text x="28" y="138" fill={C.muted} font-family={FONT} font-size="8.5">10,380 circular mils</text>
+
+  <rect x="24" y="196" width="330" height="56" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="2.2" />
+  <text x="42" y="218" fill={C.primary} font-family={FONT} font-size="9.5" font-weight="800">240.4(D) · COPPER</text>
+  <text x="42" y="240" fill={C.dark} font-family={FONT} font-size="15" font-weight="800">{`${capCu} A maximum breaker`}</text>
+
+  <rect x="366" y="196" width="330" height="56" rx="9" fill={C.white} stroke={C.border} stroke-width="1.4" />
+  <text x="384" y="218" fill={C.muted} font-family={FONT} font-size="9.5" font-weight="800">240.4(D) · ALUMINUM</text>
+  <text x="384" y="240" fill={C.dark} font-family={FONT} font-size="15" font-weight="800">{`${capAl} A maximum breaker`}</text>
+
+  <text x="24" y="274" fill={C.muted} font-family={FONT} font-size="10">The one exception is 240.4(G): air conditioners and motors follow 440.22 and 430.52 and may exceed these caps.</text>
+</svg>

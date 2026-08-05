@@ -1,0 +1,54 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The 220.87 chain exactly as the existing-load calculator computes it: the
+ * utility's recorded peak at 125%, plus the new load at 125% where continuous,
+ * measured against the service rating.
+ */
+const PEAK = 44;
+const SERVICE = 100;
+const CHARGER = 32;
+
+const existing = PEAK * 1.25;
+const added = CHARGER * 1.25;
+const total = existing + added;
+const headroom = SERVICE - total;
+const fits = total <= SERVICE;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>The NEC 220.87 calculation chain</title>
+  <desc>
+    A utility-recorded 12-month peak of 44 amps times 125 percent gives an established existing load of 55.0 amps.
+    A 32 amp EV charger, continuous under 625.41, adds 32 times 1.25 or 40.0 amps. The total is 95.0 amps against a
+    100 amp service, leaving 5.0 amps of headroom, so no upgrade is required on the basis of load.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two multiplications and a comparison</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`A ${SERVICE} A service, a ${PEAK} A recorded peak, and a ${CHARGER} A EV charger.`}</text>
+
+  <rect x="24" y="76" width="456" height="58" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="42" y="98" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">1 · EXISTING LOAD · 220.87</text>
+  <text x="42" y="120" fill={C.dark} font-family={FONT} font-size="12">{`${PEAK} A recorded peak × 1.25`}</text>
+  <rect x="496" y="76" width="200" height="58" rx="9" fill={C.white} stroke={C.blue} stroke-width="1.8" />
+  <text x="596" y="112" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="19" font-weight="800">{`${fmt(existing, 1)} A`}</text>
+
+  <rect x="24" y="146" width="456" height="58" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="42" y="168" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">2 · NEW LOAD · 625.41 MAKES EVSE CONTINUOUS</text>
+  <text x="42" y="190" fill={C.dark} font-family={FONT} font-size="12">{`${CHARGER} A charger × 1.25`}</text>
+  <rect x="496" y="146" width="200" height="58" rx="9" fill={C.white} stroke={C.orange} stroke-width="1.8" />
+  <text x="596" y="182" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="19" font-weight="800">{`${fmt(added, 1)} A`}</text>
+
+  <rect x="24" y="216" width="672" height="58" rx="10" fill={fits ? C.primaryLight : C.redLight} stroke={fits ? C.primary : C.red} stroke-width="1.8" />
+  <text x="44" y="240" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">
+    {`${fmt(existing, 1)} + ${fmt(added, 1)} = ${fmt(total, 1)} A against a ${SERVICE} A service`}
+  </text>
+  <text x="44" y="260" fill={C.muted} font-family={FONT} font-size="9.5">
+    {fits
+      ? `Fits, with ${fmt(headroom, 1)} A of headroom. No upgrade is required on the basis of load.`
+      : `Over by ${fmt(-headroom, 1)} A.`}
+  </text>
+</svg>

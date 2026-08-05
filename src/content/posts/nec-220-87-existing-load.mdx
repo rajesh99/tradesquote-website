@@ -1,0 +1,188 @@
+---
+title: "NEC 220.87: Using Utility Data to Prove You Don't Need a Panel Upgrade"
+meta_title: "NEC 220.87: Existing Load from Utility Demand Data (2026) | TradesQuote"
+description: "The calculated methods say this house needs a 125 A service. Its utility peak was 44 A, so 220.87 establishes 55.0 A of existing load — and a 32 A EV charger fits the 100 A service with 5.0 A spare."
+image: /images/posts/nec-220-87-existing-load-hero.svg
+date: 2026-08-04T13:45:00Z
+categories: ["electrical"]
+tags: ["nec 220.87","existing load","panel upgrade","demand data","ev charger"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import Load22087ChainDiagram from "@/components/blog/existing-load-22087/Load22087ChainDiagram.astro";
+import Load22087ChargerLadderDiagram from "@/components/blog/existing-load-22087/Load22087ChargerLadderDiagram.astro";
+import Load22087VsCalculatedDiagram from "@/components/blog/existing-load-22087/Load22087VsCalculatedDiagram.astro";
+
+Every load calculation in Article 220 except one models a house that doesn't exist — a hypothetical dwelling where the range, the dryer, the water heater and the air conditioner might all draw at once, moderated by demand factors that are averages across the whole housing stock.
+
+**220.87 does something different: it measures your actual house.** Take the highest demand the utility recorded over the last twelve months, multiply by 125%, and that is your established existing load. One line of code, and it routinely produces a number **40–50% lower** than the calculated methods.
+
+On the house worked through below, the optional calculation says **101.2 A** — over a 100 A service, upgrade required. The utility's recorded peak was **44 A**, so 220.87 establishes **55.0 A**, and a 32 A EV charger fits with **5.0 A to spare.**
+
+That difference is a $4,000 panel upgrade that didn't need to happen. Almost no contractor offers this calculation, which is the main reason to know about it.
+
+## The Calculation
+
+<BlogInfographic
+  title="Two multiplications and a comparison"
+  caption="A 100 A service, a 44 A recorded peak, and a 32 A EV charger."
+>
+  <Load22087ChainDiagram />
+</BlogInfographic>
+
+```
+Existing load = maximum demand over the last 12 months × 125%
+New load      = the added load, × 125% if continuous
+Total         = existing + new, compared against the service rating
+```
+
+- **Existing:** 44 A × 1.25 = **55.0 A**
+- **New:** a 32 A charger is continuous under 625.41, so 32 × 1.25 = **40.0 A**
+- **Total:** 95.0 A against a 100 A service → **fits, 5.0 A of headroom**
+
+That's the whole method. The 125% on the existing load is the code's safety margin for the possibility that the next twelve months are busier than the last twelve.
+
+### The exact conditions
+
+220.87 is permitted where the maximum demand data covers a **1-year period**. Two provisos matter:
+
+**Where a year of data isn't available**, 220.87(2) permits demand data recorded over a **minimum 30-day period**, using a recording ammeter or power meter, with the recording taken to include the highest seasonal load — which in practice means recording in the heating or cooling season, whichever is heavier for that house.
+
+**Where the load is increased**, you add the new load to the established existing load, which is what the calculation above does. 220.87 is explicitly a tool for adding load to an existing installation.
+
+**220.83 is the sibling method** for adding load to an existing dwelling using calculated rather than measured figures, and it's worth knowing about when demand data genuinely isn't obtainable.
+
+## Where to Get the Data
+
+This is the practical obstacle, and it's smaller than people assume.
+
+**Most utilities will provide 12 months of interval or demand data on request**, often through the customer portal, sometimes on a form, occasionally only to the account holder. Ask for "maximum demand" or "peak demand in amps or kW." If the data comes in kW, convert: kW × 1000 ÷ 240 gives amps for a single-phase 120/240 V service.
+
+**Smart meters make this routine.** Where AMI meters are installed the utility already has interval data at 15-minute or hourly granularity, and the annual peak is a query.
+
+**Where the utility won't or can't**, install a recording ammeter or a data-logging CT clamp on the service conductors for 30 days per 220.87(2). Metering gear for this is inexpensive to rent, and the reading is trivially defensible — it's a measurement.
+
+**Document it for the AHJ.** A 220.87 calculation stands or falls on the credibility of its input. Keep the utility's own printout or the logger's export, note the period covered, and state which seasonal peak it includes. Inspectors are generally fine with this method; they're not fine with an unsourced number.
+
+## Which Charger Fits
+
+<BlogInfographic
+  title="The charger you specify is the whole decision"
+  caption="55.0 A of established existing load, plus each charger at 125%, against a 100 A service."
+>
+  <Load22087ChargerLadderDiagram />
+</BlogInfographic>
+
+| Charger | Added at 125% | Total | Verdict |
+| --- | --- | --- | --- |
+| 16 A (3.8 kW) | 20.0 A | 75.0 A | fits, 25.0 A spare |
+| 24 A (5.8 kW) | 30.0 A | 85.0 A | fits, 15.0 A spare |
+| 32 A (7.7 kW) | 40.0 A | 95.0 A | **fits, 5.0 A spare** |
+| 40 A (9.6 kW) | 50.0 A | 105.0 A | **over by 5.0 A** |
+| 48 A (11.5 kW) | 60.0 A | 115.0 A | over by 15.0 A |
+
+**The 32 A and 40 A rows are the entire decision, and they're 5.0 A either side of the line.** Specify 32 A and the job is a circuit — a few hundred dollars. Specify 40 A and the job is a service upgrade — a few thousand.
+
+And the 32 A charger is not a compromise. **32 A at 240 V is about 7.7 kW, which adds roughly 25–30 miles of range per hour.** Overnight that's 250 miles or more. Almost nobody driving a car needs more than that at home; the case for 48 A is fast top-ups, not daily charging.
+
+This is the most useful sentence in the article: **specifying a 32 A charger instead of a 48 A one is often the entire difference between a $300 circuit and a $4,000 upgrade.** See **[EV Charger Installation Cost](/blog/ev-charger-installation-cost)** for what each path actually costs, and **[What Size Wire for an EV Charger](/blog/what-size-wire-for-ev-charger)** for the conductor ladder.
+
+Most modern EVSE is **field-adjustable** too, so a 48 A unit can often be commissioned at 32 A — you keep the hardware headroom for a future service upgrade without needing one now. That has to be a set-and-documented configuration, not a preference.
+
+## Why It Diverges So Far From the Calculated Methods
+
+<BlogInfographic
+  title="One house, three legal answers"
+  caption="A 2,000 ft² all-electric house on a 100 A service. All three methods are in the code."
+>
+  <Load22087VsCalculatedDiagram />
+</BlogInfographic>
+
+| Method | Result | On a 100 A service |
+| --- | --- | --- |
+| 220.42 standard (Part III) | 122.2 A | needs 125 A |
+| 220.82 optional | 101.2 A | needs 125 A |
+| **220.87 measured** | **55.0 A** | **fits** |
+
+The two calculated methods disagree with each other by about 21% — that comparison is worked in full in **[Residential Load Calculation](/blog/residential-electrical-load-calculation)** and **[Standard vs Optional Load Calculation](/blog/standard-vs-optional-load-calculation)**. But both of them sit roughly twice the measured figure, and that's not an error in either direction.
+
+**The calculated methods are deliberately conservative and generic.** They have to produce a safe answer for a house the designer has never seen, occupied by people whose habits are unknown, for the next fifty years. Their demand factors are population averages.
+
+**220.87 is specific and retrospective.** It knows that in this house nobody runs the dryer while the oven is on, that the heat pump does most of the heating work, and that the 12 kW range has never drawn 12 kW. It has twelve months of evidence.
+
+Neither is wrong. They answer different questions — "what could this house draw?" versus "what does this house draw?" — and when you're adding load to an existing installation, the second question is the relevant one and the code says so.
+
+## The Limits, Honestly
+
+**It only works on an existing, occupied installation.** New construction has no demand history, so you calculate. A house that's been empty, or just changed hands with a very different household arriving, has demand history that may not represent the future — and an inspector may reasonably say so.
+
+**It establishes the *existing* load, not the total.** New load gets added at full value on top, with the 125% continuous factor where it applies. 220.87 doesn't discount what you're adding.
+
+**A big new load can swamp it.** Adding electric heat, or converting a gas house to all-electric, adds so much that the measured baseline stops being decisive. The method shines where the addition is moderate relative to the service — a charger, a heat pump, a hot tub.
+
+**Panel spaces and busbar rating are separate limits.** 220.87 tells you the service has capacity. It says nothing about whether the panel has two spare spaces or whether its busbar is rated for the breaker you want to add. Those are independent constraints, as covered in **[Main Breaker vs Main Lug Panels](/blog/main-breaker-vs-main-lug)**.
+
+**The service conductors and the panel must actually be adequate for their rating.** A "100 A service" with undersized service-entrance conductors was never a 100 A service. Check, don't assume — see **[What Size Electrical Service Do I Need](/blog/what-size-electrical-service-do-i-need)**.
+
+**Where the load genuinely doesn't fit, load management is the other route.** Article 750 energy management systems, and 625.42 for EVSE specifically, permit a controlled load that sheds when the service approaches capacity. That's frequently cheaper than a service upgrade and is the standard answer for a 48 A charger on a 100 A service.
+
+## A Genuine Code Ambiguity Worth Knowing
+
+Whether EVSE load gets a demand-factor discount in the *optional* calculation is interpreted differently by different AHJs, and 220.57 sets a 7,200 VA or nameplate minimum for EVSE load. Under **220.87 the question doesn't arise** — the new load is added at 125% and there's no remainder factor to argue about, which is one more reason the measured method produces a cleaner conversation with an inspector.
+
+## Common Mistakes
+
+- **Not asking the utility.** Most will provide 12 months of demand data, and smart meters make it a query.
+- **Using an average instead of the peak.** 220.87 uses the *maximum* demand recorded.
+- **Forgetting the 125% on the existing load.** It's the code's margin, not optional.
+- **Forgetting the 125% on a continuous new load.** EVSE is continuous by rule under 625.41.
+- **Recording 30 days in the wrong season.** 220.87(2) requires the highest seasonal load to be included.
+- **Using it for new construction.** No demand history, so no measured method.
+- **Assuming it covers panel spaces or busbar rating.** Separate limits entirely.
+- **Not documenting the source.** The method is only as defensible as its input data.
+- **Specifying a 48 A charger by default.** 32 A adds 25–30 miles of range per hour and often avoids an upgrade.
+
+## Run It on Your Own Service
+
+> **[Existing Load Calculator](/calculators/electrical/electrical-existing-load-calculator)** — enter the utility's recorded peak, your service rating, and the new load with whether it's continuous. It applies the 125% factors, returns the total against the service, states the headroom, and where it doesn't fit names the options including load management.
+
+Every figure in this article is that calculator's output. Compare it against the calculated methods with the **[Load Calculator](/calculators/electrical/electrical-load-calculator)** (220.82) and the **[Service Size Calculator](/calculators/electrical/electrical-service-size-calculator)**. For the consumer-facing version of this question see **[Do I Need a Panel Upgrade](/blog/do-i-need-a-panel-upgrade)**, and for the EV-specific case **[Do You Need a Panel Upgrade for an EV Charger](/blog/panel-upgrade-for-ev-charger)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 220.42, 220.57, 220.82, 220.83, 220.87 and 220.87(2), 210.20(A), 625.41, 625.42, Article 750. Availability and format of utility demand data varies by utility. Local amendments override the model code and the AHJ has final say. Have load calculations and service work performed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What is NEC 220.87?
+
+It permits the existing load on a service or feeder to be established from the maximum demand the utility recorded over the previous 12 months, multiplied by 125%. New load is then added on top. It's the only method in Article 220 that measures a specific building rather than calculating a hypothetical one, and it typically produces a figure 40–50% below the calculated methods.
+
+### How do I get 12 months of demand data from my utility?
+
+Ask for maximum or peak demand for the account, usually through the customer portal or a written request. Where smart meters are installed the utility already holds interval data and the annual peak is a simple query. If the figure comes in kW, divide by the service voltage — kW × 1000 ÷ 240 for a single-phase 120/240 V service — to get amps.
+
+### What if the utility won't give me the data?
+
+220.87(2) permits demand data recorded over a minimum 30-day period instead, using a recording ammeter or power meter installed on the service. The recording must include the highest seasonal load, so record during the heating or cooling season, whichever is heavier for that house. Logging equipment is cheap to rent and the result is easy to defend.
+
+### Will an inspector accept a 220.87 calculation?
+
+Generally yes — it's an explicit code method, not a workaround. What matters is documenting the input: keep the utility's own printout or the logger's export, state the period it covers, and note which seasonal peak it includes. The method is only as credible as its data, and an unsourced number will be challenged.
+
+### Can I use 220.87 for new construction?
+
+No. A new building has no demand history to measure, so you use the standard method in Part III of Article 220 or the optional method in 220.82. 220.87 is specifically a tool for existing installations, most usefully when adding load to one.
+
+### Why is the measured load so much lower than the calculated load?
+
+Because the calculated methods must produce a safe answer for a house nobody has seen, occupied by unknown people, for decades — so their demand factors are population averages built to cover the worst plausible household. 220.87 has twelve months of evidence about one specific house. On the worked example the optional method gives 101.2 A and the measured method 55.0 A, and neither is wrong; they answer different questions.
+
+### Does the new load get a discount too?
+
+No. The new load is added at its full value, with the 125% continuous-load factor applied where it applies — and EV supply equipment is continuous by rule under 625.41. So a 32 A charger adds 40.0 A, not 32 A. 220.87 discounts nothing about what you're adding; its benefit is entirely in how it establishes the *existing* load.
+
+### What if the load still doesn't fit?
+
+Three options, in rough order of cost. Specify a smaller version of the new load — a 32 A charger instead of 48 A is often the whole answer. Install a load-management system under Article 750, or 625.42 for EVSE, which sheds the controlled load as the service approaches capacity. Or upgrade the service. Load management is frequently the cheapest and is under-offered.

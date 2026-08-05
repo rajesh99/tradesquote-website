@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The countertop rule drawn to scale — 24 in either way rather than 6 ft, which
+ * is a fourfold difference people routinely get wrong by applying the wall rule
+ * to a kitchen. The island note flags the contentious 2023 change honestly.
+ */
+const COUNTER_IN = 96; // an 8 ft run
+const SCALE = 4.6; // px per inch
+const X0 = 44;
+const TOP_Y = 108;
+
+/** 24 in reach means outlets at most 48 in apart, and 24 in from each end. */
+const OUTLETS_IN = [24, 72];
+const counterEnd = X0 + COUNTER_IN * SCALE;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Kitchen countertop receptacle spacing</title>
+  <desc>
+    An 8 foot countertop run with receptacles at 24 inches and 72 inches from each end. Each covers 24 inches in
+    either direction, so no point on the counter is more than 24 inches from an outlet and the two receptacles sit 48
+    inches apart. The countertop rule is 24 inches, not the 6 feet that applies to walls, and it applies to any
+    counter space 12 inches or wider.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Countertops use 24 in, not 6 ft — a fourfold difference</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">An 8 ft counter run. 210.52(C) applies to any counter space 12 in or wider.</text>
+
+  {OUTLETS_IN.map((inches, i) => {
+    const cx = X0 + inches * SCALE;
+    const left = Math.max(X0, cx - 24 * SCALE);
+    const right = Math.min(counterEnd, cx + 24 * SCALE);
+    return (
+      <g>
+        <rect x={left} y={TOP_Y - 40} width={right - left} height="40" rx="4" fill={i === 0 ? C.orange : C.primary} opacity="0.13" />
+        <text x={(left + right) / 2} y={TOP_Y - 46} text-anchor="middle" fill={i === 0 ? C.orange : C.primary} font-family={FONT} font-size="8.5" font-weight="700">
+          {`covers ${Math.round((left - X0))}–${Math.round(right - X0)} in`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x={X0} y={TOP_Y} width={counterEnd - X0} height="14" rx="3" fill={C.dark} opacity="0.6" />
+  <text x={X0 + (counterEnd - X0) / 2} y={TOP_Y + 30} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">countertop, 96 in</text>
+
+  {OUTLETS_IN.map((inches, i) => {
+    const cx = X0 + inches * SCALE;
+    return (
+      <g>
+        <rect x={cx - 8} y={TOP_Y - 30} width="16" height="24" rx="3" fill={C.white} stroke={i === 0 ? C.orange : C.primary} stroke-width="2" />
+        <circle cx={cx} cy={TOP_Y - 22} r="1.8" fill={i === 0 ? C.orange : C.primary} />
+        <circle cx={cx} cy={TOP_Y - 14} r="1.8" fill={i === 0 ? C.orange : C.primary} />
+        <text x={cx} y={TOP_Y - 34} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="8.5" font-weight="700">{`${inches} in`}</text>
+      </g>
+    );
+  })}
+
+  <line x1={X0 + OUTLETS_IN[0] * SCALE} y1={TOP_Y + 44} x2={X0 + OUTLETS_IN[1] * SCALE} y2={TOP_Y + 44} stroke={C.blue} stroke-width="1.6" />
+  <text x={X0 + 48 * SCALE} y={TOP_Y + 40} text-anchor="middle" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">48 in apart</text>
+
+  <rect x="24" y="176" width="330" height="58" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="40" y="196" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">ALSO REQUIRED</text>
+  <text x="40" y="212" fill={C.dark} font-family={FONT} font-size="9">Two 20 A small-appliance circuits, 210.52(B)</text>
+  <text x="40" y="226" fill={C.dark} font-family={FONT} font-size="9">GFCI on all kitchen countertop receptacles</text>
+
+  <rect x="366" y="176" width="330" height="58" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="382" y="196" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">ISLANDS — CHECK YOUR CODE CYCLE</text>
+  <text x="382" y="212" fill={C.dark} font-family={FONT} font-size="9">NEC 2020 required them by area</text>
+  <text x="382" y="226" fill={C.dark} font-family={FONT} font-size="9">NEC 2023 removed the requirement</text>
+</svg>

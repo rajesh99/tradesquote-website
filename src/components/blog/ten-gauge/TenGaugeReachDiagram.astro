@@ -1,0 +1,68 @@
+---
+import { maxLengthForDrop, cmilOf } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * 10 AWG's ampacity is generous and its reach is not. At 30 A on a 120 V
+ * circuit it runs out of voltage budget in under 50 ft, which is why so many
+ * 30 A 120 V runs are quietly out of tolerance even though the wire is "right".
+ */
+const CMIL = cmilOf("10");
+
+const rows = [
+  { label: "30 A, 120 V", detail: "copper", amps: 30, volts: 120, material: "copper" as const },
+  { label: "30 A, 240 V", detail: "copper — doubling volts doubles reach", amps: 30, volts: 240, material: "copper" as const },
+  { label: "24 A, 240 V", detail: "copper — an EV charger at 80%", amps: 24, volts: 240, material: "copper" as const },
+  { label: "30 A, 120 V", detail: "aluminum", amps: 30, volts: 120, material: "aluminum" as const },
+  { label: "30 A, 240 V", detail: "aluminum", amps: 30, volts: 240, material: "aluminum" as const },
+].map((r) => ({
+  ...r,
+  ft3: maxLengthForDrop({ cmil: CMIL, material: r.material, amps: r.amps, volts: r.volts, phase: 1, limitPercent: 3 }),
+  ft5: maxLengthForDrop({ cmil: CMIL, material: r.material, amps: r.amps, volts: r.volts, phase: 1, limitPercent: 5 }),
+}));
+
+const peak = Math.max(...rows.map((r) => r.ft5));
+const BAR_X = 246;
+const BAR_MAX = 330;
+const bars = rows.map((r) => ({
+  ...r,
+  w3: Math.max(18, Math.round((r.ft3 / peak) * BAR_MAX)),
+  w5: Math.round((r.ft5 / peak) * BAR_MAX),
+}));
+const shortest = rows.reduce((a, b) => (a.ft3 < b.ft3 ? a : b));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>How far 10 AWG reaches before voltage drop stops it</title>
+  <desc>
+    One-way run length for 10 AWG at a 3 percent voltage drop, with the 5 percent figure shown behind it. Copper at
+    30 amps and 120 volts reaches 48 feet, at 240 volts 97 feet, and at 24 amps and 240 volts 121 feet. Aluminum at
+    30 amps reaches 29 feet at 120 volts and 59 feet at 240 volts. The shortest case is 48 feet, which is why many 30
+    amp 120 volt runs exceed 3 percent even with correctly sized wire.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Ampacity is generous; reach is not</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Longest one-way run within 3% drop (solid) and 5% (faint outline), single-phase.</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CIRCUIT</text>
+  <text x={BAR_X} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ONE-WAY RUN LENGTH</text>
+
+  {bars.map((r, i) => {
+    const y = 90 + i * 32;
+    const accent = r.material === "copper" ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.label}</text>
+        <text x="28" y={y + 24} fill={C.muted} font-family={FONT} font-size="7.5">{r.detail}</text>
+        <rect x={BAR_X} y={y + 1} width={r.w5} height="20" rx="5" fill="none" stroke={accent} stroke-width="1" stroke-dasharray="3 2" opacity="0.7" />
+        <rect x={BAR_X} y={y + 1} width={r.w3} height="20" rx="5" fill={accent} opacity="0.18" />
+        <rect x={BAR_X} y={y + 1} width={r.w3} height="20" rx="5" fill="none" stroke={accent} stroke-width="1.6" />
+        <text x={BAR_X + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`${Math.round(r.ft3)} ft`}</text>
+        <text x={BAR_X + r.w5 + 8} y={y + 15} fill={C.muted} font-family={FONT} font-size="8.5">{`${Math.round(r.ft5)} ft at 5%`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="266" fill={C.muted} font-family={FONT} font-size="10">{`Worst case is ${Math.round(shortest.ft3)} ft. A garage or well-pump run past that needs 8 AWG for drop, not for ampacity.`}</text>
+</svg>

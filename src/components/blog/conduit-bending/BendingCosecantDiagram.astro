@@ -1,0 +1,57 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The printed multiplier table is five rounded cosecants, computed here from
+ * Math.sin so the claim is demonstrated rather than asserted. Worth showing the
+ * rounding error too: 10° is printed as 6 against an exact 5.759, which is the
+ * one place the shortcut costs you real accuracy.
+ */
+const ANGLES = [10, 22.5, 30, 45, 60];
+const PRINTED: Record<number, number> = { 10: 6, 22.5: 2.6, 30: 2, 45: 1.4, 60: 1.2 };
+
+const rad = (d: number) => (d * Math.PI) / 180;
+const rows = ANGLES.map((deg) => {
+  const exact = 1 / Math.sin(rad(deg));
+  const printed = PRINTED[deg];
+  return { deg, exact, printed, errorPct: ((printed - exact) / exact) * 100 };
+});
+
+const worst = rows.reduce((a, b) => (Math.abs(a.errorPct) > Math.abs(b.errorPct) ? a : b));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The offset multiplier is the cosecant of the bend angle</title>
+  <desc>
+    The cosecant of 10 degrees is 5.759 where the table prints 6, of 22.5 degrees 2.613 against 2.6, of 30 degrees
+    exactly 2.000 against 2, of 45 degrees 1.414 against 1.4, and of 60 degrees 1.155 against 1.2. The printed
+    multipliers are rounded cosecants, and the 10 degree entry carries the largest rounding error at about 4 percent.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The multiplier table is one trig function, rounded</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Distance between bend marks = offset height × csc θ. Nothing to memorise.</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BEND ANGLE</text>
+  <text x="150" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">EXACT csc θ</text>
+  <text x="300" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PRINTED ON THE BENDER</text>
+  <text x="500" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ROUNDING ERROR</text>
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 28;
+    const notable = Math.abs(r.errorPct) > 2;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="24" rx="6" fill={notable ? C.orangeLight : C.white} stroke={notable ? C.orange : C.border} stroke-width={notable ? 1.5 : 1} />
+        <text x="38" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.deg}°`}</text>
+        <text x="150" y={y + 16} fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">{r.exact.toFixed(3)}</text>
+        <text x="300" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.printed.toFixed(1)}</text>
+        <text x="500" y={y + 16} fill={notable ? C.orange : C.muted} font-family={FONT} font-size="9.5" font-weight={notable ? 700 : 500}>
+          {`${r.errorPct > 0 ? "+" : ""}${r.errorPct.toFixed(1)}%`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">{`${worst.deg}° carries the worst error at ${worst.errorPct > 0 ? "+" : ""}${worst.errorPct.toFixed(1)}% — use ${worst.exact.toFixed(2)} on a long shallow offset.`}</text>
+</svg>

@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The loop that actually clears a fault, drawn as a circuit rather than as a
+ * picture of a panel: source → hot → fault → case → EGC → main bonding jumper →
+ * neutral → back to the source. The ground rod hangs off the side and carries
+ * none of it.
+ */
+const NODES = [
+  { x: 56, label: "Transformer", sub: "the source" },
+  { x: 236, label: "Panel", sub: "MBJ ties EGC to neutral" },
+  { x: 428, label: "Appliance", sub: "hot faults to the case" },
+];
+const Y_HOT = 84;
+const Y_RET = 152;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The path a fault current actually takes</title>
+  <desc>
+    Fault current leaves the transformer on the ungrounded conductor, reaches the appliance, jumps to the metal case,
+    returns on the equipment grounding conductor to the panel, crosses the main bonding jumper onto the neutral, and
+    returns to the transformer. The grounding electrode hangs off the panel and carries none of this current — it
+    exists to reference the system to earth and to handle surges.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The loop that clears the fault never touches earth</text>
+
+  {/* boxes */}
+  {NODES.map((n) => (
+    <g>
+      <rect x={n.x} y="98" width="132" height="40" rx="8" fill={C.white} stroke={C.dark} stroke-width="1.5" />
+      <text x={n.x + 66} y="116" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{n.label}</text>
+      <text x={n.x + 66} y="130" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5">{n.sub}</text>
+    </g>
+  ))}
+
+  {/* hot conductor across the top */}
+  <line x1={NODES[0].x + 66} y1="98" x2={NODES[0].x + 66} y2={Y_HOT} stroke={C.red} stroke-width="2.4" />
+  <line x1={NODES[0].x + 66} y1={Y_HOT} x2={NODES[2].x + 66} y2={Y_HOT} stroke={C.red} stroke-width="2.4" />
+  <line x1={NODES[2].x + 66} y1={Y_HOT} x2={NODES[2].x + 66} y2="98" stroke={C.red} stroke-width="2.4" />
+  <text x={NODES[1].x + 30} y={Y_HOT - 8} fill={C.red} font-family={FONT} font-size="9" font-weight="800">1 · ungrounded conductor</text>
+
+  {/* the fault */}
+  <text x={NODES[2].x + 140} y="116" fill={C.red} font-family={FONT} font-size="9" font-weight="800">2 · fault</text>
+  <text x={NODES[2].x + 140} y="128" fill={C.muted} font-family={FONT} font-size="7.5">hot to metal case</text>
+
+  {/* EGC return along the bottom */}
+  <line x1={NODES[2].x + 66} y1="138" x2={NODES[2].x + 66} y2={Y_RET} stroke={C.green} stroke-width="2.4" />
+  <line x1={NODES[2].x + 66} y1={Y_RET} x2={NODES[1].x + 66} y2={Y_RET} stroke={C.green} stroke-width="2.4" />
+  <text x={NODES[1].x + 84} y={Y_RET + 14} fill={C.green} font-family={FONT} font-size="9" font-weight="800">3 · equipment grounding conductor</text>
+
+  {/* MBJ then neutral back */}
+  <line x1={NODES[1].x + 66} y1={Y_RET} x2={NODES[0].x + 66} y2={Y_RET} stroke={C.blue} stroke-width="2.4" />
+  <line x1={NODES[0].x + 66} y1={Y_RET} x2={NODES[0].x + 66} y2="138" stroke={C.blue} stroke-width="2.4" />
+  <circle cx={NODES[1].x + 66} cy={Y_RET} r="4" fill={C.blue} />
+  <text x={NODES[0].x + 74} y={Y_RET + 14} fill={C.blue} font-family={FONT} font-size="9" font-weight="800">4 · neutral, via the MBJ</text>
+
+  {/* the electrode, off to the side, carrying nothing */}
+  <line x1={NODES[1].x + 20} y1="138" x2={NODES[1].x + 20} y2="196" stroke={C.border} stroke-width="2" stroke-dasharray="4 3" />
+  <path d={`M ${NODES[1].x + 6} 196 L ${NODES[1].x + 34} 196`} stroke={C.muted} stroke-width="2.4" />
+  <path d={`M ${NODES[1].x + 11} 202 L ${NODES[1].x + 29} 202`} stroke={C.muted} stroke-width="2" />
+  <path d={`M ${NODES[1].x + 16} 208 L ${NODES[1].x + 24} 208`} stroke={C.muted} stroke-width="1.6" />
+  <text x={NODES[1].x + 44} y="196" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">grounding electrode</text>
+  <text x={NODES[1].x + 44} y="208" fill={C.muted} font-family={FONT} font-size="8">carries none of the fault current</text>
+
+  <rect x="24" y="222" width="672" height="30" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="40" y="241" fill={C.dark} font-family={FONT} font-size="10">Remove the main bonding jumper and the loop opens — the fault never clears, and the case stays live at 120 V.</text>
+</svg>

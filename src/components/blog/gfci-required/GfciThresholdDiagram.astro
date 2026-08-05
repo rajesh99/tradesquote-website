@@ -1,0 +1,55 @@
+---
+import { fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The scale comparison that explains why overcurrent protection was never going
+ * to help. Logarithmic, because a linear axis would render every human-relevant
+ * threshold as a single pixel next to the breaker.
+ */
+const levels = [
+  { name: "Perception", ma: 1, detail: "you feel a tingle", accent: C.muted, kind: "body" },
+  { name: "GFCI Class A trips", ma: 5, detail: "UL 943: 4–6 mA", accent: C.green, kind: "device" },
+  { name: '"Let-go" threshold', ma: 10, detail: "muscles lock; you cannot release the conductor", accent: C.orange, kind: "body" },
+  { name: "GFPE for equipment", ma: 30, detail: "6× Class A — protects wiring, not people", accent: C.blue, kind: "device" },
+  { name: "Fibrillation risk", ma: 50, detail: "the heart can stop", accent: C.red, kind: "body" },
+  { name: "20 A breaker", ma: 20000, detail: "and only after its time-current curve allows", accent: C.dark, kind: "device" },
+];
+
+const BAR_X = 224;
+const BAR_MAX = 322;
+const maxLog = Math.log10(20000);
+const bars = levels.map((l) => ({ ...l, width: Math.max(20, Math.round((Math.log10(l.ma * 10) / Math.log10(200000)) * BAR_MAX)) }));
+const ratio = 20000 / 5;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>GFCI trip threshold against human tolerance and a breaker</title>
+  <desc>
+    Perception of current begins near 1 milliamp. A Class A GFCI trips at 4 to 6 milliamps under UL 943. The let-go
+    threshold where muscles lock is around 10 milliamps, ground-fault protection of equipment operates at 30
+    milliamps, and ventricular fibrillation risk begins near 50 milliamps. A 20 amp breaker requires 20,000
+    milliamps — four thousand times the GFCI threshold — and only then after its time-current curve allows.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why a breaker was never going to protect you</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Current through a person, and what each device responds to. Logarithmic scale.</text>
+
+  {bars.map((l, i) => {
+    const y = 66 + i * 34;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={l.kind === "device" ? l.accent : C.dark} font-family={FONT} font-size="10" font-weight={l.kind === "device" ? 800 : 600}>
+          {l.name}
+        </text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="7.5">{l.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={l.width} height="20" rx="5" fill={l.accent} opacity={l.kind === "device" ? 0.18 : 0.1} />
+        <rect x={BAR_X} y={y + 2} width={l.width} height="20" rx="5" fill="none" stroke={l.accent} stroke-width={l.kind === "device" ? 1.8 : 1} stroke-dasharray={l.kind === "body" ? "4 3" : undefined} />
+        <text x={BAR_X + l.width + 8} y={y + 16} fill={l.accent} font-family={FONT} font-size="10" font-weight="800">{`${fmtInt(l.ma)} mA`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="270" fill={C.muted} font-family={FONT} font-size="10">{`The breaker sits ${fmtInt(ratio)}× above the GFCI threshold. Dashed bars are human tolerance; solid are devices.`}</text>
+</svg>

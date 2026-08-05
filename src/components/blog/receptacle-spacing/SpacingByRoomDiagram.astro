@@ -1,0 +1,50 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The whole of 210.52 as a lookup, because the section is a list of unrelated
+ * rules with different numbers and people remember only the first one. Grouped
+ * by whether the trigger is a distance, an area or simply "at least one".
+ */
+const rules = [
+  { sub: "(A)", place: "Habitable rooms", rule: "No point along the floor line more than 6 ft from a receptacle", accent: C.primary },
+  { sub: "(A)(2)", place: "What counts as wall", rule: "Any unbroken wall space 2 ft or wider, plus fixed panels and railings", accent: C.primary },
+  { sub: "(C)", place: "Kitchen countertops", rule: "No point more than 24 in from a receptacle; counters 12 in or wider", accent: C.orange },
+  { sub: "(D)", place: "Bathrooms", rule: "At least one within 3 ft of the outside edge of each basin", accent: C.blue },
+  { sub: "(E)", place: "Outdoors", rule: "One at the front and one at the back, not over 6½ ft above grade", accent: C.blue },
+  { sub: "(F)", place: "Laundry", rule: "At least one, on its own 20 A circuit", accent: C.blue },
+  { sub: "(G)", place: "Garages and basements", rule: "At least one per vehicle bay, not over 5½ ft above the floor", accent: C.blue },
+  { sub: "(H)", place: "Hallways", rule: "At least one where the hallway is 10 ft or longer", accent: C.muted },
+  { sub: "(I)", place: "Foyers", rule: "Walls 3 ft or wider where the foyer exceeds 60 ft²", accent: C.muted },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 328" fill="none" aria-hidden="true">
+  <title>Every receptacle requirement in NEC 210.52</title>
+  <desc>
+    In habitable rooms no point along the floor line may be more than 6 feet from a receptacle, and wall space means
+    any unbroken run 2 feet or wider. Kitchen countertops use 24 inches instead, on counters 12 inches or wider.
+    Bathrooms need one within 3 feet of each basin. Outdoors needs one front and back within 6 and a half feet of
+    grade. Laundry needs one on a dedicated 20 amp circuit. Garages need one per vehicle bay. Hallways of 10 feet or
+    more need one, and foyers over 60 square feet need them on walls 3 feet or wider.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="312" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">210.52 is nine unrelated rules with different numbers</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">The 6 ft rule is only subsection (A). The others each have their own trigger.</text>
+
+  {rules.map((r, i) => {
+    const y = 64 + i * 27;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="23" rx="5" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="23" rx="2" fill={r.accent} />
+        <text x="40" y={y + 15} fill={r.accent} font-family={FONT} font-size="8.5" font-weight="800">{r.sub}</text>
+        <text x="86" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{r.place}</text>
+        <text x="264" y={y + 15} fill={C.muted} font-family={FONT} font-size="9">{r.rule}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="314" fill={C.muted} font-family={FONT} font-size="10">All of these are minimums. Nothing in 210.52 sets a maximum number of receptacles anywhere.</text>
+</svg>

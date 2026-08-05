@@ -1,0 +1,182 @@
+---
+title: "How Many Lights Can You Put on One Circuit?"
+meta_title: "How Many Lights on One Circuit? The Real Limits (2026) | TradesQuote"
+description: "A 15 A circuit holds about 160 nine-watt LED trims. The dimmer allows 16. LEDs moved the binding constraint off the breaker entirely — and in a dwelling the NEC sets no limit at all."
+image: /images/posts/how-many-lights-on-one-circuit-hero.svg
+date: 2026-08-04T13:15:00Z
+categories: ["electrical"]
+tags: ["lights per circuit","lighting circuit","led dimmer","nec 220.14","branch circuit"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import LightsCountDiagram from "@/components/blog/lights-circuit/LightsCountDiagram.astro";
+import LightsRealLimitsDiagram from "@/components/blog/lights-circuit/LightsRealLimitsDiagram.astro";
+import LightsDwellingCommercialDiagram from "@/components/blog/lights-circuit/LightsDwellingCommercialDiagram.astro";
+
+The honest answer has two parts, and neither is the number you were expecting.
+
+**In a dwelling, the NEC sets no limit on how many luminaires you may put on a branch circuit.** None. There is no per-fixture allowance to divide into a circuit rating, for the same structural reason there's no limit on receptacles — the load has already been counted somewhere else.
+
+**And electrically, the limit is now absurd.** A 15 A circuit will carry about **160 nine-watt LED trims** inside the continuous-load limit. Twelve of them draw 108 W — nine tenths of one amp. Nobody installs 160 downlights on a circuit, so the breaker stopped being the constraint the moment LEDs took over.
+
+What *does* bind is a dimmer rated 150 W for LED loads, which allows **16**.
+
+## What the Circuit Could Carry
+
+<BlogInfographic
+  title="What the circuit could actually carry"
+  caption="At 120 V. Large figure is full capacity; small figure is the 80% continuous limit."
+>
+  <LightsCountDiagram />
+</BlogInfographic>
+
+| Lamp | 15 A circuit | 20 A circuit |
+| --- | --- | --- |
+| 9 W LED trim | 200 (160 continuous) | 266 (213 continuous) |
+| 15 W LED panel | 120 (96 continuous) | 160 (128 continuous) |
+| 60 W incandescent | 30 (24 continuous) | 40 (32 continuous) |
+
+The bottom row is where the familiar advice came from. **Twenty-four 60 W lamps on a 15 A circuit** is the arithmetic behind a generation of rules of thumb — and the widely quoted "8 to 10 lights per circuit" was already conservative against it, chosen for margin and for serviceability rather than derived from anything.
+
+With LEDs the same circuit reaches into the hundreds. That is a change of kind, not degree: no realistic lighting design gets anywhere near it, so you now have to design against something else.
+
+One aside on the 80% column. Residential lighting is **generally not a continuous load** — Article 100 defines continuous as three hours or more at maximum current, and a house's lights rarely qualify. So in a dwelling you can legitimately use the full-capacity column. Commercial lighting is the textbook continuous load and does get the 125% factor, which is covered in **[The 80% Rule](/blog/80-percent-rule-electrical)**.
+
+## What Actually Limits You
+
+<BlogInfographic
+  title="Four real limits, and the breaker is the loosest"
+  caption="A 15 A circuit of 9 W LED trims. Bars are how many fixtures each constraint permits."
+>
+  <LightsRealLimitsDiagram />
+</BlogInfographic>
+
+### 1. The dimmer's LED rating — usually the binding one
+
+This is the limit that catches almost everybody, because the number printed largest on the box is the wrong number. **A dimmer marked 600 W is typically rated only around 150 W for LED loads**, and that lower figure is the one that applies. 150 ÷ 9 = **16 trims**.
+
+The reason is that LED drivers are non-linear, capacitive loads that stress a dimmer's triac far harder than a resistive filament does. The manufacturer's LED rating accounts for it; the incandescent rating doesn't. Exceed it and the failure isn't a tripped breaker — it's flicker, buzz, premature dimmer death, or a minimum dim level that won't go low.
+
+Always check the specific dimmer's LED wattage rating, and prefer a dimmer the fixture manufacturer lists as compatible. Compatibility charts exist precisely because this is a real problem.
+
+### 2. Driver inrush — the modern breaker-tripper
+
+When an LED lighting circuit is energised, every driver charges its input capacitors simultaneously. That inrush is brief but can be tens of amps, and it is genuinely capable of tripping a breaker or an AFCI on switch-on while the steady-state load sits under one amp.
+
+Fixture manufacturers publish a **maximum number of fixtures per 15 A or 20 A circuit** for exactly this reason — commonly in the 30–50 range, sometimes lower for high-output drivers. It's in the spec sheet, it's frequently ignored, and it's the most common cause of "the breaker trips when I turn the lights on but everything works fine after."
+
+### 3. Serviceability — judgement, not code
+
+One breaker shouldn't black out a floor. Splitting lighting across circuits so that a trip leaves you somewhere to see from is ordinary good practice, and it's why 10–12 fixtures per circuit remains a reasonable working number even though nothing requires it.
+
+Also worth thinking about: put stair, hall and bathroom lighting on more than one circuit in a house, so a fault never leaves a dark stairwell.
+
+### 4. Circuit ampacity — last by an order of magnitude
+
+160 trims. It never binds. Design to the tightest of the other three.
+
+## The Code Rules, by Occupancy
+
+<BlogInfographic
+  title="The rule depends on the occupancy, not the fixture"
+  caption="Dwelling lighting is folded into the general lighting load; non-dwelling lighting is computed fixture by fixture."
+>
+  <LightsDwellingCommercialDiagram />
+</BlogInfographic>
+
+### In a dwelling — a minimum number of circuits, never a maximum number of fixtures
+
+**220.41** computes general lighting at **3 VA per square foot**, and **220.14(J)** then says that the lighting outlets and general-use receptacle outlets in a dwelling are *included in that figure* — no additional load calculation is required for them.
+
+That's the structural reason there's no per-fixture limit. There is no per-outlet volt-ampere allowance for dwelling lighting outlets, so there's nothing to divide a circuit rating by. The calculation runs the other direction entirely: it tells you the **minimum number of circuits** the dwelling needs.
+
+For a 2,000 ft² house: 2,000 × 3 = **6,000 VA**, which is 50 A of general lighting load, needing a minimum of **five 15 A circuits or three 20 A circuits** (210.11(A) requires the minimum number of branch circuits to be determined from the calculated load). How you distribute fixtures among them is a design decision.
+
+This is exactly the same structure as the receptacle question — and the same reason the answer disappoints people looking for a number. See **[How Many Outlets on a 20 Amp Circuit](/blog/how-many-outlets-on-a-20-amp-circuit)**.
+
+### In a non-dwelling — count the actual VA
+
+**220.14(D)** requires each luminaire to be counted at its own maximum volt-amperes, including the ballast or driver. Commercial lighting is normally a continuous load, so the 125% factor applies, meaning **a 20 A circuit carries 16 A — 1,920 VA — of lighting**, not 2,400 VA.
+
+This is where residential habits go wrong in commercial work. It's also where the conductor can surprise you: 25 A of required device rating means 10 AWG, because 240.4(D) caps 12 AWG at 20 A.
+
+Sign and outline lighting has its own rules in 600.5, including a required dedicated 20 A circuit for a sign at each entrance.
+
+## Requirements That Do Apply to Lighting Circuits
+
+Independent of the count:
+
+**AFCI protection.** 210.12 requires AFCI protection for branch circuits supplying outlets and devices in most dwelling living areas — kitchens, bedrooms, living rooms, hallways and more. Lighting circuits are included. Driver inrush interacting with AFCI is a real phenomenon; a nuisance trip on energisation is worth diagnosing rather than swapping breakers blindly, as covered in **[AFCI and GFCI Nuisance Tripping](/blog/afci-gfci-nuisance-tripping)**.
+
+**GFCI in specific locations.** Lighting in tubs and shower areas, and some outdoor and basement locations, falls under 210.8 requirements. See **[Where GFCI Protection Is Required](/blog/where-gfci-is-required)**.
+
+**Neutral required at the switch.** 404.2(C) requires a grounded (neutral) conductor at most switch locations, because modern smart switches and dimmers need it. This has nothing to do with fixture count and everything to do with not having to open a wall later.
+
+**Mixing lights and receptacles is legal in a dwelling.** Nothing prohibits it, and it's common on bedroom circuits. In a commercial occupancy, keeping them separate is better practice because the load calculations differ.
+
+**Box fill still applies.** A lighting outlet box with a fixture, several conductors and a device can run out of cubic inches quickly — see **[Box Fill Calculation](/blog/box-fill-calculation)**.
+
+## Recessed Downlights Specifically
+
+The most common version of this question is about recessed cans, and the numbers there are worth spelling out:
+
+**Twelve 9 W LED trims = 108 W = 0.90 A on a 120 V circuit.** A 15 A circuit would hold roughly 160 of them. So when you're laying out a kitchen with twelve downlights, circuit capacity is not a consideration at all — the layout is driven by spacing and light level, and the electrical constraint is the dimmer.
+
+How many you actually need, and why the wall offset is half the spacing, is worked through in **[How Many Recessed Lights Do I Need](/blog/how-many-recessed-lights-do-i-need)**.
+
+## Common Mistakes
+
+- **Looking for a code limit on fixtures per dwelling circuit.** There isn't one. 220.14(J) has already counted them.
+- **Reading a dimmer's incandescent rating.** The LED rating is typically a quarter of it, and it's the one that applies.
+- **Ignoring the manufacturer's fixtures-per-circuit figure.** That's the driver inrush limit, and it's why breakers trip on switch-on.
+- **Applying the 125% continuous factor to residential lighting.** Generally not a continuous load. It is in commercial work.
+- **Using 12 AWG for a 25 A commercial lighting circuit.** 240.4(D) caps 12 AWG at 20 A; you need 10 AWG.
+- **Treating the 3 VA/ft² calculation as a maximum.** It gives the minimum number of circuits, not a fixture cap.
+- **Putting all the lighting on one circuit because it fits.** It fits electrically and it's poor design.
+- **Forgetting the neutral at the switch.** 404.2(C) requires it in most locations, and smart devices need it.
+- **Assuming the old 8–10 rule still means something.** It came from 60 W filament lamps.
+
+## Size a Lighting Circuit
+
+> **[Receptacle & Circuit Calculator](/calculators/electrical/electrical-receptacle-circuit-calculator)** — enter the circuit rating and voltage and it returns the outlet count under both the dwelling and non-dwelling rules, applies the continuous-load factor where relevant, and states plainly where the code sets no limit rather than inventing one.
+
+For the layout question use the **[Recessed Lighting Calculator](/calculators/electrical/electrical-recessed-lighting-calculator)**, and for the load calculation that determines the minimum number of circuits use the **[Load Calculator](/calculators/electrical/electrical-load-calculator)**. See **[What Size Breaker Do I Need](/blog/what-size-breaker-do-i-need)** and **[15 Amp vs 20 Amp Circuit](/blog/15-amp-vs-20-amp-circuit)** for the circuit itself.
+
+*Sources & standards: NEC (NFPA 70) 2023 — Article 100 definition of Continuous Load, 210.8, 210.11(A), 210.12, 220.14(D), 220.14(J), 220.41, 240.4(D), 404.2(C), 600.5, and Table 314.16 for box fill. Dimmer and driver ratings are manufacturer specifications, not code. Local amendments override the model code and the AHJ has final say. Have electrical work designed and installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### How many lights can be on a 15 amp circuit?
+
+Electrically, about 160 nine-watt LED trims within the continuous-load limit, or 200 at full capacity — and 24 sixty-watt incandescent lamps. In a dwelling the NEC sets no limit at all, because 220.14(J) folds lighting outlets into the general lighting load. The practical limit is usually the dimmer's LED rating, often around 150 W, which allows about 16 trims.
+
+### How many lights on a 20 amp circuit?
+
+Around 213 nine-watt LED trims within the continuous limit, or 32 sixty-watt incandescent lamps. As with a 15 A circuit, there is no code limit in a dwelling, and the binding constraints in practice are the dimmer's LED rating and the fixture manufacturer's published maximum per circuit for driver inrush.
+
+### Is there a code limit on lights per circuit?
+
+Not in a dwelling. 220.14(J) includes lighting outlets in the 3 VA/ft² general lighting load, so no per-outlet allowance exists to divide by. In a non-dwelling occupancy, 220.14(D) requires each luminaire to be counted at its actual volt-amperes and the load is normally continuous, so a 20 A circuit carries 16 A of lighting.
+
+### Why does my breaker trip when I switch the lights on but not afterwards?
+
+Almost certainly LED driver inrush. Every driver charges its input capacitors at the instant of energisation, which can briefly draw tens of amps even though the running load is under an amp. Fixture manufacturers publish a maximum number of fixtures per 15 or 20 A circuit for this reason — commonly 30 to 50. Splitting the fixtures across two circuits fixes it.
+
+### How many LED lights can one dimmer handle?
+
+Divide the dimmer's **LED** wattage rating by the fixture wattage — not its incandescent rating. A dimmer marked 600 W is often rated only about 150 W for LED, which is roughly 16 nine-watt trims. LED drivers are capacitive, non-linear loads that stress a dimmer far more than a filament lamp does, which is why the two ratings differ so much.
+
+### Can lights and outlets be on the same circuit?
+
+In a dwelling, yes — nothing in the NEC prohibits it and it's common on bedroom circuits. Both are counted inside the same general lighting load. In commercial work it's better practice to separate them, because luminaires and receptacle outlets are computed differently under 220.14(D) and 220.14(I).
+
+### How many circuits do I need for lighting in a house?
+
+Take the floor area times 3 VA per square foot. A 2,000 ft² house gives 6,000 VA, which is 50 A and needs a minimum of five 15 A or three 20 A circuits under 210.11(A). That's a floor, not a target — most houses end up with more, because kitchens, bathrooms and laundry have their own required circuits and because splitting lighting improves serviceability.
+
+### Is the old "8 to 10 lights per circuit" rule still valid?
+
+It was never a code rule, and the arithmetic behind it belongs to 60 W incandescent lamps — where 24 would fit on a 15 A circuit and 8 to 10 left comfortable margin. With 9 W LEDs the electrical capacity is around 160, so the number survives only as a serviceability convention: don't let one breaker black out a whole floor.

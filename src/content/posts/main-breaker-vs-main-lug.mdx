@@ -1,0 +1,166 @@
+---
+title: "Main Breaker vs Main Lug Panels: The 6-Handle Rule"
+meta_title: "Main Breaker vs Main Lug Panel: And the 6-Handle Rule (2026) | TradesQuote"
+description: "An MLO panel isn't unprotected — its busbar is protected upstream. And the six-handle panelboard is gone: NEC 2020 permits only one service disconnect per enclosure."
+image: /images/posts/main-breaker-vs-main-lug-hero.svg
+date: 2026-08-04T13:30:00Z
+categories: ["electrical"]
+tags: ["main lug panel","main breaker","service disconnect","nec 230.71","subpanel"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import MainLugVsBreakerDiagram from "@/components/blog/main-lug/MainLugVsBreakerDiagram.astro";
+import SixHandleRuleDiagram from "@/components/blog/main-lug/SixHandleRuleDiagram.astro";
+import MainLugDecisionDiagram from "@/components/blog/main-lug/MainLugDecisionDiagram.astro";
+
+A main lug only panel has no main breaker in it, and the instinctive reaction — that it's therefore unprotected — is the misunderstanding this whole topic turns on.
+
+**Both panels have a protected busbar.** The only question is whether the device protecting it sits inside the enclosure or upstream of it. An MLO subpanel's busbar is protected by the feeder breaker back in the main panel, and that is a complete answer to 408.36.
+
+The other thing worth knowing here is a change most people missed: **the six-handle panelboard is gone.** NEC 2020 revised 230.71(A) so that a single enclosure may contain only one service disconnect. Two to six service disconnects are still permitted — but each needs its own enclosure.
+
+## The Physical Difference
+
+<BlogInfographic
+  title="Both busbars are protected. Only the location differs."
+  caption="A main breaker protects its own busbar; an MLO panel's busbar is protected by the feeder breaker upstream."
+>
+  <MainLugVsBreakerDiagram />
+</BlogInfographic>
+
+**A main breaker panel** has a two-pole breaker between the incoming lugs and the busbar. It disconnects everything downstream with one handle, and it protects the busbar at its own rating.
+
+**A main lug only panel** has lugs that land directly on the busbar. There's no internal disconnect, so you kill it from upstream.
+
+**408.36** requires a panelboard to be protected by an overcurrent device rated no greater than the panelboard. For an MLO subpanel that device is the feeder breaker — a 100 A feeder breaker feeding a panel with a 125 A busbar is compliant, and so is a 100 A feeder breaker feeding a 100 A busbar. What you may *not* do is protect a 100 A busbar with a 150 A feeder breaker.
+
+That's the practical rule for buying an MLO panel: **the feeder breaker must not exceed the busbar rating.** And it's worth buying more busbar than you need, because busbar rating is one of three separate numbers that people routinely conflate:
+
+- The **service rating** — what the utility and service conductors deliver.
+- The **main breaker rating** — what the disconnect permits.
+- The **busbar rating** — what the panel's bus is listed for.
+
+The smallest of the three governs, and a new panel on old conductors upgrades nothing. That's worked through in **[What Size Electrical Service Do I Need](/blog/what-size-electrical-service-do-i-need)**.
+
+## The Six-Handle Rule and What Changed
+
+<BlogInfographic
+  title='"Six disconnects" survived. Six in one box did not.'
+  caption="NEC 2020 revised 230.71(A) to permit one service disconnect per enclosure."
+>
+  <SixHandleRuleDiagram />
+</BlogInfographic>
+
+For decades, 230.71 permitted a service to have **up to six disconnects** rather than a single main — the "six-handle rule" or "six-throw rule." The classic implementation was a **split-bus panelboard**: no main breaker, and up to six large breakers at the top of the bus, each feeding either a major load or the lighting half of the bus. Turning off the power meant throwing several handles.
+
+**NEC 2020 changed this.** 230.71(A) now permits two to six service disconnecting means only where each is **in a separate enclosure**. One enclosure, one service disconnect.
+
+What that means in practice:
+
+- **Split-bus six-handle panels are no longer a legal new installation.** They're also long out of production, so this mostly matters for what you *can't* do when replacing one.
+- **Two to six disconnects remain perfectly legal** as separate enclosures — six individual disconnects on a multifamily service, or a large service split into two 200 A panels. They must be **grouped** (230.72(A)) so nobody has to hunt.
+- **The common residential arrangement is unaffected.** A meter-main with one disconnect feeding one or more MLO panels inside was always one disconnect per enclosure.
+- **Existing installations are not suddenly illegal.** The code applies to new work; whether an alteration triggers compliance is an AHJ judgement.
+
+One related requirement worth knowing whenever you're replacing an old split-bus panel: **230.85** in recent cycles requires an **emergency disconnect** at a readily accessible outdoor location for one- and two-family dwellings. Combined with the 230.71 change, the modern answer to a dead split-bus panel is usually an outdoor meter-main disconnect feeding an MLO or main-breaker panel inside — which is a bigger job than a straight panel swap, and worth pricing as one. See **[Electrical Panel Upgrade Cost](/blog/electrical-panel-upgrade-cost)**.
+
+## Which One You Need
+
+<BlogInfographic
+  title="Which panel, and what happens to the neutral"
+  caption="The panel type and the neutral-bonding decision are separate questions with a common source of confusion."
+>
+  <MainLugDecisionDiagram />
+</BlogInfographic>
+
+| Where it goes | Panel type | Neutral–ground |
+| --- | --- | --- |
+| Service panel, disconnect inside | Main breaker | Bonded — install the MBJ |
+| Service panel, meter-main outside | MLO is fine | Isolated — no MBJ |
+| Subpanel, same building | MLO is fine | Isolated — no MBJ |
+| Subpanel, detached building | **Main breaker** | Isolated — no MBJ |
+
+**The detached-building row is the one people get wrong.** 225.31 requires a disconnecting means at a separate structure to disconnect all ungrounded conductors, and 225.32 requires it to be at a readily accessible location at or near the point of entry. So a subpanel in a detached garage, shop or barn needs either a main breaker in the panel or a separate disconnect ahead of it. An MLO panel out there, fed only from a breaker back in the house, does not satisfy that requirement.
+
+**A main breaker in a same-building subpanel is optional and often worth it anyway** — it gives you a local disconnect so you can work on the subpanel without walking to the main panel, which matters in a finished basement or a detached-adjacent utility room. It is not a service disconnect and doesn't need to be treated as one.
+
+## Neutral Bonding — The Thing That Actually Causes Failures
+
+This is a separate question from panel type, but it always comes up alongside it and it's where real mistakes happen.
+
+**Exactly one point in the system bonds the neutral to the equipment grounding system: the service.** 250.24(A)(5) prohibits a grounded-conductor-to-equipment connection on the load side of the service disconnect. So:
+
+- In a panel used as **service equipment**, install the **main bonding jumper** (the green screw or strap that ties the neutral bar to the enclosure).
+- In **every subpanel**, remove or omit it. The neutral bar must float, isolated from the can, and the equipment grounding conductors land on a separate ground bar that *is* bonded to the enclosure. 408.40 requires that ground bar to be bonded.
+
+MLO panels ship without the main bonding jumper installed for precisely this reason — the common use is a subpanel. If you use an MLO panel *as* service equipment (fed from a meter-main where the disconnect is outside)… you still leave it out, because the service disconnect is at the meter-main and the panel is on the load side of it. That distinction trips people up.
+
+Also: a panel used as service equipment must be **marked suitable for use as service equipment**. Not every panel is.
+
+Getting this wrong produces objectionable current on the grounding conductors, and it's a leading cause of shared-neutral AFCI and GFCI nuisance tripping. The concepts are separated properly in **[Grounding vs Bonding](/blog/grounding-vs-bonding)**.
+
+## The Backfed Main Breaker
+
+You can create a "main" in an MLO panel by installing a two-pole breaker and feeding it from the lugs — or, more commonly, by feeding a breaker in a panel and taking the supply from it. That's a **backfed** device, and **408.36(D)** requires plug-in overcurrent devices that are backfed to be **secured in place by an additional fastener** that requires other than a pull to release.
+
+It's a small clip, it's cheap, and it's one of the most commonly missed items on an inspection. The reason is straightforward: a backfed breaker stays energised when it's snapped out of the bus, so nothing should let it come loose by accident.
+
+Note also that not every panel accepts a backfed main in every position, and the panel's listing and labelling govern.
+
+## Common Mistakes
+
+- **Thinking an MLO panel is unprotected.** Its busbar is protected by the upstream feeder breaker, which satisfies 408.36.
+- **Feeder breaker larger than the busbar rating.** The busbar rating is a hard ceiling.
+- **An MLO subpanel in a detached building.** 225.31 requires a disconnect at the structure.
+- **Leaving the main bonding jumper in a subpanel.** The neutral must float everywhere downstream of the service disconnect.
+- **Omitting the main bonding jumper in service equipment.** Exactly one bond, at the service.
+- **Landing grounds and neutrals on the same bar in a subpanel.** Separate bars; the ground bar bonded to the can.
+- **No additional fastener on a backfed breaker.** 408.36(D) requires it, and inspectors look.
+- **Assuming six disconnects in one enclosure is still fine.** NEC 2020 permits one per enclosure.
+- **Confusing busbar, main breaker and service ratings.** Three numbers; the smallest governs.
+- **Using a panel not marked suitable for service equipment as service equipment.** Check the label.
+
+## Size the Panel and Service
+
+> **[Service Size Calculator](/calculators/electrical/electrical-service-size-calculator)** — works the calculated load through to a service rating, so you can check that the panel's busbar, the main breaker and the service conductors are all adequate rather than assuming the panel's label is the whole story.
+
+For a subpanel feeder, the **[Service Wire Size Calculator](/calculators/electrical/electrical-service-wire-size-calculator)** handles the conductors and the **[Ground Wire Size Calculator](/calculators/electrical/electrical-ground-wire-size-calculator)** the EGC. See **[100 Amp vs 200 Amp Service](/blog/100-amp-vs-200-amp-service)** for the rating decision, and **[Do I Need a Panel Upgrade](/blog/do-i-need-a-panel-upgrade)** before assuming a replacement is necessary.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 225.31, 225.32, 230.70, 230.71(A), 230.72(A), 230.85, 250.24(A)(5), 408.36, 408.36(D), 408.40. The 230.71(A) one-disconnect-per-enclosure revision dates from the 2020 cycle; whether it applies to you depends on the cycle your jurisdiction has adopted. Local amendments override the model code and the AHJ has final say. Have electrical work designed and installed by a licensed electrician under permit.*
+
+---
+
+## FAQ
+
+### What is the difference between a main breaker and a main lug panel?
+
+A main breaker panel has a disconnect between the incoming lugs and the busbar, so one handle kills everything downstream. A main lug only panel has lugs landing directly on the busbar and no internal disconnect — it's switched off from upstream. Both have protected busbars; in the MLO case the protection is the feeder breaker in the panel that feeds it.
+
+### Is a main lug panel safe without a main breaker?
+
+Yes. 408.36 requires a panelboard to be protected by an overcurrent device not exceeding its rating, and for an MLO panel the upstream feeder breaker is that device. What matters is that the feeder breaker does not exceed the panel's busbar rating — a 150 A feeder breaker on a 100 A busbar is the violation, not the absence of a main.
+
+### Can I use a main lug panel as a subpanel?
+
+Yes, and that's its normal use — provided the subpanel is in the same building as the panel feeding it. In a detached building you need a disconnect at the structure under 225.31, so use a main breaker panel or install a separate disconnect ahead of the MLO panel.
+
+### Does a subpanel need a main breaker?
+
+Only if it's in a separate structure, where 225.31 requires a disconnecting means. In the same building an MLO subpanel is fine. That said, a main breaker in a subpanel is often worth the small extra cost purely for convenience — it lets you isolate the subpanel without walking back to the main panel.
+
+### What is the 6-handle rule?
+
+It was the long-standing allowance in 230.71 for a service to have up to six disconnecting means instead of a single main — implemented most often as a split-bus panelboard with several large breakers at the top of the bus. NEC 2020 revised 230.71(A) so that only **one** service disconnect is permitted per enclosure. Two to six are still allowed, but each must be in its own enclosure and they must be grouped.
+
+### Are split-bus panels illegal now?
+
+They can't be installed new — both because 230.71(A) now permits one service disconnect per enclosure and because they're long out of production. An existing split-bus panel isn't automatically illegal; whether an alteration triggers current code is a decision for the AHJ. In practice a failed split-bus panel is usually replaced with an outdoor meter-main disconnect feeding a modern panel inside.
+
+### Do I remove the bonding screw in a main lug panel?
+
+If the panel is a subpanel — or is on the load side of a service disconnect located elsewhere, such as an outdoor meter-main — then yes: the neutral bar must be isolated from the enclosure, and equipment grounding conductors go to a separate ground bar that is bonded to the can. The main bonding jumper belongs only in the enclosure that contains the service disconnect. MLO panels ship without it installed.
+
+### What is a backfed main breaker?
+
+A breaker fed from its load-side terminals so it functions as a main in a panel that has no factory main. NEC 408.36(D) requires plug-in overcurrent devices that are backfed to be secured with an additional fastener requiring more than a pull to release — a small retaining clip. It's cheap, it's required, and it's one of the most frequently missed inspection items.
