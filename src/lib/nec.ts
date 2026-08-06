@@ -1141,3 +1141,489 @@ export function faultCurrentAfterRun(opts: {
 export function requiredAicRating(faultCurrent: number): number | null {
   return STANDARD_AIC_RATINGS.find((r) => r >= faultCurrent) ?? null;
 }
+
+/* ------------------------------------------------------------------------- *
+ * Article 220 Part III — the standard calculation method                      *
+ * ------------------------------------------------------------------------- */
+
+/**
+ * General lighting load by occupancy, in volt-amperes per square foot.
+ *
+ * IMPORTANT — read before using these figures. NEC 2020 replaced the historic
+ * Table 220.12 with a much longer, energy-code-aligned table whose values are
+ * generally *lower* than the ones below (an office building went from 3.5 to
+ * roughly 1.3 VA/ft²). The values here are the long-standing pre-2020 figures.
+ *
+ * They are retained deliberately because they err on the high side, and a high
+ * general-lighting figure produces a larger service — conservative in the safe
+ * direction. Every page that surfaces them says so and makes the VA/ft² a
+ * directly editable field, so anyone working to a 2020 or later edition can
+ * enter the value their adopted table actually gives.
+ */
+export const TABLE_220_12: {
+  key: string;
+  occupancy: string;
+  vaPerFt2: number;
+  /** Which Table 220.42 demand-factor set this occupancy uses. */
+  demandKey: "dwelling" | "hospital" | "hotel" | "warehouse" | "other";
+}[] = [
+  { key: "dwelling", occupancy: "Dwelling unit", vaPerFt2: 3, demandKey: "dwelling" },
+  { key: "store", occupancy: "Store / retail", vaPerFt2: 3, demandKey: "other" },
+  { key: "school", occupancy: "School", vaPerFt2: 3, demandKey: "other" },
+  { key: "barber", occupancy: "Barber shop / beauty parlor", vaPerFt2: 3, demandKey: "other" },
+  { key: "bank", occupancy: "Bank", vaPerFt2: 3.5, demandKey: "other" },
+  { key: "office", occupancy: "Office building", vaPerFt2: 3.5, demandKey: "other" },
+  { key: "restaurant", occupancy: "Restaurant", vaPerFt2: 2, demandKey: "other" },
+  { key: "hotel", occupancy: "Hotel / motel", vaPerFt2: 2, demandKey: "hotel" },
+  { key: "hospital", occupancy: "Hospital", vaPerFt2: 2, demandKey: "hospital" },
+  { key: "club", occupancy: "Club", vaPerFt2: 2, demandKey: "other" },
+  { key: "court", occupancy: "Court room", vaPerFt2: 2, demandKey: "other" },
+  { key: "loft", occupancy: "Industrial commercial (loft)", vaPerFt2: 2, demandKey: "other" },
+  { key: "lodge", occupancy: "Lodge room", vaPerFt2: 1.5, demandKey: "other" },
+  { key: "armory", occupancy: "Armory / auditorium", vaPerFt2: 1, demandKey: "other" },
+  { key: "church", occupancy: "Church", vaPerFt2: 1, demandKey: "other" },
+  { key: "garage", occupancy: "Commercial garage (storage)", vaPerFt2: 0.5, demandKey: "other" },
+  { key: "warehouse", occupancy: "Warehouse (storage)", vaPerFt2: 0.25, demandKey: "warehouse" },
+];
+
+/** 220.14(I) — each receptacle strap (yoke) counts as 180 VA in a non-dwelling. */
+export const VA_PER_RECEPTACLE_STRAP = 180;
+
+/** 220.43(A) — show-window lighting, per linear foot. */
+export const VA_PER_SHOW_WINDOW_FOOT = 200;
+
+/** 220.43(B) — track lighting, per 2 ft of track (or fraction thereof). */
+export const VA_PER_TRACK_2FT = 150;
+
+export type DemandTier = { upTo: number | null; percent: number };
+
+/**
+ * Table 220.42 — lighting load demand factors. Each entry is a tier applied to
+ * the portion of the load that falls inside it, not to the whole load.
+ */
+export const TABLE_220_42: Record<string, { label: string; tiers: DemandTier[] }> = {
+  dwelling: {
+    label: "Dwelling unit",
+    tiers: [
+      { upTo: 3000, percent: 100 },
+      { upTo: 120000, percent: 35 },
+      { upTo: null, percent: 25 },
+    ],
+  },
+  hospital: {
+    label: "Hospital",
+    tiers: [
+      { upTo: 50000, percent: 40 },
+      { upTo: null, percent: 20 },
+    ],
+  },
+  hotel: {
+    label: "Hotel / motel",
+    tiers: [
+      { upTo: 20000, percent: 50 },
+      { upTo: 100000, percent: 40 },
+      { upTo: null, percent: 30 },
+    ],
+  },
+  warehouse: {
+    label: "Warehouse (storage)",
+    tiers: [
+      { upTo: 12500, percent: 100 },
+      { upTo: null, percent: 50 },
+    ],
+  },
+  other: {
+    label: "All others",
+    tiers: [{ upTo: null, percent: 100 }],
+  },
+};
+
+/** Table 220.44 — non-dwelling receptacle load: first 10 kVA at 100%, rest at 50%. */
+export const TABLE_220_44: DemandTier[] = [
+  { upTo: 10000, percent: 100 },
+  { upTo: null, percent: 50 },
+];
+
+/**
+ * Apply a tiered demand table to a connected load. Returns the demand load plus
+ * the per-tier working so a page can show the arithmetic rather than a result.
+ */
+export function applyDemandTiers(
+  connectedVa: number,
+  tiers: DemandTier[],
+): { demandVa: number; steps: { from: number; to: number; va: number; percent: number; result: number }[] } {
+  const steps: { from: number; to: number; va: number; percent: number; result: number }[] = [];
+  let remaining = Math.max(0, connectedVa);
+  let floor = 0;
+  for (const tier of tiers) {
+    if (remaining <= 0) break;
+    const span = tier.upTo === null ? remaining : Math.max(0, tier.upTo - floor);
+    const va = Math.min(remaining, span);
+    if (va > 0) {
+      steps.push({
+        from: floor,
+        to: floor + va,
+        va,
+        percent: tier.percent,
+        result: (va * tier.percent) / 100,
+      });
+      remaining -= va;
+    }
+    floor = tier.upTo ?? floor + va;
+  }
+  return { demandVa: steps.reduce((sum, s) => sum + s.result, 0), steps };
+}
+
+/**
+ * 220.56 — demand factors for commercial kitchen equipment. The result may never
+ * fall below the sum of the two largest pieces of equipment, which the caller
+ * must enforce; `kitchenEquipmentDemand` below does it.
+ */
+export const TABLE_220_56: { units: number; percent: number }[] = [
+  { units: 1, percent: 100 },
+  { units: 2, percent: 100 },
+  { units: 3, percent: 90 },
+  { units: 4, percent: 80 },
+  { units: 5, percent: 70 },
+  { units: 6, percent: 65 },
+];
+
+/** 220.56 demand factor for a given unit count — 65% at six units and above. */
+export function kitchenEquipmentPercent(units: number): number {
+  if (units <= 0) return 0;
+  const row = TABLE_220_56.find((r) => r.units === units);
+  return row ? row.percent : 65;
+}
+
+/**
+ * 220.56 applied, including the floor: the demand may not be less than the sum
+ * of the two largest units.
+ */
+export function kitchenEquipmentDemand(unitKva: number[]): {
+  connected: number;
+  percent: number;
+  factored: number;
+  twoLargest: number;
+  demand: number;
+  floorGoverns: boolean;
+} {
+  const units = unitKva.filter((v) => v > 0);
+  const connected = units.reduce((s, v) => s + v, 0);
+  const percent = kitchenEquipmentPercent(units.length);
+  const factored = (connected * percent) / 100;
+  const sorted = [...units].sort((a, b) => b - a);
+  const twoLargest = (sorted[0] ?? 0) + (sorted[1] ?? 0);
+  const floorGoverns = units.length >= 3 && twoLargest > factored;
+  return {
+    connected,
+    percent,
+    factored,
+    twoLargest,
+    demand: floorGoverns ? twoLargest : factored,
+    floorGoverns,
+  };
+}
+
+/* ------------------------------------------------------------------------- *
+ * Table 220.54 / 220.55 — dryer and range demand factors                      *
+ * ------------------------------------------------------------------------- */
+
+/** 220.54 — each dryer counts at 5,000 VA or nameplate, whichever is larger. */
+export const DRYER_MINIMUM_VA = 5000;
+
+/**
+ * Table 220.54 demand factor, in percent, for a given number of dwelling-unit
+ * electric clothes dryers. The tail is formulaic rather than tabulated.
+ */
+export function dryerDemandPercent(count: number): number {
+  const n = Math.max(0, Math.floor(count));
+  if (n <= 0) return 0;
+  if (n <= 4) return 100;
+  const fixed: Record<number, number> = { 5: 85, 6: 75, 7: 65, 8: 60, 9: 55, 10: 50, 11: 47 };
+  if (fixed[n] !== undefined) return fixed[n];
+  if (n <= 23) return 47 - (n - 11);
+  if (n <= 42) return 35 - (n - 23) * 0.5;
+  return 25;
+}
+
+/** Table 220.54 applied — returns the demand load in VA. */
+export function dryerDemand(count: number, nameplateVa: number): {
+  perDryerVa: number;
+  connectedVa: number;
+  percent: number;
+  demandVa: number;
+} {
+  const n = Math.max(0, Math.floor(count));
+  const perDryerVa = Math.max(DRYER_MINIMUM_VA, nameplateVa || 0);
+  const connectedVa = perDryerVa * n;
+  const percent = dryerDemandPercent(n);
+  return { perDryerVa, connectedVa, percent, demandVa: (connectedVa * percent) / 100 };
+}
+
+/**
+ * Table 220.55 Column C — maximum demand in kW for household electric ranges
+ * over 1¾ kW through 12 kW. Rows 1 through 25 are tabulated; beyond that the
+ * table becomes a formula.
+ */
+const RANGE_COLUMN_C: Record<number, number> = {
+  1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 21, 7: 22, 8: 23, 9: 24, 10: 25,
+  11: 26, 12: 27, 13: 28, 14: 29, 15: 30, 16: 31, 17: 32, 18: 33, 19: 34, 20: 35,
+  21: 36, 22: 37, 23: 38, 24: 39, 25: 40,
+};
+
+/** Table 220.55 Column C maximum demand, in kW, for `count` ranges. */
+export function rangeColumnC(count: number): number {
+  const n = Math.max(0, Math.floor(count));
+  if (n <= 0) return 0;
+  if (n <= 25) return RANGE_COLUMN_C[n];
+  if (n <= 40) return 15 + n;
+  return 25 + 0.75 * n;
+}
+
+/** Table 220.55 Column A — demand factor % for ranges over 1¾ kW and under 3½ kW. */
+export function rangeColumnA(count: number): number {
+  const n = Math.max(0, Math.floor(count));
+  if (n <= 0) return 0;
+  const tabulated: Record<number, number> = {
+    1: 80, 2: 75, 3: 70, 4: 66, 5: 62, 6: 59, 7: 56, 8: 53, 9: 51, 10: 49,
+    11: 47, 12: 45, 13: 43, 14: 41, 15: 40, 16: 39, 17: 38, 18: 37, 19: 36, 20: 35,
+    21: 34, 22: 33, 23: 32, 24: 31, 25: 30,
+  };
+  return tabulated[n] ?? 30;
+}
+
+/** Table 220.55 Column B — demand factor % for ranges 3½ kW through 8¾ kW. */
+export function rangeColumnB(count: number): number {
+  const n = Math.max(0, Math.floor(count));
+  if (n <= 0) return 0;
+  const tabulated: Record<number, number> = {
+    1: 80, 2: 65, 3: 55, 4: 50, 5: 45, 6: 43, 7: 40, 8: 36, 9: 35, 10: 34,
+    11: 32, 12: 32, 13: 32, 14: 32, 15: 32, 16: 28, 17: 28, 18: 28, 19: 28, 20: 28,
+    21: 26, 22: 26, 23: 26, 24: 26, 25: 26,
+  };
+  if (tabulated[n] !== undefined) return tabulated[n];
+  if (n <= 30) return 24;
+  if (n <= 40) return 22;
+  if (n <= 50) return 20;
+  if (n <= 60) return 18;
+  return 16;
+}
+
+/**
+ * Table 220.55 for household ranges of equal rating, applying Notes 1 and 3.
+ *
+ * - At or below 12 kW, Column C is read straight off the table.
+ * - Note 1: between 12 and 27 kW the Column C figure is increased 5% for each
+ *   full kW (or major fraction) above 12.
+ * - Note 3: at 8¾ kW and below, Columns A and B may be used instead, and for a
+ *   single small range they usually give a lower answer than Column C's 8 kW.
+ */
+export function rangeDemand(count: number, eachKw: number): {
+  count: number;
+  eachKw: number;
+  columnC: number;
+  note1Percent: number;
+  demandKw: number;
+  note1Applies: boolean;
+  columnAlternative: { column: "A" | "B"; percent: number; demandKw: number } | null;
+} {
+  const n = Math.max(0, Math.floor(count));
+  const kw = Math.max(0, eachKw);
+  const columnC = rangeColumnC(n);
+
+  const note1Applies = kw > 12 && n > 0;
+  const overTwelve = note1Applies ? Math.round(kw - 12) : 0;
+  const note1Percent = note1Applies ? 5 * Math.max(1, overTwelve) : 0;
+  const demandKw = note1Applies ? columnC * (1 + note1Percent / 100) : columnC;
+
+  let columnAlternative: { column: "A" | "B"; percent: number; demandKw: number } | null = null;
+  if (n > 0 && kw > 1.75 && kw < 3.5) {
+    const percent = rangeColumnA(n);
+    columnAlternative = { column: "A", percent, demandKw: (n * kw * percent) / 100 };
+  } else if (n > 0 && kw >= 3.5 && kw <= 8.75) {
+    const percent = rangeColumnB(n);
+    columnAlternative = { column: "B", percent, demandKw: (n * kw * percent) / 100 };
+  }
+
+  return { count: n, eachKw: kw, columnC, note1Percent, demandKw, note1Applies, columnAlternative };
+}
+
+/* ------------------------------------------------------------------------- *
+ * Article 705 — PV interconnection, and Article 690 string sizing             *
+ * ------------------------------------------------------------------------- */
+
+/** 705.12(B)(3) — the busbar allowance, as a percentage of the busbar rating. */
+export const BUSBAR_ALLOWANCE_PERCENT = 120;
+
+/** 690.8(A)(1) — PV source and output circuit current is 125% of rated Isc. */
+export const PV_CONTINUOUS_FACTOR = 1.25;
+
+/**
+ * The 120% rule of 705.12(B)(3)(2): the main overcurrent device plus the PV
+ * backfed breaker may total up to 120% of the busbar rating, provided the PV
+ * breaker sits at the opposite end of the busbar from the main.
+ *
+ * The other options in 705.12(B)(3) — the sum rule, the centre-fed rule, and
+ * engineering supervision — are separate paths and are not modelled here.
+ */
+export function busbarAllowance(opts: {
+  busbarRating: number;
+  mainBreaker: number;
+  inverterAmps: number;
+}): {
+  pvBreaker: number;
+  allowance: number;
+  total: number;
+  headroom: number;
+  passes: boolean;
+  maxPvBreaker: number;
+  maxInverterAmps: number;
+} {
+  const pvBreaker = nextStandardOcpd(opts.inverterAmps * PV_CONTINUOUS_FACTOR);
+  const allowance = (opts.busbarRating * BUSBAR_ALLOWANCE_PERCENT) / 100;
+  const total = opts.mainBreaker + pvBreaker;
+  const rawMax = allowance - opts.mainBreaker;
+  const maxPvBreaker = rawMax > 0 ? prevStandardOcpd(rawMax) : 0;
+  return {
+    pvBreaker,
+    allowance,
+    total,
+    headroom: allowance - total,
+    passes: total <= allowance,
+    maxPvBreaker,
+    maxInverterAmps: maxPvBreaker / PV_CONTINUOUS_FACTOR,
+  };
+}
+
+/**
+ * Table 690.7(A) voltage correction factors for crystalline and multicrystalline
+ * silicon, used when the module's own temperature coefficient is not available.
+ * Each row's `minC` is the bottom of the ambient band it applies to.
+ */
+export const TABLE_690_7: { minC: number; label: string; factor: number }[] = [
+  { minC: 20, label: "24°C to 20°C", factor: 1.02 },
+  { minC: 15, label: "19°C to 15°C", factor: 1.04 },
+  { minC: 10, label: "14°C to 10°C", factor: 1.06 },
+  { minC: 5, label: "9°C to 5°C", factor: 1.08 },
+  { minC: 0, label: "4°C to 0°C", factor: 1.1 },
+  { minC: -5, label: "−1°C to −5°C", factor: 1.12 },
+  { minC: -10, label: "−6°C to −10°C", factor: 1.14 },
+  { minC: -15, label: "−11°C to −15°C", factor: 1.16 },
+  { minC: -20, label: "−16°C to −20°C", factor: 1.18 },
+  { minC: -25, label: "−21°C to −25°C", factor: 1.2 },
+  { minC: -30, label: "−26°C to −30°C", factor: 1.21 },
+  { minC: -35, label: "−31°C to −35°C", factor: 1.23 },
+  { minC: -40, label: "−36°C to −40°C", factor: 1.25 },
+];
+
+/** Table 690.7(A) factor for a record-low ambient temperature in °C. */
+export function pvVoltageCorrection(lowAmbientC: number): { factor: number; label: string } {
+  if (lowAmbientC > 24) return { factor: 1.0, label: "above 24°C — no correction" };
+  const row = TABLE_690_7.find((r) => lowAmbientC >= r.minC) ?? TABLE_690_7[TABLE_690_7.length - 1];
+  return { factor: row.factor, label: row.label };
+}
+
+/**
+ * String sizing. The cold end sets the maximum module count — Voc rises as the
+ * cell gets colder and must never exceed the inverter's maximum input voltage.
+ * The hot end sets the minimum — Vmp falls as the cell heats and must stay above
+ * the MPPT window's floor or the inverter drops out of tracking.
+ *
+ * `tempCoeffVoc` and `tempCoeffVmp` are percent per °C and are negative for
+ * silicon. Cell temperature, not ambient, drives the hot case, hence
+ * `hotCellC` — typically ambient plus 25 to 35°C for a roof-mounted array.
+ */
+export function stringSizing(opts: {
+  vocStc: number;
+  vmpStc: number;
+  tempCoeffVoc: number;
+  tempCoeffVmp: number;
+  lowAmbientC: number;
+  hotCellC: number;
+  inverterMaxVolts: number;
+  mpptMinVolts: number;
+}): {
+  vocCold: number;
+  vmpHot: number;
+  maxModules: number;
+  minModules: number;
+  viable: boolean;
+  tableFactor: number;
+  tableVocCold: number;
+  tableMaxModules: number;
+} {
+  const coldDelta = opts.lowAmbientC - 25;
+  const hotDelta = opts.hotCellC - 25;
+
+  const vocCold = opts.vocStc * (1 + (opts.tempCoeffVoc / 100) * coldDelta);
+  const vmpHot = opts.vmpStc * (1 + (opts.tempCoeffVmp / 100) * hotDelta);
+
+  const maxModules = vocCold > 0 ? Math.floor(opts.inverterMaxVolts / vocCold) : 0;
+  const minModules = vmpHot > 0 ? Math.ceil(opts.mpptMinVolts / vmpHot) : 0;
+
+  const { factor } = pvVoltageCorrection(opts.lowAmbientC);
+  const tableVocCold = opts.vocStc * factor;
+  const tableMaxModules = tableVocCold > 0 ? Math.floor(opts.inverterMaxVolts / tableVocCold) : 0;
+
+  return {
+    vocCold,
+    vmpHot,
+    maxModules,
+    minModules,
+    viable: maxModules >= minModules && minModules > 0,
+    tableFactor: factor,
+    tableVocCold,
+    tableMaxModules,
+  };
+}
+
+/* ------------------------------------------------------------------------- *
+ * Panel schedules, spaces, and tandem breakers                                *
+ * ------------------------------------------------------------------------- */
+
+/**
+ * 408.54 caps a panelboard at the number of overcurrent devices it is "designed,
+ * rated, and listed" for — a number printed on the panel label, not derived from
+ * anything in the code. Tandem (twin) breakers put two poles in one space, but
+ * only where the panel is listed for them, and Class CTL panelboards use physical
+ * rejection features to enforce that on specific slots only.
+ *
+ * `tandemSlots` is how many of the panel's physical spaces accept a tandem, taken
+ * from the label. Zero means a full-size breaker in every space.
+ */
+export function panelCapacity(opts: {
+  spaces: number;
+  tandemSlots: number;
+  maxDevices: number;
+  fullSizeUsed: number;
+  tandemsUsed: number;
+}): {
+  spacesUsed: number;
+  spacesFree: number;
+  devicesUsed: number;
+  devicesFree: number;
+  maxPolesWithTandems: number;
+  additionalPolesAvailable: number;
+  overDeviceLimit: boolean;
+  overTandemLimit: boolean;
+} {
+  const spacesUsed = opts.fullSizeUsed + opts.tandemsUsed;
+  const devicesUsed = opts.fullSizeUsed + opts.tandemsUsed * 2;
+  const spacesFree = Math.max(0, opts.spaces - spacesUsed);
+
+  const maxPolesWithTandems = Math.min(
+    opts.maxDevices,
+    opts.spaces + Math.min(opts.tandemSlots, opts.spaces),
+  );
+
+  return {
+    spacesUsed,
+    spacesFree,
+    devicesUsed,
+    devicesFree: Math.max(0, opts.maxDevices - devicesUsed),
+    maxPolesWithTandems,
+    additionalPolesAvailable: Math.max(0, maxPolesWithTandems - devicesUsed),
+    overDeviceLimit: devicesUsed > opts.maxDevices,
+    overTandemLimit: opts.tandemsUsed > opts.tandemSlots,
+  };
+}

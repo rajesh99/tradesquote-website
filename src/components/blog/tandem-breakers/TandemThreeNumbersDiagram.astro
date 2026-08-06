@@ -1,0 +1,82 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { panelCapacity } from "@/lib/nec";
+
+/**
+ * Spaces, poles and the listed device limit are three different numbers, and
+ * almost every "my panel is full" conversation confuses at least two of them.
+ */
+const PANEL = { spaces: 30, tandemSlots: 10, maxDevices: 40, fullSizeUsed: 24, tandemsUsed: 3 };
+const r = panelCapacity(PANEL);
+
+const cards = [
+  {
+    label: "SPACES",
+    value: `${r.spacesUsed} of ${PANEL.spaces}`,
+    sub: `${r.spacesFree} free`,
+    detail: "Physical positions on the busbar. A tandem uses one; a 2-pole breaker uses two.",
+    accent: C.blue,
+  },
+  {
+    label: "POLES",
+    value: `${r.devicesUsed} of ${PANEL.maxDevices}`,
+    sub: `${r.devicesFree} free`,
+    detail: "Overcurrent devices. A tandem is two of these in one space.",
+    accent: C.primary,
+  },
+  {
+    label: "THE LISTED LIMIT",
+    value: `${PANEL.maxDevices}`,
+    sub: "off the label",
+    detail: "NEC 408.54 forbids exceeding it. Nothing in the code derives it — the listing does.",
+    accent: C.red,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 274" fill="none" aria-hidden="true">
+  <title>Spaces, poles and the listed device limit are three different numbers</title>
+  <desc>
+    A 30-space, 40-circuit panel with 24 full-size breakers and 3 tandems fitted uses 27 of 30 spaces, leaving 3
+    free, and 30 of 40 poles, leaving 10 free. The 40-device limit comes from the panel's listing, and NEC 408.54
+    makes exceeding it a violation. Ten more poles are available.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="258" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Three numbers, and they are not the same number
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A 30-space / 40-circuit load centre with ${PANEL.fullSizeUsed} full-size breakers and ${PANEL.tandemsUsed} tandems fitted.`}
+  </text>
+
+  {cards.map((c, i) => {
+    const x = 24 + i * 226;
+    return (
+      <g>
+        <rect x={x} y={68} width="214" height="112" rx="9" fill={C.white} stroke={c.accent} stroke-width="1.8" />
+        <text x={x + 16} y={90} fill={c.accent} font-family={FONT} font-size="9.5" font-weight="800">{c.label}</text>
+        <text x={x + 16} y={122} fill={C.dark} font-family={FONT} font-size="24" font-weight="800">{c.value}</text>
+        <text x={x + 16} y={140} fill={C.muted} font-family={FONT} font-size="9.5" font-weight="600">{c.sub}</text>
+        <text x={x + 16} y={158} fill={C.muted} font-family={FONT} font-size="8.5">
+          {c.detail.length > 46 ? c.detail.slice(0, c.detail.lastIndexOf(" ", 46)) : c.detail}
+        </text>
+        <text x={x + 16} y={170} fill={C.muted} font-family={FONT} font-size="8.5">
+          {c.detail.length > 46 ? c.detail.slice(c.detail.lastIndexOf(" ", 46) + 1) : ""}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="194" width="672" height="42" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="40" y="212" fill={C.primary} font-family={FONT} font-size="10" font-weight="800">
+    {`Ceiling = min(${PANEL.maxDevices} listed, ${PANEL.spaces} spaces + ${PANEL.tandemSlots} tandem gain) = ${r.maxPolesWithTandems} poles`}
+  </text>
+  <text x="40" y="228" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`${r.maxPolesWithTandems} − ${r.devicesUsed} fitted = ${r.additionalPolesAvailable} more poles available in this panel.`}
+  </text>
+
+  <text x="28" y="256" fill={C.muted} font-family={FONT} font-size="9.5">
+    A panel can run out of poles with spaces left, or out of spaces with poles left. Check both.
+  </text>
+</svg>

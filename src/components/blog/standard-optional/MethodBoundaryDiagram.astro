@@ -1,0 +1,82 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { STANDARD_SERVICE_RATINGS } from "@/lib/nec";
+
+/**
+ * The honest version of "does the method matter?" — the anchor house lands on the
+ * same service either way, but that is luck rather than a rule. Sweeping the
+ * optional result across a range shows the two methods disagree more often than
+ * they agree, because a 21% gap straddles a service boundary most of the time.
+ */
+const RATIO = 29325 / 24280; // the anchor house: standard ÷ optional
+
+const nextService = (amps: number) => STANDARD_SERVICE_RATINGS.find((r) => r >= amps) ?? 400;
+
+const rows = [80, 90, 101.2, 110, 120, 130, 145, 160, 180].map((optional) => {
+  const standard = optional * RATIO;
+  const svcOpt = nextService(optional);
+  const svcStd = nextService(standard);
+  return { optional, standard, svcOpt, svcStd, same: svcOpt === svcStd };
+});
+
+const sameCount = rows.filter((r) => r.same).length;
+const PLOT_X = 96;
+const PLOT_W = 440;
+const MAX_A = 240;
+const xFor = (a: number) => PLOT_X + (a / MAX_A) * PLOT_W;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 316" fill="none" aria-hidden="true">
+  <title>When the choice of method changes the service size</title>
+  <desc>
+    Sweeping the optional-method result across a range and applying the same 21 percent gap the anchor house shows,
+    the two methods land on the same standard service rating in only three of nine cases. The anchor house at 101.2
+    amps optional and 122.2 standard happens to be one of them, both giving a 125 amp service, but that is
+    coincidence rather than a rule.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="300" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    The method matters more often than the anchor case suggests
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Applying the anchor house's ${((RATIO - 1) * 100).toFixed(0)}% gap across a range. Same service in only ${sameCount} of ${rows.length} cases.`}
+  </text>
+
+  {[100, 125, 150, 200].map((svc) => (
+    <g>
+      <line x1={xFor(svc)} y1={68} x2={xFor(svc)} y2={262} stroke={C.border} stroke-width="1" stroke-dasharray="3 3" />
+      <text x={xFor(svc)} y={64} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{`${svc} A`}</text>
+    </g>
+  ))}
+
+  {rows.map((r, i) => {
+    const y = 76 + i * 21;
+    const accent = r.same ? C.green : C.red;
+    return (
+      <g>
+        <line x1={xFor(r.optional)} y1={y + 7} x2={xFor(r.standard)} y2={y + 7} stroke={accent} stroke-width="1.6" />
+        <circle cx={xFor(r.optional)} cy={y + 7} r="4" fill={C.primary} />
+        <circle cx={xFor(r.standard)} cy={y + 7} r="4" fill={C.blue} />
+        <text x="28" y={y + 11} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${r.optional.toFixed(0)} → ${r.standard.toFixed(0)} A`}
+        </text>
+        <text x={556} y={y + 11} fill={accent} font-family={FONT} font-size="9" font-weight="700">
+          {r.same ? `both ${r.svcOpt} A` : `${r.svcOpt} vs ${r.svcStd} A`}
+        </text>
+      </g>
+    );
+  })}
+
+  <circle cx="40" cy="278" r="4" fill={C.primary} />
+  <text x="52" y="282" fill={C.muted} font-family={FONT} font-size="9">optional (220.82)</text>
+  <circle cx="176" cy="278" r="4" fill={C.blue} />
+  <text x="188" y="282" fill={C.muted} font-family={FONT} font-size="9">standard (Part III)</text>
+
+  <text x="320" y="282" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">
+    They agree only when both fall inside the same band.
+  </text>
+  <text x="28" y="300" fill={C.muted} font-family={FONT} font-size="9.5">
+    The anchor house lands on 125 A either way — luck, not a rule. Run the one that fits the job.
+  </text>
+</svg>

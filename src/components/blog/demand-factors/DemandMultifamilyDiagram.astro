@@ -1,0 +1,92 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { rangeColumnC, dryerDemand } from "@/lib/nec";
+
+/**
+ * Both tables scale hard with unit count, and they scale differently — ranges
+ * fall away immediately, dryers hold at 100% until the fifth. At ten units they
+ * happen to land on exactly the same 25 kW, which is coincidence rather than
+ * design but makes the point memorably.
+ */
+const rows = [1, 2, 4, 5, 6, 10, 20, 40].map((n) => {
+  const rangeKw = rangeColumnC(n);
+  const d = dryerDemand(n, 5000);
+  return {
+    n,
+    rangeConnected: n * 12,
+    rangeKw,
+    rangePercent: (rangeKw / (n * 12)) * 100,
+    dryerKw: d.demandVa / 1000,
+    dryerPercent: d.percent,
+  };
+});
+
+const PLOT_X = 74;
+const PLOT_W = 570;
+const PLOT_Y = 76;
+const PLOT_H = 120;
+const xFor = (i: number) => PLOT_X + (i / (rows.length - 1)) * PLOT_W;
+const yFor = (pct: number) => PLOT_Y + PLOT_H - (pct / 100) * PLOT_H;
+
+const rangePath = rows.map((r, i) => `${i === 0 ? "M" : "L"}${xFor(i).toFixed(1)} ${yFor(r.rangePercent).toFixed(1)}`).join(" ");
+const dryerPath = rows.map((r, i) => `${i === 0 ? "M" : "L"}${xFor(i).toFixed(1)} ${yFor(r.dryerPercent).toFixed(1)}`).join(" ");
+const ten = rows.find((r) => r.n === 10)!;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>How both demand tables scale with unit count</title>
+  <desc>
+    Ranges fall away immediately — one 12 kilowatt range counts at 67 percent of its nameplate, two at 46 percent,
+    ten at 21 percent and forty at 11 percent. Dryers hold at 100 percent through four units, then drop to 85
+    percent at five, 50 percent at ten and 26.5 percent at forty. At ten units both tables happen to give exactly
+    25 kilowatts.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Both tables scale hard — but not in the same shape
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Demand as a percentage of connected load. Ranges at 12 kW each, dryers at 5 kW each.
+  </text>
+
+  <rect x={PLOT_X} y={PLOT_Y} width={PLOT_W} height={PLOT_H} rx="4" fill={C.white} stroke={C.border} />
+  {[0, 25, 50, 75, 100].map((pct) => (
+    <g>
+      <line x1={PLOT_X} y1={yFor(pct)} x2={PLOT_X + PLOT_W} y2={yFor(pct)} stroke={C.border} stroke-width="0.7" />
+      <text x={PLOT_X - 8} y={yFor(pct) + 3.5} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8">
+        {`${pct}%`}
+      </text>
+    </g>
+  ))}
+
+  <path d={dryerPath} stroke={C.orange} stroke-width="2.4" fill="none" />
+  <path d={rangePath} stroke={C.blue} stroke-width="2.4" fill="none" />
+
+  {rows.map((r, i) => (
+    <g>
+      <circle cx={xFor(i)} cy={yFor(r.dryerPercent)} r="3.4" fill={C.orange} />
+      <circle cx={xFor(i)} cy={yFor(r.rangePercent)} r="3.4" fill={C.blue} />
+      <text x={xFor(i)} y={PLOT_Y + PLOT_H + 15} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">
+        {r.n}
+      </text>
+    </g>
+  ))}
+
+  <text x={PLOT_X + PLOT_W / 2} y={PLOT_Y + PLOT_H + 30} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">
+    number of dwelling units
+  </text>
+
+  <rect x={PLOT_X + PLOT_W + 12} y={PLOT_Y + 6} width="14" height="4" rx="2" fill={C.blue} />
+  <text x={PLOT_X + PLOT_W + 32} y={PLOT_Y + 13} fill={C.blue} font-family={FONT} font-size="9" font-weight="700">ranges</text>
+  <rect x={PLOT_X + PLOT_W + 12} y={PLOT_Y + 26} width="14" height="4" rx="2" fill={C.orange} />
+  <text x={PLOT_X + PLOT_W + 32} y={PLOT_Y + 33} fill={C.orange} font-family={FONT} font-size="9" font-weight="700">dryers</text>
+
+  <line x1="24" y1="242" x2="696" y2="242" stroke={C.border} />
+  <text x="28" y="260" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {`At ten units both land on exactly 25 kW — ranges from ${ten.rangeConnected} kW connected, dryers from 50 kW.`}
+  </text>
+  <text x="28" y="278" fill={C.muted} font-family={FONT} font-size="9.5">
+    Ranges fall immediately; dryers stay at 100% through four units. Different shapes, same purpose.
+  </text>
+</svg>

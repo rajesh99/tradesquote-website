@@ -1,0 +1,96 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The physical reason the cold end binds: Voc has a negative temperature
+ * coefficient, so string voltage climbs as the array chills — and it climbs most
+ * on exactly the kind of cold clear morning that also delivers full irradiance.
+ */
+const VOC_STC = 49.5;
+const COEFF = -0.27;
+const MODULES = 11;
+const CEILING = 600;
+
+const temps = [25, 15, 5, -5, -15, -25, -35];
+const points = temps.map((t) => {
+  const perModule = VOC_STC * (1 + (COEFF / 100) * (t - 25));
+  return { t, perModule, stringV: perModule * MODULES };
+});
+
+const PLOT_X = 92;
+const PLOT_W = 508;
+const PLOT_Y = 76;
+const PLOT_H = 132;
+const V_MIN = 520;
+const V_MAX = 660;
+
+const xFor = (i: number) => PLOT_X + (i / (points.length - 1)) * PLOT_W;
+const yFor = (v: number) => PLOT_Y + PLOT_H - ((v - V_MIN) / (V_MAX - V_MIN)) * PLOT_H;
+const ceilingY = yFor(CEILING);
+const path = points.map((p, i) => `${i === 0 ? "M" : "L"}${xFor(i).toFixed(1)} ${yFor(p.stringV).toFixed(1)}`).join(" ");
+const firstOver = points.find((p) => p.stringV > CEILING);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 274" fill="none" aria-hidden="true">
+  <title>String voltage rising as temperature falls</title>
+  <desc>
+    An eleven-module string of 49.5 volt modules at minus 0.27 percent per degree Celsius. At the 25 degree
+    standard test condition the string sits at 544.5 volts. As the array chills the voltage climbs, crossing the
+    600 volt inverter ceiling somewhere below minus 10 degrees, which is why the maximum string length is set at
+    the lowest expected ambient rather than at nameplate.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="258" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Cold raises voltage — that is the whole problem
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`An ${MODULES}-module string of ${VOC_STC} V modules at ${COEFF}%/°C, against a ${CEILING} V inverter.`}
+  </text>
+
+  <rect x={PLOT_X} y={PLOT_Y} width={PLOT_W} height={PLOT_H} rx="4" fill={C.white} stroke={C.border} />
+
+  <line x1={PLOT_X} y1={ceilingY} x2={PLOT_X + PLOT_W} y2={ceilingY} stroke={C.red} stroke-width="2" stroke-dasharray="5 3" />
+  <text x={PLOT_X + PLOT_W + 8} y={ceilingY + 4} fill={C.red} font-family={FONT} font-size="9.5" font-weight="800">
+    {`${CEILING} V max`}
+  </text>
+
+  <text x={PLOT_X - 8} y={yFor(V_MAX) + 4} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8.5">{V_MAX} V</text>
+  <text x={PLOT_X - 8} y={yFor(V_MIN) + 4} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8.5">{V_MIN} V</text>
+
+  <path d={path} stroke={C.blue} stroke-width="2.6" fill="none" />
+
+  {points.map((p, i) => {
+    const over = p.stringV > CEILING;
+    return (
+      <g>
+        <circle cx={xFor(i)} cy={yFor(p.stringV)} r="4" fill={over ? C.red : C.blue} />
+        <text x={xFor(i)} y={PLOT_Y + PLOT_H + 16} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${p.t}°`}
+        </text>
+        <text
+          x={xFor(i)}
+          y={yFor(p.stringV) - 9}
+          text-anchor="middle"
+          fill={over ? C.red : C.dark}
+          font-family={FONT}
+          font-size="8.5"
+          font-weight="700"
+        >
+          {p.stringV.toFixed(0)}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x={PLOT_X} y={PLOT_Y + PLOT_H + 32} fill={C.muted} font-family={FONT} font-size="9">
+    ambient temperature, °C — colder to the right
+  </text>
+
+  <line x1="24" y1="238" x2="696" y2="238" stroke={C.border} />
+  <text x="28" y="256" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {firstOver
+      ? `At ${firstOver.t}°C this string reaches ${firstOver.stringV.toFixed(0)} V and the inverter is over its input rating.`
+      : "This string stays under the ceiling across the whole range shown."}
+  </text>
+</svg>

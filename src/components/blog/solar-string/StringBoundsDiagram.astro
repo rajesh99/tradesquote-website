@@ -1,0 +1,90 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { stringSizing } from "@/lib/nec";
+
+/**
+ * A string is bounded at both ends by temperature, and the two ends have very
+ * different consequences. Undershooting the MPPT floor costs an afternoon of
+ * production; overshooting the cold ceiling destroys an inverter.
+ */
+const MODULE = { vocStc: 49.5, vmpStc: 41.5, tempCoeffVoc: -0.27, tempCoeffVmp: -0.35 };
+const INVERTER = { inverterMaxVolts: 600, mpptMinVolts: 80 };
+const r = stringSizing({ ...MODULE, ...INVERTER, lowAmbientC: -10, hotCellC: 65 });
+
+const CELL_W = 46;
+const START_X = 96;
+const cells = Array.from({ length: 13 }, (_, i) => i + 1);
+const atCeiling = r.maxModules * r.vocCold;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The valid string length band</title>
+  <desc>
+    With a 49.5 volt module on a 600 volt inverter with an 80 volt MPPT floor, strings of three to eleven modules
+    are valid. Below three the string falls out of the MPPT window when hot and production collapses. Above eleven
+    the string exceeds the inverter's maximum input voltage when cold and destroys it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Bounded at both ends, with very different penalties
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A ${MODULE.vocStc} V module on a ${INVERTER.inverterMaxVolts} V inverter, MPPT floor ${INVERTER.mpptMinVolts} V, record low −10°C.`}
+  </text>
+
+  <text x="24" y="86" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">MODULES</text>
+
+  {cells.map((n) => {
+    const x = START_X + (n - 1) * CELL_W;
+    const tooFew = n < r.minModules;
+    const tooMany = n > r.maxModules;
+    const fill = tooFew ? C.orangeLight : tooMany ? C.redLight : C.greenLight;
+    const stroke = tooFew ? C.orange : tooMany ? C.red : C.green;
+    return (
+      <g>
+        <rect x={x} y={70} width={CELL_W - 6} height="34" rx="5" fill={fill} stroke={stroke} stroke-width="1.5" />
+        <text x={x + (CELL_W - 6) / 2} y={91} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+          {n}
+        </text>
+      </g>
+    );
+  })}
+
+  <path d={`M${START_X} 116 L${START_X + (r.minModules - 1) * CELL_W + CELL_W - 6} 116`} stroke={C.orange} stroke-width="2" />
+  <text x={START_X} y="132" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="700">
+    {`under ${r.minModules} — drops out of MPPT`}
+  </text>
+
+  <path
+    d={`M${START_X + r.minModules * CELL_W - CELL_W} 116 L${START_X + (r.maxModules - 1) * CELL_W + CELL_W - 6} 116`}
+    stroke={C.green}
+    stroke-width="2.6"
+  />
+  <text x={START_X + 130} y="150" fill={C.green} font-family={FONT} font-size="10.5" font-weight="800">
+    {`${r.minModules} to ${r.maxModules} modules — valid`}
+  </text>
+
+  <path d={`M${START_X + r.maxModules * CELL_W} 116 L${START_X + 12 * CELL_W + CELL_W - 6} 116`} stroke={C.red} stroke-width="2" />
+  <text x={START_X + r.maxModules * CELL_W - 8} y="132" fill={C.red} font-family={FONT} font-size="9.5" font-weight="700">
+    {`over ${r.maxModules}`}
+  </text>
+
+  <rect x="24" y="166" width="330" height="54" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="40" y="186" fill={C.orange} font-family={FONT} font-size="10" font-weight="800">HOT END — the minimum</text>
+  <text x="40" y="202" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`Vmp falls to ${r.vmpHot.toFixed(2)} V at 65°C cell. ${INVERTER.mpptMinVolts} ÷ ${r.vmpHot.toFixed(2)} = ${r.minModules}.`}
+  </text>
+  <text x="40" y="215" fill={C.muted} font-family={FONT} font-size="8.5">Penalty: lost production for an afternoon.</text>
+
+  <rect x="366" y="166" width="330" height="54" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.5" />
+  <text x="382" y="186" fill={C.red} font-family={FONT} font-size="10" font-weight="800">COLD END — the maximum</text>
+  <text x="382" y="202" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`Voc rises to ${r.vocCold.toFixed(2)} V at −10°C. 600 ÷ ${r.vocCold.toFixed(2)} = ${r.maxModules}.`}
+  </text>
+  <text x="382" y="215" fill={C.muted} font-family={FONT} font-size="8.5">Penalty: a destroyed inverter.</text>
+
+  <text x="28" y="244" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {`Eleven modules reach ${atCeiling.toFixed(1)} V — only ${(600 - atCeiling).toFixed(1)} V under the ceiling.`}
+  </text>
+</svg>

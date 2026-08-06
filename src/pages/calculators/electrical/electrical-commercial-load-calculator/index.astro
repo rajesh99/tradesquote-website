@@ -1,0 +1,590 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { TABLE_220_12, TABLE_220_44, applyDemandTiers, fmtInt } from "@/lib/nec";
+
+const title = "Commercial Load Calculator — NEC 220 Part III | TradesQuote";
+const description =
+  "Free commercial electrical load calculator using the NEC Article 220 Part III standard method. General lighting by area, receptacles at 180 VA per strap, show window and track lighting, each with its own demand factor.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-commercial-load-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Commercial Load Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Commercial Load Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online commercial electrical load calculator applying the NEC Article 220 Part III standard method — general lighting demand, receptacle demand, show window and track lighting, and the resulting service size.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do you calculate a commercial electrical load?",
+    answer:
+      "By the <strong>Article 220 Part III standard method</strong>, in four groups. <strong>General lighting</strong> is floor area × the VA per square foot for the occupancy, then a Table 220.42 demand factor. <strong>Receptacles</strong> are 180 VA per strap, then the Table 220.44 factor — first 10 kVA at 100%, the rest at 50%. <strong>Show window and track lighting</strong> are per-foot rules that get no demand factor at all. Everything else — HVAC, motors, dedicated equipment — lands at 100%. Add the four, divide by the system voltage, and you have the minimum service.",
+  },
+  {
+    question: "Is there an optional method for commercial buildings?",
+    answer:
+      "No, and this is the single most common misunderstanding. <strong>NEC 220.82 is a dwelling-only shortcut</strong> — it says so in its own title. There is no commercial equivalent, so the Part III standard method is not one option among several for a non-dwelling; it is the calculation. Part IV contains a few narrow optional methods for specific occupancies such as schools and restaurants, but they are exceptions with their own conditions, not a general shortcut.",
+  },
+  {
+    question: "How many VA per square foot for a commercial building?",
+    answer:
+      "It depends on the occupancy, and on which code cycle you are working to. The long-standing figures are <strong>3 VA/ft² for stores and schools</strong>, <strong>3.5 for offices and banks</strong>, <strong>2 for restaurants, hotels and hospitals</strong>, <strong>0.5 for commercial garages</strong>, and <strong>0.25 for warehouses</strong>. Those are the values preloaded here. <strong>NEC 2020 rewrote Table 220.12</strong> around energy-code lighting densities and its numbers are generally lower — an office dropped to roughly a third of the old figure. The VA/ft² field is directly editable for exactly that reason.",
+  },
+  {
+    question: "How do you count receptacles in a commercial load calculation?",
+    answer:
+      "At <strong>180 VA per strap</strong>, under 220.14(I). A strap — a yoke — is the mounting device, so a duplex receptacle counts <em>once</em>, not twice. A quad on two straps counts twice. Then Table 220.44 applies: the first 10,000 VA at 100% and everything above at 50%. That crossover matters more than people expect. Below about 55 straps there is no reduction at all; a 200-strap office sees its 36,000 VA fall to 23,000.",
+  },
+  {
+    question: "Why don't show windows and track lighting get a demand factor?",
+    answer:
+      "Because they are already sized to what is actually installed rather than to a statistical average. <strong>220.43(A)</strong> requires 200 VA per linear foot of show window, and <strong>220.43(B)</strong> requires 150 VA for every 2 feet of track. Both are lighting loads that run at full output during business hours — the textbook continuous load — so there is nothing to diversify. They sit alongside the general lighting load, not inside it.",
+  },
+  {
+    question: "Does the general lighting load include the receptacles?",
+    answer:
+      "In a <em>dwelling</em>, yes — 220.14(J) folds general-use receptacles into the 3 VA/ft², which is why there is no NEC limit on outlets per circuit in a house. In a <em>non-dwelling</em>, no. Commercial receptacles are counted separately at 180 VA per strap under 220.14(I). This is the structural difference between the two calculations, and mixing them up either doubles the receptacle load or drops it entirely.",
+  },
+  {
+    question: "Is a commercial kitchen calculated the same way?",
+    answer:
+      "The cooking equipment is not. <strong>NEC 220.56</strong> gives commercial kitchen equipment its own demand factors — 100% for one or two units, 90% for three, 80% for four, 70% for five, and 65% for six or more — with a floor: the result may never be less than the sum of the two largest pieces. Note that this is entirely separate from Table 220.55, which applies only to <em>household</em> ranges. Enter the kitchen equipment demand into the other-loads field here.",
+  },
+  {
+    question: "Do I still need to check the largest motor?",
+    answer:
+      "Yes. <strong>220.50</strong> routes motor loads to Article 430, and <strong>430.24</strong> requires the feeder to carry 125% of the largest motor's full-load current plus the full-load current of the rest. That 25% adder is not part of the Part III arithmetic and has to be added separately. Size the motors first with the Motor Circuit Calculator, then bring the total into the other-loads field.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load calculated? Quote the build-out in minutes.";
+const ctaDescription =
+  "Commercial jobs live or die on the takeoff. TradesQuote turns a scope into a detailed line-item estimate — gear, feeders, branch circuits, and labor — validated by a built-in quality control agent before it reaches the client.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Turn the calculated load into a service rating.",
+  },
+  {
+    href: "/calculators/electrical/electrical-motor-circuit-calculator",
+    title: "Motor Circuit Calculator",
+    description: "Size the Article 430 loads before adding them in.",
+  },
+  {
+    href: "/calculators/electrical/electrical-transformer-sizing-calculator",
+    title: "Transformer Sizing Calculator",
+    description: "Feed a 208 V panel from a 480 V service.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Estimate Calculator",
+    description: "Price the job with overhead and margin.",
+  },
+];
+
+/** The Table 220.44 crossover, worked at a few strap counts, computed not transcribed. */
+const strapRows = [20, 40, 56, 80, 120, 200, 400].map((straps) => {
+  const connected = straps * 180;
+  const { demandVa } = applyDemandTiers(connected, TABLE_220_44);
+  return { straps, connected, demand: demandVa, saved: connected - demandVa };
+});
+
+const styles = electricalAccentStyles.indigo;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Commercial Load Calculator — NEC 220 Part III" />
+    <meta
+      property="og:description"
+      content="The standard method for non-dwellings: lighting by area, receptacles per strap, and the demand factors that apply to each."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Commercial Load Calculator" />
+    <meta name="twitter:description" content="NEC Article 220 Part III, worked line by line. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Commercial Load Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Commercial Load Calculator <span class="text-indigo-600">— NEC 220 Part III</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              There is <strong>no optional method for a commercial building</strong> — 220.82 is a dwelling
+              shortcut and has no non-dwelling equivalent. The standard method is the calculation, and it works in
+              four groups, each with its own demand factor. This runs all four.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Build the load
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="cl-occupancy" class="text-sm font-semibold text-slate-800">Occupancy</label>
+                  <select
+                    id="cl-occupancy"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    {
+                      TABLE_220_12.map((row) => (
+                        <option value={row.key} selected={row.key === "store"}>
+                          {row.occupancy} — {row.vaPerFt2} VA/ft²
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label for="cl-system" class="text-sm font-semibold text-slate-800">System</label>
+                  <select
+                    id="cl-system"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    <option value="208:3ph" selected>208Y/120 V, 3-phase</option>
+                    <option value="480:3ph">480Y/277 V, 3-phase</option>
+                    <option value="240:3ph">240 V, 3-phase</option>
+                    <option value="240:1ph">240 V, single-phase</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="cl-area" class="text-sm font-semibold text-slate-800">Floor area (ft²)</label>
+                  <input
+                    id="cl-area"
+                    type="number"
+                    min="0"
+                    step="100"
+                    value="5000"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="cl-va-ft2" class="text-sm font-semibold text-slate-800">VA per ft² (editable)</label>
+                  <input
+                    id="cl-va-ft2"
+                    type="number"
+                    min="0"
+                    step="0.05"
+                    value="3"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="cl-straps" class="text-sm font-semibold text-slate-800">Receptacle straps</label>
+                  <input
+                    id="cl-straps"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="40"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="cl-show-window" class="text-sm font-semibold text-slate-800">Show window (ft)</label>
+                  <input
+                    id="cl-show-window"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="30"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="cl-track" class="text-sm font-semibold text-slate-800">Track (ft)</label>
+                  <input
+                    id="cl-track"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="20"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="cl-hvac" class="text-sm font-semibold text-slate-800">HVAC / largest load (VA)</label>
+                  <input
+                    id="cl-hvac"
+                    type="number"
+                    min="0"
+                    step="500"
+                    value="25000"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="cl-other" class="text-sm font-semibold text-slate-800">Other loads (VA)</label>
+                  <input
+                    id="cl-other"
+                    type="number"
+                    min="0"
+                    step="500"
+                    value="0"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                A strap is a yoke — a duplex receptacle counts once. Put kitchen equipment (220.56), motor loads
+                including the 430.24 adder, and any dedicated equipment into "other loads", where they land at 100%.
+              </p>
+
+              <button
+                id="cl-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Calculated load</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="cl-amps" class="text-5xl font-extrabold tracking-tight text-indigo-600">151.8 A</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-3 gap-3">
+                <div class="rounded-xl border border-indigo-100 bg-white p-3">
+                  <p class="text-xs text-slate-500">Min service</p>
+                  <p id="cl-service" class="mt-1 text-xl font-bold text-slate-900">175 A</p>
+                </div>
+                <div class="rounded-xl border border-indigo-100 bg-white p-3">
+                  <p class="text-xs text-slate-500">Demand VA</p>
+                  <p id="cl-total-va" class="mt-1 text-xl font-bold text-slate-900">54,700 VA</p>
+                </div>
+                <div class="rounded-xl border border-indigo-100 bg-white p-3">
+                  <p class="text-xs text-slate-500">Connected</p>
+                  <p id="cl-connected" class="mt-1 text-xl font-bold text-slate-900">54,700 VA</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Lighting connected</span><span id="cl-bd-lighting" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>· Table 220.42</span><span id="cl-bd-lighting-demand" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Show window</span><span id="cl-bd-show-window" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Track lighting</span><span id="cl-bd-track" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Receptacles connected</span><span id="cl-bd-receptacles" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>· Table 220.44</span><span id="cl-bd-receptacles-demand" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>HVAC</span><span id="cl-bd-hvac" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Other</span><span id="cl-bd-other" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Calculated load</span><span id="cl-bd-total" class="font-bold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Amps</span><span id="cl-bd-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="cl-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Demand factors reduce the calculated load below the connected load.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The method, explained in plain English</h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># 1. General lighting — 220.12, then 220.42</div>
+            <div>lighting&nbsp;=&nbsp;area × VA/ft² <span class="text-slate-400">→ demand factor by occupancy</span></div>
+            <div class="mt-3 text-cyan-300"># 2. Receptacles — 220.14(I), then 220.44</div>
+            <div>receptacles&nbsp;=&nbsp;straps × <span class="text-amber-300">180 VA</span></div>
+            <div>&nbsp;&nbsp;first 10,000 @ 100%, remainder @ 50%</div>
+            <div class="mt-3 text-cyan-300"># 3. Show window and track — 220.43, no demand factor</div>
+            <div>show window&nbsp;=&nbsp;ft × <span class="text-amber-300">200 VA</span></div>
+            <div>track&nbsp;=&nbsp;ft ÷ 2 × <span class="text-amber-300">150 VA</span></div>
+            <div class="mt-3 text-cyan-300"># 4. Everything else at 100%</div>
+            <div>amps&nbsp;=&nbsp;total VA ÷ (√3 × V) <span class="text-slate-400">three-phase</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">No optional method exists</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                220.82 is titled "Optional Calculations — Dwelling Unit". For a commercial building the standard
+                method is not one choice among several. It is the calculation.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Receptacles are separate here</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                In a dwelling 220.14(J) buries receptacles inside the 3 VA/ft². In a non-dwelling they are counted
+                individually at 180 VA per strap. Same code, opposite structure.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A strap, not a receptacle</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                220.14(I) counts the yoke. A duplex is one strap and one 180 VA allowance — counting both halves
+                doubles the receptacle load and oversizes the service.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Motors bring their own rule</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                220.50 sends motors to Article 430, where 430.24 wants 125% of the largest plus 100% of the rest.
+                That adder is not in the Part III arithmetic.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three occupancies at 208Y/120 V three-phase, showing how differently the same method behaves.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">5,000 ft² retail store — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">40 straps, 30 ft of show window, 20 ft of track, 25 kVA of HVAC.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              lighting: 5,000 × 3 = 15,000 VA @ 100% = 15,000<br />
+              show window: 30 × 200 = 6,000 · track: 10 × 150 = 1,500<br />
+              receptacles: 40 × 180 = 7,200 @ 100% = 7,200<br />
+              HVAC: 25,000<br />
+              total <span class="font-bold text-indigo-700">54,700 VA ÷ (1.732 × 208) = 151.8 A → 175 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> no demand reduction anywhere. Lighting gets
+              100% for a store, and 7,200 VA of receptacles never reaches the 10 kVA crossover. The show window is
+              11% of the whole service on its own.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">20,000 ft² warehouse — four times the floor, a third of the load</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">0.25 VA/ft², 20 straps, no show window or track, 15 kVA of HVAC.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              lighting: 20,000 × 0.25 = 5,000 VA @ 100% = 5,000<br />
+              receptacles: 20 × 180 = 3,600 @ 100% = 3,600<br />
+              HVAC: 15,000<br />
+              total <span class="font-bold text-indigo-700">23,600 VA ÷ 360.3 = 65.5 A → 70 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> occupancy dominates everything. A warehouse
+              four times the size of the store needs less than half the service, because 0.25 VA/ft² is a twelfth of
+              the retail figure.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">12,000 ft² office — where Table 220.44 finally bites</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">3.5 VA/ft², 200 straps, no show window or track, 40 kVA of HVAC.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              lighting: 12,000 × 3.5 = 42,000 VA @ 100% = 42,000<br />
+              receptacles: 200 × 180 = 36,000 → 10,000 @ 100% + 26,000 @ 50% = 23,000<br />
+              HVAC: 40,000<br />
+              total <span class="font-bold text-indigo-700">105,000 VA ÷ 360.3 = 291.5 A → 300 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> Table 220.44 removed 13,000 VA — 36 amps of
+              service, and the difference between a 300 A and a 350 A switchboard. This is the one demand factor in a
+              commercial calculation that routinely changes the answer.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Where the receptacle demand factor starts</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Table 220.44 does nothing until the receptacle load passes 10 kVA — which takes
+            {Math.ceil(10000 / 180)} straps. Below that the "demand factor" is a 100% pass-through.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Straps</th>
+                  <th class="py-3 px-4 font-semibold">Connected</th>
+                  <th class="py-3 px-4 font-semibold">After 220.44</th>
+                  <th class="py-3 px-4 font-semibold">Removed</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  strapRows.map((row, index) => (
+                    <tr class={index === strapRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.straps}</td>
+                      <td class="py-3 px-4">{fmtInt(row.connected)} VA</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{fmtInt(row.demand)} VA</td>
+                      <td class="py-3 px-4">{row.saved > 0 ? `${fmtInt(row.saved)} VA` : "—"}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 <strong>Article 220 Part III</strong> — general lighting
+            <strong>220.12</strong>, other loads <strong>220.14</strong> (receptacles at 180 VA per strap in
+            <strong>220.14(I)</strong>), lighting demand factors <strong>Table 220.42</strong>, show window and
+            track lighting <strong>220.43</strong>, receptacle demand <strong>Table 220.44</strong>, commercial
+            kitchen equipment <strong>220.56</strong>, and motor loads via <strong>220.50</strong> into Article 430.
+            <strong
+              >The VA/ft² values preloaded here are the long-standing pre-2020 Table 220.12 figures. NEC 2020
+              replaced that table with energy-code-aligned densities that are generally lower</strong
+            >, so confirm the figure against the edition your jurisdiction has adopted — the field is editable for
+            that reason, and the higher legacy values err toward a larger service. Local amendments and the AHJ have
+            final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about the commercial load calculation and its demand factors."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalCommercialLoadCalculator } from "@/scripts/calculators/electrical-commercial-load-calculator";
+    initElectricalCommercialLoadCalculator();
+  </script>
+</Layout>

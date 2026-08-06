@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Footcandle targets by room use, with the fixture count each implies on one
+ * reference room. The five-fold spread from hallway to workshop is the point —
+ * a single "lumens per square foot" number for a whole house is meaningless.
+ */
+const AREA = 192;
+const FIXTURE_LM = 650;
+
+const rows = [
+  { use: "Hallway, closet", fc: 10 },
+  { use: "Living room, bedroom", fc: 20 },
+  { use: "Dining room", fc: 25 },
+  { use: "Bathroom", fc: 30 },
+  { use: "Kitchen, office", fc: 40 },
+  { use: "Workshop, garage", fc: 50 },
+].map((r) => {
+  const lumens = AREA * r.fc;
+  return { ...r, lumens, fixtures: Math.ceil(lumens / FIXTURE_LM) };
+});
+
+const peak = Math.max(...rows.map((r) => r.fc));
+const BAR_X = 190;
+const BAR_MAX = 280;
+const fmt = (n: number) => n.toLocaleString("en-US");
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>Footcandle targets by room use</title>
+  <desc>
+    Target light levels run from 10 footcandles for a hallway to 50 for a workshop — a fivefold spread. On a 192
+    square foot room with 650 lumen trims that is 3 fixtures for a hallway, 6 for a living room, 9 for a bathroom,
+    12 for a kitchen and 15 for a workshop.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    A fivefold spread across one house
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Fixture counts shown for a ${AREA} ft² room with ${FIXTURE_LM} lm trims. These are general lighting, not task lighting.`}
+  </text>
+
+  {rows.map((r, i) => {
+    const y = 70 + i * 29;
+    const width = Math.max(20, Math.round((r.fc / peak) * BAR_MAX));
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{r.use}</text>
+        <rect x={BAR_X} y={y + 2} width={width} height="18" rx="4" fill={C.orange} opacity="0.18" />
+        <rect x={BAR_X} y={y + 2} width={width} height="18" rx="4" fill="none" stroke={C.orange} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">
+          {`${r.fc} fc`}
+        </text>
+        <text x={BAR_X + width + 10} y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${fmt(r.lumens)} lm needed`}
+        </text>
+        <text x={BAR_X + width + 108} y={y + 16} fill={C.primary} font-family={FONT} font-size="9.5" font-weight="800">
+          {`${r.fixtures} fixtures`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="248" x2="696" y2="248" stroke={C.border} />
+  <text x="28" y="264" fill={C.muted} font-family={FONT} font-size="9.5">
+    A kitchen still wants under-cabinet lighting on top of this. General light is not task light.
+  </text>
+</svg>

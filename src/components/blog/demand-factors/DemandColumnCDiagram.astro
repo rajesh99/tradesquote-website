@@ -1,0 +1,87 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { rangeDemand } from "@/lib/nec";
+
+/**
+ * Column C is a demand in kilowatts, not a percentage — so every single range
+ * from just over 1¾ kW to 12 kW lands on the same 8 kW figure. Note 3's Columns
+ * A and B are what rescue the small appliances from that flat rate.
+ */
+const nameplates = [2.5, 3.5, 6, 8.75, 10, 12];
+const rows = nameplates.map((kw) => {
+  const r = rangeDemand(1, kw);
+  return {
+    kw,
+    columnC: r.columnC,
+    alt: r.columnAlternative,
+    best: r.columnAlternative ? Math.min(r.columnC, r.columnAlternative.demandKw) : r.columnC,
+  };
+});
+
+const peak = 12;
+const BAR_X = 118;
+const BAR_MAX = 300;
+const w = (v: number) => Math.max(6, Math.round((v / peak) * BAR_MAX));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Column C is a flat 8 kW for every range up to 12 kW</title>
+  <desc>
+    Table 220.55 Column C gives a maximum demand of 8 kilowatts for one household range of any rating from just
+    over 1.75 kW through 12 kW. Note 3 permits Columns A and B instead for appliances at 8.75 kW and below, which
+    gives 2 kW for a 2.5 kW appliance, 2.8 for a 3.5 kW one, 4.8 for a 6 kW one and 7 for an 8.75 kW one.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Column C is kilowatts, not a percentage
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    One range. Outline is the nameplate, solid is what the table counts it as.
+  </text>
+
+  {rows.map((r, i) => {
+    const y = 68 + i * 30;
+    const altBetter = r.alt && r.alt.demandKw < r.columnC;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+          {`${r.kw} kW`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={w(r.kw)} height="18" rx="4" fill="none" stroke={C.border} stroke-width="1.4" />
+        <rect
+          x={BAR_X}
+          y={y + 3}
+          width={w(altBetter ? r.alt!.demandKw : r.columnC)}
+          height="18"
+          rx="4"
+          fill={altBetter ? C.green : C.blue}
+          opacity="0.2"
+        />
+        <rect
+          x={BAR_X}
+          y={y + 3}
+          width={w(altBetter ? r.alt!.demandKw : r.columnC)}
+          height="18"
+          rx="4"
+          fill="none"
+          stroke={altBetter ? C.green : C.blue}
+          stroke-width="1.6"
+        />
+        <text x={BAR_X + w(r.kw) + 10} y={y + 16} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="800">
+          {`Column C ${r.columnC} kW`}
+        </text>
+        <text x={BAR_X + w(r.kw) + 108} y={y + 16} fill={altBetter ? C.green : C.muted} font-family={FONT} font-size="8.5">
+          {altBetter
+            ? `Note 3: Column ${r.alt!.column} @ ${r.alt!.percent}% = ${r.alt!.demandKw.toFixed(2)} kW`
+            : "no Note 3 alternative above 8¾ kW"}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="254" x2="696" y2="254" stroke={C.border} />
+  <text x="28" y="270" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    A 9 kW range and a 12 kW range are both 8 kW of load. At that size the nameplate barely matters.
+  </text>
+</svg>
