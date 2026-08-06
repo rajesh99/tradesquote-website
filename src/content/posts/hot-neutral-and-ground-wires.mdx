@@ -1,0 +1,183 @@
+---
+title: "Hot, Neutral and Ground: What Each Wire Actually Does"
+meta_title: "Hot vs Neutral vs Ground Wire Explained (2026) | TradesQuote"
+description: "The neutral carries current every second the load runs. The ground carries none until something fails. Both connect to earth — which is exactly why swapping them looks fine and isn't."
+image: /images/posts/hot-neutral-and-ground-wires-hero.svg
+date: 2026-08-06T09:40:00Z
+categories: ["electrical"]
+tags: ["hot neutral ground","wire colors","equipment grounding conductor","basic electrical theory","shared neutral"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import HotNeutralGroundPathDiagram from "@/components/blog/hot-neutral-ground/HotNeutralGroundPathDiagram.astro";
+import HotNeutralGroundFaultPathDiagram from "@/components/blog/hot-neutral-ground/HotNeutralGroundFaultPathDiagram.astro";
+import HotNeutralGroundMwbcDiagram from "@/components/blog/hot-neutral-ground/HotNeutralGroundMwbcDiagram.astro";
+
+Three wires arrive at a receptacle and two of them are connected to earth. That fact is the source of nearly every misconception in this subject, because it makes the neutral and the ground look interchangeable — and in day-to-day operation, wiring them wrongly changes nothing you can see.
+
+Here is the distinction that actually matters:
+
+```
+Hot      — delivers current to the load
+Neutral  — returns that current, every second the load runs
+Ground   — carries nothing at all, until something fails
+```
+
+The neutral is a **working conductor**. The equipment grounding conductor is a **safety conductor** that exists for one purpose: to give fault current a path low enough in impedance to trip the breaker before anyone touches anything.
+
+## The Two Situations
+
+<BlogInfographic
+  title="The neutral works every day. The ground works once."
+  caption="Normal operation on the left, a ground fault on the right. Only one conductor changes job."
+>
+  <HotNeutralGroundPathDiagram />
+</BlogInfographic>
+
+In **normal operation**, current leaves the panel on the hot, does its work in the load, and returns on the neutral. The two are equal — 12 A out, 12 A back. The equipment grounding conductor sits there carrying zero.
+
+In a **ground fault** — a hot conductor contacting the metal case of an appliance, say — the EGC suddenly becomes the return path. Because it's a metallic conductor bonded all the way back to the source, the impedance is tiny and the current is enormous. That current is not a side effect; it is the mechanism. **The fault current is what trips the breaker.**
+
+This is why the answer to "does the ground wire do anything?" is that it does nothing at all, right up until the moment it does the most important thing in the installation.
+
+## The Names, and the Colours
+
+The code's vocabulary is unhelpfully similar, and it's worth getting straight because the two terms are not interchangeable:
+
+- **Grounded conductor** = the neutral. It is grounded, and it carries current.
+- **Grounding conductor** = the EGC or GEC. It does the grounding, and carries no current normally.
+
+One letter apart, opposite jobs.
+
+| Conductor | Code name | What code actually requires | Common practice |
+| --- | --- | --- | --- |
+| Hot | Ungrounded | No colour is mandated — only that it isn't white, gray or green | Black, red, blue at 120/208/240; brown, orange, yellow at 277/480 |
+| Neutral | Grounded | White, gray, or three continuous white stripes — **200.6** | White |
+| Ground | Equipment grounding conductor | Green, green with yellow stripes, or bare — **250.119** | Green or bare |
+
+Two things surprise people here. First, **the black-for-hot convention is not a code requirement** — the NEC reserves white, gray and green and leaves the rest to you. Second, above 6 AWG the identification rules relax and larger conductors are commonly re-identified with tape or marking at their terminations, which is why you'll see white tape on a black 4/0 conductor in a service.
+
+One genuine trap: **orange has two meanings**. It's a common phase colour in 277/480 V work, but NEC **110.15** requires the high leg of a 4-wire delta system — the "wild leg" that sits at about 208 V to ground rather than 120 V — to be identified in orange. Assuming orange means one or the other without checking is how people put a 120 V load across 208 V.
+
+## Why Earth Cannot Clear a Fault
+
+<BlogInfographic
+  title="Earth is not a fault return path"
+  caption="Current available at 120 V through each return path. The scale is logarithmic."
+>
+  <HotNeutralGroundFaultPathDiagram />
+</BlogInfographic>
+
+| Return path | Impedance | Fault current at 120 V | Against a 20 A breaker |
+| --- | --- | --- | --- |
+| Earth via a 25 Ω rod | 25 Ω | 4.8 A | 0.24× — never trips |
+| Earth via a 5 Ω rod | 5 Ω | 24 A | 1.20× — barely, eventually |
+| Earth via a 1 Ω rod | 1 Ω | 120 A | 6× — unachievable in practice |
+| Bonded EGC | ~0.1 Ω | **1,200 A** | 60× — instant |
+
+This is the single most misunderstood idea in residential work, and the NEC states it flatly in **250.4(A)(5)**: *the earth shall not be considered as an effective ground-fault current path.*
+
+A driven ground rod is typically 25 Ω or worse — which is why **250.53(A)(2)** requires a second electrode unless a single rod is proven to be 25 Ω or less. At 120 V that rod passes 4.8 A. A 20 A breaker will sit there indefinitely while the faulted case stays energised at something close to full voltage, waiting for a person to complete a better path to earth than the rod does.
+
+So what are ground rods for? Lightning and surge dissipation, stabilising the system's voltage reference to earth, and limiting voltage from line surges. **They are not part of the fault-clearing system.** That job belongs entirely to the bonded metallic path — the EGC back to the panel, the neutral back to the transformer. The bonding side of this is covered in **[Grounding vs Bonding](/blog/grounding-vs-bonding)**, and sizing the conductors in **[Ground Wire Size Chart](/blog/ground-wire-size-chart)**.
+
+## The Bond Happens Exactly Once
+
+Neutral and ground are connected together at **one** point in the system: the service disconnect. Everywhere downstream they stay separate — separate bars in every subpanel, no bonding screw, four-wire feeders. NEC **250.24(A)(5)** and **408.40** are the relevant rules.
+
+The reason is simple once you see it. Current returns by every path available to it, in inverse proportion to impedance. Bond the neutral to the ground bar at a subpanel and the feeder's EGC becomes a second return path in parallel with the neutral, so **normal load current permanently flows on the grounding system** — through the EGC, through the conduit, through the metal water piping, through anything else bonded along the way. NEC **250.6** calls this objectionable current, and it makes every grounded metal surface in the building part of the return circuit.
+
+Nothing about that is visible. Everything works. The failure only appears when someone opens a connection or touches two grounded surfaces at once.
+
+The same logic is why a **bootleg ground** — a jumper from the neutral terminal to the ground terminal of a receptacle, used to make a three-prong outlet on two-wire cable — is dangerous rather than merely non-compliant. It puts the appliance case on the neutral, which means the case rises to whatever the neutral's voltage drop is under load, and if the neutral ever opens, the case goes to full line voltage. Worse, **a plug-in receptacle tester reads it as correctly wired**, because it can't tell the difference. The legitimate fix for an ungrounded receptacle is GFCI protection under **406.4(D)(2)**, which works precisely because **a GFCI needs no ground to function** — see **[GFCI vs AFCI](/blog/gfci-vs-afci)** and **[Where GFCI Is Required](/blog/where-gfci-is-required)**.
+
+## When Two Circuits Share a Neutral
+
+<BlogInfographic
+  title="A shared neutral carries the difference — or the sum"
+  caption="Two hots sharing one neutral. Which leg they land on decides everything."
+>
+  <HotNeutralGroundMwbcDiagram />
+</BlogInfographic>
+
+| Loads | Arrangement | Neutral carries | Why |
+| --- | --- | --- | --- |
+| 12 A + 8 A | opposite legs | 4 A | return currents cancel |
+| 12 A + 12 A | opposite legs | 0 A | perfectly balanced |
+| 16 A + 4 A | opposite legs | 12 A | difference only |
+| 12 A + 8 A | **same leg** | 20 A | nothing cancels |
+| 16 A + 16 A | **same leg** | **32 A** | on a 12 AWG conductor |
+
+A multiwire branch circuit runs two hots on **opposite** legs sharing one neutral, and the neutral carries only the *difference* between them. That's the entire economy of the arrangement — three wires doing the work of four.
+
+Put both hots on the **same** leg and the returns add instead of cancelling. Two 16 A loads then put 32 A on a 12 AWG neutral, and here is the part that makes it dangerous: **no breaker is watching a neutral.** Both circuits are at 16 A, comfortably under their 20 A breakers, and nothing anywhere in the system objects while the shared conductor runs at 160% of its rating.
+
+This is also why NEC **210.4(B)** requires a means to disconnect all ungrounded conductors of a multiwire branch circuit simultaneously — a handle tie or a two-pole breaker. Open one hot with the other still live and the shared neutral remains energised through the load, which is exactly the surprise nobody wants when they've turned off the breaker they think feeds the box.
+
+The 120/240 V arrangement that makes opposite legs possible in the first place is worked through in **[Split-Phase 120/240 V](/blog/split-phase-120-240-volts)**, and the reason currents add rather than divide is the parallel topology described in **[Series vs Parallel Circuits](/blog/series-vs-parallel-circuits)**.
+
+## Why You Get a Shock From Hot to Ground
+
+Because the system's neutral is deliberately bonded to earth at the service, the hot conductor sits at 120 V *with respect to earth*. Stand on a concrete floor, touch a hot conductor, and you have completed a circuit from the hot, through you, into the earth, and back to the transformer's grounded centre tap. No second wire required.
+
+That's also why birds on a line are fine — they contact one conductor and nothing else, so there's no path — and why the classic advice about working one-handed exists: it keeps a current path from crossing your chest.
+
+## Common Mistakes
+
+- **Treating neutral and ground as interchangeable.** They're both earthed and only one is meant to carry current. Everything works either way until it doesn't.
+- **Bonding neutral to ground in a subpanel.** One bond, at the service only — 250.24(A)(5) and 408.40. Anything else puts load current on the grounding system.
+- **Believing a ground rod clears faults.** 250.4(A)(5) says the earth is not an effective fault path, and 4.8 A through a 25 Ω rod is the arithmetic behind it.
+- **Trusting a plug-in receptacle tester.** It cannot detect a bootleg ground, and reads it as correct.
+- **Landing both hots of a shared neutral on the same leg.** The neutral then carries the sum, with no overcurrent device watching it.
+- **Omitting the handle tie on a multiwire circuit.** 210.4(B) exists because one hot open still leaves the neutral live through the load.
+- **Assuming black must be hot.** Only white/gray (200.6) and green/bare (250.119) are mandated; hot colours are convention.
+- **Reading orange as 480 V.** On a 4-wire delta, 110.15 makes orange the high leg at ~208 V to ground.
+
+## Run the Numbers
+
+> **[Ground Wire Size Calculator](/calculators/electrical/electrical-ground-wire-size-calculator)** — Table 250.122 for the EGC keyed to the breaker, and Table 250.66 for the grounding electrode conductor keyed to the service conductors. They are two different sizings.
+
+To see what a fault path actually delivers, the **[Short Circuit Calculator](/calculators/electrical/electrical-short-circuit-calculator)** works the available fault current at a panel, and the **[Conductor Resistance Calculator](/calculators/electrical/electrical-conductor-resistance-calculator)** gives the impedance of the run itself. For the load side, the **[Receptacle & Circuit Calculator](/calculators/electrical/electrical-receptacle-circuit-calculator)** and **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)** cover normal operation, and **[Common NEC Violations](/blog/common-nec-violations)** collects the wiring errors this page describes.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 200.6 identification of grounded conductors, 250.119 identification of equipment grounding conductors, 110.15 high-leg identification, 250.4(A)(5) earth not an effective ground-fault path, 250.6 objectionable current, 250.24(A)(5) and 408.40 single-point bonding, 250.53(A)(2) supplemental electrode, 210.4(B) simultaneous disconnect for multiwire branch circuits, 406.4(D)(2) GFCI replacement of ungrounded receptacles. Ground-rod resistance of 25 Ω and an EGC path of about 0.1 Ω are representative planning figures; real values depend on soil and run length. Local amendments override the model code, and a licensed electrician plus the authority having jurisdiction have final say on anything installed.*
+
+---
+
+## FAQ
+
+### What is the difference between neutral and ground?
+
+The neutral is a working conductor that carries return current every second the load is running. The equipment grounding conductor carries nothing in normal operation and exists only to give fault current a low-impedance path back to the source so the breaker trips. Both are connected to earth at the service, which is why swapping them appears to work — the installation runs normally until a fault or an open connection exposes the error.
+
+### Why does the neutral carry current if it's grounded?
+
+Because grounding sets its voltage reference, not its job. Current has to return to its source to complete the circuit, and the neutral is that return path. Being bonded to earth at the service just means the neutral sits near zero volts relative to ground, which is what makes the hot conductor 120 V relative to earth. It still carries the full load current.
+
+### Can I use the ground wire as a neutral?
+
+No. It puts normal load current on the grounding system permanently, energising every bonded metal surface in the path — NEC 250.6 calls this objectionable current. The specific version of this at a receptacle, jumpering neutral to the ground screw, is a bootleg ground: the appliance case then rides on the neutral's voltage drop and goes to full line voltage if the neutral ever opens. A plug-in tester cannot detect it.
+
+### Why can't neutral and ground be bonded in a subpanel?
+
+Because current returns by every path available to it. Bond them at a subpanel and the feeder's grounding conductor becomes a second return path in parallel with the neutral, so load current flows continuously through the EGC, the conduit and any bonded metal piping. NEC 250.24(A)(5) and 408.40 confine the bond to the service disconnect for exactly this reason. Nothing about the error is visible in normal operation.
+
+### Does a ground rod protect against electric shock?
+
+Not from a circuit fault. NEC 250.4(A)(5) states plainly that the earth is not an effective ground-fault current path, and the arithmetic backs it up: 120 V through a typical 25 Ω rod moves just 4.8 amps, less than a quarter of what a 20 A breaker needs to notice. Ground rods handle lightning, surges and voltage stabilisation. Fault clearing is done by the bonded metallic path back to the source, which carries roughly 1,200 amps.
+
+### What do the wire colors mean?
+
+Only two are mandated. White or gray identifies the grounded conductor (200.6), and green, green with a yellow stripe, or bare identifies the equipment grounding conductor (250.119). Hot conductors have no required colour — the code only forbids using the reserved ones. Black, red and blue at 120/208/240 V, and brown, orange and yellow at 277/480 V, are convention. One exception: 110.15 requires the high leg of a 4-wire delta to be orange.
+
+### Why does a shared neutral sometimes overload?
+
+Because it carries the difference between the two hot currents only when they're on opposite legs. On the same leg the returns add instead of cancelling, so two 16 A loads put 32 A on a shared 12 AWG neutral. Both circuits stay under their 20 A breakers and nothing trips, because no overcurrent device monitors a neutral. Correct leg assignment is what makes the arrangement safe.
+
+### Why do multiwire branch circuits need a handle tie?
+
+Because switching off one hot leaves the shared neutral energised through the load on the other circuit. Someone who has turned off "the" breaker can still find voltage in the box. NEC 210.4(B) requires a means to disconnect all ungrounded conductors of the circuit simultaneously — a two-pole breaker or an approved handle tie.
+
+### Why do you get shocked touching only the hot wire?
+
+Because the system's neutral is bonded to earth at the service, so the hot conductor sits at 120 V relative to the ground you're standing on. Touching it completes a circuit through your body into the earth and back to the transformer, with no second wire needed. A bird on a wire is safe because it contacts one conductor and nothing else, so no path exists.

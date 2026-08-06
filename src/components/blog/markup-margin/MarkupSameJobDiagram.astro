@@ -1,0 +1,91 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same job priced two ways. Both use "25%", both feel like the same
+ * decision, and they differ by $248 of profit — because markup measures against
+ * cost and margin measures against price.
+ */
+const HOURS = 12;
+const RATE = 95;
+const FIXTURES = 600;
+const MATERIAL = 850;
+const OVERHEAD_PCT = 15;
+const TARGET = 25;
+
+const direct = HOURS * RATE + FIXTURES + MATERIAL;
+const overhead = (direct * OVERHEAD_PCT) / 100;
+const breakEven = direct + overhead;
+
+const marginPrice = breakEven / (1 - TARGET / 100);
+const marginProfit = marginPrice - breakEven;
+
+const markupPrice = breakEven * (1 + TARGET / 100);
+const markupProfit = markupPrice - breakEven;
+const markupActualMargin = (markupProfit / markupPrice) * 100;
+
+const gap = marginProfit - markupProfit;
+const usd = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+
+const BAR_X = 200;
+const BAR_MAX = 380;
+const peak = marginPrice;
+const w = (v: number) => Math.round((v / peak) * BAR_MAX);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>The same job priced by markup and by margin</title>
+  <desc>
+    A job with $2,590 of direct cost and $389 of overhead breaks even at $2,979. Priced at a 25 percent margin it
+    sells for $3,971 and earns $993. Priced at a 25 percent markup it sells for $3,723 and earns $745 — which is
+    only a 20 percent margin, and $248 less profit on identical work.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Same job, same "25%", $248 apart
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${HOURS} h at $${RATE}, ${usd(FIXTURES)} fixtures, ${usd(MATERIAL)} material, ${OVERHEAD_PCT}% overhead.`}
+  </text>
+
+  <text x="28" y="82" fill={C.muted} font-family={FONT} font-size="9.5" font-weight="700">BREAK-EVEN</text>
+  <rect x={BAR_X} y={70} width={w(breakEven)} height="22" rx="4" fill={C.muted} opacity="0.18" />
+  <rect x={BAR_X} y={70} width={w(breakEven)} height="22" rx="4" fill="none" stroke={C.muted} stroke-width="1.5" />
+  <text x={BAR_X + 9} y={85} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{usd(breakEven)}</text>
+  <text x={BAR_X + w(breakEven) + 10} y={85} fill={C.muted} font-family={FONT} font-size="8.5">
+    {`${usd(direct)} direct + ${usd(overhead)} overhead`}
+  </text>
+
+  <text x="28" y="128" fill={C.green} font-family={FONT} font-size="9.5" font-weight="800">25% MARGIN</text>
+  <text x="28" y="142" fill={C.muted} font-family={FONT} font-size="8.5">÷ (1 − 0.25)</text>
+  <rect x={BAR_X} y={116} width={w(breakEven)} height="22" rx="4" fill={C.muted} opacity="0.14" />
+  <rect x={BAR_X + w(breakEven)} y={116} width={w(marginProfit)} height="22" rx="4" fill={C.green} opacity="0.28" />
+  <rect x={BAR_X} y={116} width={w(marginPrice)} height="22" rx="4" fill="none" stroke={C.green} stroke-width="1.8" />
+  <text x={BAR_X + 9} y={131} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{usd(marginPrice)}</text>
+  <text x={BAR_X + w(marginPrice) + 10} y={131} fill={C.green} font-family={FONT} font-size="9.5" font-weight="800">
+    {`${usd(marginProfit)} profit`}
+  </text>
+
+  <text x="28" y="182" fill={C.red} font-family={FONT} font-size="9.5" font-weight="800">25% MARKUP</text>
+  <text x="28" y="196" fill={C.muted} font-family={FONT} font-size="8.5">× 1.25</text>
+  <rect x={BAR_X} y={170} width={w(breakEven)} height="22" rx="4" fill={C.muted} opacity="0.14" />
+  <rect x={BAR_X + w(breakEven)} y={170} width={w(markupProfit)} height="22" rx="4" fill={C.red} opacity="0.24" />
+  <rect x={BAR_X} y={170} width={w(markupPrice)} height="22" rx="4" fill="none" stroke={C.red} stroke-width="1.8" />
+  <text x={BAR_X + 9} y={185} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{usd(markupPrice)}</text>
+  <text x={BAR_X + w(markupPrice) + 10} y={185} fill={C.red} font-family={FONT} font-size="9.5" font-weight="800">
+    {`${usd(markupProfit)} profit`}
+  </text>
+
+  <rect x="24" y="216" width="672" height="42" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="40" y="234" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+    {`A 25% markup is a ${markupActualMargin.toFixed(1)}% margin — and ${usd(gap)} less profit on identical work.`}
+  </text>
+  <text x="40" y="250" fill={C.dark} font-family={FONT} font-size="9.5">
+    Markup measures against cost. Margin measures against price. They are never the same number.
+  </text>
+
+  <text x="28" y="278" fill={C.muted} font-family={FONT} font-size="9.5">
+    Run that gap across a year of jobs and it is the difference between a good year and a flat one.
+  </text>
+</svg>

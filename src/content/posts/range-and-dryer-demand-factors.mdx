@@ -1,0 +1,200 @@
+---
+title: "Range and Dryer Demand Factors: NEC 220.54 and 220.55"
+meta_title: "Range & Dryer Demand Factors: NEC 220.55 Explained (2026) | TradesQuote"
+description: "A 12 kW range counts as 8 kW — Column C is a demand in kilowatts, not a percentage. Why every dryer has a 5,000 VA floor, and how both tables strip 71% off a ten-unit building."
+image: /images/posts/range-and-dryer-demand-factors-hero.svg
+date: 2026-08-05T11:30:00Z
+categories: ["electrical"]
+tags: ["nec 220.55","nec 220.54","range demand factor","dryer demand factor","load calculation"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import DemandColumnCDiagram from "@/components/blog/demand-factors/DemandColumnCDiagram.astro";
+import DemandNote1Diagram from "@/components/blog/demand-factors/DemandNote1Diagram.astro";
+import DemandMultifamilyDiagram from "@/components/blog/demand-factors/DemandMultifamilyDiagram.astro";
+
+**A 12 kW electric range counts as 8 kW.** Not 80% of 12. Eight kilowatts, flat.
+
+This is the most misread table in Article 220, and the misreading has a specific shape: people see "8" in Column C of Table 220.55 and assume it is a percentage. It isn't. **Column C gives a maximum demand in kilowatts**, already diversified, and a 9 kW range and a 12 kW range both land on the same 8 kW figure.
+
+The dryer table has its own trap in the opposite direction. **Table 220.54's demand factor for a single dryer is 100%** — nothing is reduced. What changes the number is a *floor*: every dryer counts at 5,000 VA or its nameplate, whichever is larger. A 4,800 W dryer counts as 5,000.
+
+## Column C Is Flat
+
+<BlogInfographic
+  title="Column C is kilowatts, not a percentage"
+  caption="One range. Outline is the nameplate, solid is what the table counts it as."
+>
+  <DemandColumnCDiagram />
+</BlogInfographic>
+
+For a single household range rated over 1¾ kW and up to 12 kW, Column C says 8 kW. Full stop. The table has already accounted for the fact that nobody runs every element plus the oven at full output for long enough to matter.
+
+But look at what that flat rate does to a small appliance. A 6 kW wall oven counted at 8 kW is being charged for **more than its nameplate** — which is why **Note 3** exists.
+
+**Note 3** permits Columns A and B *in lieu of* Column C for appliances at 8¾ kW and below. Column A covers over 1¾ kW and under 3½ kW; Column B covers 3½ kW through 8¾ kW. Both give percentages, and for a single appliance both are 80%.
+
+| Nameplate | Column C | Note 3 alternative | Use |
+| --- | --- | --- | --- |
+| 2.5 kW | 8 kW | Column A @ 80% = 2.00 kW | **2.00 kW** |
+| 3.5 kW | 8 kW | Column B @ 80% = 2.80 kW | **2.80 kW** |
+| 6 kW | 8 kW | Column B @ 80% = 4.80 kW | **4.80 kW** |
+| 8.75 kW | 8 kW | Column B @ 80% = 7.00 kW | **7.00 kW** |
+| 10 kW | 8 kW | none — above 8¾ kW | **8 kW** |
+| 12 kW | 8 kW | none — above 8¾ kW | **8 kW** |
+
+Below 8¾ kW, Note 3 always wins. Above it, Column C is the only route and the flat 8 kW is a genuine saving.
+
+### Note 4: cooktop plus ovens count as one range
+
+A **counter-mounted cooking unit and up to two wall ovens**, supplied from a single branch circuit and located in the same room, may have their nameplate ratings added together and be treated as **a single range**.
+
+That is worth real money. A 7 kW cooktop plus a 5 kW oven totals 12 kW — one range, 8 kW of demand — instead of two appliances counted separately. The conditions are strict, though: one circuit, same room, and no more than two ovens.
+
+## Above 12 kW, Note 1 Takes Over
+
+<BlogInfographic
+  title="Note 1 multiplies the table, not the nameplate"
+  caption="+5% on the 8 kW Column C figure for each full kilowatt above 12. Outline is the nameplate."
+>
+  <DemandNote1Diagram />
+</BlogInfographic>
+
+For ranges over 12 kW through 27 kW of the same rating, **Note 1 increases the Column C figure by 5% for each additional kilowatt above 12.**
+
+The critical word is *Column C figure*. The 5% applies to the 8 kW table value, not to the nameplate. Applying it to the nameplate inflates the result badly and is a common error.
+
+| Nameplate | Over 12 by | Increase | Demand | As % of nameplate |
+| --- | --- | --- | --- | --- |
+| 12 kW | — | — | 8.00 kW | 67% |
+| 13 kW | 1 kW | +5% | 8.40 kW | 65% |
+| 14 kW | 2 kW | +10% | 8.80 kW | 63% |
+| 16 kW | 4 kW | +20% | 9.60 kW | 60% |
+| 18 kW | 6 kW | +30% | 10.40 kW | 58% |
+| 21 kW | 9 kW | +45% | 11.60 kW | 55% |
+| 27 kW | 15 kW | +75% | 14.00 kW | 52% |
+
+**Upgrading from a 12 kW to a 16 kW range adds 1.6 kW to the calculated load** — under 7 A on a 240 V service. Homeowners routinely assume a professional range forces a service upgrade. The table says otherwise, and even a 27 kW monster only reaches 14 kW of demand.
+
+## The Dryer's Floor
+
+NEC **220.54** requires each dwelling-unit electric clothes dryer to be counted at **5,000 VA or the nameplate, whichever is larger**. Then the demand factor:
+
+| Dryers | Factor |
+| --- | --- |
+| 1–4 | 100% |
+| 5 | 85% |
+| 6 | 75% |
+| 7 | 65% |
+| 8 | 60% |
+| 9 | 55% |
+| 10 | 50% |
+| 11 | 47% |
+| 12–23 | 47% less 1% per dryer over 11 |
+| 24–42 | 35% less 0.5% per dryer over 23 |
+| 43 and over | 25% |
+
+In a single-family house **none of that matters** — the factor is 100% and the dryer is simply 5,000 VA, or its nameplate if larger. The table only starts working at five units, which makes it a multifamily tool almost exclusively.
+
+## Where the Tables Really Earn Their Keep
+
+<BlogInfographic
+  title="Both tables scale hard — but not in the same shape"
+  caption="Demand as a percentage of connected load. Ranges at 12 kW each, dryers at 5 kW each."
+>
+  <DemandMultifamilyDiagram />
+</BlogInfographic>
+
+| Units | Ranges connected | Range demand | Of connected | Dryer demand | Factor |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 12 kW | 8.00 kW | 67% | 5.0 kW | 100% |
+| 2 | 24 kW | 11.00 kW | 46% | 10.0 kW | 100% |
+| 4 | 48 kW | 17.00 kW | 35% | 20.0 kW | 100% |
+| 5 | 60 kW | 20.00 kW | 33% | 21.3 kW | 85% |
+| 6 | 72 kW | 21.00 kW | 29% | 22.5 kW | 75% |
+| 10 | 120 kW | 25.00 kW | 21% | 25.0 kW | 50% |
+| 20 | 240 kW | 35.00 kW | 15% | 38.0 kW | 38% |
+| 40 | 480 kW | 55.00 kW | 11% | 53.0 kW | 26.5% |
+
+Ten apartments have **170 kVA** of connected cooking and laundry. The calculated load is **50 kVA** — 71% removed. Without these tables every multifamily service in the country would be roughly three times larger than it needs to be, for equipment that will never all run at once.
+
+Note the different shapes. **Ranges fall away immediately** — one range is already down to 67% of nameplate, two to 46%. **Dryers hold at 100% through four units** and only then start dropping. Two tables, both diversifying, with completely different curves.
+
+At ten units they happen to land on exactly 25 kW each. That is coincidence rather than design, but it makes the point stick.
+
+## Never Combine These With 220.82
+
+This is the error that undersizes services, and it happens to people working carefully.
+
+The **220.82 optional method takes appliance nameplate ratings at full value** and then applies its own single reduction — first 10 kVA at 100%, remainder at 40%. The diversity is *inside that 40% factor*.
+
+Tables 220.55 and 220.54 belong to the **Part III standard method**. Applying a range demand factor first and then the 40% remainder factor double-counts the diversity and produces a load that is too small.
+
+The two methods on the same 2,000 ft² all-electric house give **122.2 A standard against 101.2 A optional** — about 21% apart, though both round to the same 125 A service. Both worked side by side in **[Residential Electrical Load Calculation](/blog/residential-electrical-load-calculation)**, and the method choice is covered in **[Standard vs Optional Load Calculation](/blog/standard-vs-optional-load-calculation)**.
+
+## What These Tables Don't Cover
+
+**Gas ranges.** No significant electrical cooking load — just ignition, controls and a clock, counted as an ordinary appliance.
+
+**Commercial kitchens.** Table 220.55 is *household* equipment. A commercial kitchen uses **220.56**, an entirely different set of factors — 100% for one or two units, then 90%, 80%, 70% and 65% at six or more — with a floor at the sum of the two largest pieces. See **[Commercial Load Calculation](/blog/commercial-electrical-load-calculation)**.
+
+**Branch circuit sizing.** These are *feeder and service* demand factors. The branch circuit to a single range is sized from Column C under Note 4, but a single wall oven or counter-mounted unit is sized from its nameplate. A demand factor never shrinks the circuit feeding one appliance.
+
+**Gas dryers.** A gas dryer's electrical load is the motor and controls, typically under 1,000 VA, and 220.54 does not apply.
+
+## Common Mistakes
+
+- **Reading Column C as a percentage.** It is a demand in kilowatts. A 12 kW range is 8 kW, not 9.6.
+- **Applying Note 1's 5% to the nameplate.** It multiplies the 8 kW table figure.
+- **Missing Note 3 on small appliances.** Below 8¾ kW, Columns A and B beat Column C every time.
+- **Missing Note 4.** A cooktop plus up to two ovens on one circuit in one room is a single range.
+- **Forgetting the dryer's 5,000 VA floor.** A 4,800 W dryer counts as 5,000.
+- **Expecting a dryer demand factor in a house.** It is 100% through four units.
+- **Combining these tables with 220.82.** The optional method has its own diversity; stacking undersizes the service.
+- **Using Table 220.55 for a commercial kitchen.** That is 220.56, a different table entirely.
+- **Applying a demand factor to a single appliance's branch circuit.** These are feeder and service factors.
+
+## Run the Numbers
+
+> **[Range & Dryer Demand Factor Calculator](/calculators/electrical/electrical-demand-factor-calculator)** — enter how many ranges and dryers and what each is rated, and it returns the demand load with the full arithmetic: the Column C figure, whether Note 1 applies and by how much, the Note 3 alternative where one exists, and the dryer floor and factor. It also shows the connected load alongside so you can see exactly how much diversity the tables are claiming.
+
+Carry the result into the **[Residential Load Calculator](/calculators/electrical/electrical-load-calculator)** and then the **[Service Size Calculator](/calculators/electrical/electrical-service-size-calculator)**. If the question is whether an existing service has room, **[Do I Need a Panel Upgrade?](/blog/do-i-need-a-panel-upgrade)** is the better starting point.
+
+*Sources & standards: NEC (NFPA 70) 2023 — Table 220.55 for household electric ranges, wall-mounted ovens and counter-mounted cooking units rated over 1¾ kW, with Note 1 (5% increase per kilowatt above 12 kW, applied to the Column C value), Note 3 (Columns A and B in lieu of Column C at 8¾ kW and below) and Note 4 (a counter-mounted cooking unit plus not more than two wall ovens supplied from a single branch circuit in the same room treated as one range); Table 220.54 for electric clothes dryers, with the 5,000 VA minimum stated in 220.54 itself. Both apply to dwelling units only — commercial kitchen equipment uses 220.56. These are Part III standard-method demand factors and must not be combined with the 220.82 optional method, which applies its own diversity. Local amendments override the model code and the AHJ has final say.*
+
+---
+
+## FAQ
+
+### How much does a 12 kW range count as in a load calculation?
+
+8 kW. Table 220.55 Column C gives a maximum demand of 8 kilowatts for one household range rated over 1¾ kW through 12 kW, and that figure is a demand in kilowatts rather than a percentage. It is the single most misread table in Article 220 — people see "8" and assume 80%, which would give 9.6 kW. A 9 kW range and a 12 kW range are both 8 kW of load.
+
+### What about a range larger than 12 kW?
+
+Note 1 applies: for ranges over 12 kW through 27 kW of the same rating, the Column C figure increases by 5% for each additional kilowatt above 12. A 16 kW range is 4 kW over, so 8 × 1.20 = 9.6 kW. The increase applies to the table value, not the nameplate. Even a 27 kW range only reaches 14 kW of demand, so upgrading a range rarely forces a service upgrade.
+
+### How much does an electric dryer count as?
+
+5,000 VA or the nameplate, whichever is larger, under NEC 220.54. A 4,800 W dryer counts as 5,000 VA; a 5,600 W one counts as 5,600. The demand factor is 100% for one through four dryers and only starts reducing at five — 85% at five, 75% at six, 50% at ten. In a single-family house there is no reduction at all, so the dryer is simply its 5,000 VA floor.
+
+### What are Columns A and B in Table 220.55 for?
+
+Small cooking appliances. Column A covers units over 1¾ kW and under 3½ kW, Column B covers 3½ kW through 8¾ kW, and both give percentages rather than kilowatts. Note 3 permits using them instead of Column C for appliances in those ranges, which matters because Column C's flat 8 kW would otherwise charge a 6 kW wall oven for more than its nameplate. For a single appliance both columns are 80%.
+
+### Can a cooktop and wall oven be counted as one range?
+
+Yes, under Note 4, and it saves real load. A counter-mounted cooking unit plus not more than two wall ovens, supplied from a single branch circuit and located in the same room, may have their nameplate ratings added and be treated as one range. A 7 kW cooktop plus a 5 kW oven totals 12 kW, which is a single 8 kW range demand rather than two separate appliance loads.
+
+### Why do these demand factors exist?
+
+Because connected load and simultaneous load are different quantities, and services are sized for the second. Ten apartments have ten ranges totalling 120 kW installed, but the chance all ten run at full output at the same moment is effectively zero — Table 220.55 counts them at 25 kW. Across ranges and dryers together, a ten-unit building drops from 170 kVA connected to 50 kVA calculated.
+
+### Do the 220.82 optional method calculations use these tables?
+
+No, and combining them undersizes the service. The 220.82 optional method takes appliance nameplate ratings at full value and applies its own single reduction — first 10 kVA at 100%, remainder at 40% — so the diversity lives in that 40% factor. Tables 220.55 and 220.54 belong to the Part III standard method. Applying a range demand factor and then the 40% remainder counts the same diversity twice.
+
+### Do these tables apply to commercial kitchens or gas ranges?
+
+Neither. Table 220.55 covers household cooking appliances only; commercial kitchen equipment uses NEC 220.56, which has its own factors — 100% for one or two units, then 90%, 80%, 70% and 65% — with a floor at the sum of the two largest pieces. A gas range has no significant electrical cooking load, just ignition and controls, and is counted as an ordinary appliance.

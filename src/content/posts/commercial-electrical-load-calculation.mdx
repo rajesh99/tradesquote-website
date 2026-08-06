@@ -1,0 +1,180 @@
+---
+title: "Commercial Load Calculation: VA per Square Foot by Occupancy"
+meta_title: "Commercial Electrical Load Calculation: NEC 220 Part III (2026) | TradesQuote"
+description: "There is no optional method for a commercial building — 220.82 is a dwelling shortcut. The standard method in four groups, each with its own demand factor, worked on a real 5,000 ft² store."
+image: /images/posts/commercial-electrical-load-calculation-hero.svg
+date: 2026-08-05T09:00:00Z
+categories: ["electrical"]
+tags: ["commercial load calculation","nec 220.12","nec 220.44","va per square foot","service sizing"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import CommercialFourGroupsDiagram from "@/components/blog/commercial-load/CommercialFourGroupsDiagram.astro";
+import CommercialReceptacleDemandDiagram from "@/components/blog/commercial-load/CommercialReceptacleDemandDiagram.astro";
+import CommercialOccupancyDiagram from "@/components/blog/commercial-load/CommercialOccupancyDiagram.astro";
+
+Start with the thing that trips up everyone arriving from residential work.
+
+**There is no optional method for a commercial building.** NEC 220.82 is titled "Optional Calculations — Dwelling Unit", and it means it. There is no non-dwelling equivalent, no shortcut, no 40% remainder factor. The Article 220 Part III standard method is not one option among several — it is *the* calculation.
+
+The second surprise follows immediately: **commercial receptacles are counted individually**, at 180 VA per strap. In a dwelling, 220.14(J) buries general-use receptacles inside the 3 VA/ft² general lighting figure, which is why there's no NEC limit on outlets per circuit in a house. In a non-dwelling, that structure inverts. Same code, opposite treatment.
+
+Get those two things straight and the rest is arithmetic in four groups.
+
+## The Four Groups
+
+<BlogInfographic
+  title="Four groups, four different rules"
+  caption="A 5,000 ft² retail store at 3 VA/ft², 40 straps, 30 ft of show window."
+>
+  <CommercialFourGroupsDiagram />
+</BlogInfographic>
+
+| Group | Rule | Demand factor |
+| --- | --- | --- |
+| General lighting | area × VA/ft² (220.12) | Table 220.42 |
+| Receptacles | 180 VA per strap (220.14(I)) | Table 220.44 |
+| Show window | 200 VA per linear foot (220.43(A)) | none |
+| Track lighting | 150 VA per 2 ft (220.43(B)) | none |
+| Everything else | nameplate | none |
+
+Two of the five get a demand factor. Three never do, and the reason is worth understanding rather than memorising: **show window and track lighting are already sized to what is installed and running.** They are the textbook continuous load — on at full output through business hours — so there is no diversity to claim.
+
+Worked on the reference store: 15,000 VA of general lighting, 6,000 of show window, 1,500 of track, 7,200 of receptacles and 25,000 of HVAC gives **54,700 VA**. At 208Y/120 V three-phase that is 54,700 ÷ (1.732 × 208) = **151.8 A**, needing a **175 A** service.
+
+Notice what didn't happen: nothing was reduced. A store's lighting gets 100% under Table 220.42, and 7,200 VA of receptacles never reaches the point where Table 220.44 does anything. The demand factors people expect to save them a service size frequently save nothing at all.
+
+## Why the Receptacle Table Usually Does Nothing
+
+<BlogInfographic
+  title="Table 220.44 does nothing until 10 kVA"
+  caption="Outline is connected load, solid is after the demand factor. The crossover is 56 straps."
+>
+  <CommercialReceptacleDemandDiagram />
+</BlogInfographic>
+
+Table 220.44 gives the first 10,000 VA at 100% and the remainder at 50%. At 180 VA per strap, **you need 56 straps before a single volt-ampere comes off.**
+
+| Straps | Connected | After 220.44 | Removed |
+| --- | --- | --- | --- |
+| 20 | 3,600 VA | 3,600 VA | — |
+| 40 | 7,200 VA | 7,200 VA | — |
+| 56 | 10,080 VA | 10,040 VA | 40 VA |
+| 80 | 14,400 VA | 12,200 VA | 2,200 VA |
+| 120 | 21,600 VA | 15,800 VA | 5,800 VA |
+| 200 | 36,000 VA | 23,000 VA | 13,000 VA |
+| 400 | 72,000 VA | 41,000 VA | 31,000 VA |
+
+For small retail and restaurant work the table is a pass-through and you can stop thinking about it. For an office fit-out it is the single demand factor that changes the answer: **a 200-strap office sheds 13,000 VA, which is 36 A of service** — often exactly the difference between a 300 A and a 350 A switchboard.
+
+### A strap is a yoke, not a receptacle
+
+220.14(I) counts the **strap** — the mounting yoke. A standard duplex receptacle is one strap and one 180 VA allowance, not two. A quad on two straps counts twice. Counting each half of every duplex is the commonest way this section gets misapplied, and it doubles the receptacle load.
+
+Multi-outlet assemblies have their own rule in 220.14(H): each 5 ft of assembly counts as one outlet, or each 1 ft where the assembly is likely to supply several appliances simultaneously.
+
+## Occupancy Matters More Than Size
+
+<BlogInfographic
+  title="Occupancy decides more than floor area does"
+  caption="General lighting VA per ft², with what each gives across a 10,000 ft² building."
+>
+  <CommercialOccupancyDiagram />
+</BlogInfographic>
+
+Run the same method on a warehouse four times the size of the store:
+
+```
+20,000 ft² × 0.25 VA/ft²  = 5,000 VA lighting
+20 straps × 180           = 3,600 VA
+HVAC                      = 15,000 VA
+                          ─────────────
+                            23,600 VA ÷ 360.3 = 65.5 A → 70 A
+```
+
+**Four times the floor area, less than half the service.** A store carries twelve times a warehouse's lighting density, and lighting is the term that scales with area. This is why "VA per square foot" is a nearly useless rule of thumb across occupancies and a very good one within a single occupancy type.
+
+Then the office, where the receptacle table finally earns its keep:
+
+```
+12,000 ft² × 3.5 VA/ft²   = 42,000 VA lighting
+200 straps × 180 = 36,000 → 10,000 @ 100% + 26,000 @ 50% = 23,000 VA
+HVAC                      = 40,000 VA
+                          ─────────────
+                           105,000 VA ÷ 360.3 = 291.5 A → 300 A
+```
+
+### An important caveat on the VA/ft² figures
+
+The values above — 3 for stores, 3.5 for offices, 0.25 for warehouses — are the long-standing Table 220.12 figures, and they are the ones most references still quote. **NEC 2020 replaced that table.** The current version is aligned with energy-code lighting power densities and is organised by a much longer list of building types, with values that are generally *lower*; an office fell to roughly a third of the old figure.
+
+That matters for two reasons. First, using the legacy numbers gives a **larger** service, which is conservative in the safe direction and rarely a compliance problem. Second, it may cost your client real money on gear they don't need. Check which edition your jurisdiction has adopted and read its actual Table 220.12 — this is one place where the difference between code cycles is large enough to change equipment.
+
+## What Part III Doesn't Cover
+
+Three loads have their own rules and are added on top.
+
+**Motors — 220.50 into Article 430.** The feeder must carry 125% of the largest motor's full-load current plus 100% of the rest, per 430.24. That 25% adder is not part of the Part III arithmetic. Work the circuits with **[Motor Circuit Sizing](/blog/motor-circuit-sizing)** first, then bring a total across.
+
+**Commercial kitchen equipment — 220.56.** Its own demand factors: 100% for one or two units, then 90%, 80%, 70% and 65% at six or more, with a floor at the sum of the two largest pieces. This is *not* Table 220.55, which covers household ranges only — see **[Range and Dryer Demand Factors](/blog/range-and-dryer-demand-factors)**.
+
+**Continuous loads generally.** 210.19(A) and 215.2(A) require conductors sized at 125% of continuous load. Commercial lighting is the classic case, which is where residential habits go wrong — the arithmetic is in **[The 80% Rule for Circuits](/blog/80-percent-rule-electrical)**.
+
+Non-coincident loads get relief under 220.60: where two loads are unlikely to run simultaneously — heating and air conditioning being the standard example — only the larger need be counted.
+
+## Common Mistakes
+
+- **Looking for a commercial optional method.** 220.82 is dwellings only. Part III is the calculation.
+- **Folding receptacles into the VA/ft².** That's the dwelling rule (220.14(J)). Non-dwellings count straps.
+- **Counting both halves of a duplex.** One yoke, one 180 VA allowance.
+- **Expecting Table 220.44 to reduce a small job.** Under 56 straps it removes nothing.
+- **Applying a demand factor to show window or track lighting.** Neither gets one.
+- **Using Table 220.55 for a commercial kitchen.** That's household ranges. Commercial is 220.56.
+- **Forgetting the 430.24 motor adder.** 125% of the largest motor sits outside Part III.
+- **Quoting pre-2020 VA/ft² values under a 2020 or later code.** The table was rewritten and the numbers dropped.
+- **Ignoring 220.60.** Heating and cooling rarely run together; only the larger counts.
+
+## Run the Calculation
+
+> **[Commercial Load Calculator](/calculators/electrical/electrical-commercial-load-calculator)** — enter the occupancy, floor area, strap count, show window and track footage, and it applies Table 220.42 and Table 220.44 separately, shows each tier of the arithmetic, and returns the calculated load in amps with the minimum service. The VA/ft² field is directly editable so you can enter the value from whichever edition of Table 220.12 your jurisdiction has adopted.
+
+Then carry the result into the **[Service Size Calculator](/calculators/electrical/electrical-service-size-calculator)**, and size the feeders with the **[Service & Feeder Wire Size Calculator](/calculators/electrical/electrical-service-wire-size-calculator)**. For the residential counterpart, see **[Residential Electrical Load Calculation](/blog/residential-electrical-load-calculation)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — Article 220 Part III, including 220.12 and Table 220.12 (general lighting by occupancy), 220.14 with 220.14(H), 220.14(I) and 220.14(J), Table 220.42 (lighting demand factors), 220.43 (show window and track lighting), Table 220.44 (receptacle demand), 220.50 into Article 430 with 430.24, 220.56 (commercial kitchen equipment) and 220.60 (non-coincident loads); continuous-load sizing at 210.19(A) and 215.2(A). NEC 2020 substantially revised Table 220.12 to energy-code-aligned lighting densities that are generally lower than the values used here; confirm the figures against your adopted edition. Local amendments override the model code and the AHJ has final say. Have commercial electrical design performed by a licensed engineer or electrician under permit.*
+
+---
+
+## FAQ
+
+### How do you calculate a commercial electrical load?
+
+By the Article 220 Part III standard method, in four groups. General lighting is floor area times the VA per square foot for the occupancy, then a Table 220.42 demand factor. Receptacles are 180 VA per strap, then Table 220.44 — first 10 kVA at 100%, the rest at 50%. Show window lighting is 200 VA per linear foot and track lighting 150 VA per 2 ft, neither with a demand factor. Everything else lands at 100%. Add the groups and divide by the system voltage.
+
+### Is there an optional method for commercial load calculations?
+
+No. NEC 220.82 is titled "Optional Calculations — Dwelling Unit" and has no non-dwelling equivalent. Part IV of Article 220 contains a few narrow optional methods for specific occupancies such as schools and restaurants, but they carry their own conditions and are exceptions rather than a general shortcut. For an ordinary commercial building the standard method is the only route.
+
+### How many VA per square foot for a commercial building?
+
+Under the long-standing Table 220.12 figures: 3 VA/ft² for stores and schools, 3.5 for offices and banks, 2 for restaurants, hotels and hospitals, 1 for churches, 0.5 for commercial garages, and 0.25 for warehouses. NEC 2020 rewrote the table around energy-code lighting power densities, and its values are generally lower — an office dropped to roughly a third. Check the edition your jurisdiction enforces before relying on either set.
+
+### How do you count receptacles in a commercial load calculation?
+
+At 180 VA per strap under 220.14(I). A strap is the mounting yoke, so a duplex receptacle counts once, not twice, and a quad on two straps counts twice. Multi-outlet assemblies follow 220.14(H) instead: each 5 ft counts as one outlet, or each 1 ft where several appliances are likely to be used simultaneously. The total then gets the Table 220.44 demand factor.
+
+### Why don't show windows and track lighting get a demand factor?
+
+Because they are already sized to what is installed and actually running. Both are lighting loads that operate at full output throughout business hours — the definition of a continuous load — so there is no diversity to claim. 220.43 sets them at 200 VA per linear foot of show window and 150 VA per 2 ft of track, and they sit alongside the general lighting load rather than inside it.
+
+### What's the difference between a dwelling and a non-dwelling load calculation?
+
+Structurally, how receptacles are treated. In a dwelling, 220.14(J) includes general-use receptacle outlets in the 3 VA/ft² general lighting load, which is why the NEC sets no limit on outlets per circuit in a house. In a non-dwelling, receptacles are counted separately at 180 VA per strap. Dwellings also get the 220.82 optional method as a shortcut; non-dwellings do not.
+
+### Does a commercial kitchen use Table 220.55?
+
+No — that table covers household cooking appliances only. Commercial kitchen equipment uses NEC 220.56, which has its own demand factors: 100% for one or two units, 90% for three, 80% for four, 70% for five and 65% for six or more. It carries a floor as well, in that the result may never be less than the sum of the two largest pieces of equipment.
+
+### Do motors get included in the Part III calculation?
+
+They get included in the total, but they are not calculated by Part III. 220.50 routes motor loads to Article 430, and 430.24 requires the feeder to carry 125% of the largest motor's full-load current plus the full-load current of all the others. That 25% adder has no equivalent in the Part III arithmetic, so size the motor circuits separately and bring the total across as an additional load.

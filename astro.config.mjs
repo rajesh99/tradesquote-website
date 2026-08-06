@@ -23,6 +23,14 @@ export default defineConfig({
   }),
   site: config.site.base_url,
   base: config.site.base_path ? config.site.base_path : "/",
+  // Evergreen-slug migrations. The dated post was refreshed for 2026 and renamed;
+  // the old URL had accumulated links, so it 301s rather than 404s.
+  redirects: {
+    "/blog/hvac-system-cost-2025": {
+      status: 301,
+      destination: "/blog/hvac-system-cost",
+    },
+  },
   image: { service: sharpImageService() },
   vite: {
     plugins: [

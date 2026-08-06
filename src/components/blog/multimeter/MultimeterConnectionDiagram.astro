@@ -1,0 +1,114 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The rule that saves the meter: a voltmeter is a near-open circuit and goes in
+ * parallel; an ammeter is a near-short and goes in series. Put the ammeter in
+ * parallel and its shunt becomes a deliberate bolted fault.
+ */
+const V = 120;
+const METER_MOHM = 10;
+const SHUNT_OHMS = 0.01;
+
+const voltmeterDraw = V / (METER_MOHM * 1_000_000);
+const shortCurrent = V / SHUNT_OHMS;
+
+const COLS = [
+  {
+    x: 24,
+    accent: C.green,
+    kicker: "VOLTS — IN PARALLEL",
+    inSeries: false,
+    symbol: "V",
+    detail: `${METER_MOHM} MΩ input impedance`,
+    verdict: `Draws ${(voltmeterDraw * 1_000_000).toFixed(0)} µA — the circuit never notices`,
+  },
+  {
+    x: 252,
+    accent: C.blue,
+    kicker: "AMPS — IN SERIES",
+    inSeries: true,
+    symbol: "A",
+    detail: `${SHUNT_OHMS} Ω shunt, circuit opened`,
+    verdict: "Adds almost no resistance to the loop",
+  },
+  {
+    x: 480,
+    accent: C.red,
+    kicker: "AMPS IN PARALLEL — DON'T",
+    inSeries: false,
+    symbol: "A",
+    detail: `${SHUNT_OHMS} Ω placed straight across ${V} V`,
+    verdict: `A deliberate short — ${shortCurrent.toLocaleString("en-US")} A if the source can supply it`,
+  },
+];
+
+const W = 216;
+const TOP = 112;
+const BOT = 182;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 294" fill="none" aria-hidden="true">
+  <title>Where a voltmeter and an ammeter belong in a circuit</title>
+  <desc>
+    A voltmeter has about 10 megohms of input impedance and connects in parallel across the load, drawing only 12
+    microamps. An ammeter has a shunt of about 0.01 ohms and must be inserted in series, with the circuit opened. Placing
+    an ammeter in parallel across 120 volts puts that 0.01 ohm shunt directly across the supply, which is a bolted short
+    of roughly 12,000 amps.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="278" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Volts in parallel, amps in series — and never the other way round</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">The meter's own impedance is the whole reason. One is nearly an open circuit, the other nearly a short.</text>
+
+  {COLS.map((col) => {
+    const x0 = col.x + 16;
+    const x1 = col.x + W - 16;
+    const meterX = col.x + W / 2 - 24;
+    const loadX = col.x + W - 46;
+    return (
+      <g>
+        <text x={col.x + W / 2} y="76" text-anchor="middle" fill={col.accent} font-family={FONT} font-size="9" font-weight="700">{col.kicker}</text>
+
+        <rect x={x0 - 10} y={TOP + 14} width="20" height="42" rx="4" fill={C.white} stroke={C.dark} stroke-width="1.5" />
+        <text x={x0} y={TOP + 40} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">src</text>
+
+        {col.inSeries ? (
+          <g>
+            <line x1={x0} y1={TOP} x2={meterX - 17} y2={TOP} stroke={C.dark} stroke-width="1.8" />
+            <line x1={meterX + 17} y1={TOP} x2={x1} y2={TOP} stroke={C.dark} stroke-width="1.8" />
+          </g>
+        ) : (
+          <line x1={x0} y1={TOP} x2={x1} y2={TOP} stroke={C.dark} stroke-width="1.8" />
+        )}
+        <line x1={x0} y1={BOT} x2={x1} y2={BOT} stroke={C.dark} stroke-width="1.8" />
+        <line x1={x0} y1={TOP} x2={x0} y2={TOP + 14} stroke={C.dark} stroke-width="1.8" />
+        <line x1={x0} y1={TOP + 56} x2={x0} y2={BOT} stroke={C.dark} stroke-width="1.8" />
+
+        <rect x={loadX - 15} y={TOP + 16} width="30" height="38" rx="4" fill={C.white} stroke={C.muted} stroke-width="1.8" />
+        <text x={loadX} y={TOP + 40} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">load</text>
+        <line x1={loadX} y1={TOP} x2={loadX} y2={TOP + 16} stroke={C.dark} stroke-width="1.8" />
+        <line x1={loadX} y1={TOP + 54} x2={loadX} y2={BOT} stroke={C.dark} stroke-width="1.8" />
+
+        {!col.inSeries && (
+          <g>
+            <line x1={meterX} y1={TOP} x2={meterX} y2={TOP + 20} stroke={col.accent} stroke-width="1.8" />
+            <line x1={meterX} y1={TOP + 54} x2={meterX} y2={BOT} stroke={col.accent} stroke-width="1.8" />
+          </g>
+        )}
+        <circle cx={meterX} cy={col.inSeries ? TOP : TOP + 37} r="17" fill={C.white} stroke={col.accent} stroke-width="2.4" />
+        <text x={meterX} y={(col.inSeries ? TOP : TOP + 37) + 5} text-anchor="middle" fill={col.accent} font-family={FONT} font-size="13" font-weight="800">{col.symbol}</text>
+
+        <text x={col.x + W / 2} y="208" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{col.detail}</text>
+
+        <rect x={col.x} y="222" width={W} height="38" rx="7" fill={col.accent} opacity="0.09" />
+        <rect x={col.x} y="222" width={W} height="38" rx="7" fill="none" stroke={col.accent} stroke-width={col.accent === C.red ? 2.4 : 1.4} />
+        <text x={col.x + W / 2} y="245" text-anchor="middle" fill={col.accent} font-family={FONT} font-size="9.5" font-weight="700">{col.verdict}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    The current jacks are fused for exactly this mistake — but a fuse only helps if the meter's rating suits the circuit.
+  </text>
+</svg>

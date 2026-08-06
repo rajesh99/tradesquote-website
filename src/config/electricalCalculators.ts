@@ -1,3 +1,5 @@
+import { hvacCalculators } from "@/config/hvacCalculators";
+
 export type ElectricalCalculatorAccent =
   | "blue"
   | "sky"
@@ -319,6 +321,60 @@ export const electricalCalculators: ElectricalCalculator[] = [
     accent: "cyan",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12h4l3-8 4 16 3-8h2"/></svg>`,
   },
+  {
+    slug: "electrical-commercial-load-calculator",
+    title: "Commercial Load Calculator",
+    description:
+      "The Article 220 Part III standard method for non-dwellings — general lighting by area, receptacles at 180 VA per strap, show window and track per foot, each with its own demand factor.",
+    question: "How do I calculate a commercial electrical load?",
+    accent: "indigo",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>`,
+  },
+  {
+    slug: "electrical-demand-factor-calculator",
+    title: "Range & Dryer Demand Factor Calculator",
+    description:
+      "Table 220.55 and Table 220.54 worked properly — why a 12 kW range counts as 8 kW, why every dryer has a 5,000 VA floor, and how hard both scale in multifamily.",
+    question: "How much does a 12 kW range count as?",
+    accent: "violet",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 10h16M8 7h.01M12 7h.01"/></svg>`,
+  },
+  {
+    slug: "electrical-panel-schedule-calculator",
+    title: "Panel Spaces & Tandem Breaker Calculator",
+    description:
+      "How many more poles a panel can legally take — spaces, the listed device limit under NEC 408.54, and which of them will actually accept a tandem on a Class CTL panelboard.",
+    question: "My panel is full — can I use tandem breakers?",
+    accent: "blue",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM8 8h3M8 12h3M8 16h3M13 8h3M13 12h3M13 16h3"/></svg>`,
+  },
+  {
+    slug: "electrical-solar-interconnection-calculator",
+    title: "Solar 120% Rule Calculator",
+    description:
+      "The NEC 705.12(B)(3)(2) busbar check — main breaker plus PV backfed breaker against 120% of the busbar rating, and the largest inverter the panel will actually accept.",
+    question: "Can my panel take a solar interconnection?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2M5.6 5.6l1.4 1.4m10 10l1.4 1.4M3 12h2m14 0h2M5.6 18.4L7 17m10-10l1.4-1.4M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,
+  },
+  {
+    slug: "electrical-solar-string-calculator",
+    title: "Solar String Sizing Calculator",
+    description:
+      "Maximum and minimum modules per string — cold-weather Voc against the inverter's ceiling per NEC 690.7, hot-cell Vmp against the bottom of the MPPT window.",
+    question: "How many solar panels per string?",
+    accent: "amber",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v10H4zM4 9h16M9 4v10M15 4v10M8 20h8M12 14v6"/></svg>`,
+  },
+  {
+    slug: "electrical-generator-install-cost-calculator",
+    title: "Standby Generator Installation Cost",
+    description:
+      "A whole-house standby priced line by line — the set, the transfer switch, the gas run, the pad, the permit, and labour, with the share the machine itself actually represents.",
+    question: "How much does a standby generator cost to install?",
+    accent: "orange",
+    icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  },
 ];
 
 export type ElectricalCalculatorGroup = {
@@ -351,6 +407,9 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
       "electrical-load-calculator",
       "electrical-service-size-calculator",
       "electrical-existing-load-calculator",
+      "electrical-commercial-load-calculator",
+      "electrical-demand-factor-calculator",
+      "electrical-panel-schedule-calculator",
       "electrical-ev-charger-calculator",
       "electrical-generator-sizing-calculator",
     ],
@@ -392,6 +451,15 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
     ],
   },
   {
+    label: "Solar & Interconnection",
+    description:
+      "Getting an array onto an existing service — the 705.12 busbar check that decides whether the panel can take the interconnection at all, and the temperature extremes that bound a string.",
+    slugs: [
+      "electrical-solar-interconnection-calculator",
+      "electrical-solar-string-calculator",
+    ],
+  },
+  {
     label: "Cost & Pricing",
     description:
       "Price the work once the circuit is designed — labor, material, overhead, and the margin that has to survive all of it.",
@@ -399,6 +467,7 @@ export const electricalCalculatorGroups: ElectricalCalculatorGroup[] = [
       "electrical-estimate-calculator",
       "electrical-panel-upgrade-cost-calculator",
       "electrical-ev-charger-install-cost-calculator",
+      "electrical-generator-install-cost-calculator",
       "electrical-rewiring-cost-calculator",
       "electrical-labor-rate-calculator",
     ],
@@ -746,13 +815,55 @@ export const electricalCalculatorGuide = [
     accent: "cyan" as const,
     rule: "Ch. 9 T8 resistance + T9 reactance → Ze = R·cos θ + X·sin θ, not √(R² + X²)",
   },
+  {
+    question: "What load does this commercial building have?",
+    slug: "electrical-commercial-load-calculator",
+    tool: "Commercial Load Calculator",
+    accent: "indigo" as const,
+    rule: "220 Part III — area × T220.12, then T220.42; receptacles 180 VA/strap, then T220.44",
+  },
+  {
+    question: "How much does a range or dryer really count as?",
+    slug: "electrical-demand-factor-calculator",
+    tool: "Range & Dryer Demand Factor Calculator",
+    accent: "violet" as const,
+    rule: "T220.55 Column C is kW not % (12 kW range → 8 kW) · T220.54 has a 5,000 VA floor",
+  },
+  {
+    question: "Is my panel full, and can tandems fix it?",
+    slug: "electrical-panel-schedule-calculator",
+    tool: "Panel Spaces & Tandem Breaker Calculator",
+    accent: "blue" as const,
+    rule: "408.54 — never more devices than the panel is listed for; tandems only in CTL-rated slots",
+  },
+  {
+    question: "Can this panel take a solar interconnection?",
+    slug: "electrical-solar-interconnection-calculator",
+    tool: "Solar 120% Rule Calculator",
+    accent: "amber" as const,
+    rule: "705.12(B)(3)(2) — main + PV breaker ≤ 120% of busbar, PV at the opposite end",
+  },
+  {
+    question: "How many modules per string?",
+    slug: "electrical-solar-string-calculator",
+    tool: "Solar String Sizing Calculator",
+    accent: "amber" as const,
+    rule: "cold Voc ≤ inverter max (690.7) · hot Vmp ≥ MPPT minimum",
+  },
+  {
+    question: "How much does a standby generator install cost?",
+    slug: "electrical-generator-install-cost-calculator",
+    tool: "Standby Generator Installation Cost",
+    accent: "orange" as const,
+    rule: "set + transfer switch + fuel run × ft + pad + permit + labor, × region",
+  },
 ];
 
 export const electricalFaqs = [
   {
     question: "Are these electrical calculators really free?",
     answer:
-      "Yes. All twenty-three are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. Every one of them is completely free, runs instantly in your browser, and requires no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which NEC edition are these calculators based on?",
@@ -777,11 +888,10 @@ export const electricalFaqs = [
   {
     question: "Do these work for commercial and industrial work?",
     answer:
-      "The load calculators are tuned for dwellings (NEC 220.82 optional method). The conductor, ampacity, breaker, conduit fill, box fill, and grounding calculators are code-general and work for commercial installations at the same voltages, and the three-phase, kVA, and power-factor tools are built for 208 V, 480 V, and 600 V systems. For commercial and industrial work specifically, there are now dedicated tools for motor full-load amps, complete motor branch circuits, transformer sizing and NEC 450.3(B) protection, available fault current by the point-to-point method, and conductor impedance from Chapter 9 Tables 8 and 9. Commercial load calculations are still on the roadmap.",
+      "Yes. The Commercial Load Calculator runs the NEC Article 220 Part III standard method for non-dwellings — general lighting by area, receptacles at 180 VA per strap, show-window and track lighting per foot, each with its own demand factor. The conductor, ampacity, breaker, conduit fill, box fill, and grounding calculators are code-general and work for commercial installations at the same voltages, and the three-phase, kVA, and power-factor tools are built for 208 V, 480 V, and 600 V systems. For industrial work there are dedicated tools for motor full-load amps, complete motor branch circuits, transformer sizing and NEC 450.3(B) protection, available fault current by the point-to-point method, and conductor impedance from Chapter 9 Tables 8 and 9. The residential load calculators remain dwelling-only, because the 220.82 optional method is a dwelling shortcut with no commercial equivalent.",
   },
   {
     question: "Do you have calculators for other trades?",
-    answer:
-      "Yes — there are thirty-two free HVAC calculators covering sizing, airflow, diagnostics, efficiency, and cost. Electrical is the second set, and calculators for plumbing, carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.",
+    answer: `Yes — there are ${hvacCalculators.length} free HVAC calculators covering sizing, airflow, diagnostics, efficiency, and cost. Electrical is the second set, and calculators for plumbing, carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.`,
   },
 ];

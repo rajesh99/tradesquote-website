@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The service neutral carries the imbalance between the two legs, never their
+ * sum — which is why NEC 220.61 permits it to be smaller than the ungrounded
+ * conductors.
+ */
+const CASES = [
+  { a: 40, b: 40, note: "perfectly balanced" },
+  { a: 40, b: 30, note: "typical house" },
+  { a: 50, b: 10, note: "poorly balanced" },
+  { a: 60, b: 0, note: "all on one leg" },
+];
+
+const rows = CASES.map((c) => ({ ...c, neutral: Math.abs(c.a - c.b) }));
+const MAX = 60;
+const BAR_MAX = 90;
+const scale = (a: number) => (a / MAX) * BAR_MAX;
+
+const A_X = 150;
+const B_X = 290;
+const N_X = 430;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Service neutral current for different leg loadings</title>
+  <desc>
+    With 40 amps on each leg the neutral carries nothing. With 40 and 30 amps it carries 10. With 50 and 10 amps it
+    carries 40. With everything on one leg at 60 amps the neutral carries the full 60. The neutral always carries the
+    difference between the legs, never their sum.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The neutral carries the imbalance, never the sum</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Because the two legs are 180° apart, their return currents cancel in the shared neutral.</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CASE</text>
+  <text x={A_X} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LEG L1</text>
+  <text x={B_X} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LEG L2</text>
+  <text x={N_X} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NEUTRAL</text>
+  <text x="580" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BALANCE</text>
+
+  {rows.map((row, i) => {
+    const y = 88 + i * 34;
+    const accent = row.neutral === 0 ? C.green : row.neutral >= 40 ? C.orange : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${row.a} A / ${row.b} A`}</text>
+
+        <rect x={A_X} y={y + 3} width={Math.max(2, scale(row.a))} height="16" rx="3" fill={C.dark} opacity="0.55" />
+        <text x={A_X + scale(row.a) + 6} y={y + 15} fill={C.muted} font-family={FONT} font-size="9.5">{`${row.a} A`}</text>
+
+        <rect x={B_X} y={y + 3} width={Math.max(2, scale(row.b))} height="16" rx="3" fill={C.dark} opacity="0.55" />
+        <text x={B_X + scale(row.b) + 6} y={y + 15} fill={C.muted} font-family={FONT} font-size="9.5">{`${row.b} A`}</text>
+
+        <rect x={N_X} y={y + 3} width={Math.max(2, scale(row.neutral))} height="16" rx="3" fill={accent} opacity="0.85" />
+        <text x={N_X + Math.max(2, scale(row.neutral)) + 6} y={y + 15} fill={accent} font-family={FONT} font-size="10" font-weight="800">{`${row.neutral} A`}</text>
+
+        <text x="580" y={y + 15} fill={C.muted} font-family={FONT} font-size="9.5">{row.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">
+    This is why NEC 220.61 lets the service neutral be smaller than the ungrounded conductors feeding it.
+  </text>
+</svg>

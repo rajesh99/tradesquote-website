@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A breaker carries two completely different current ratings. The trip rating
+ * says when it opens; the interrupting rating says the largest fault it can
+ * open without failing. Fault figures are the verified 300 kVA / 480 V example.
+ */
+const TRIP_A = 20;
+const AIC = 10000;
+
+const POINTS = [
+  { label: "At the 300 kVA transformer secondary", amps: 11455 },
+  { label: "100 ft down 4/0 copper", amps: 8626 },
+];
+
+const BAR_X = 268;
+const BAR_W = 300;
+const MAX = 12000;
+const scale = (a: number) => (a / MAX) * BAR_W;
+const thresholdX = BAR_X + scale(AIC);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Trip rating compared with interrupting rating</title>
+  <desc>
+    A 20 amp breaker opens at 20 amps but must also be able to interrupt the largest fault the system can deliver. A 300
+    kVA 480 volt transformer produces 11,455 amps at its secondary, which exceeds a 10,000 amp interrupting rating. One
+    hundred feet of 4/0 copper away, the available fault current has fallen to 8,626 amps and 10,000 amp equipment is
+    adequate.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Every breaker carries two current ratings</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">One says when it opens. The other says what it can survive opening.</text>
+
+  <rect x="24" y="72" width="328" height="62" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="40" y="94" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">TRIP RATING</text>
+  <text x="40" y="116" fill={C.primary} font-family={FONT} font-size="16" font-weight="800">{`${TRIP_A} A`}</text>
+  <text x="104" y="116" fill={C.dark} font-family={FONT} font-size="9.5">the current at which it protects the wire</text>
+
+  <rect x="368" y="72" width="328" height="62" rx="9" fill={C.redLight} stroke={C.red} stroke-width="2.4" />
+  <text x="384" y="94" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">INTERRUPTING RATING (AIC)</text>
+  <text x="384" y="116" fill={C.red} font-family={FONT} font-size="16" font-weight="800">{`${AIC.toLocaleString("en-US")} A`}</text>
+  <text x="472" y="116" fill={C.dark} font-family={FONT} font-size="9.5">the biggest fault it can safely open</text>
+
+  <text x="24" y="158" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">AVAILABLE FAULT CURRENT AT TWO POINTS IN ONE SYSTEM</text>
+
+  <line x1={thresholdX} y1="164" x2={thresholdX} y2="224" stroke={C.red} stroke-width="1.6" stroke-dasharray="5 4" />
+  <text x={thresholdX + 6} y="172" fill={C.red} font-family={FONT} font-size="8.5" font-weight="700">{`${(AIC / 1000).toFixed(0)} kA rating`}</text>
+
+  {POINTS.map((p, i) => {
+    const y = 178 + i * 28;
+    const over = p.amps > AIC;
+    const accent = over ? C.red : C.green;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5">{p.label}</text>
+        <rect x={BAR_X} y={y + 3} width={scale(p.amps)} height="16" rx="3" fill={accent} opacity="0.75" />
+        <text x={BAR_X + scale(p.amps) + 8} y={y + 15} fill={accent} font-family={FONT} font-size="10" font-weight="800">
+          {`${p.amps.toLocaleString("en-US")} A`}
+        </text>
+        <text x="632" y={y + 15} fill={accent} font-family={FONT} font-size="9.5" font-weight="700">{over ? "needs 22 kA" : "10 kA fits"}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">
+    100 ft of conductor shed 25% of the fault current — distance is the cheapest way to reduce required equipment ratings.
+  </text>
+</svg>

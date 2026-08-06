@@ -1,0 +1,82 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A full panel and a full service are different problems with wildly different
+ * price tags, and conflating them is how homeowners get sold work they do not
+ * need. The decision tree is short.
+ */
+const options = [
+  {
+    step: "1",
+    name: "Tandems, where listed",
+    cost: "$15–$30 each",
+    when: "Panel label shows tandem-capable slots and you are under the device limit.",
+    accent: C.green,
+  },
+  {
+    step: "2",
+    name: "Pigtail a double-tap",
+    cost: "under $10",
+    when: "Two conductors share a lug not listed for two. Fixes a defect and frees nothing — but it is free.",
+    accent: C.green,
+  },
+  {
+    step: "3",
+    name: "Subpanel",
+    cost: "$800–$1,500",
+    when: "Out of poles. Trades two spaces for 12 to 24 new ones. The usual answer.",
+    accent: C.primary,
+  },
+  {
+    step: "4",
+    name: "Service upgrade",
+    cost: "$3,000+",
+    when: "Only when the calculated load genuinely exceeds the service. Prove it with 220.87 first.",
+    accent: C.red,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>What to do when the panel is full</title>
+  <desc>
+    Four options in order of cost. Tandem breakers where the panel is listed for them cost $15 to $30 each.
+    Pigtailing a double-tap costs under $10. A subpanel costs $800 to $1,500 and trades two spaces for twelve to
+    twenty-four. A service upgrade at $3,000 or more is only warranted when the calculated load exceeds the
+    service, which is a separate question from whether the panel has space.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    A full panel is a space problem, not an amps problem
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Four options in order of cost. Most jobs stop at step 3.
+  </text>
+
+  {options.map((o, i) => {
+    const y = 68 + i * 46;
+    return (
+      <g>
+        <circle cx="42" cy={y + 18} r="13" fill={o.accent} opacity="0.18" />
+        <circle cx="42" cy={y + 18} r="13" fill="none" stroke={o.accent} stroke-width="1.6" />
+        <text x="42" y={y + 22} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">
+          {o.step}
+        </text>
+        <text x="68" y={y + 14} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{o.name}</text>
+        <text x="68" y={y + 30} fill={C.muted} font-family={FONT} font-size="8.5">{o.when}</text>
+        <rect x="576" y={y + 3} width="112" height="24" rx="5" fill={o.accent} opacity="0.14" />
+        <rect x="576" y={y + 3} width="112" height="24" rx="5" fill="none" stroke={o.accent} stroke-width="1.4" />
+        <text x="632" y={y + 19} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="800">
+          {o.cost}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="256" x2="696" y2="256" stroke={C.border} />
+  <text x="28" y="274" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    A 200 A service with a full panel still has 200 A. Running out of spaces says nothing about capacity.
+  </text>
+</svg>

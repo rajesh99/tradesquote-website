@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same house by three routes. The gap between the two calculations is real
+ * but modest; the gap between either calculation and the measured figure is
+ * enormous — which is the argument for reaching for 220.87 whenever there is an
+ * existing service and twelve months of data.
+ */
+const STANDARD_VA = 29325;
+const OPTIONAL_VA = 24280;
+const MEASURED_A = 55.0;
+const VOLTS = 240;
+
+const results = [
+  {
+    name: "Standard — 220 Part III",
+    amps: STANDARD_VA / VOLTS,
+    detail: "Table 220.42 lighting, T220.55 range, T220.54 dryer, 220.53 appliances.",
+    accent: C.blue,
+  },
+  {
+    name: "Optional — 220.82",
+    amps: OPTIONAL_VA / VOLTS,
+    detail: "First 10 kVA at 100%, remainder at 40%, plus the largest HVAC term.",
+    accent: C.primary,
+  },
+  {
+    name: "Measured — 220.87",
+    amps: MEASURED_A,
+    detail: "44 A utility peak over 12 months × 1.25. Not a calculation at all.",
+    accent: C.green,
+  },
+];
+
+const peak = Math.max(...results.map((r) => r.amps));
+const BAR_X = 186;
+const BAR_MAX = 320;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 258" fill="none" aria-hidden="true">
+  <title>One house, three methods</title>
+  <desc>
+    The same 2,000 square foot all-electric house gives 122.2 amps by the standard method, 101.2 amps by the 220.82
+    optional method, and 55.0 amps by the 220.87 measured method using twelve months of utility peak demand. The
+    two calculations differ by 21 percent; the measured figure is less than half of either.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="242" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    The same house, three ways
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    A 2,000 ft² all-electric dwelling at 240 V. The calculations disagree; the measurement disagrees with both.
+  </text>
+
+  {results.map((r, i) => {
+    const y = 70 + i * 46;
+    const width = Math.max(30, Math.round((r.amps / peak) * BAR_MAX));
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.name}</text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="8.5">
+          {r.detail.length > 60 ? r.detail.slice(0, r.detail.lastIndexOf(" ", 60)) : r.detail}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={width} height="22" rx="5" fill={r.accent} opacity="0.2" />
+        <rect x={BAR_X} y={y + 3} width={width} height="22" rx="5" fill="none" stroke={r.accent} stroke-width="1.8" />
+        <text x={BAR_X + 10} y={y + 19} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+          {`${r.amps.toFixed(1)} A`}
+        </text>
+        <text x={BAR_X + width + 10} y={y + 19} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${((r.amps / (STANDARD_VA / VOLTS)) * 100).toFixed(0)}% of the standard result`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="216" x2="696" y2="216" stroke={C.border} />
+  <text x="28" y="234" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    The two calculations are 21% apart. The measurement is 45% of the standard result.
+  </text>
+  <text x="28" y="248" fill={C.muted} font-family={FONT} font-size="9.5">
+    On an existing service with utility data, 220.87 is almost always the argument that settles it.
+  </text>
+</svg>
