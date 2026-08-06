@@ -1,0 +1,174 @@
+---
+title: "Split-Phase 120/240 V: Where Two Voltages Come From One Winding"
+meta_title: "Split-Phase 120/240 V Service Explained (2026) | TradesQuote"
+description: "One centre-tapped transformer gives a house both voltages. Why the neutral carries the difference, why 240 V loads need no neutral, and why an open neutral pushes a light leg to 228 V."
+image: /images/posts/split-phase-120-240-volts-hero.svg
+date: 2026-08-06T10:00:00Z
+categories: ["electrical"]
+tags: ["split phase","120/240 volts","service entrance","neutral current","basic electrical theory"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import SplitPhaseTransformerDiagram from "@/components/blog/split-phase/SplitPhaseTransformerDiagram.astro";
+import SplitPhaseNeutralBalanceDiagram from "@/components/blog/split-phase/SplitPhaseNeutralBalanceDiagram.astro";
+import SplitPhaseOpenNeutralDiagram from "@/components/blog/split-phase/SplitPhaseOpenNeutralDiagram.astro";
+
+A house has 120 V receptacles and a 240 V range, fed by three wires from one transformer. Students reasonably assume that means two phases arriving. It doesn't.
+
+**There is one phase, one winding, and a tap in the middle of it.** Ground that centre tap and call it the neutral, and you have 120 V from either end to the middle and 240 V end to end. That's the whole arrangement, and almost every practical fact about residential wiring falls out of it.
+
+The name for this is **split-phase**, or in code language a 120/240 V single-phase three-wire system. Calling it "two-phase" is the classic error — a genuine two-phase system would have windings 90° apart, and it hasn't been built since the 1890s.
+
+## One Winding, Two Voltages
+
+<BlogInfographic
+  title="Two voltages from one winding"
+  caption="The utility transformer's secondary, with its centre tap grounded to become the neutral."
+>
+  <SplitPhaseTransformerDiagram />
+</BlogInfographic>
+
+Follow the three conductors that reach the service:
+
+- **L1 to neutral** — 120 V. Lighting and general receptacles.
+- **L2 to neutral** — 120 V. The other half of the same winding.
+- **L1 to L2** — 240 V. Ranges, dryers, water heaters, EV chargers, air conditioning.
+
+The two halves are **180° apart**, which is just another way of saying one is the inverted image of the other. When L1 is at +170 V instantaneous, L2 is at −170 V, so the difference between them is 340 V instantaneous — a 240 V RMS supply. That's why they add rather than cancel. The waveform arithmetic behind those peak figures is in **[AC vs DC](/blog/ac-vs-dc-current)**.
+
+**A pure 240 V load needs no neutral at all.** A water heater or a baseboard heater is two hots and a ground — three conductors, not four. The neutral only appears on a 240 V circuit when the appliance also contains 120 V parts: a range's clock and oven light, a dryer's motor and controls. That's the entire reason a range needs four wires and a water heater needs three.
+
+Worth knowing the history there, because it comes up on every remodel. Older ranges and dryers were permitted to ground their frames through the circuit's grounded conductor. New circuits must have a separate equipment grounding conductor — four wires — while NEC **250.140** allows existing three-wire installations to remain in service under specified conditions. Replacing a dryer rarely triggers a rewire, but relocating the receptacle does.
+
+## Why 240 V Beats 120 V for Big Loads
+
+The same 4,500 W water heater, on the same 100 ft of 10 AWG copper:
+
+| | At 120 V | At 240 V |
+| --- | --- | --- |
+| Current | 37.50 A | **18.75 A** |
+| Voltage drop over the run | 9.1 V | 4.5 V |
+| Drop as a percentage | 7.56% | **1.89%** |
+| Heat wasted in the conductors | 340 W | **85 W** |
+
+Doubling the voltage halves the current for the same power. Halving the current **quarters** the I²R loss, and because the drop in volts also halves while the reference voltage doubles, the **percentage** drop drops by a factor of four as well.
+
+That's why every large appliance in a North American house runs at 240 V, and why the conductors for them are so much smaller than intuition suggests. The full treatment is in **[Voltage Drop](/blog/voltage-drop-calculation)**, and the wire sizing in **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)**.
+
+## The Neutral Carries the Difference
+
+<BlogInfographic
+  title="The neutral carries the imbalance, never the sum"
+  caption="Because the two legs are 180° apart, their return currents cancel in the shared neutral."
+>
+  <SplitPhaseNeutralBalanceDiagram />
+</BlogInfographic>
+
+| L1 | L2 | Neutral carries | |
+| --- | --- | --- | --- |
+| 40 A | 40 A | **0 A** | perfectly balanced |
+| 40 A | 30 A | 10 A | typical house |
+| 50 A | 10 A | 40 A | poorly balanced |
+| 60 A | 0 A | 60 A | all on one leg |
+
+Return current from L1 and return current from L2 arrive at the neutral in opposition, so they cancel. A perfectly balanced service puts **nothing** on the neutral — the two legs simply feed each other through the loads.
+
+This has a direct code consequence: NEC **220.61** computes the feeder or service neutral load from the **maximum unbalance**, which is why the service neutral is routinely a size or two smaller than the ungrounded conductors. It is not carrying the sum and never will.
+
+It also explains a piece of panel hardware that otherwise looks arbitrary. **Panel busbars alternate legs down the stack**, so any two vertically adjacent positions are on opposite legs. That's what lets a two-pole breaker pick up 240 V by occupying two neighbouring slots, and it's what makes a multiwire branch circuit's two hots land on opposite legs automatically when they share a two-pole device. Get that assignment wrong and a shared neutral carries the *sum* instead — the failure mode worked through in **[Hot, Neutral and Ground](/blog/hot-neutral-and-ground-wires)**. Panel space arithmetic is in **[Panel Full of Tandem Breakers](/blog/electrical-panel-full-tandem-breakers)**.
+
+Balancing a panel is therefore real work, not neatness. **240 V loads balance themselves** — they draw equally from both legs by definition — so the balancing problem is entirely about how the 120 V circuits are distributed.
+
+## When the Neutral Opens
+
+<BlogInfographic
+  title="Lose the neutral and the legs divide 240 V between them"
+  caption="With the neutral intact every leg sits at 120 V no matter what. With it open, load decides."
+>
+  <SplitPhaseOpenNeutralDiagram />
+</BlogInfographic>
+
+| Load on L1 | Load on L2 | L1 now sees | L2 now sees | |
+| --- | --- | --- | --- | --- |
+| 600 W | 600 W | 120.0 V | 120.0 V | survivable |
+| 240 W | 480 W | 160.0 V | 80.0 V | damaging |
+| 60 W | 600 W | 218.2 V | 21.8 V | damaging |
+| 60 W | 1,200 W | **228.6 V** | 11.4 V | damaging |
+
+This is the failure that makes the neutral the most safety-critical conductor in the service, and it's genuinely counter-intuitive.
+
+With the neutral connected, each leg is held at 120 V by the transformer's centre tap regardless of what's plugged in. **Open that connection and the two legs stop being independent** — they become a series circuit across the full 240 V, with the house's own loads acting as the divider. Voltage then distributes in proportion to resistance, which means the **lightly loaded leg takes the larger share**.
+
+Put a 60 W lamp on one leg and a 1,200 W heater on the other and the lamp's leg climbs to **228.6 V** while the heater's collapses to 11.4 V. The two always sum to 240. Everything on the light leg is now running at nearly double its rated voltage, and electronics fail within seconds.
+
+The diagnostic signature is unmistakable and worth memorising: **lights brightening in one part of the house as loads switch on elsewhere**, or dimming and brightening in opposition. That is an open neutral until proven otherwise, it is usually in the service drop, the meter socket or the main lug termination, and it is a utility call rather than something to chase with a plug-in tester.
+
+It's also the reason **250.24(C)** requires the grounded conductor to be run to the service equipment even when the load appears to be entirely 240 V. Without it there is no reference holding the two legs apart.
+
+## Where This Isn't What You Get
+
+Split-phase is the dwelling arrangement. Two common exceptions:
+
+**Apartments and commercial buildings on 120/208 V.** These are fed from a three-phase wye system, so two legs are 120° apart rather than 180°, and line-to-line is 120 × √3 = **207.85 V**, not 240 V. A 240 V-rated resistive element on 208 V produces only **75.1%** of its rated output, because heat goes with the square of voltage — which is why a 208 V range takes noticeably longer to preheat. Sizing and the √3 arithmetic are in **[Three-Phase Power Calculation](/blog/three-phase-power-calculation)**.
+
+**High-leg delta services.** A 4-wire delta gives 120 V on two legs and about 208 V on the third. NEC **110.15** requires that high leg to be identified in orange, and putting a 120 V load on it is a classic and expensive mistake.
+
+## Common Mistakes
+
+- **Calling it two-phase.** One winding, one phase, two halves 180° apart. Two-phase means 90° apart and hasn't been installed in over a century.
+- **Running a neutral to a pure 240 V load.** A water heater or baseboard heater needs two hots and a ground. The neutral is only for 120 V components.
+- **Sizing the service neutral like the hots.** 220.61 sizes it on maximum unbalance, so it's normally smaller.
+- **Landing a shared neutral's two hots on the same leg.** They then add instead of cancelling, with no breaker watching the neutral.
+- **Ignoring lights that brighten when appliances start.** That's an open neutral, and it will destroy electronics.
+- **Assuming leg-to-leg is always 240 V.** On a 120/208 V wye it's 207.85 V, and a 240 V element gives 75% of its output.
+- **Treating panel balance as cosmetic.** Imbalance loads the neutral and skews voltage under heavy draw.
+- **Putting a 120 V load on the high leg of a delta.** 110.15 marks it orange for exactly this reason.
+
+## Run the Numbers
+
+> **[Load Calculator](/calculators/electrical/electrical-load-calculator)** — the NEC 220.82 optional method, which divides the total VA by 240 precisely because the service is split-phase.
+
+For the service itself use the **[Service Size Calculator](/calculators/electrical/electrical-service-size-calculator)** and **[Service Wire Size Calculator](/calculators/electrical/electrical-service-wire-size-calculator)**, and for laying circuits across the two legs the **[Panel Schedule Calculator](/calculators/electrical/electrical-panel-schedule-calculator)**. The **[Watts to Amps Calculator](/calculators/electrical/electrical-watts-to-amps-calculator)** handles the 120-versus-240 comparison directly, and the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)** shows the four-to-one advantage on a real run. The service-rating decision itself is in **[100 Amp vs 200 Amp Service](/blog/100-amp-vs-200-amp-service)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 220.61 feeder and service neutral load, 250.24(C) grounded conductor brought to service equipment, 250.140 frames of ranges and clothes dryers, 110.15 high-leg identification. Nominal system voltages follow ANSI C84.1. Worked figures use a 4,500 W element on 100 ft of 10 AWG copper at 1.21 Ω per 1,000 ft from NEC Chapter 9 Table 8, and the open-neutral cases model purely resistive loads — real loads with electronic supplies behave less predictably, generally failing sooner. A licensed electrician and the authority having jurisdiction have final say on anything installed.*
+
+---
+
+## FAQ
+
+### What is split-phase power?
+
+A single transformer winding with its centre tap grounded to form the neutral. Either end of the winding to the centre tap gives 120 V, and end to end gives 240 V. It's one phase split into two halves 180° apart, which is why the halves add to 240 rather than cancelling. Nearly every North American house is fed this way.
+
+### Is 120/240 V single-phase or two-phase?
+
+Single-phase. There is one winding and one phase; the two "legs" are opposite ends of it, 180° apart. A true two-phase system uses windings 90° apart and hasn't been installed since the 1890s. The correct terms are split-phase or 120/240 V single-phase three-wire.
+
+### Why does a 240 V water heater have no neutral?
+
+Because it connects across the two hot legs and never references the centre tap. Two hots and an equipment grounding conductor is the complete circuit. A neutral only appears on a 240 V circuit when the appliance also contains 120 V components — a range's clock and light, or a dryer's motor and controls — which is exactly why those need four wires and a water heater needs three.
+
+### How much current does the neutral carry?
+
+Only the difference between the two legs. With 40 A on each leg the neutral carries nothing; with 40 A and 30 A it carries 10 A. That's why NEC 220.61 computes the service neutral from the maximum unbalance and why it's commonly a size or two smaller than the ungrounded conductors. It never carries the sum.
+
+### Why is 240 V better than 120 V for large appliances?
+
+Because the same power at double the voltage needs half the current. Half the current quarters the I²R heat lost in the conductors, and the percentage voltage drop falls by a factor of four. A 4,500 W heater on 100 ft of 10 AWG copper drops 7.56% at 120 V but only 1.89% at 240 V, wasting 340 W versus 85 W in the wire.
+
+### What happens if the neutral wire breaks?
+
+The two legs stop being independent and become a series divider across the full 240 V, with the house's own loads setting the split. The lightly loaded leg takes the larger share — a 60 W load opposite a 1,200 W load ends up at 228.6 V while the heavy leg falls to 11.4 V. Electronics on the high side fail quickly. The classic symptom is lights brightening in one area as appliances start elsewhere, and the cause is usually in the service drop, meter socket or main lug termination.
+
+### Why do double-pole breakers span two slots?
+
+Because panel busbars alternate legs down the stack, so two vertically adjacent positions are always on opposite legs. Occupying both picks up L1 and L2, which is 240 V. The same alternation is what puts a multiwire branch circuit's two hots on opposite legs automatically when they share a two-pole device, so their shared neutral carries the difference rather than the sum.
+
+### Is 208 V the same as 240 V?
+
+No. 208 V comes from a three-phase wye system where the legs are 120° apart, so line-to-line is 120 × √3 = 207.85 V rather than 240 V. Since heat output goes with the square of voltage, a 240 V-rated resistive element on 208 V delivers only 75.1% of its rating. Equipment that will see 208 V should be specified for it rather than assumed compatible.
+
+### Why does my panel need to be balanced?
+
+Because every 120 V circuit loads one leg only, and the difference between the legs shows up as current on the neutral. A badly skewed panel puts unnecessary current on the neutral and makes voltage sag worse on the heavier leg under load. 240 V loads balance themselves by definition, so balancing is entirely a question of how the 120 V circuits are distributed between the two legs.

@@ -1,0 +1,175 @@
+---
+title: "How a Circuit Breaker Works: Two Mechanisms in One Device"
+meta_title: "How a Circuit Breaker Works — Thermal and Magnetic Trip (2026) | TradesQuote"
+description: "A bimetal strip handles overload over seconds to an hour; a solenoid clears a short in about 17 ms. Why a breaker protects the wire rather than the appliance, and why 20 A isn't its only rating."
+image: /images/posts/how-a-circuit-breaker-works-hero.svg
+date: 2026-08-06T10:20:00Z
+categories: ["electrical"]
+tags: ["circuit breaker","thermal magnetic","trip curve","interrupting rating","basic electrical theory"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import BreakerTripCurveDiagram from "@/components/blog/breaker-operation/BreakerTripCurveDiagram.astro";
+import BreakerContinuousLoadDiagram from "@/components/blog/breaker-operation/BreakerContinuousLoadDiagram.astro";
+import BreakerAicDiagram from "@/components/blog/breaker-operation/BreakerAicDiagram.astro";
+
+Start with the sentence that reorganises everything else:
+
+**A breaker protects the conductor, not the appliance.**
+
+Not the TV, not the motor, not the person. The wire buried in the wall that nobody can inspect and that has no other defence. Once that's the frame, a lot of apparently strange rules stop being strange — including why a motor circuit can legally run a 35 A breaker on 14 AWG wire, and why swapping a 15 A breaker for a 20 A one is a serious act rather than a convenience.
+
+Inside the case there are two entirely separate mechanisms, solving two entirely separate problems.
+
+## Overload and Short Circuit Are Different Problems
+
+<BlogInfographic
+  title="Two mechanisms, one device"
+  caption="Trip time against overload. Both axes are logarithmic; the shape is representative, not a specific product."
+>
+  <BreakerTripCurveDiagram />
+</BlogInfographic>
+
+**The thermal element** is a bimetallic strip — two metals with different expansion rates bonded together, so heating makes it curl. Load current warms it, and past a certain point it curls far enough to release the latch. Because it works by accumulating heat, it is **inverse-time**: a small overload takes a long while, a large one acts quickly.
+
+That's not a limitation, it's the design intent. Conductor damage from overload is a heat problem, and heat takes time to build. A motor drawing six times its running current for two seconds while it starts is completely harmless to a conductor; the same current for two minutes is not. A device that responded instantly to any overload would be useless — nothing with a motor in it would ever start.
+
+**The magnetic element** is a solenoid in series with the load. Fault current — hundreds or thousands of amps — produces a magnetic field strong enough to physically snap the armature and trip the mechanism, in roughly **one cycle, about 17 milliseconds**. There is no timing involved because a short circuit is not a heat-accumulation problem. It's an energy-release problem, and the only correct response is immediate.
+
+UL 489 defines the calibration: a breaker must carry its rated current indefinitely, and must trip within a defined period at 135% of rating. **Exact trip times vary by manufacturer and frame size**, which is why published curves are per-product bands rather than a universal line. The shape above is the characteristic, not a specification.
+
+Two consequences worth carrying:
+
+**A breaker at exactly its rating does not trip.** A 20 A breaker carrying 20 A is doing its job, not failing. Tripping begins meaningfully above that.
+
+**A tripped breaker is information.** Thermal trips mean sustained overload — too much load on the circuit. Magnetic trips mean a short or ground fault. They feel identical at the handle, but they are telling you different things, and one of them means there is a fault in the wiring to find.
+
+## The Last 20% Is Not Yours
+
+<BlogInfographic
+  title="The last 20% is headroom, not capacity"
+  caption="A standard breaker is calibrated in open air. A load running three hours or more gets 80% of the rating."
+>
+  <BreakerContinuousLoadDiagram />
+</BlogInfographic>
+
+| Breaker | Continuous load allowed | Held in reserve |
+| --- | --- | --- |
+| 15 A | 12 A | 3 A |
+| 20 A | 16 A | 4 A |
+| 30 A | 24 A | 6 A |
+| 40 A | 32 A | 8 A |
+| 50 A | 40 A | 10 A |
+| 60 A | 48 A | 12 A |
+
+A **continuous load** in NEC terms is one expected to run for **three hours or more**, and NEC **210.20(A)** requires the overcurrent device to be rated at not less than 125% of it. Since 1 ÷ 0.8 = **1.25 exactly**, "125% of the load" and "80% of the breaker" are the same rule stated from opposite ends.
+
+The reason is thermal, and it's about the panel rather than the breaker. A standard breaker is calibrated in free air on a test bench. Installed, it sits shoulder to shoulder with other breakers in a steel enclosure, warmed by its own busbar connection and its neighbours'. The bimetal responds to *total* heat and cannot tell its own from the room's, so a breaker in a hot panel trips sooner than its published curve suggests. That 20% is the margin covering the difference.
+
+It also means the same breaker behaves differently in an attic in August than in a basement in January. Standard devices are calibrated at 40 °C ambient; **100%-rated** breakers exist for continuous duty but require specific enclosures and listings, so they aren't a drop-in substitute. The rule and its awkward cases — 50 A being the row where 62.5 A isn't a standard rating and the answer jumps to 70 A — are worked through in **[The 80 Percent Rule](/blog/80-percent-rule-electrical)**.
+
+## The Breaker Is Sized to the Wire
+
+Because the breaker protects the conductor, the conductor's ampacity sets the breaker, and the load only determines what conductor you needed in the first place. NEC **240.4** is the rule; **240.4(D)** is the part that catches people:
+
+| Conductor | 60 °C | 75 °C | 90 °C | 240.4(D) limit |
+| --- | --- | --- | --- | --- |
+| 14 AWG Cu | 15 A | 20 A | 25 A | **15 A** |
+| 12 AWG Cu | 20 A | 25 A | 30 A | **20 A** |
+| 10 AWG Cu | 30 A | 35 A | 40 A | **30 A** |
+
+The 90 °C column is a **derating base only** — it's the number you apply correction factors to, never the number you protect at. And 240.4(D) caps small conductors below even their 60 °C figure, which is why **14 AWG is 15 A no matter what the table says elsewhere**.
+
+Which settles the most common dangerous question in this subject. **You cannot upgrade a 15 A circuit to 20 A by changing the breaker.** The wire is what carries the current, the wire is 14 AWG, and 14 AWG is capped at 15 A. Fitting a 20 A breaker doesn't add capacity; it removes protection, and the conductor now runs beyond its rating with nothing watching. On a circuit with mixed 12 and 14 AWG, **the smallest conductor anywhere in the run governs the whole circuit.** More in **[15 Amp vs 20 Amp Circuits](/blog/15-amp-vs-20-amp-circuit)** and **[What Size Breaker Do I Need](/blog/what-size-breaker-do-i-need)**.
+
+The exception proves the rule. **240.4(G)** routes motor circuits out of the ordinary rules and over to **430.52**, where a breaker may be set as high as 250% of the motor's full-load current — a 10 HP motor at 460 V ends up with a **35 A breaker on 14 AWG rated 20 A**, which is 1.75× the conductor's ampacity. That's legal because a *separate* overload device protects the conductor against sustained current, leaving the breaker to handle only short circuits and ground faults. Split the two jobs and the numbers stop looking reckless. See **[Motor Circuit Sizing](/blog/motor-circuit-sizing)**.
+
+## The Second Rating Nobody Reads
+
+<BlogInfographic
+  title="Every breaker carries two current ratings"
+  caption="One says when it opens. The other says what it can survive opening."
+>
+  <BreakerAicDiagram />
+</BlogInfographic>
+
+A 20 A breaker has a **trip rating** of 20 A and an **interrupting rating** — its AIC — of perhaps 10,000 A. These measure completely different things, and only one of them is printed large.
+
+The trip rating is when it opens. The interrupting rating is **the largest fault current it can open without failing**. Feed a breaker more fault current than its AIC and the arc it draws may not be extinguished — the device can weld shut, rupture, or vent plasma into the enclosure. NEC **110.9** requires the interrupting rating to be adequate for the available fault current at the point of installation, and **110.10** extends the same requirement to the rest of the equipment.
+
+| Point in the system | Available fault current | 10 kA equipment |
+| --- | --- | --- |
+| At a 300 kVA 480 V transformer secondary | 11,455 A | **inadequate — needs 22 kA** |
+| 100 ft down 4/0 copper | 8,626 A | adequate |
+
+That's the same system a hundred feet apart. Conductor impedance sheds about 25% of the fault current over that distance, which is enough to move the panel from a 22 kA requirement into ordinary 10 kA equipment. **Distance is the cheapest way to reduce required interrupting ratings** — a genuinely useful design lever, and one of the reasons transformer placement matters. The method is in **[Available Fault Current](/blog/available-fault-current)**.
+
+Residential breakers are commonly 10 kA and typical house fault currents fall well below that, so it rarely bites on dwellings. Close to a large transformer it matters enormously.
+
+## Three Things Breakers Are Not
+
+**A breaker is not a switch.** Only devices marked **SWD** or **HID** under NEC **240.83(D)** are listed for regular switching duty. Using an ordinary breaker as a daily light switch wears the contacts, and worn contacts mean resistance, heat and an unreliable trip. Use a switch.
+
+**A breaker is not a shock protector.** It watches for currents far above anything a person survives — a 20 A breaker will happily deliver 15 A through someone indefinitely. Personnel protection is a GFCI's job, tripping at **4–6 mA**, a factor of several thousand lower. Arc detection is an AFCI's. Both are built *on top of* the thermal-magnetic mechanism rather than replacing it, which is why an AFCI breaker still trips on overload. See **[GFCI vs AFCI](/blog/gfci-vs-afci)**.
+
+**A breaker is not infinitely resettable.** Every trip draws an arc across the contacts and erodes them. Repeatedly resetting a breaker into a fault degrades the device and postpones finding the actual problem. If it trips twice, diagnose it — the trip is the symptom, not the fault. Persistent nuisance tripping on an AFCI or GFCI usually traces to a loose terminal or a shared neutral, both covered in **[AFCI and GFCI Nuisance Tripping](/blog/afci-gfci-nuisance-tripping)**.
+
+## Common Mistakes
+
+- **Sizing the breaker to the load instead of the wire.** The load sizes the conductor; the conductor sizes the breaker.
+- **Fitting a 20 A breaker on 14 AWG.** 240.4(D) caps it at 15 A. The breaker never upgrades the wire.
+- **Using the 90 °C column to pick a breaker.** It's a derating starting point only, per 110.14(C).
+- **Loading a breaker to 100% continuously.** Three hours or more means 80% — 210.20(A).
+- **Ignoring the interrupting rating.** 110.9 requires adequate AIC for the fault current available at that point.
+- **Treating a trip as a nuisance.** A thermal trip means overload; a magnetic trip means a fault. They mean different things.
+- **Using a breaker as a light switch.** 240.83(D) reserves that for SWD/HID-marked devices.
+- **Expecting a breaker to prevent shock.** It protects the conductor. A GFCI at 4–6 mA protects people.
+
+## Run the Numbers
+
+> **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** — works the load, the continuous-load multiplier and the 240.6(A) standard ratings, then checks the result against the conductor.
+
+Size the conductor first with the **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** and check its derated ampacity in the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** — derating is the other reason a conductor may not carry what the table suggests, as **[Wire Derating Explained](/blog/wire-derating-nec)** covers. For interrupting ratings use the **[Short Circuit Calculator](/calculators/electrical/electrical-short-circuit-calculator)**, and for the Article 430 exception the **[Motor Circuit Calculator](/calculators/electrical/electrical-motor-circuit-calculator)**. The topology that decides what current reaches the breaker in the first place is in **[Series vs Parallel Circuits](/blog/series-vs-parallel-circuits)**.
+
+*Sources & standards: NEC (NFPA 70) 2023 — 240.4 protection of conductors, 240.4(D) small conductor ratings, 240.4(G) specific applications including motors, 240.6(A) standard ampere ratings, 210.20(A) continuous load, 110.9 interrupting rating, 110.10 circuit impedance and withstand, 110.14(C) temperature limitations, 240.83(D) switching duty marking, 430.52 motor branch-circuit protection. Trip-curve behaviour follows UL 489 calibration; the curve shown is a representative characteristic and exact trip times vary by manufacturer and frame size — use the published curve for the specific product. Fault-current figures are computed for a 300 kVA 480 V three-phase transformer at 3.5% impedance with a −10% tolerance margin, using the point-to-point method with an infinite primary source. A licensed electrician and the authority having jurisdiction have final say on anything installed.*
+
+---
+
+## FAQ
+
+### How does a circuit breaker work?
+
+Two mechanisms share one case. A bimetallic strip heats with load current and curls until it releases the latch, which handles sustained overload over seconds to about an hour depending on severity. A magnetic solenoid responds to the huge current of a short circuit and snaps the mechanism open in roughly one cycle, about 17 milliseconds. Overload is a heat problem so it's timed; a short circuit isn't, so it isn't.
+
+### What does a breaker actually protect?
+
+The conductor. Not the appliance, not the person. The wire in the wall has no other defence and can't be inspected, so the breaker's job is to open before that conductor is damaged by current. Appliances protect themselves with their own fuses and controls, and people are protected by GFCIs, which trip at 4–6 mA rather than 20 A.
+
+### Why does a breaker trip slowly on overload but instantly on a short?
+
+Because the two failures are physically different. Conductor damage from overload comes from accumulated heat, which takes time — so the thermal element is deliberately inverse-time, letting a motor draw six times its running current for a couple of seconds while it starts. A short circuit releases enormous energy immediately, so the magnetic element responds without any intentional delay.
+
+### Can I put a bigger breaker on to stop it tripping?
+
+No, and it's one of the more dangerous things a person can do in a panel. The breaker is sized to the conductor, and NEC 240.4(D) caps 14 AWG at 15 A and 12 AWG at 20 A. A larger breaker doesn't add capacity, it removes protection — the wire then runs beyond its rating with nothing watching it. On a run containing both 12 and 14 AWG, the smallest conductor anywhere governs the whole circuit.
+
+### What is the 80% rule for breakers?
+
+A load running three hours or more is a continuous load, and NEC 210.20(A) requires the breaker to be rated at 125% of it — which is the same as loading the breaker to 80%. So a 20 A breaker allows 16 A continuously. The reason is thermal: breakers are calibrated in open air, but installed they sit in a warm steel enclosure surrounded by other breakers, and the bimetal can't distinguish its own heat from its neighbours'.
+
+### What is a breaker's AIC or interrupting rating?
+
+The largest fault current the breaker can safely open. It's completely separate from the trip rating — a 20 A breaker might be rated 10,000 A interrupting. Exceed it and the device may fail to clear the arc, welding shut or rupturing. NEC 110.9 requires the interrupting rating to suit the fault current available at that point, which is why equipment near a large transformer often needs 22 kA or more while a typical house is fine at 10 kA.
+
+### Why can a motor circuit use a breaker far above the wire's rating?
+
+Because NEC 240.4(G) routes motor circuits to Article 430, where 430.52 permits a breaker up to 250% of full-load current so the motor can start. A 10 HP 460 V motor ends up with a 35 A breaker on 14 AWG rated 20 A. That's safe because a separate overload device protects the conductor against sustained current, leaving the breaker responsible only for short circuits and ground faults. The two jobs are split between two devices.
+
+### Is it bad to reset a breaker repeatedly?
+
+Yes. Every trip draws an arc across the contacts and erodes them, and eroded contacts mean added resistance, heat and less reliable operation. More importantly the trip is a symptom: a thermal trip says the circuit is overloaded, a magnetic trip says there's a fault in the wiring. Resetting twice without investigating postpones finding something that will not fix itself.
+
+### Can I use a circuit breaker as a light switch?
+
+Only if it's marked SWD or HID, which NEC 240.83(D) requires for devices listed for regular switching duty. Ordinary breakers are built to operate rarely, and using one daily wears the contacts — which eventually compromises the protection it exists to provide. Fit a switch.

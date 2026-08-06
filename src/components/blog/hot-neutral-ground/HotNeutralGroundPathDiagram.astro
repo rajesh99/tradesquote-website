@@ -1,0 +1,84 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The single distinction that matters: the neutral is a working conductor that
+ * carries return current every second the load runs, while the equipment
+ * grounding conductor carries nothing at all until something fails.
+ */
+const PREFIX = "hng-path";
+const LOAD_AMPS = 12;
+const FAULT_AMPS = 1200;
+
+const defs = `
+  <marker id="${PREFIX}-red" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L7,3.5 L0,7 Z" fill="${C.red}" />
+  </marker>
+  <marker id="${PREFIX}-blue" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L7,3.5 L0,7 Z" fill="${C.blue}" />
+  </marker>
+  <marker id="${PREFIX}-green" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L7,3.5 L0,7 Z" fill="${C.green}" />
+  </marker>
+`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Current paths in normal operation and during a ground fault</title>
+  <desc>
+    In normal operation current leaves the panel on the hot conductor, passes through the load and returns on the
+    neutral, while the equipment grounding conductor carries zero amps. When a hot conductor contacts the metal case,
+    the equipment grounding conductor becomes the return path and carries roughly 1,200 amps, which trips the breaker
+    instantly.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The neutral works every day. The ground works once.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Both connect to earth at the service, but only one is meant to carry current.</text>
+
+  <text x="28" y="78" fill={C.green} font-family={FONT} font-size="9" font-weight="700">NORMAL OPERATION</text>
+  <text x="376" y="78" fill={C.red} font-family={FONT} font-size="9" font-weight="700">GROUND FAULT</text>
+
+  <rect x="36" y="106" width="54" height="84" rx="6" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="63" y="152" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">PANEL</text>
+  <rect x="252" y="106" width="76" height="84" rx="6" fill={C.white} stroke={C.muted} stroke-width="2.2" />
+  <text x="290" y="145" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">LOAD</text>
+  <text x="290" y="160" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">metal case</text>
+
+  <line x1="90" y1="122" x2="246" y2="122" stroke={C.dark} stroke-width="2.4" marker-end={`url(#${PREFIX}-red)`} />
+  <text x="168" y="115" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{`hot — ${LOAD_AMPS} A out`}</text>
+
+  <line x1="246" y1="150" x2="94" y2="150" stroke={C.blue} stroke-width="2.4" marker-end={`url(#${PREFIX}-blue)`} />
+  <text x="168" y="143" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="700">{`neutral — ${LOAD_AMPS} A back`}</text>
+
+  <line x1="90" y1="178" x2="252" y2="178" stroke={C.green} stroke-width="2.4" stroke-dasharray="6 4" />
+  <text x="168" y="194" text-anchor="middle" fill={C.green} font-family={FONT} font-size="9.5" font-weight="700">ground — 0 A, idle</text>
+
+  <rect x="382" y="106" width="54" height="84" rx="6" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="409" y="152" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">PANEL</text>
+  <rect x="598" y="106" width="76" height="84" rx="6" fill={C.redLight} stroke={C.red} stroke-width="2.4" />
+  <text x="636" y="145" text-anchor="middle" fill={C.red} font-family={FONT} font-size="9.5" font-weight="700">LOAD</text>
+  <text x="636" y="160" text-anchor="middle" fill={C.red} font-family={FONT} font-size="8">case now live</text>
+
+  <line x1="436" y1="122" x2="592" y2="122" stroke={C.dark} stroke-width="2.4" marker-end={`url(#${PREFIX}-red)`} />
+  <text x="514" y="115" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">hot touches the case</text>
+  <path d="M592 124 L586 132 L594 134 L588 143" stroke={C.red} stroke-width="2.2" fill="none" stroke-linecap="round" />
+
+  <line x1="592" y1="178" x2="440" y2="178" stroke={C.green} stroke-width="3" marker-end={`url(#${PREFIX}-green)`} />
+  <text x="514" y="194" text-anchor="middle" fill={C.green} font-family={FONT} font-size="9.5" font-weight="700">
+    {`ground — ${FAULT_AMPS.toLocaleString("en-US")} A back`}
+  </text>
+  <text x="514" y="143" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">neutral — 0 A</text>
+
+  <rect x="28" y="212" width="316" height="34" rx="7" fill={C.white} stroke={C.green} stroke-width="1.4" />
+  <text x="186" y="234" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Neutral is a working conductor</text>
+
+  <rect x="376" y="212" width="316" height="34" rx="7" fill={C.white} stroke={C.red} stroke-width="2.2" />
+  <text x="534" y="234" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Ground exists to trip the breaker</text>
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">
+    Swap the two and everything still runs — which is exactly why the mistake survives until somebody touches the case.
+  </text>
+</svg>

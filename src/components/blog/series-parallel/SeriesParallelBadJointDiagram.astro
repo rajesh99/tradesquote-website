@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The series circuit nobody draws on purpose: a degrading termination is a
+ * resistor in series with the load, so it forms a voltage divider. Computed
+ * from a 10 Ω load on 120 V.
+ */
+const V = 120;
+const R_LOAD = 10;
+const JOINTS = [0, 0.05, 0.1, 0.5, 1.0];
+
+const rows = JOINTS.map((rj) => {
+  const i = V / (R_LOAD + rj);
+  return {
+    rj,
+    amps: i,
+    vJoint: i * rj,
+    wJoint: i * i * rj,
+    vLoad: i * R_LOAD,
+  };
+});
+
+const COL_X = [176, 302, 428, 554];
+const COL_W = 112;
+const HEADERS = ["CURRENT", "VOLTS AT JOINT", "WATTS AT JOINT", "VOLTS AT LOAD"];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 272" fill="none" aria-hidden="true">
+  <title>A failing termination acts as a voltage divider in series with the load</title>
+  <desc>
+    A 10 ohm load on 120 volts. With a perfect connection the load sees the full 120 volts at 12 amps. A 0.1 ohm joint
+    takes 1.19 volts and burns 14 watts. A 0.5 ohm joint takes 5.71 volts and burns 65 watts. A 1 ohm joint takes 10.91
+    volts and burns 119 watts, leaving the load only 109 volts.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="256" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The series circuit nobody draws on purpose</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`A degrading termination is a resistor in series with the load. Computed on a ${R_LOAD} Ω load at ${V} V.`}</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">JOINT RESISTANCE</text>
+  {HEADERS.map((h, j) => (
+    <text x={COL_X[j] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{h}</text>
+  ))}
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    const hot = row.wJoint >= 60;
+    const accent = row.rj === 0 ? C.green : hot ? C.red : row.rj >= 0.1 ? C.orange : C.blue;
+    const values = [
+      `${row.amps.toFixed(2)} A`,
+      `${row.vJoint.toFixed(2)} V`,
+      `${row.wJoint.toFixed(1)} W`,
+      `${row.vLoad.toFixed(2)} V`,
+    ];
+    return (
+      <g>
+        <text x="28" y={y + 17} fill={accent} font-family={FONT} font-size="10.5" font-weight="800">
+          {row.rj === 0 ? "Perfect" : `${row.rj.toFixed(2)} Ω`}
+        </text>
+        {values.map((v, j) => (
+          <g>
+            <rect x={COL_X[j]} y={y} width={COL_W} height="24" rx="6" fill={accent} opacity={hot && j === 2 ? 0.2 : 0.08} />
+            <rect x={COL_X[j]} y={y} width={COL_W} height="24" rx="6" fill="none" stroke={accent} stroke-width={hot && j === 2 ? 2 : 1.1} />
+            <text x={COL_X[j] + COL_W / 2} y={y + 16} text-anchor="middle" fill={hot && j === 2 ? accent : C.dark} font-family={FONT} font-size="10.5" font-weight={hot && j === 2 ? 800 : 600}>
+              {v}
+            </text>
+          </g>
+        ))}
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">
+    Every volt the joint takes is a volt the load never sees — and the joint keeps all of that heat in one screw.
+  </text>
+</svg>

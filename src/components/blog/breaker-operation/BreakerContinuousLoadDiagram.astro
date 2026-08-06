@@ -1,0 +1,57 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A standard breaker is tested in free air, not stacked in a warm enclosure, so
+ * a load running three hours or more is limited to 80% of the rating. The 80%
+ * and 125% figures are the same rule from opposite ends: 1 ÷ 0.8 = 1.25.
+ */
+const RATINGS = [15, 20, 30, 40, 50, 60];
+const CONTINUOUS_FACTOR = 0.8;
+
+const rows = RATINGS.map((r) => ({ rating: r, usable: r * CONTINUOUS_FACTOR }));
+
+const BAR_X = 196;
+const BAR_MAX = 260;
+const MAX_RATING = Math.max(...RATINGS);
+const scale = (a: number) => (a / MAX_RATING) * BAR_MAX;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 274" fill="none" aria-hidden="true">
+  <title>Continuous load capacity of standard breaker ratings</title>
+  <desc>
+    A load running three hours or more is limited to 80 percent of the breaker rating. A 15 amp breaker allows 12 amps
+    continuous, a 20 allows 16, a 30 allows 24, a 40 allows 32, a 50 allows 40 and a 60 allows 48. The remaining 20
+    percent is thermal headroom, not spare capacity.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="258" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The last 20% is headroom, not capacity</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">A standard breaker is calibrated in open air. A load running three hours or more gets 80% of the rating.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BREAKER</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">USABLE CONTINUOUSLY</text>
+  <text x="500" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HELD IN RESERVE</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 26;
+    const full = scale(row.rating);
+    const used = scale(row.usable);
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${row.rating} A`}</text>
+
+        <rect x={BAR_X} y={y + 2} width={full} height="20" rx="4" fill={C.border} opacity="0.5" />
+        <rect x={BAR_X} y={y + 2} width={used} height="20" rx="4" fill={C.primary} opacity="0.85" />
+        <line x1={BAR_X + used} y1={y} x2={BAR_X + used} y2={y + 24} stroke={C.dark} stroke-width="1.4" />
+
+        <text x={BAR_X + full + 8} y={y + 16} fill={C.primary} font-family={FONT} font-size="10" font-weight="800">{`${row.usable.toFixed(0)} A`}</text>
+        <text x="500" y={y + 16} fill={C.muted} font-family={FONT} font-size="9.5">{`${(row.rating - row.usable).toFixed(0)} A of thermal margin`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">
+    1 ÷ 0.8 = 1.25 exactly, so "80% of the breaker" and "125% of the load" are the same rule stated from either end.
+  </text>
+</svg>

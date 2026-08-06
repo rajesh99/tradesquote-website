@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A shared neutral carries the DIFFERENCE between two hots on opposite legs and
+ * the SUM when both land on the same leg. Getting the leg wrong is how a 12 AWG
+ * neutral ends up carrying 32 A with no breaker watching it.
+ */
+const NEUTRAL_LIMIT = 20;
+
+const CASES = [
+  { a: 12, b: 8, opposite: true },
+  { a: 12, b: 12, opposite: true },
+  { a: 16, b: 4, opposite: true },
+  { a: 12, b: 8, opposite: false },
+  { a: 16, b: 16, opposite: false },
+];
+
+const rows = CASES.map((c) => {
+  const neutral = c.opposite ? Math.abs(c.a - c.b) : c.a + c.b;
+  return { ...c, neutral, over: neutral > NEUTRAL_LIMIT };
+});
+
+const COL_X = [188, 300, 448];
+const COL_W = 104;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 272" fill="none" aria-hidden="true">
+  <title>Neutral current on a shared-neutral circuit, by leg arrangement</title>
+  <desc>
+    On opposite legs a shared neutral carries the difference between the two hot currents: 12 amps and 8 amps give 4
+    amps, and two equal 12 amp loads give zero. On the same leg the neutral carries the sum: 12 plus 8 is 20 amps, and 16
+    plus 16 is 32 amps on a conductor no breaker is protecting.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="256" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A shared neutral carries the difference — or the sum</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Two hots sharing one neutral. Which leg they land on decides everything.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LOADS</text>
+  <text x={COL_X[0] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ARRANGEMENT</text>
+  <text x={COL_X[1] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NEUTRAL CARRIES</text>
+  <text x={COL_X[2]} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHY</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    const accent = row.over ? C.red : row.opposite ? C.green : C.orange;
+    const why = row.opposite
+      ? `${Math.max(row.a, row.b)} − ${Math.min(row.a, row.b)}: return currents cancel`
+      : `${row.a} + ${row.b}: nothing cancels, they add`;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${row.a} A  +  ${row.b} A`}</text>
+
+        <rect x={COL_X[0]} y={y} width={COL_W} height="24" rx="6" fill={row.opposite ? C.greenLight : C.orangeLight} stroke={row.opposite ? C.green : C.orange} stroke-width="1.2" />
+        <text x={COL_X[0] + COL_W / 2} y={y + 16} text-anchor="middle" fill={row.opposite ? C.green : C.orange} font-family={FONT} font-size="9.5" font-weight="700">
+          {row.opposite ? "opposite legs" : "SAME leg"}
+        </text>
+
+        <rect x={COL_X[1]} y={y} width={COL_W} height="24" rx="6" fill={accent} opacity={row.over ? 0.2 : 0.08} />
+        <rect x={COL_X[1]} y={y} width={COL_W} height="24" rx="6" fill="none" stroke={accent} stroke-width={row.over ? 2 : 1.1} />
+        <text x={COL_X[1] + COL_W / 2} y={y + 16} text-anchor="middle" fill={row.over ? accent : C.dark} font-family={FONT} font-size="10.5" font-weight={row.over ? 800 : 600}>
+          {`${row.neutral} A`}
+        </text>
+
+        <text x={COL_X[2]} y={y + 16} fill={row.over ? C.red : C.muted} font-family={FONT} font-size="9.5" font-weight={row.over ? 700 : 400}>
+          {row.over ? `${why} — overloaded` : why}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">
+    No breaker watches a neutral. That is why 210.4(B) demands a handle tie and why the leg assignment is not optional.
+  </text>
+</svg>

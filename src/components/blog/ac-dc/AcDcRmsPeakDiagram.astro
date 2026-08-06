@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Every nominal AC voltage in North American work, with the peak and
+ * peak-to-peak values the conductors and insulation actually see. Peak is
+ * always RMS × √2.
+ */
+const SYSTEMS = [
+  { rms: 120, note: "receptacles, lighting", accent: C.blue },
+  { rms: 208, note: "3φ commercial, line-to-line", accent: C.blue },
+  { rms: 240, note: "dwelling line-to-line", accent: C.primary },
+  { rms: 277, note: "commercial lighting", accent: C.orange },
+  { rms: 480, note: "3φ motors and equipment", accent: C.red },
+];
+
+const rows = SYSTEMS.map((s) => ({
+  ...s,
+  peak: s.rms * Math.SQRT2,
+  pp: s.rms * Math.SQRT2 * 2,
+}));
+
+const COL_X = [250, 400, 548];
+const COL_W = 138;
+const HEADERS = ["PEAK (RMS × √2)", "PEAK TO PEAK", "WHERE IT SHOWS UP"];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 272" fill="none" aria-hidden="true">
+  <title>Nominal AC voltages with their peak and peak-to-peak values</title>
+  <desc>
+    120 volts RMS peaks at 169.7 volts and swings 339.4 volts peak to peak. 208 volts peaks at 294.2. 240 volts peaks at
+    339.4. 277 volts peaks at 391.7. 480 volts peaks at 678.8 volts and swings 1,357.6 volts peak to peak. Peak is always
+    the RMS value multiplied by the square root of two.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="256" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What the insulation actually sees</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Every nominal AC voltage peaks 41% higher than its name. Peak = RMS × 1.41421.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NOMINAL (RMS)</text>
+  {HEADERS.map((h, j) => (
+    <text x={COL_X[j] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{h}</text>
+  ))}
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <rect x="24" y={y} width="212" height="24" rx="6" fill={row.accent} opacity="0.1" />
+        <rect x="24" y={y} width="212" height="24" rx="6" fill="none" stroke={row.accent} stroke-width="1.4" />
+        <text x="130" y={y + 16} text-anchor="middle" fill={row.accent} font-family={FONT} font-size="11" font-weight="800">{`${row.rms} V`}</text>
+
+        <rect x={COL_X[0]} y={y} width={COL_W} height="24" rx="6" fill={C.white} stroke={C.border} stroke-width="1.1" />
+        <text x={COL_X[0] + COL_W / 2} y={y + 16} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${row.peak.toFixed(1)} V`}</text>
+
+        <rect x={COL_X[1]} y={y} width={COL_W} height="24" rx="6" fill={C.white} stroke={C.border} stroke-width="1.1" />
+        <text x={COL_X[1] + COL_W / 2} y={y + 16} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10.5" font-weight="600">{`${row.pp.toFixed(1)} V`}</text>
+
+        <text x={COL_X[2] + COL_W / 2} y={y + 16} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{row.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">
+    Insulation ratings are stated in RMS volts, but the dielectric has to hold off the peak — 600 V wire sees 678.8 V.
+  </text>
+</svg>
