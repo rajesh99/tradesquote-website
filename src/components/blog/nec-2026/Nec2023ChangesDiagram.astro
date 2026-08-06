@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The 2023 changes that actually alter daily residential and light commercial
+ * work, with an honest column for how contested each one is — because that
+ * predicts whether it survived adoption where you are.
+ */
+const changes = [
+  {
+    section: "210.52(C)(2)",
+    what: "Island and peninsula receptacles no longer required",
+    effect: "Removes a requirement the 2020 cycle imposed by area",
+    status: "Settled",
+    accent: C.green,
+  },
+  {
+    section: "230.85",
+    what: "Outdoor emergency disconnect for dwellings",
+    effect: "Changes panel replacement scope significantly",
+    status: "Settled",
+    accent: C.green,
+  },
+  {
+    section: "Article 235",
+    what: "Over-1000 V requirements consolidated",
+    effect: "Reorganisation — no residential impact",
+    status: "Settled",
+    accent: C.green,
+  },
+  {
+    section: "230.67",
+    what: "Surge protection at dwelling services",
+    effect: "An SPD is now part of a service change",
+    status: "Settled",
+    accent: C.green,
+  },
+  {
+    section: "210.8(D)",
+    what: "GFCI for specific appliances, expanded",
+    effect: "Reaches further into cooking and other equipment",
+    status: "Contested",
+    accent: C.red,
+  },
+  {
+    section: "210.8(F)",
+    what: "GFCI for all outdoor dwelling outlets",
+    effect: "Caught A/C condensers — real nuisance trips",
+    status: "Contested",
+    accent: C.red,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>NEC 2023 changes that affect everyday work</title>
+  <desc>
+    Settled 2023 changes include 210.52(C)(2) removing the island and peninsula receptacle requirement the 2020 cycle
+    imposed, 230.85 requiring an outdoor emergency disconnect for dwellings, the consolidation of over-1000 volt
+    requirements into a new Article 235, and 230.67 requiring surge protection at dwelling services. Two remain
+    contested: 210.8(D) expanding GFCI protection for specific appliances, and 210.8(F) extending it to all outdoor
+    dwelling outlets, which caught air-conditioning condensers and produced real nuisance tripping.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The 2023 changes that reach ordinary jobs</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">"Contested" means widely amended out or delayed — check before designing to it.</text>
+
+  {changes.map((ch, i) => {
+    const y = 64 + i * 32;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="28" rx="7" fill={ch.accent} opacity="0.06" />
+        <rect x="24" y={y} width="4" height="28" rx="2" fill={ch.accent} />
+        <text x="38" y={y + 12} fill={C.blue} font-family={FONT} font-size="8.5" font-weight="800">{ch.section}</text>
+        <text x="38" y={y + 24} fill={C.muted} font-family={FONT} font-size="7.5">{ch.effect}</text>
+        <text x="140" y={y + 18} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{ch.what}</text>
+        <rect x="602" y={y + 5} width="80" height="18" rx="5" fill={ch.accent} />
+        <text x="642" y={y + 18} text-anchor="middle" fill={C.white} font-family={FONT} font-size="8" font-weight="800">{ch.status}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">Note 210.52(C)(2) runs the "wrong" way — the newer code requires less, so a 2020 jurisdiction is stricter.</text>
+</svg>

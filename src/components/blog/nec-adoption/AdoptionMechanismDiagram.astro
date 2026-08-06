@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * How a model standard becomes enforceable law. Each arrow is a place the text
+ * can change or stall, which is why "the NEC says" is an incomplete sentence.
+ */
+const stages = [
+  {
+    who: "NFPA",
+    what: "Publishes the NEC",
+    detail: "Every three years, about a year before the edition year. It is a model standard, not law.",
+    accent: C.blue,
+  },
+  {
+    who: "The state",
+    what: "Adopts an edition",
+    detail: "By legislature, board or agency rulemaking. Takes months to years — and some states never adopt statewide.",
+    accent: C.orange,
+  },
+  {
+    who: "The state",
+    what: "Amends it",
+    detail: "Deletes, delays or modifies specific sections. This is where recent GFCI and AFCI expansions get removed.",
+    accent: C.red,
+  },
+  {
+    who: "The city or county",
+    what: "May amend again",
+    detail: "Local ordinances can add requirements on top, and often do in seismic, coastal or historic areas.",
+    accent: C.red,
+  },
+  {
+    who: "The AHJ",
+    what: "Interprets and enforces",
+    detail: "The inspector applies the adopted, amended text to your job. 90.4 gives them authority to interpret.",
+    accent: C.primary,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>How the NEC becomes enforceable law</title>
+  <desc>
+    The NFPA publishes the NEC every three years, about a year before the edition year, as a model standard rather than
+    law. A state then adopts an edition through its legislature, board or agency, which takes months to years — and
+    some states never adopt statewide. The state amends it, deleting, delaying or modifying specific sections, which is
+    where recent GFCI and AFCI expansions are often removed. Cities and counties may amend again. Finally the authority
+    having jurisdiction interprets and enforces the adopted, amended text, with authority to interpret under 90.4.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">"The NEC says" is an incomplete sentence</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Five steps between publication and the inspector, and the text can change at three of them.</text>
+
+  {stages.map((s, i) => {
+    const y = 64 + i * 38;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="32" rx="8" fill={s.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="32" rx="8" fill="none" stroke={s.accent} stroke-width="1.5" />
+        <rect x="36" y={y + 7} width="106" height="18" rx="5" fill={s.accent} />
+        <text x="89" y={y + 20} text-anchor="middle" fill={C.white} font-family={FONT} font-size="8.5" font-weight="800">{s.who}</text>
+        <text x="154" y={y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{s.what}</text>
+        <text x="154" y={y + 26} fill={C.muted} font-family={FONT} font-size="8">{s.detail}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">The book on your shelf is the model code. The enforceable code is the adopted edition plus every amendment above it.</text>
+</svg>

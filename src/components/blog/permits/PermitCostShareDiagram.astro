@@ -1,0 +1,58 @@
+---
+import { usd, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Permit fees as a share of the job, using the cost calculators' own default
+ * permit figures. The point is that the fee is small and the schedule impact is
+ * not — which is the opposite of how people weigh it.
+ */
+const jobs = [
+  { name: "Panel upgrade, 200 A", total: 3060, permit: 250 },
+  { name: "Whole-house rewire, 1,800 ft²", total: 17360, permit: 500 },
+  { name: "EV charger circuit", total: 1300, permit: 150 },
+  { name: "New 20 A branch circuit", total: 675, permit: 120 },
+];
+
+const rows = jobs.map((j) => ({ ...j, pct: (j.permit / j.total) * 100 }));
+const BAR_X = 250;
+const BAR_MAX = 300;
+const peak = Math.max(...rows.map((r) => r.pct));
+const bars = rows.map((r) => ({ ...r, width: Math.max(18, Math.round((r.pct / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 236" fill="none" aria-hidden="true">
+  <title>Permit fees as a share of job cost</title>
+  <desc>
+    A 250 dollar permit on a 3,060 dollar panel upgrade is 8.2 percent of the job. A 500 dollar permit on a 17,360
+    dollar whole-house rewire is 2.9 percent. A 150 dollar permit on a 1,300 dollar EV charger circuit is 11.5 percent,
+    and a 120 dollar permit on a 675 dollar branch circuit is 17.8 percent. The fee weighs most heavily on the smallest
+    jobs, which is where people are most tempted to skip it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="220" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The fee weighs most on the smallest jobs</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Permit figures are the cost calculators' defaults; actual fees are set locally and vary widely.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">JOB</text>
+  <text x="186" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PERMIT</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SHARE OF JOB COST</text>
+
+  {bars.map((r, i) => {
+    const y = 86 + i * 32;
+    const heavy = r.pct > 10;
+    const accent = heavy ? C.orange : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{r.name}</text>
+        <text x="28" y={y + 24} fill={C.muted} font-family={FONT} font-size="7.5">{`total ${usd(r.total)}`}</text>
+        <text x="186" y={y + 18} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{usd(r.permit)}</text>
+        <rect x={BAR_X} y={y + 2} width={r.width} height="20" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={r.width} height="20" rx="5" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 17} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{`${fmt(r.pct, 1)}%`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="220" fill={C.muted} font-family={FONT} font-size="10">The fee is rarely the real cost. The scheduling — two inspection visits and the waiting — usually is.</text>
+</svg>

@@ -1,0 +1,73 @@
+---
+import { motorFlc, motorConductorAmps, motorOverloadRating, motorOverloadMax, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The single most consequential rule in Article 430: 430.6(A)(1) sends
+ * conductors and OCPD to the table, and 430.32 sends the overload device to the
+ * nameplate. Two numbers, three calculations, and they do not share a source.
+ */
+const HP = 10;
+const VOLTS = 460;
+const NAMEPLATE = 13.0;
+
+const flc = motorFlc(HP, "3ph", VOLTS)!;
+const conductor = motorConductorAmps(flc);
+const overload = motorOverloadRating(NAMEPLATE, "serviceFactor115");
+const overloadMax = motorOverloadMax(NAMEPLATE, "serviceFactor115");
+const gap = ((flc - NAMEPLATE) / NAMEPLATE) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>Which motor current each calculation uses</title>
+  <desc>
+    A 10 horsepower three-phase motor at 460 volts has a Table 430.250 full-load current of 14.0 amps and a nameplate
+    rating of 13.0 amps, a gap of 7.7 percent. Section 430.6(A)(1) requires conductors and overcurrent protection to
+    be sized from the table value, so conductors are 14 times 1.25 or 17.50 amps. Section 430.32 requires the overload
+    device to be set from the nameplate value, so it is 13.0 times 1.25 or 16.25 amps, with an absolute maximum of
+    18.20 amps.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two current values, and they are not interchangeable</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`A ${HP} HP three-phase motor at ${VOLTS} V with a ${NAMEPLATE} A nameplate.`}</text>
+
+  {/* the two sources */}
+  <rect x="24" y="74" width="320" height="52" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="2" />
+  <text x="42" y="95" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">TABLE 430.250</text>
+  <text x="42" y="115" fill={C.dark} font-family={FONT} font-size="16" font-weight="800">{`${fmt(flc, 1)} A`}</text>
+  <text x="112" y="115" fill={C.muted} font-family={FONT} font-size="8.5">what the code says a motor this size draws</text>
+
+  <rect x="376" y="74" width="320" height="52" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="394" y="95" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">THE NAMEPLATE</text>
+  <text x="394" y="115" fill={C.dark} font-family={FONT} font-size="16" font-weight="800">{`${fmt(NAMEPLATE, 1)} A`}</text>
+  <text x="464" y="115" fill={C.muted} font-family={FONT} font-size="8.5">{`what this motor actually draws — ${fmt(gap, 1)}% lower`}</text>
+
+  {/* which calculation uses which */}
+  <text x="28" y="152" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CALCULATION</text>
+  <text x="300" y="152" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">USES</text>
+  <text x="404" y="152" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RESULT</text>
+
+  {[
+    { name: "Branch-circuit conductors", rule: "430.22", src: "TABLE", accent: C.blue, calc: `${flc} × 1.25`, result: `${fmt(conductor, 2)} A` },
+    { name: "Overcurrent device", rule: "430.52", src: "TABLE", accent: C.blue, calc: `${flc} × 250%`, result: `${fmt(flc * 2.5, 1)} A ceiling` },
+    { name: "Overload device", rule: "430.32", src: "NAMEPLATE", accent: C.orange, calc: `${NAMEPLATE} × 125%`, result: `${fmt(overload, 2)} A` },
+    { name: "Overload absolute max", rule: "430.32(C)", src: "NAMEPLATE", accent: C.orange, calc: `${NAMEPLATE} × 140%`, result: `${fmt(overloadMax, 2)} A` },
+  ].map((row, i) => {
+    const y = 160 + i * 28;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="24" rx="6" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="24" rx="2" fill={row.accent} />
+        <text x="40" y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.name}</text>
+        <text x="222" y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">{row.rule}</text>
+        <rect x="300" y={y + 5} width="76" height="14" rx="4" fill={row.accent} opacity="0.18" />
+        <text x="338" y={y + 15} text-anchor="middle" fill={row.accent} font-family={FONT} font-size="7.5" font-weight="800">{row.src}</text>
+        <text x="404" y={y + 16} fill={C.muted} font-family={FONT} font-size="9">{row.calc}</text>
+        <text x="530" y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{row.result}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="270" fill={C.muted} font-family={FONT} font-size="10">Using the nameplate for conductors undersizes them. Using the table for the overload leaves the motor unprotected.</text>
+</svg>

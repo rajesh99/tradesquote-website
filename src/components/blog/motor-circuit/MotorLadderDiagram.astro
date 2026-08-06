@@ -1,0 +1,83 @@
+---
+import { motorFlc, motorConductorAmps, prevStandardOcpd, ampacityOf, CONDUCTOR_SIZES, egcSize, voltageDrop, cmilOf, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Complete circuits across the range, so the pattern is visible: the EGC is
+ * frequently larger than the phase conductors, because Table 250.122 keys off the
+ * OCPD rating and motor OCPDs run far above the conductor ampacity.
+ */
+function motorSize(amps: number) {
+  return CONDUCTOR_SIZES.find((s) => {
+    const a = ampacityOf(s, "copper", 75);
+    return a !== null && a >= amps;
+  })!;
+}
+
+const rows = [
+  { hp: 5, volts: 460 },
+  { hp: 10, volts: 460 },
+  { hp: 25, volts: 460 },
+  { hp: 50, volts: 460 },
+].map((m) => {
+  const flc = motorFlc(m.hp, "3ph", m.volts)!;
+  const cond = motorSize(motorConductorAmps(flc));
+  const ocpd = prevStandardOcpd(flc * 2.5);
+  const egc = egcSize(ocpd, "copper");
+  const dropPct = (voltageDrop({ cmil: cmilOf(cond.label), material: "copper", amps: flc, lengthFt: 100, phase: 3 }) / m.volts) * 100;
+  return {
+    ...m,
+    flc,
+    cond: cond.label,
+    condAmps: ampacityOf(cond, "copper", 75)!,
+    ocpd,
+    egc,
+    dropPct,
+    // CONDUCTOR_SIZES runs smallest-first, so a higher index is a larger conductor.
+    egcBigger: CONDUCTOR_SIZES.findIndex((s) => s.label === egc) > CONDUCTOR_SIZES.findIndex((s) => s.label === cond.label),
+  };
+});
+
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Complete motor circuits across the horsepower range</title>
+  <desc>
+    For three-phase 460 volt motors: 5 horsepower has a 7.6 amp full-load current on 14 AWG with a 15 amp device and a
+    14 AWG ground. 10 horsepower draws 14 amps on 14 AWG with a 35 amp device and a 10 AWG ground, which is larger
+    than the phase conductors because Table 250.122 is keyed to the device rating rather than the load. 25 horsepower
+    draws 34 amps on 8 AWG with an 80 amp device and an 8 AWG ground. 50
+    horsepower draws 65 amps on 4 AWG with a 150 amp device and a 6 AWG ground. Voltage drop over 100 feet stays
+    under 2 percent throughout.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Complete circuits, and where the ground outgrows the phases</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Three-phase 460 V, Design B, inverse-time breaker at the 250% ceiling. Drop is over 100 ft.</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MOTOR</text>
+  <text x="110" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">FLC</text>
+  <text x="182" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CONDUCTOR</text>
+  <text x="316" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DEVICE</text>
+  <text x="404" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">EGC</text>
+  <text x="530" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DROP, 100 FT</text>
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 32;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="28" rx="6" fill={r.egcBigger ? C.orangeLight : C.white} stroke={r.egcBigger ? C.orange : C.border} stroke-width={r.egcBigger ? 1.5 : 1} />
+        <text x="38" y={y + 18} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.hp} HP`}</text>
+        <text x="110" y={y + 18} fill={C.dark} font-family={FONT} font-size="10">{`${fmt(r.flc, r.flc % 1 === 0 ? 0 : 1)} A`}</text>
+        <text x="182" y={y + 18} fill={C.primary} font-family={FONT} font-size="10" font-weight="800">{`${r.cond} AWG`}</text>
+        <text x="246" y={y + 18} fill={C.muted} font-family={FONT} font-size="8.5">{`${r.condAmps} A`}</text>
+        <text x="316" y={y + 18} fill={C.red} font-family={FONT} font-size="10" font-weight="700">{`${r.ocpd} A`}</text>
+        <text x="404" y={y + 18} fill={r.egcBigger ? C.orange : C.dark} font-family={FONT} font-size="10" font-weight={r.egcBigger ? 800 : 600}>{`${r.egc} AWG`}</text>
+        <text x="452" y={y + 18} fill={C.muted} font-family={FONT} font-size="8">{r.egcBigger ? "bigger than phases" : ""}</text>
+        <text x="530" y={y + 18} fill={C.muted} font-family={FONT} font-size="10">{`${fmt(r.dropPct, 2)}%`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="234" fill={C.muted} font-family={FONT} font-size="10">{`On the 10 HP circuit the EGC outgrows the phase conductors, because Table 250.122 keys off the ${rows[1].ocpd} A device, not the load.`}</text>
+</svg>

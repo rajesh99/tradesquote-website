@@ -1,0 +1,63 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * What to actually do, since a published state-by-state table goes stale within
+ * months. Three questions and the authoritative place to answer each.
+ */
+const questions = [
+  {
+    n: "1",
+    q: "Which edition is adopted here?",
+    where: "The state's building code or electrical board site, and NEMA's adoption map",
+    trap: "Don't assume the newest — adoption lags publication by years",
+    accent: C.blue,
+  },
+  {
+    n: "2",
+    q: "What has been amended out?",
+    where: "The state's amendment document, published alongside the adoption",
+    trap: "Recent GFCI and AFCI expansions are the most commonly deleted",
+    accent: C.orange,
+  },
+  {
+    n: "3",
+    q: "What does this AHJ add locally?",
+    where: "The city or county building department, and their own handouts",
+    trap: "Local ordinances stack on top of state amendments",
+    accent: C.primary,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Three questions to establish which code applies</title>
+  <desc>
+    First, which edition is adopted, answered from the state's building code or electrical board site and NEMA's
+    adoption map — never assume the newest, since adoption lags publication by years. Second, what has been amended
+    out, answered from the state's amendment document published alongside the adoption, where recent GFCI and AFCI
+    expansions are the most commonly deleted provisions. Third, what the local authority adds, answered from the city
+    or county building department, because local ordinances stack on top of state amendments.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three questions, answered from primary sources</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Any published state-by-state table goes stale within months. Ask these instead.</text>
+
+  {questions.map((q, i) => {
+    const y = 66 + i * 58;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="50" rx="9" fill={q.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="50" rx="9" fill="none" stroke={q.accent} stroke-width="1.6" />
+        <circle cx="50" cy={y + 25} r="13" fill={q.accent} />
+        <text x="50" y={y + 29} text-anchor="middle" fill={C.white} font-family={FONT} font-size="12" font-weight="800">{q.n}</text>
+        <text x="76" y={y + 20} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{q.q}</text>
+        <text x="76" y={y + 34} fill={C.muted} font-family={FONT} font-size="8.5">{q.where}</text>
+        <text x="76" y={y + 45} fill={q.accent} font-family={FONT} font-size="8" font-weight="700">{q.trap}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="236" fill={C.muted} font-family={FONT} font-size="10">Then get anything genuinely ambiguous confirmed in writing before you build it. It costs an email.</text>
+</svg>

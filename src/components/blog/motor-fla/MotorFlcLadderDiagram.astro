@@ -1,0 +1,71 @@
+---
+import { motorFlc, motorConductorAmps, ampacityOf, CONDUCTOR_SIZES, prevStandardOcpd, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The ladder across horsepower and phase, computed from Tables 430.248 and
+ * 430.250. The striking column is the conductor: 14 AWG covers everything up to
+ * 10 HP at 460 V, because voltage does most of the work.
+ */
+function motorSize(amps: number) {
+  return CONDUCTOR_SIZES.find((s) => {
+    const a = ampacityOf(s, "copper", 75);
+    return a !== null && a >= amps;
+  })!;
+}
+
+const motors = [
+  { hp: 1, phase: "1ph" as const, volts: 115 },
+  { hp: 5, phase: "3ph" as const, volts: 460 },
+  { hp: 10, phase: "1ph" as const, volts: 230 },
+  { hp: 10, phase: "3ph" as const, volts: 460 },
+  { hp: 50, phase: "3ph" as const, volts: 460 },
+].map((m) => {
+  const flc = motorFlc(m.hp, m.phase, m.volts)!;
+  const cond = motorConductorAmps(flc);
+  return { ...m, flc, cond, size: motorSize(cond).label, ocpd: prevStandardOcpd(flc * 2.5) };
+});
+
+const peak = Math.max(...motors.map((m) => m.flc));
+const BAR_X = 214;
+const BAR_MAX = 240;
+const bars = motors.map((m) => ({ ...m, width: Math.max(22, Math.round((m.flc / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Motor full-load current and circuit by horsepower and phase</title>
+  <desc>
+    A 1 horsepower single-phase motor at 115 volts has a table full-load current of 16 amps needing 14 AWG and a 40
+    amp device. A 5 horsepower three-phase motor at 460 volts draws 7.6 amps on 14 AWG with a 15 amp device. A 10
+    horsepower single-phase motor at 230 volts draws 50 amps needing 6 AWG and 125 amps. The same 10 horsepower motor
+    on three-phase 460 volts draws only 14 amps on 14 AWG with a 35 amp device. A 50 horsepower three-phase motor
+    draws 65 amps needing 4 AWG and a 150 amp device.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Voltage and phase do most of the work</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Table full-load current, conductors at 125%, and an inverse-time device at the 250% ceiling.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MOTOR</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TABLE FLC</text>
+  <text x="502" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CONDUCTOR</text>
+  <text x="608" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DEVICE</text>
+
+  {bars.map((m, i) => {
+    const y = 86 + i * 32;
+    const accent = m.phase === "3ph" ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${m.hp} HP`}</text>
+        <text x="72" y={y + 14} fill={C.muted} font-family={FONT} font-size="8.5">{`${m.phase === "3ph" ? "3φ" : "1φ"} ${m.volts} V`}</text>
+        <rect x={BAR_X} y={y + 1} width={m.width} height="19" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={m.width} height="19" rx="5" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{`${fmt(m.flc, m.flc % 1 === 0 ? 0 : 1)} A`}</text>
+        <text x="502" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{`${m.size} AWG`}</text>
+        <text x="608" y={y + 15} fill={C.muted} font-family={FONT} font-size="10">{`${m.ocpd} A`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">The same 10 HP motor draws 50 A single-phase and 14 A on three-phase 460 V — 6 AWG against 14 AWG.</text>
+</svg>

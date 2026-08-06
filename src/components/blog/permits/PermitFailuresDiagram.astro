@@ -1,0 +1,58 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The repeat offenders, with the code section for each. Presented as a checklist
+ * rather than a ranking, because the value is in walking the job against it
+ * before calling for the inspection.
+ */
+const failures = [
+  { item: "Box fill exceeded", rule: "314.16", stage: "Rough", note: "Device yokes count twice; all grounds count once" },
+  { item: "Missing AFCI or GFCI", rule: "210.12 / 210.8", stage: "Final", note: "Dual-function needed in kitchens and laundry" },
+  { item: "No neutral at a switch box", rule: "404.2(C)", stage: "Rough", note: "Required in most locations for smart devices" },
+  { item: "Cable support and staple spacing", rule: "334.30", stage: "Rough", note: "Within 12 in of a box, then every 4.5 ft" },
+  { item: "Neutral bonded in a subpanel", rule: "250.24(A)(5)", stage: "Final", note: "Exactly one bond, at the service" },
+  { item: "Backfed breaker not secured", rule: "408.36(D)", stage: "Final", note: "Needs the retaining clip" },
+  { item: "Panel not labelled", rule: "408.4(A)", stage: "Final", note: "Every circuit, legibly, at the panel" },
+  { item: "Conductor size or OCPD mismatch", rule: "240.4", stage: "Final", note: "Especially 14 and 12 AWG under 240.4(D)" },
+  { item: "Missing or inaccessible disconnect", rule: "225.31 / 230.70", stage: "Final", note: "Detached buildings catch people" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 328" fill="none" aria-hidden="true">
+  <title>The electrical items inspectors flag most often</title>
+  <desc>
+    Common failures at rough-in include box fill exceeded under 314.16, no neutral at a switch box under 404.2(C), and
+    cable support and staple spacing under 334.30. Common failures at final include missing AFCI or GFCI protection
+    under 210.12 and 210.8, a neutral bonded in a subpanel violating 250.24(A)(5), a backfed breaker without its
+    retaining clip under 408.36(D), an unlabelled panel under 408.4(A), conductor and overcurrent device mismatches
+    under 240.4, and missing or inaccessible disconnects under 225.31 and 230.70.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="312" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The same items fail over and over</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Walk the job against this list before calling for the inspection. It's a free re-inspection avoided.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ITEM</text>
+  <text x="252" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CODE</text>
+  <text x="330" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">STAGE</text>
+  <text x="392" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT TO CHECK</text>
+
+  {failures.map((f, i) => {
+    const y = 84 + i * 25;
+    const accent = f.stage === "Rough" ? C.red : C.orange;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="21" rx="5" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="21" rx="2" fill={accent} />
+        <text x="38" y={y + 14} fill={C.dark} font-family={FONT} font-size="9" font-weight="700">{f.item}</text>
+        <text x="252" y={y + 14} fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">{f.rule}</text>
+        <rect x="330" y={y + 4} width="46" height="13" rx="3.5" fill={accent} opacity="0.18" />
+        <text x="353" y={y + 14} text-anchor="middle" fill={accent} font-family={FONT} font-size="7.5" font-weight="800">{f.stage}</text>
+        <text x="392" y={y + 14} fill={C.muted} font-family={FONT} font-size="8">{f.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="314" fill={C.muted} font-family={FONT} font-size="10">None of these are judgement calls. They're all checkable before the inspector arrives.</text>
+</svg>

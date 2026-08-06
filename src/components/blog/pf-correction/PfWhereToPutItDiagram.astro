@@ -1,0 +1,63 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Where the capacitors go, ordered by how much of the system they unload. The
+ * further downstream, the more conductor benefits — which is the opposite of how
+ * most installations are actually built.
+ */
+const options = [
+  {
+    where: "At the motor terminals",
+    unloads: "Everything upstream",
+    accent: C.green,
+    pros: "Frees the branch circuit, the feeder and the service",
+    cons: "Must switch with the motor; over-correction risks self-excitation",
+  },
+  {
+    where: "At the motor control centre",
+    unloads: "Feeder and service",
+    accent: C.blue,
+    pros: "Fewer, larger units; easier to maintain and switch",
+    cons: "Branch circuits stay fully loaded",
+  },
+  {
+    where: "At the service entrance",
+    unloads: "The utility side only",
+    accent: C.orange,
+    pros: "Simplest install; fixes the demand bill",
+    cons: "Frees no capacity inside the building at all",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where to install correction capacitors</title>
+  <desc>
+    Capacitors at the motor terminals unload everything upstream, freeing the branch circuit, the feeder and the
+    service, but must be switched with the motor and risk self-excitation if over-corrected. At the motor control
+    centre they unload the feeder and service and are easier to maintain, but branch circuits stay fully loaded. At
+    the service entrance they only unload the utility side, which fixes a demand bill but frees no capacity inside the
+    building.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The further downstream, the more you unload</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Correction only reduces current between the capacitor and the source. Everything downstream is unchanged.</text>
+
+  {options.map((o, i) => {
+    const y = 68 + i * 60;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="52" rx="9" fill={o.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="52" rx="9" fill="none" stroke={o.accent} stroke-width="1.6" />
+        <text x="40" y={y + 21} fill={o.accent} font-family={FONT} font-size="11.5" font-weight="800">{o.where}</text>
+        <text x="40" y={y + 40} fill={C.muted} font-family={FONT} font-size="8.5">{o.pros}</text>
+        <text x="352" y={y + 21} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{`Unloads: ${o.unloads}`}</text>
+        <text x="352" y={y + 40} fill={C.red} font-family={FONT} font-size="8.5">{o.cons}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">Most installations put them at the service, which is the cheapest to fit and the least useful for capacity.</text>
+</svg>

@@ -1,0 +1,192 @@
+---
+title: "kVA vs kW: Power Factor, Apparent Power, and Why It Matters"
+meta_title: "kVA vs kW: Power Factor and Apparent Power Explained (2026) | TradesQuote"
+description: "kW = kVA × power factor. At PF 0.8 the power triangle is a 3-4-5: 100 kVA is 80 kW and 60 kVAR — and the conductor is sized for the hypotenuse, not the base."
+image: /images/posts/kva-vs-kw-hero.svg
+date: 2026-08-04T15:30:00Z
+categories: ["electrical"]
+tags: ["kva vs kw","power factor","apparent power","kvar","transformer sizing"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import KvaTriangleDiagram from "@/components/blog/kva-kw/KvaTriangleDiagram.astro";
+import KvaSameKvaDiagram from "@/components/blog/kva-kw/KvaSameKvaDiagram.astro";
+import KvaWhyRatedDiagram from "@/components/blog/kva-kw/KvaWhyRatedDiagram.astro";
+
+**kW = kVA × power factor.** That's the whole relationship, and if you only remember one thing, remember that kVA is always the bigger number.
+
+The distinction matters because **the wire, the breaker and the transformer are all sized for kVA, while the work getting done — and mostly the bill — is kW.** Those two diverge exactly as far as the power factor is below 1, and on a motor-heavy service that's 20% or more of your capacity going into current that does nothing.
+
+The textbook example is PF 0.8, and there's a reason: **the power triangle at 0.8 is a 3-4-5 triangle.** 100 kVA gives exactly 80 kW and exactly 60 kVAR.
+
+## The Power Triangle
+
+<BlogInfographic
+  title="100 kVA at PF 0.8 — a 3-4-5 triangle"
+  caption="Real power along the bottom, reactive up the side, apparent power the hypotenuse. Drawn to scale."
+>
+  <KvaTriangleDiagram />
+</BlogInfographic>
+
+Three quantities, and each has a physical meaning:
+
+**Real power, kW** — the base. Energy actually converted into work, heat or light. This is what your meter's kWh register counts and what the load actually consumes.
+
+**Reactive power, kVAR** — the vertical. Energy that flows into a magnetic or electric field and back out again, twice per cycle. It does no work. It exists because motors, transformers and fluorescent ballasts need magnetic fields to function, and building a field takes energy that's returned when it collapses.
+
+**Apparent power, kVA** — the hypotenuse. Volts × amps, ignoring phase. This is what the conductors actually carry, and therefore what everything in the distribution path must be sized for.
+
+The identities:
+
+```
+PF   = kW ÷ kVA
+kW   = kVA × PF
+kVAR = kW × tan θ        (tan θ = 0.75 exactly at PF 0.8)
+kVA  = √(kW² + kVAR²)
+```
+
+**Power factor is just the cosine of the phase angle** between voltage and current — at PF 0.8 that angle is 36.9°. And the useful shortcut: at PF 0.8, tan θ is exactly 0.75, so kVAR is three quarters of kW.
+
+**The base does the work and the hypotenuse sizes the equipment.** That single sentence is the practical content of the whole subject.
+
+## The Same Transformer, Six Answers
+
+<BlogInfographic
+  title="One 100 kVA transformer, six different answers"
+  caption="The full bar is the 100 kVA the windings carry. The solid part is the real power that reaches the load."
+>
+  <KvaSameKvaDiagram />
+</BlogInfographic>
+
+| Load power factor | Real power delivered | Reactive |
+| --- | --- | --- |
+| 1.00 — resistive | 100 kW | 0 kVAR |
+| 0.95 | 95 kW | 31 kVAR |
+| 0.90 | 90 kW | 44 kVAR |
+| 0.85 | 85 kW | 53 kVAR |
+| 0.80 — motor-heavy | 80 kW | 60 kVAR |
+| 0.70 | 70 kW | 71 kVAR |
+
+**A 30 kW spread on identical equipment.** Nothing about the transformer changed; only the character of the load. The windings can carry 100 kVA because that's a heating limit set by current, and the transformer has no way to know or care what phase relationship the load imposes.
+
+Which is exactly why **transformers are rated in kVA.** It's not a convention or a marketing choice — it's the only honest rating for a device whose limit is current.
+
+## Which Equipment Uses Which Unit
+
+<BlogInfographic
+  title="Why the nameplate says one or the other"
+  caption="Limited by conductor heating → kVA. Limited by mechanical output → kW."
+>
+  <KvaWhyRatedDiagram />
+</BlogInfographic>
+
+**Rated in kVA** — transformers, UPS units and inverters, and service and feeder capacity generally. All limited by conductor or winding heating, which follows current regardless of phase. This is also why NEC load calculations work in **volt-amperes** throughout Article 220 rather than in watts.
+
+**Rated in kW** — motors (by mechanical output at the shaft), generators (by engine torque), and resistive heaters (where kW and kVA are the same number anyway).
+
+Three traps in that list.
+
+**Three-phase generators are rated at 0.8 power factor.** A "20 kW" three-phase set is a **25 kVA** machine. Single-phase residential air-cooled sets are normally rated at unity, so their two figures match — which makes the three-phase case easy to get wrong. See **[What Size Generator Do I Need](/blog/what-size-generator-do-i-need)**.
+
+**UPS units are dual-rated and the smaller number usually binds.** A "1,500 VA" UPS is commonly 900 W, an implied PF of 0.6. Load it with 1,200 W of servers and it doesn't matter that you're under 1,500 VA — you're over the watt rating.
+
+**A motor's kW rating is output, not input.** A 10 kW motor at 88% efficiency and PF 0.85 draws about 11.4 kW of real power and roughly 13.4 kVA of apparent power. The circuit is sized from the current, which comes from the kVA. That's why motor circuits are sized from **Table 430.248 and Table 430.250 FLC values** rather than from nameplate kW — covered in **[Motor Full Load Amps](/blog/motor-full-load-amps)**.
+
+## Why It Costs Money
+
+**Residential customers are almost never billed for power factor.** A domestic meter registers kWh — real energy — and a poor power factor costs the homeowner nothing directly.
+
+**Commercial and industrial customers frequently are**, through one of two mechanisms:
+
+**A demand charge in kVA rather than kW.** If the utility bills peak demand in kVA, poor power factor raises the bill in direct proportion. Going from PF 0.8 to 0.95 on an 80 kW load takes apparent demand from 100 kVA to 84.2 kVA — a **15.8% reduction** in the billed quantity.
+
+**An explicit power-factor penalty**, typically applied below a threshold around 0.90 or 0.95, as a surcharge or a ratchet on demand.
+
+Either way the fix is capacitors, and the sizing is straightforward: kVAR needed = kW × (tan θ₁ − tan θ₂). For 80 kW from 0.8 to 0.95 that's **33.7 kVAR**. The detail is in **[Power Factor Correction](/blog/power-factor-correction)**.
+
+There's a second, quieter benefit. **Line current falls by the same 15.8%**, which reduces I²R losses in your own distribution, frees capacity in existing feeders and transformers, and can defer an upgrade. On a service that's near capacity, correction is sometimes cheaper than more copper.
+
+## Converting Between Them
+
+For a single load:
+
+```
+1φ:  kVA = V × A ÷ 1000
+3φ:  kVA = V × A × √3 ÷ 1000
+     kW  = kVA × PF
+```
+
+A 480 V three-phase load drawing 100 A: 480 × 100 × 1.732 = **83.14 kVA**, and at PF 0.85 that's **70.67 kW**. The √3 and why it's there is the subject of **[Three-Phase Power](/blog/three-phase-power-calculation)**.
+
+Going the other way, from power to current, is the more common site problem — **[Watts to Amps](/blog/watts-to-amps)** and **[Amps to Watts](/blog/amps-to-watts)** cover both directions.
+
+## What Makes Power Factor Poor
+
+**Induction motors, especially lightly loaded ones.** A motor's magnetising current is roughly constant regardless of load, so a motor running at 25% of rated load has a much worse power factor than the same motor fully loaded. Oversized motors are a common hidden cause.
+
+**Transformers**, particularly lightly loaded ones, for the same reason.
+
+**Older fluorescent ballasts** — magnetic ballasts without correction can be 0.5 or worse. Electronic ballasts and LED drivers are typically 0.9+.
+
+**Welders and induction heating.**
+
+What *doesn't* hurt it: resistive loads. Heaters, elements, incandescent lamps and ranges are unity power factor.
+
+One modern wrinkle: **electronic loads can have a good power factor and still be a problem**, because they draw non-sinusoidal current. That's **distortion** rather than **displacement** power factor, capacitors won't fix it, and the practical consequence is harmonic current in the neutral — which is why 310.15(E)(2) makes you count a wye feeder's neutral as a current-carrying conductor. See **[Wire Derating Explained](/blog/wire-derating-nec)**.
+
+## Common Mistakes
+
+- **Treating kVA and kW as interchangeable.** They differ by the power factor, always.
+- **Reading a three-phase generator's kW as kVA.** At 0.8 PF a 20 kW set is 25 kVA.
+- **Sizing a conductor from kW.** Conductors carry current, so size from kVA.
+- **Ignoring a UPS's watt rating.** A 1,500 VA unit is often 900 W, and the watts bind first.
+- **Reading a motor's kW rating as input power.** It's shaft output; input is higher by efficiency and power factor.
+- **Using √(R² + X²) for line drop.** That's the fault form — see **[Ohm's Law Explained](/blog/ohms-law-explained)**.
+- **Trying to fix distortion power factor with capacitors.** Harmonics need filters, not kVAR.
+- **Assuming poor power factor costs a homeowner money.** Residential meters register kWh.
+- **Correcting past unity.** Overcorrection makes the load leading and can cause resonance and overvoltage.
+
+## Run the Conversion
+
+> **[kVA Calculator](/calculators/electrical/electrical-kva-calculator)** — converts between kVA, kW, kVAR, voltage, current and power factor in single-phase and three-phase, showing the power triangle for the values you enter.
+
+Pair it with the **[Power Factor Calculator](/calculators/electrical/electrical-power-factor-calculator)** for correction kVAR, the **[Three-Phase Power Calculator](/calculators/electrical/electrical-three-phase-power-calculator)** for line quantities, and the **[Transformer Sizing Calculator](/calculators/electrical/electrical-transformer-sizing-calculator)** where the kVA rating is the decision. See the **[Electrical Formulas Cheat Sheet](/blog/electrical-formulas-cheat-sheet)** for the full set.
+
+*Sources & standards: the power-triangle relationships are physics. NEC (NFPA 70) 2023 works in volt-amperes throughout Article 220 for load calculations; 310.15(E)(2) covers harmonic neutral counting; motor FLC values are Tables 430.248 and 430.250. Generator and UPS rating conventions are manufacturer practice — read the nameplate. Utility demand-charge and power-factor-penalty structures vary by utility and tariff.*
+
+---
+
+## FAQ
+
+### What is the difference between kVA and kW?
+
+kW is real power — energy actually doing work, and what a kWh meter registers. kVA is apparent power — volts times amps, which is what the conductors physically carry. They're related by kW = kVA × power factor, so kVA is always the larger figure unless the load is purely resistive. Conductors, breakers and transformers are sized for kVA; the work done is kW.
+
+### How do I convert kVA to kW?
+
+Multiply by the power factor. 100 kVA at 0.8 power factor is 80 kW. Going the other way, divide: 80 kW at 0.8 power factor requires 100 kVA of capacity. If you don't know the power factor, 0.8 is the conventional assumption for a motor-heavy load and 0.95 or higher for modern electronic and LED loads.
+
+### Why are transformers rated in kVA instead of kW?
+
+Because a transformer's limit is heating in its windings, which depends on current — and current depends on apparent power, not real power. The transformer has no way to know what power factor the load will impose. A 100 kVA transformer delivers 100 kW into a resistive load and only 80 kW into a load at 0.8 power factor, so kVA is the only rating that's true in both cases.
+
+### What is kVAR?
+
+Reactive power — energy that flows into a magnetic or electric field and back out again twice per cycle, doing no net work. Motors, transformers and ballasts need it to establish their magnetic fields. It's the vertical side of the power triangle: at 100 kVA and 0.8 power factor, kVAR is exactly 60. It still occupies conductor capacity even though it does nothing useful.
+
+### What is a good power factor?
+
+0.95 or better is generally the target for a commercial installation, and many utility tariffs set their penalty threshold around 0.90 to 0.95. Modern electronic and LED loads are typically 0.9 or higher inherently. Motor-heavy installations often sit at 0.75 to 0.85, especially where motors are oversized and lightly loaded, since a motor's magnetising current is roughly constant regardless of load.
+
+### Does poor power factor increase my electricity bill?
+
+For residential customers, generally not — a domestic meter registers kWh, which is real energy. For commercial and industrial customers, frequently yes, either because demand is billed in kVA or because the tariff applies an explicit power-factor penalty below a threshold. Correcting 80 kW from PF 0.8 to 0.95 reduces apparent demand from 100 kVA to 84.2 kVA, a 15.8% cut in the billed quantity.
+
+### Is a 20 kW three-phase generator the same as 20 kVA?
+
+No — three-phase generator sets are normally rated at 0.8 power factor, so a 20 kW set is a 25 kVA machine. Single-phase residential air-cooled sets are typically rated at unity power factor, so their kW and kVA figures are identical, which is what makes the three-phase convention easy to misread. Always check the spec sheet before sizing against a motor load.
+
+### Can capacitors fix any power factor problem?
+
+No. Capacitors correct *displacement* power factor, where current lags voltage because of inductive load — that's the motor case and capacitors are the right answer. They do nothing for *distortion* power factor, where the current waveform isn't sinusoidal because of electronic loads. That needs harmonic filtering, and its most visible symptom is harmonic current in a wye system's neutral.

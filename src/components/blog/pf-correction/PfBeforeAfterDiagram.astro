@@ -1,0 +1,68 @@
+---
+import { tanPhi, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Two power triangles sharing the same base. Real power never changes — that's
+ * the whole point of correction — so the capacitor shortens the vertical side and
+ * the hypotenuse follows it down.
+ */
+const KW = 80;
+const FROM = 0.8;
+const TO = 0.95;
+
+const kvaFrom = KW / FROM;
+const kvaTo = KW / TO;
+const kvarFrom = KW * tanPhi(FROM);
+const kvarTo = KW * tanPhi(TO);
+const kvarCap = kvarFrom - kvarTo;
+const cut = (1 - kvaTo / kvaFrom) * 100;
+
+const SCALE = 2.9;
+const X0 = 150;
+const Y0 = 196;
+const baseW = KW * SCALE;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Power triangles before and after correction</title>
+  <desc>
+    An 80 kilowatt load at 0.8 power factor draws 100 kVA with 60 kVAR of reactive power. Adding 33.7 kVAR of
+    capacitance cancels most of that, leaving 26.3 kVAR and bringing apparent power down to 84.2 kVA at 0.95 power
+    factor. The real power along the base is unchanged at 80 kilowatts — only the reactive side and the hypotenuse
+    shrink, which is a 15.8 percent reduction in current.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Same ${KW} kW of work, less current to deliver it`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Correcting from PF ${FROM} to ${TO}. The base never moves — only the reactive side shortens.`}</text>
+
+  {/* shared base */}
+  <line x1={X0} y1={Y0} x2={X0 + baseW} y2={Y0} stroke={C.green} stroke-width="5" />
+  <text x={X0 + baseW / 2} y={Y0 + 20} text-anchor="middle" fill={C.green} font-family={FONT} font-size="11.5" font-weight="800">{`${KW} kW — unchanged`}</text>
+
+  {/* before triangle */}
+  <line x1={X0 + baseW} y1={Y0} x2={X0 + baseW} y2={Y0 - kvarFrom * SCALE} stroke={C.red} stroke-width="4" stroke-dasharray="6 3" />
+  <line x1={X0} y1={Y0} x2={X0 + baseW} y2={Y0 - kvarFrom * SCALE} stroke={C.red} stroke-width="3.4" stroke-dasharray="6 3" />
+
+  {/* after triangle */}
+  <line x1={X0 + baseW} y1={Y0} x2={X0 + baseW} y2={Y0 - kvarTo * SCALE} stroke={C.blue} stroke-width="5" />
+  <line x1={X0} y1={Y0} x2={X0 + baseW} y2={Y0 - kvarTo * SCALE} stroke={C.blue} stroke-width="4.4" />
+
+  {/* labels */}
+  <text x={X0 + baseW + 12} y={Y0 - kvarFrom * SCALE + 4} fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(kvarFrom, 0)} kVAR`}</text>
+  <text x={X0 + baseW + 12} y={Y0 - kvarFrom * SCALE + 16} fill={C.muted} font-family={FONT} font-size="8">{`before, PF ${FROM}`}</text>
+  <text x={X0 + baseW + 12} y={Y0 - kvarTo * SCALE + 4} fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(kvarTo, 1)} kVAR`}</text>
+  <text x={X0 + baseW + 12} y={Y0 - kvarTo * SCALE + 16} fill={C.muted} font-family={FONT} font-size="8">{`after, PF ${TO}`}</text>
+
+  <text x={X0 + 24} y={Y0 - kvarFrom * SCALE + 44} fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(kvaFrom, 0)} kVA`}</text>
+  <text x={X0 + 30} y={Y0 - kvarTo * SCALE - 8} fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(kvaTo, 1)} kVA`}</text>
+
+  {/* the capacitor */}
+  <rect x="24" y="78" width="112" height="76" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="80" y="98" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9" font-weight="800">CAPACITOR</text>
+  <text x="80" y="122" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="16" font-weight="800">{`${fmt(kvarCap, 1)}`}</text>
+  <text x="80" y="138" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">kVAR</text>
+
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">{`kVAR = kW × (tan θ₁ − tan θ₂) = ${KW} × (${fmt(tanPhi(FROM), 4)} − ${fmt(tanPhi(TO), 4)}) = ${fmt(kvarCap, 1)} kVAR, cutting current ${fmt(cut, 1)}%.`}</text>
+</svg>

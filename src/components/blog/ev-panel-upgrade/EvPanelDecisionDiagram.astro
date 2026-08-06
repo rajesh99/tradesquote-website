@@ -1,0 +1,70 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The order of operations, because it's the whole point: three cheaper questions
+ * come before "upgrade the service", and most installers ask none of them.
+ */
+const steps = [
+  {
+    n: "1",
+    q: "Run NEC 220.87 on the utility's 12-month peak",
+    then: "Most houses have more headroom than a calculation suggests",
+    cost: "Free",
+    accent: C.primary,
+  },
+  {
+    n: "2",
+    q: "Specify the charger you actually need, not the biggest",
+    then: "32 A gives 25–30 miles of range per hour — ample overnight",
+    cost: "Free",
+    accent: C.blue,
+  },
+  {
+    n: "3",
+    q: "Use load management — 625.42 or Article 750",
+    then: "The charger sheds when the service approaches capacity",
+    cost: "Hundreds",
+    accent: C.orange,
+  },
+  {
+    n: "4",
+    q: "Only now: upgrade the service",
+    then: "The right answer sometimes, and the first answer almost never",
+    cost: "Thousands",
+    accent: C.red,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The order to ask the questions in</title>
+  <desc>
+    Four steps in ascending cost order. First run NEC 220.87 against the utility's 12-month peak demand, which is free
+    and usually shows more headroom than a calculation does. Second, specify the charger you actually need — 32 amps
+    delivers 25 to 30 miles of range per hour, which is ample overnight. Third, use load management under 625.42 or
+    Article 750, costing hundreds. Only then consider a service upgrade, costing thousands.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four questions, in ascending order of cost</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Most quotes start at step 4. The first three are cheaper and often sufficient.</text>
+
+  {steps.map((s, i) => {
+    const y = 66 + i * 46;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="38" rx="9" fill={s.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="38" rx="9" fill="none" stroke={s.accent} stroke-width="1.6" />
+        <circle cx="48" cy={y + 19} r="12" fill={s.accent} />
+        <text x="48" y={y + 23} text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="800">{s.n}</text>
+        <text x="70" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{s.q}</text>
+        <text x="70" y={y + 30} fill={C.muted} font-family={FONT} font-size="8.5">{s.then}</text>
+        <rect x="600" y={y + 10} width="80" height="19" rx="5" fill={s.accent} opacity="0.16" />
+        <text x="640" y={y + 23} text-anchor="middle" fill={s.accent} font-family={FONT} font-size="9" font-weight="800">{s.cost}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">A panel upgrade is a legitimate answer. It just isn't the first thing to check, and it's the most expensive.</text>
+</svg>

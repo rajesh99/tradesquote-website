@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Which model fits which work. The dividing line is scope certainty, not job
+ * size — which is why the same contractor sensibly uses both.
+ */
+const lanes = [
+  {
+    accent: C.primary,
+    heading: "Flat rate fits",
+    items: [
+      "Repeatable tasks you've done 20 times",
+      "Service calls where scope is visible",
+      "Device swaps, fixture changes, panel labels",
+      "Anything a customer wants a number for",
+      "Work where speed is your advantage",
+    ],
+  },
+  {
+    accent: C.orange,
+    heading: "Time and materials fits",
+    items: [
+      "Troubleshooting — scope unknown by definition",
+      "Old buildings with hidden conditions",
+      "Work behind other trades' schedules",
+      "Emergency and after-hours callouts",
+      "Anything where you'd have to pad heavily",
+    ],
+  },
+  {
+    accent: C.blue,
+    heading: "Hybrids that work",
+    items: [
+      "Flat diagnostic fee, then flat-rate repair",
+      "T&M with a not-to-exceed cap",
+      "Flat rate for known scope + T&M for extras",
+      "Per-point pricing on repetitive rough-in",
+      "Written change-order rate agreed up front",
+    ],
+  },
+];
+
+const LANE_X = [24, 256, 488];
+const LANE_W = 208;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Which pricing model fits which work</title>
+  <desc>
+    Flat rate fits repeatable tasks done many times, service calls with visible scope, device and fixture swaps,
+    anything a customer wants a firm number for, and work where speed is an advantage. Time and materials fits
+    troubleshooting where scope is unknown by definition, old buildings with hidden conditions, work behind other
+    trades, emergency callouts, and anything that would need heavy padding. Useful hybrids include a flat diagnostic
+    fee followed by flat-rate repair, time and materials with a not-to-exceed cap, and flat rate for known scope with
+    time and materials for extras.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The dividing line is scope certainty, not job size</text>
+
+  {lanes.map((lane, j) => (
+    <g>
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="152" rx="10" fill={lane.accent} opacity="0.07" />
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="152" rx="10" fill="none" stroke={lane.accent} stroke-width="1.6" />
+      <text x={LANE_X[j] + 14} y="70" fill={lane.accent} font-family={FONT} font-size="10.5" font-weight="800">{lane.heading}</text>
+      {lane.items.map((item, k) => (
+        <g>
+          <circle cx={LANE_X[j] + 20} cy={95 + k * 22} r="2.3" fill={lane.accent} />
+          <text x={LANE_X[j] + 30} y={98 + k * 22} fill={C.dark} font-family={FONT} font-size="8">{item}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">Most successful shops use both — flat rate for the catalogue, T&M for the unknown, and a written rule for which applies.</text>
+</svg>

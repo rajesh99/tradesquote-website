@@ -1,0 +1,200 @@
+---
+title: "Three-Phase Power: Why √3, and How to Get Line Amps"
+meta_title: "Three-Phase Power Calculation: Why √3 and How to Get Amps (2026) | TradesQuote"
+description: "√3 is a vector sum, not a fudge factor. 120 V × √3 = 207.85 V — which is why 208 V exists. And three-phase delivers the same power at 57.7% of the single-phase current."
+image: /images/posts/three-phase-power-calculation-hero.svg
+date: 2026-08-04T15:45:00Z
+categories: ["electrical"]
+tags: ["three phase power","sqrt 3","line current","wye vs delta","208v"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import ThreePhaseSqrt3Diagram from "@/components/blog/three-phase/ThreePhaseSqrt3Diagram.astro";
+import ThreePhaseCurrentDiagram from "@/components/blog/three-phase/ThreePhaseCurrentDiagram.astro";
+import ThreePhaseWyeDeltaDiagram from "@/components/blog/three-phase/ThreePhaseWyeDeltaDiagram.astro";
+
+Most people learn the three-phase formula as an incantation with a mysterious 1.732 in it:
+
+```
+P = √3 × V_line × I_line × PF
+```
+
+**√3 is a vector sum.** Three voltages 120° apart, and the difference between any two of them is √3 times either one. That's all it is — and once you've seen it, two facts about the electrical world stop being arbitrary.
+
+**208 V exists because 120 × √3 = 207.85.** It isn't a design choice; it's what you get when you take a 120 V wye system and measure between two phases instead of phase to neutral.
+
+**Three-phase delivers the same power at 57.7% of the single-phase current** — because 1 ÷ √3 = 0.577. That's the entire commercial case for it, and it's copper you don't buy.
+
+## Where √3 Comes From
+
+<BlogInfographic
+  title="√3 is a vector sum, not a fudge factor"
+  caption="Line-to-line voltage is the vector difference of two line-to-neutral voltages 120° apart."
+>
+  <ThreePhaseSqrt3Diagram />
+</BlogInfographic>
+
+Three phase voltages of equal magnitude sit 120° apart in time. Measure from any phase to the neutral and you get the phase voltage. Measure between two phases and you're taking a **vector difference** of two quantities 120° apart — and the geometry of that gives you √3 times the magnitude of either.
+
+| System | V line-to-neutral | × √3 | Nominal line-to-line |
+| --- | --- | --- | --- |
+| 208Y/120 V | 120 V | 207.85 V | 208 V |
+| 480Y/277 V | 277 V | 479.78 V | 480 V |
+| 600Y/347 V | 347 V | 601.02 V | 600 V |
+
+**Every standard system voltage pair is this ratio, rounded.** 208 isn't exactly 207.85 and 480 isn't exactly 479.78, because the nominal figures are conventions rounded to sensible numbers. Working backwards: 480 ÷ √3 = **277.13**, and 208 ÷ √3 = **120.09**.
+
+This is also why a "120/208 V" panel gives you 120 V from any phase to neutral and 208 V between phases — and why **a two-pole 208 V circuit in a wye panel is not 240 V**. Heating elements and equipment rated 240 V will deliver only about 75% of rated output at 208 V, since power goes with the square of voltage. That catches people converting residential habits to commercial buildings.
+
+## Why Anyone Bothers
+
+<BlogInfographic
+  title="30 kW, four ways to deliver it"
+  caption="At unity power factor. Less current means smaller conductors for identical work."
+>
+  <ThreePhaseCurrentDiagram />
+</BlogInfographic>
+
+| Supply | Line current for 30 kW |
+| --- | --- |
+| 1φ, 240 V | 125.0 A |
+| 3φ, 208 V | 83.3 A |
+| 3φ, 240 V | 72.2 A |
+| 3φ, 480 V | 36.1 A |
+
+**At the same voltage, three-phase needs 72.2 A where single-phase needs 125.0 A** — exactly 57.7%, which is 1 ÷ √3. Same work, same voltage, four fifths of the copper by area and rather less than that by cost.
+
+Go to 480 V and you're at 36.1 A, which is why every commercial building of any size distributes at 480 V and transforms down locally. **Doubling the voltage halves the current, and halving the current quarters the I²R losses** — see **[Ohm's Law Explained](/blog/ohms-law-explained)**.
+
+Three-phase has two other advantages worth knowing:
+
+**Constant power delivery.** The instantaneous power in a balanced three-phase system is constant, where single-phase power pulses at twice the line frequency. That's why three-phase motors don't need starting capacitors or auxiliary windings, run smoother, and are physically smaller for a given output.
+
+**A rotating field for free.** Three phases 120° apart produce a rotating magnetic field directly. A single-phase motor has to fake one, which is what the start winding, capacitor and centrifugal switch are all for — and what makes them the parts that fail.
+
+## The Formulas
+
+```
+kVA = V_line × I_line × √3 ÷ 1000
+kW  = kVA × PF
+I   = W ÷ (V × √3 × PF)
+```
+
+The critical detail: **these use LINE voltage and LINE current** — the quantities you actually measure between conductors at a panel. You don't need to know or care whether the source is wye or delta.
+
+Worked, at 480 V three-phase drawing 100 A:
+
+- **kVA** = 480 × 100 × 1.732 ÷ 1000 = **83.14 kVA**
+- **kW at PF 0.85** = 83.14 × 0.85 = **70.67 kW**
+- **kW at PF 1.0** = **83.14 kW**
+
+And the same current at other voltages: 208 V gives 36.03 kVA and 30.62 kW at PF 0.85; 240 V gives 41.57 kVA and 35.33 kW.
+
+The kVA-versus-kW distinction, and why transformers are rated in the former, is in **[kVA vs kW](/blog/kva-vs-kw)**. For the reverse direction, **[Watts to Amps](/blog/watts-to-amps)** and **[Amps to Watts](/blog/amps-to-watts)**.
+
+## Wye and Delta
+
+<BlogInfographic
+  title="Wye and delta swap which quantity gets the √3"
+  caption="The power formula is identical for both, because it uses line quantities."
+>
+  <ThreePhaseWyeDeltaDiagram />
+</BlogInfographic>
+
+**Wye (star)** — three windings joined at a common point, which becomes the neutral.
+
+- V_line = √3 × V_phase
+- I_line = I_phase
+- **Has a neutral**, which is what makes 120 V loads possible
+
+**Delta** — three windings in a closed loop, no common point.
+
+- V_line = V_phase
+- I_line = √3 × I_phase
+- **No neutral** unless corner-grounded or centre-tapped
+
+The symmetry is the memorable part: **wye puts the √3 on the voltage, delta puts it on the current.** And the power formula is the same for both, because it's written in line quantities.
+
+Where you meet each: **208Y/120 and 480Y/277 are the commercial standards**, because the neutral gives you receptacle and lighting voltages from the same system. **Delta** turns up in utility distribution, in motor loads, and in 240 V three-phase services.
+
+### The high-leg delta trap
+
+A **centre-tapped (high-leg) delta** gives 240 V between phases, 120 V from two of the phases to the neutral, and **208 V from the third phase to neutral** — the "wild leg" or "high leg." Landing a 120 V load on that leg puts 208 V across it.
+
+**110.15 requires the high leg to be identified by an orange finish** or equivalent marking, and it's a genuine hazard in older commercial buildings where the marking has been lost. If you're working in a building with 240 V three-phase, measure every leg to neutral before assuming.
+
+## Where This Shows Up in Practice
+
+**Motor circuits.** Three-phase motor FLC comes from **Table 430.250**, and the conductor is sized at 125% of that while the breaker follows Table 430.52. A 10 HP motor at 460 V has a table FLC of 14.00 A — and the table value is used, not the nameplate. See **[Motor Full Load Amps](/blog/motor-full-load-amps)** and **[Motor Circuit Sizing](/blog/motor-circuit-sizing)**.
+
+**Transformer sizing.** A 75 kVA 480→208 V three-phase transformer has a primary FLA of 90.21 A and a secondary of 208.2 A, both from the √3 formula. **[Transformer Sizing](/blog/transformer-sizing-calculation)** works it through.
+
+**Voltage drop.** The three-phase form uses **1.732 rather than 2** as the multiplier, because current doesn't make a full round trip on a single pair:
+
+```
+1φ:  VD = 2 × K × I × L ÷ cmil
+3φ:  VD = 1.732 × K × I × L ÷ cmil
+```
+
+So a three-phase run of the same length, current and conductor has about **13% less drop** than single-phase. **[Voltage Drop](/blog/voltage-drop-calculation)** covers it.
+
+**Harmonics and the neutral.** In a wye system with significant electronic load, triplen harmonics **add** in the neutral rather than cancelling, so 310.15(E)(2) requires the neutral to be counted as a current-carrying conductor for derating. This is why a neutral can run hotter than the phases in an office fit-out — see **[Wire Derating Explained](/blog/wire-derating-nec)**.
+
+**Unbalanced loads.** The formulas above assume balance. Where single-phase loads are distributed unevenly across phases, current in the neutral rises and the simple formula understates what individual conductors carry. Balancing panel schedules across phases is real work, not bookkeeping.
+
+## Common Mistakes
+
+- **Treating √3 as a constant to memorise.** It's the vector difference of two phases 120° apart.
+- **Assuming 208 V and 240 V are interchangeable.** A 240 V element on 208 V delivers about 75% of its rating.
+- **Using phase values in the power formula.** It takes line voltage and line current.
+- **Using 2 instead of 1.732 for three-phase voltage drop.** The three-phase multiplier is √3.
+- **Landing a 120 V load on a high-leg delta's wild leg.** That leg is 208 V to neutral; 110.15 requires orange marking.
+- **Sizing a three-phase motor circuit from nameplate amps.** Conductors and OCPD use the Table 430.250 value.
+- **Ignoring harmonic neutral current in a wye system.** 310.15(E)(2) makes you count it.
+- **Applying the balanced formula to a badly unbalanced panel.** It understates individual conductor current.
+- **Reading a three-phase generator's kW as kVA.** They're rated at 0.8 PF, so 20 kW is 25 kVA.
+
+## Run the Numbers
+
+> **[Three-Phase Power Calculator](/calculators/electrical/electrical-three-phase-power-calculator)** — enter any three of line voltage, line current, kW, kVA and power factor and it returns the rest, with the √3 shown explicitly rather than buried.
+
+Pair it with the **[kVA Calculator](/calculators/electrical/electrical-kva-calculator)** for the power triangle, the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)** for the 1.732 multiplier, and the **[Motor FLA Calculator](/calculators/electrical/electrical-motor-fla-calculator)** for three-phase motor circuits. The **[Electrical Formulas Cheat Sheet](/blog/electrical-formulas-cheat-sheet)** collects the set, and the **[formulas reference](/calculators/electrical/formulas#section-power-conversions)** has them alongside their derivations.
+
+*Sources & standards: the √3 relationship and the power formulas are physics. NEC (NFPA 70) 2023 — 110.15 for high-leg identification, 310.15(E)(2) for harmonic neutral counting, Table 430.250 for three-phase motor FLC, Table 430.52 for motor OCPD, and the informational notes to 210.19(A) and 215.2(A) for the voltage-drop design targets. Nominal system voltages follow ANSI C84.1.*
+
+---
+
+## FAQ
+
+### Why is there a √3 in three-phase power calculations?
+
+Because line-to-line voltage is the vector difference between two line-to-neutral voltages that are 120° apart, and that difference works out to √3 — about 1.732 — times either one. It isn't a correction factor or a convention; it falls out of the geometry. The same relationship is why 120 V line-to-neutral gives 208 V line-to-line.
+
+### How do I calculate three-phase amps?
+
+Divide the power by the voltage, √3 and the power factor: I = W ÷ (V × 1.732 × PF). For 30 kW at 480 V and unity power factor that's 36.1 A. Use the *line* voltage and you get the *line* current, which is what you measure between conductors — the wye or delta configuration of the source doesn't change it.
+
+### Why is 208 volts not 240 volts?
+
+Because 208 V comes from measuring between two phases of a 120 V wye system: 120 × √3 = 207.85, rounded to 208. A 240 V single-phase supply is two 120 V legs 180° apart, so they add directly. The practical consequence is that a 240 V heating element on 208 V delivers only about 75% of its rating, since power varies with the square of voltage.
+
+### How much current does three-phase save?
+
+At the same voltage, three-phase carries the same power at 57.7% of the single-phase current — exactly 1 ÷ √3. For 30 kW at 240 V that's 72.2 A instead of 125.0 A. Combined with a higher distribution voltage the saving compounds: the same 30 kW at 480 V three-phase is only 36.1 A.
+
+### What is the difference between wye and delta?
+
+In a wye the three windings share a common point that becomes the neutral, line voltage is √3 times phase voltage, and line current equals phase current. In a delta the windings form a closed loop, line voltage equals phase voltage, and line current is √3 times phase current. Wye's neutral is what allows 120 V loads, which is why 208Y/120 and 480Y/277 dominate commercial buildings.
+
+### What is a high-leg delta?
+
+A centre-tapped delta giving 240 V between phases, 120 V from two phases to neutral, and 208 V from the third phase to neutral — the "high leg" or "wild leg." NEC 110.15 requires that conductor to be identified by an orange finish. Landing a 120 V load on it applies 208 V, so in any building with 240 V three-phase, measure each leg to neutral before connecting.
+
+### Do I use 2 or 1.732 for three-phase voltage drop?
+
+1.732. The single-phase formula uses 2 because current travels out and back on a pair of conductors; in a balanced three-phase system the return is distributed across the other phases, and the multiplier becomes √3. A three-phase run therefore has about 13% less drop than single-phase for the same current, length and conductor.
+
+### Does the neutral carry current in a three-phase system?
+
+In a perfectly balanced system with linear loads, almost none — the three phase currents cancel at the neutral point. Two things break that. Unbalanced single-phase loads put the difference on the neutral. And triplen harmonics from electronic loads *add* rather than cancel, which can make neutral current approach or exceed phase current — the reason 310.15(E)(2) requires the neutral to be counted as current-carrying for derating.

@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Simple payback ignores four things, two of which help and two of which hurt.
+ * Being explicit about both directions is what separates an honest estimate from
+ * a sales figure.
+ */
+const factors = [
+  {
+    dir: "HELPS",
+    accent: C.green,
+    name: "Relamping labour avoided",
+    detail: "A 400 W metal halide at 20,000 h needs replacing three times over an LED's life — plus a lift each time.",
+  },
+  {
+    dir: "HELPS",
+    accent: C.green,
+    name: "Utility rebates",
+    detail: "Prescriptive per-fixture rebates are common for commercial retrofits and can cover a third of the cost.",
+  },
+  {
+    dir: "HELPS",
+    accent: C.green,
+    name: "Cooling load reduced",
+    detail: "Every watt of lighting was a watt of heat the air conditioning had to remove.",
+  },
+  {
+    dir: "HURTS",
+    accent: C.red,
+    name: "Heating load increased",
+    detail: "The same waste heat was doing useful work in winter. In a heating-dominated climate this claws some saving back.",
+  },
+  {
+    dir: "HURTS",
+    accent: C.red,
+    name: "Driver failures",
+    detail: "LED lamps rarely fail; drivers do. Warranty terms and driver access matter more than lumen maintenance.",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>What simple payback leaves out</title>
+  <desc>
+    Simple payback ignores five factors. Three help: relamping labour avoided, since a 400 watt metal halide needs
+    replacing three times over an LED's life; utility rebates, which can cover a third of a commercial retrofit; and
+    reduced cooling load, since every watt of lighting was heat the air conditioning had to remove. Two hurt: increased
+    heating load in a heating-dominated climate, because that waste heat was doing useful work in winter; and driver
+    failures, since LED drivers fail long before the diodes do.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What a simple payback number leaves out</text>
+
+  {factors.map((f, i) => {
+    const y = 46 + i * 38;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="32" rx="7" fill={f.accent} opacity="0.06" />
+        <rect x="24" y={y} width="4" height="32" rx="2" fill={f.accent} />
+        <rect x="38" y={y + 7} width="52" height="17" rx="4" fill={f.accent} />
+        <text x="64" y={y + 19} text-anchor="middle" fill={C.white} font-family={FONT} font-size="8" font-weight="800">{f.dir}</text>
+        <text x="102" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{f.name}</text>
+        <text x="102" y={y + 26} fill={C.muted} font-family={FONT} font-size="8.5">{f.detail}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="238" fill={C.muted} font-family={FONT} font-size="10">On net these usually shorten the payback — but say which way each one points rather than quoting only the helpful ones.</text>
+</svg>

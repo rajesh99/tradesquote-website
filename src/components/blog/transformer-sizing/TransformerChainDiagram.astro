@@ -1,0 +1,80 @@
+---
+import {
+  nextStandardTransformerKva, transformerFla, transformerPrimaryMaxPercent,
+  TRANSFORMER_SECONDARY_MAX_PERCENT, prevStandardOcpd, nextStandardOcpd,
+  findSizeByAmpacity, sizeLabel, fmt,
+} from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The whole calculation in one pass, exactly as the transformer calculator runs
+ * it. The asymmetry is the point: the primary device rounds DOWN to stay under
+ * its ceiling, while the secondary rounds UP under Table 450.3(B) Note 1.
+ */
+const LOAD_KVA = 60;
+const GROWTH = 0.25;
+const PRI_V = 480;
+const SEC_V = 208;
+
+const kva = nextStandardTransformerKva(LOAD_KVA * (1 + GROWTH));
+const priFla = transformerFla(kva, PRI_V, "3ph");
+const secFla = transformerFla(kva, SEC_V, "3ph");
+
+const priPct = transformerPrimaryMaxPercent(priFla, true);
+const priCeiling = (priFla * priPct) / 100;
+const priPick = prevStandardOcpd(priCeiling);
+
+const secCeiling = (secFla * TRANSFORMER_SECONDARY_MAX_PERCENT) / 100;
+const secPick = nextStandardOcpd(secCeiling);
+
+const priCond = findSizeByAmpacity(priPick, "copper", 75);
+const secCond = findSizeByAmpacity(secCeiling, "copper", 75);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>Transformer sizing from load to conductors</title>
+  <desc>
+    A 60 kVA load plus 25 percent growth is 75 kVA, which is a standard rating. At 480 volts three-phase the primary
+    full-load current is 90.21 amps and at 208 volts the secondary is 208.18 amps. With secondary protection provided,
+    the primary device may go to 250 percent, or 225.5 amps, rounded down to 225 amps on a 4/0 copper conductor. The
+    secondary device is 125 percent of 208.18, or 260.2 amps, rounded up to 300 amps under Table 450.3(B) Note 1, on a
+    300 kcmil copper conductor.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`${LOAD_KVA} kVA of load, ${GROWTH * 100}% growth, ${PRI_V} → ${SEC_V} V three-phase`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`${LOAD_KVA} × ${1 + GROWTH} = ${fmt(LOAD_KVA * (1 + GROWTH), 0)} kVA → the ${kva} kVA standard rating.`}</text>
+
+  {/* the transformer */}
+  <rect x="290" y="78" width="140" height="118" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2.2" />
+  <text x="360" y="106" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="20" font-weight="800">{`${kva}`}</text>
+  <text x="360" y="122" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="11" font-weight="700">kVA</text>
+  <circle cx="340" cy="152" r="15" fill="none" stroke={C.primary} stroke-width="2" />
+  <circle cx="380" cy="152" r="15" fill="none" stroke={C.primary} stroke-width="2" />
+  <text x="360" y="186" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{`${PRI_V} → ${SEC_V} V`}</text>
+
+  {/* primary side */}
+  <rect x="24" y="78" width="244" height="118" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1.6" />
+  <text x="40" y="98" fill={C.blue} font-family={FONT} font-size="10" font-weight="800">PRIMARY · 450.3(B)</text>
+  <text x="40" y="120" fill={C.dark} font-family={FONT} font-size="10">{`FLA ${fmt(priFla, 2)} A`}</text>
+  <text x="40" y="138" fill={C.dark} font-family={FONT} font-size="10">{`× ${priPct}% = ${fmt(priCeiling, 1)} A ceiling`}</text>
+  <text x="40" y="158" fill={C.blue} font-family={FONT} font-size="14" font-weight="800">{`${priPick} A device`}</text>
+  <text x="40" y="176" fill={C.muted} font-family={FONT} font-size="8.5">{`rounded DOWN · ${priCond ? sizeLabel(priCond.label) : "parallel"} Cu`}</text>
+
+  {/* secondary side */}
+  <rect x="452" y="78" width="244" height="118" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="468" y="98" fill={C.orange} font-family={FONT} font-size="10" font-weight="800">SECONDARY · 450.3(B)</text>
+  <text x="468" y="120" fill={C.dark} font-family={FONT} font-size="10">{`FLA ${fmt(secFla, 2)} A`}</text>
+  <text x="468" y="138" fill={C.dark} font-family={FONT} font-size="10">{`× ${TRANSFORMER_SECONDARY_MAX_PERCENT}% = ${fmt(secCeiling, 1)} A`}</text>
+  <text x="468" y="158" fill={C.orange} font-family={FONT} font-size="14" font-weight="800">{`${secPick} A device`}</text>
+  <text x="468" y="176" fill={C.muted} font-family={FONT} font-size="8.5">{`rounded UP, Note 1 · ${secCond ? sizeLabel(secCond.label) : "parallel"} Cu`}</text>
+
+  {/* connectors */}
+  <line x1="268" y1="137" x2="288" y2="137" stroke={C.border} stroke-width="2" />
+  <line x1="432" y1="137" x2="450" y2="137" stroke={C.border} stroke-width="2" />
+
+  <rect x="24" y="212" width="672" height="58" rx="10" fill={C.white} stroke={C.border} />
+  <text x="40" y="234" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">The two sides round in opposite directions</text>
+  <text x="40" y="252" fill={C.muted} font-family={FONT} font-size="9.5">{`Primary: ${fmt(priCeiling, 1)} A is a maximum, so round down to ${priPick} A. Secondary: Note 1 permits the next higher rating, so ${fmt(secCeiling, 1)} A becomes ${secPick} A.`}</text>
+  <text x="40" y="266" fill={C.muted} font-family={FONT} font-size="9">{`Note the primary conductor is sized to the ${priPick} A device, not to 125% of FLA — using the 250% allowance costs copper.`}</text>
+</svg>

@@ -1,0 +1,73 @@
+---
+import { SQRT3, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Wye and delta, and the symmetry that makes them easy to remember: wye divides
+ * the voltage by √3 and passes the current straight through; delta does the
+ * reverse. The power formula is identical for both, which is the point.
+ */
+const configs = [
+  {
+    name: "Wye (star)",
+    accent: C.blue,
+    voltage: "V_line = √3 × V_phase",
+    current: "I_line = I_phase",
+    neutral: "Has a neutral — supports 120 V loads",
+    use: "208Y/120 and 480Y/277 — the commercial standard",
+  },
+  {
+    name: "Delta",
+    accent: C.orange,
+    voltage: "V_line = V_phase",
+    current: "I_line = √3 × I_phase",
+    neutral: "No neutral (unless corner- or centre-tapped)",
+    use: "Motor loads, utility distribution, 240 V 3φ services",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Wye and delta configurations compared</title>
+  <desc>
+    In a wye configuration the line voltage is the square root of three times the phase voltage and the line current
+    equals the phase current. It has a neutral, which is what allows 120 volt loads, and gives the standard 208Y/120
+    and 480Y/277 systems. In a delta configuration the line voltage equals the phase voltage and the line current is
+    the square root of three times the phase current. It has no neutral unless corner or centre tapped. The power
+    formula is the same for both.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Wye and delta swap which quantity gets the √3</text>
+
+  {/* wye symbol */}
+  <g transform="translate(96,120)">
+    <line x1="0" y1="0" x2="0" y2="-40" stroke={C.blue} stroke-width="3.4" />
+    <line x1="0" y1="0" x2="-35" y2="20" stroke={C.blue} stroke-width="3.4" />
+    <line x1="0" y1="0" x2="35" y2="20" stroke={C.blue} stroke-width="3.4" />
+    <circle cx="0" cy="0" r="4" fill={C.dark} />
+    <text x="0" y="40" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NEUTRAL</text>
+  </g>
+
+  {/* delta symbol */}
+  <g transform="translate(96,206)">
+    <path d="M 0 -22 L 32 24 L -32 24 Z" fill="none" stroke={C.orange} stroke-width="3.4" />
+  </g>
+
+  {configs.map((cfg, i) => {
+    const y = 62 + i * 92;
+    return (
+      <g>
+        <rect x="160" y={y} width="536" height="82" rx="10" fill={cfg.accent} opacity="0.06" />
+        <rect x="160" y={y} width="536" height="82" rx="10" fill="none" stroke={cfg.accent} stroke-width="1.6" />
+        <text x="178" y={y + 22} fill={cfg.accent} font-family={FONT} font-size="12.5" font-weight="800">{cfg.name}</text>
+        <text x="178" y={y + 42} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{cfg.voltage}</text>
+        <text x="178" y={y + 58} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{cfg.current}</text>
+        <text x="178" y={y + 74} fill={C.muted} font-family={FONT} font-size="8.5">{cfg.neutral}</text>
+        <text x="410" y={y + 42} fill={C.muted} font-family={FONT} font-size="8.5">{cfg.use}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">{`P = √3 × V_line × I_line × PF works for both. √3 = ${fmt(SQRT3, 4)}, and the line quantities are what you measure.`}</text>
+</svg>

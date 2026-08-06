@@ -1,0 +1,70 @@
+---
+import { usd } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Seven scenarios through the estimate calculator's own arithmetic — labour at
+ * $95/h plus material, 15% overhead, 25% margin. The spread is entirely a
+ * function of hours, which is the point.
+ */
+const RATE = 95;
+const OVERHEAD = 0.15;
+const MARGIN = 0.25;
+
+const rows = [
+  { name: "Receptacle on an existing circuit", detail: "open basement or garage wall", hours: 1.5, material: 15 },
+  { name: "Same, fishing a finished wall", detail: "drywall, insulation, a fire block", hours: 3, material: 20 },
+  { name: "Exterior GFCI receptacle", detail: "weatherproof box and in-use cover", hours: 2.5, material: 45 },
+  { name: "New 20 A circuit, open access", detail: "unfinished basement to panel", hours: 4, material: 60 },
+  { name: "New 20 A circuit, finished walls", detail: "two floors, fished, patched", hours: 6, material: 70 },
+  { name: "240 V range or dryer outlet", detail: "10 AWG or larger, new 2-pole breaker", hours: 5, material: 120 },
+  { name: "Kitchen small-appliance circuit", detail: "four outlets, GFCI, two circuits' worth", hours: 7, material: 140 },
+].map((r) => {
+  const labor = r.hours * RATE;
+  const direct = labor + r.material;
+  const breakEven = direct * (1 + OVERHEAD);
+  return { ...r, labor, direct, breakEven, price: breakEven / (1 - MARGIN) };
+});
+
+const peak = Math.max(...rows.map((r) => r.price));
+const BAR_X = 290;
+const BAR_MAX = 288;
+const bars = rows.map((r) => ({ ...r, width: Math.max(26, Math.round((r.price / peak) * BAR_MAX)) }));
+const spread = rows[rows.length - 2].price / rows[0].price;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Installed price for seven outlet scenarios</title>
+  <desc>
+    At 95 dollars an hour with 15 percent overhead and a 25 percent margin: a receptacle added to an existing circuit
+    with open access costs 242 dollars, fishing a finished wall 468, an exterior GFCI 433, a new 20 amp circuit with
+    open access 675, the same circuit through finished walls 981, a 240 volt range or dryer outlet 912, and a kitchen
+    small-appliance circuit with four outlets 1,234 dollars.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Seven scenarios at $${RATE}/h, ${OVERHEAD * 100}% overhead, ${MARGIN * 100}% margin`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Every difference below is hours. The devices are almost identical in cost.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SCOPE</text>
+  <text x="228" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOURS</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PRICE TO THE CUSTOMER</text>
+
+  {bars.map((r, i) => {
+    const y = 86 + i * 29;
+    const accent = r.price < 400 ? C.green : r.price < 800 ? C.blue : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{r.name}</text>
+        <text x="28" y={y + 23} fill={C.muted} font-family={FONT} font-size="7.5">{r.detail}</text>
+        <text x="228" y={y + 17} fill={C.muted} font-family={FONT} font-size="9.5">{`${r.hours} h`}</text>
+        <rect x={BAR_X} y={y + 1} width={r.width} height="19" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={r.width} height="19" rx="5" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{usd(r.price)}</text>
+        <text x={BAR_X + r.width + 8} y={y + 15} fill={C.muted} font-family={FONT} font-size="8">{`cost ${usd(r.breakEven)}`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">{`A ${spread.toFixed(1)}× spread on what the customer sees as the same finished outlet. Access is what they're paying for.`}</text>
+</svg>

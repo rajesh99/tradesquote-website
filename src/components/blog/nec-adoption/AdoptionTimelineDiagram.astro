@@ -1,0 +1,63 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The publication timeline against a typical adoption window. Drawn rather than
+ * tabulated because the overlap is the point: at any given moment several
+ * editions are simultaneously in force somewhere.
+ */
+const editions = [
+  { year: 2017, published: 2016 },
+  { year: 2020, published: 2019 },
+  { year: 2023, published: 2022 },
+  { year: 2026, published: 2025 },
+];
+
+const X0 = 118;
+const X1 = 690;
+const START = 2016;
+const END = 2029;
+const scale = (y: number) => X0 + ((y - START) / (END - START)) * (X1 - X0);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>NEC publication dates against typical adoption windows</title>
+  <desc>
+    The 2017 edition was published in 2016, the 2020 edition in 2019, the 2023 edition in 2022 and the 2026 edition in
+    2025 — each about a year before its edition year. Typical state adoption then follows one to four years after
+    publication, so the enforcement windows overlap heavily and several editions are simultaneously in force in
+    different jurisdictions at any moment.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Several editions are always in force at once</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Solid marks publication; the bar is a typical adoption-and-enforcement window. Overlap is normal.</text>
+
+  {/* axis */}
+  <line x1={X0} y1="196" x2={X1} y2="196" stroke={C.border} stroke-width="1.4" />
+  {[2016, 2019, 2022, 2025, 2028].map((y) => (
+    <g>
+      <line x1={scale(y)} y1="196" x2={scale(y)} y2="201" stroke={C.muted} stroke-width="1.2" />
+      <text x={scale(y)} y="214" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{y}</text>
+    </g>
+  ))}
+
+  {editions.map((e, i) => {
+    const y = 74 + i * 28;
+    const px = scale(e.published);
+    const adoptStart = scale(e.published + 1);
+    const adoptEnd = scale(e.published + 4);
+    const accent = [C.muted, C.blue, C.primary, C.orange][i];
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`NEC ${e.year}`}</text>
+        <rect x={adoptStart} y={y + 2} width={adoptEnd - adoptStart} height="18" rx="5" fill={accent} opacity="0.16" />
+        <rect x={adoptStart} y={y + 2} width={adoptEnd - adoptStart} height="18" rx="5" fill="none" stroke={accent} stroke-width="1.3" stroke-dasharray="4 3" />
+        <circle cx={px} cy={y + 11} r="5" fill={accent} />
+        <text x={px} y={y - 1} text-anchor="middle" fill={accent} font-family={FONT} font-size="7.5" font-weight="700">{`pub ${e.published}`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="236" fill={C.muted} font-family={FONT} font-size="10">Adoption windows are indicative, not a schedule. Some jurisdictions skip an edition entirely; a few adopt none.</text>
+</svg>

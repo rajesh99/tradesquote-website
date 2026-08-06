@@ -1,0 +1,76 @@
+---
+import { motorFlc, TABLE_430_52, motorOcpdAbsoluteMax, prevStandardOcpd, egcSize, MOTOR_DEVICE_LABELS, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Table 430.52 by device type on one motor. The spread is enormous — 20 A to
+ * 150 A on the same 14 A motor — and the device you choose also changes the EGC,
+ * because Table 250.122 is keyed to the OCPD rating rather than the load.
+ */
+const flc = motorFlc(10, "3ph", 460)!;
+const DEVICES = ["dualElementFuse", "inverseTime", "nonTimeDelayFuse", "instantTrip"] as const;
+
+const rows = DEVICES.map((device) => {
+  const pct = TABLE_430_52.designB[device];
+  const ceiling = flc * (pct / 100);
+  const pick = prevStandardOcpd(ceiling);
+  return {
+    device,
+    label: MOTOR_DEVICE_LABELS[device],
+    pct,
+    ceiling,
+    pick,
+    exception: motorOcpdAbsoluteMax(flc, device),
+    egc: egcSize(pick, "copper"),
+  };
+});
+
+const peak = Math.max(...rows.map((r) => r.pick));
+const BAR_X = 268;
+const BAR_MAX = 250;
+const bars = rows.map((r) => ({ ...r, width: Math.max(24, Math.round((r.pick / peak) * BAR_MAX)) }));
+const lowest = rows.reduce((a, b) => (a.pick < b.pick ? a : b));
+const highest = rows.reduce((a, b) => (a.pick > b.pick ? a : b));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Table 430.52 percentages by protective device type</title>
+  <desc>
+    On a Design B motor with a 14 amp full-load current, a dual-element time-delay fuse is permitted at 175 percent
+    giving 24.5 amps and a 20 amp device, an inverse-time breaker at 250 percent giving 35.0 amps exactly, a
+    non-time-delay fuse at 300 percent giving 42 amps and a 40 amp device, and an instantaneous-trip breaker at 1,100
+    percent giving 154 amps and a 150 amp device. The equipment grounding conductor grows with the device, from 12 AWG
+    to 6 AWG.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The device type changes the answer sevenfold</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Table 430.52 for a Design B motor, FLC ${flc} A. Same motor, same conductors.`}</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DEVICE</text>
+  <text x="212" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">%</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">STANDARD RATING SELECTED</text>
+  <text x="596" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">EGC</text>
+
+  {bars.map((r, i) => {
+    const y = 86 + i * 32;
+    const exact = Math.abs(r.ceiling - r.pick) < 0.01;
+    const accent = exact ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{r.label}</text>
+        <text x="212" y={y + 14} fill={C.muted} font-family={FONT} font-size="9.5">{`${r.pct}%`}</text>
+        <rect x={BAR_X} y={y + 1} width={r.width} height="19" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={r.width} height="19" rx="5" fill="none" stroke={accent} stroke-width={exact ? 2.2 : 1.4} />
+        <text x={BAR_X + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{`${r.pick} A`}</text>
+        <text x={BAR_X + r.width + 8} y={y + 15} fill={C.muted} font-family={FONT} font-size="8">
+          {`from ${fmt(r.ceiling, 1)} A${exact ? " — exact" : ""}`}
+        </text>
+        <text x="596" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{`${r.egc} AWG`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">{`${lowest.pick} A to ${highest.pick} A on the same motor. The inverse-time breaker's 250% lands exactly on a standard rating.`}</text>
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">430.52(C)(1) Exception No. 2 raises these ceilings where the motor won't start — to 56 A for the breaker here.</text>
+</svg>

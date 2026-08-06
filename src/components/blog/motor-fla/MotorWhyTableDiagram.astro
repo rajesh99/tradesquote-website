@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Why the code uses a table value rather than the nameplate in front of you.
+ * The reasoning is worth stating because it also explains when the table is
+ * conservative and when a nameplate exceeds it — the case people miss.
+ */
+const reasons = [
+  {
+    accent: C.blue,
+    heading: "Why the table for conductors",
+    points: [
+      "A motor can be replaced without rewiring",
+      "Table values bound the whole product class",
+      "Design is possible before the motor is chosen",
+      "Removes nameplate variation between makers",
+    ],
+  },
+  {
+    accent: C.orange,
+    heading: "Why the nameplate for overload",
+    points: [
+      "The overload protects this specific motor",
+      "It must trip on this motor's real thermal limit",
+      "A table value would run it too hot",
+      "430.32(C) caps the setting at 140%",
+    ],
+  },
+  {
+    accent: C.red,
+    heading: "When the nameplate exceeds the table",
+    points: [
+      "High-efficiency and inverter-duty motors",
+      "Conductors still follow the table by 430.6(A)(1)",
+      "But 430.22 requires adequate ampacity — check both",
+      "Multispeed and wound-rotor have their own rules",
+    ],
+  },
+];
+
+const LANE_X = [24, 256, 488];
+const LANE_W = 208;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Why the code uses a table value rather than the nameplate</title>
+  <desc>
+    Conductors use the table because a motor can be replaced without rewiring, because table values bound the whole
+    product class, because design must be possible before the motor is selected, and because it removes nameplate
+    variation between manufacturers. The overload uses the nameplate because it protects one specific motor and must
+    trip at that motor's real thermal limit, with 430.32(C) capping the setting at 140 percent. Where a nameplate
+    exceeds the table value, as on some high-efficiency and inverter-duty motors, conductors still follow the table
+    but must remain adequate under 430.22.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why two sources, and where it gets awkward</text>
+
+  {reasons.map((r, j) => (
+    <g>
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="152" rx="10" fill={r.accent} opacity="0.07" />
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="152" rx="10" fill="none" stroke={r.accent} stroke-width="1.6" />
+      <text x={LANE_X[j] + 14} y="70" fill={r.accent} font-family={FONT} font-size="10.5" font-weight="800">{r.heading}</text>
+      {r.points.map((p, k) => (
+        <g>
+          <circle cx={LANE_X[j] + 20} cy={95 + k * 26} r="2.4" fill={r.accent} />
+          <text x={LANE_X[j] + 30} y={98 + k * 26} fill={C.dark} font-family={FONT} font-size="8.5">{p}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">The table is a design tool for the circuit; the nameplate is a protection setting for one machine.</text>
+</svg>

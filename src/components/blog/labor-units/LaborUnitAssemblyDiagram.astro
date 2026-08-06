@@ -1,0 +1,77 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A receptacle assembly built from its components, because estimating one line
+ * item per device is what makes a takeoff fast — and because the cable pull is
+ * usually the largest single component, which surprises people.
+ */
+const CABLE_FT = 25;
+const CABLE_PER_FT = 0.01;
+
+const parts = [
+  { name: "4-square box with bracket", unit: 0.25, qty: 1, note: "set, level, secure" },
+  { name: `12/2 NM cable, ${CABLE_FT} ft`, unit: CABLE_PER_FT, qty: CABLE_FT, note: "drill, pull, staple" },
+  { name: "Duplex device and plate", unit: 0.2, qty: 1, note: "make up, mount, plate" },
+  { name: "Trim and test", unit: 0.1, qty: 1, note: "tester, label, punch" },
+].map((p) => ({ ...p, hours: p.unit * p.qty }));
+
+const total = parts.reduce((s, p) => s + p.hours, 0);
+
+const BAR_X = 300;
+const BAR_MAX = 300;
+let running = 0;
+const segments = parts.map((p) => {
+  const x = BAR_X + (running / total) * BAR_MAX;
+  const w = (p.hours / total) * BAR_MAX;
+  running += p.hours;
+  return { ...p, x, w, pct: (p.hours / total) * 100 };
+});
+const biggest = parts.reduce((a, b) => (a.hours > b.hours ? a : b));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>A receptacle assembly built from labour units</title>
+  <desc>
+    One duplex receptacle assembly comprises a 4-square box with bracket at 0.25 hours, 25 feet of 12/2 NM cable at
+    0.01 hours per foot for 0.25 hours, the duplex device and plate at 0.20 hours, and trim and test at 0.10 hours —
+    totalling 0.80 hours. The box and the cable pull are the two largest components at 31 percent each, which surprises
+    people who assume the device is the work.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One receptacle, four labour units</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">New-construction "normal conditions" figures. An assembly is a bundle you estimate once and count many times.</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">COMPONENT</text>
+  <text x="228" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOURS</text>
+  <text x={BAR_X} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SHARE OF THE ASSEMBLY</text>
+
+  {parts.map((p, i) => {
+    const y = 88 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{p.name}</text>
+        <text x="28" y={y + 24} fill={C.muted} font-family={FONT} font-size="7.5">{p.note}</text>
+        <text x="228" y={y + 18} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{fmt(p.hours, 2)}</text>
+      </g>
+    );
+  })}
+
+  {/* stacked share bar */}
+  {segments.map((s, i) => (
+    <g>
+      <rect x={s.x} y="212" width={s.w} height="26" fill={i % 2 === 0 ? C.primary : C.blue} opacity="0.22" />
+      <rect x={s.x} y="212" width={s.w} height="26" fill="none" stroke={i % 2 === 0 ? C.primary : C.blue} stroke-width="1.3" />
+      {s.pct > 12 && (
+        <text x={s.x + s.w / 2} y="229" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="800">{`${fmt(s.pct, 0)}%`}</text>
+      )}
+    </g>
+  ))}
+
+  <rect x="24" y="184" width="248" height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="38" y="201" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`Assembly total: ${fmt(total, 2)} h`}</text>
+
+  <text x="24" y="254" fill={C.muted} font-family={FONT} font-size="10">{`The ${biggest.name.split(",")[0].toLowerCase()} is the largest component — not the device everyone pictures.`}</text>
+</svg>

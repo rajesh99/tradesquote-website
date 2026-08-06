@@ -1,0 +1,53 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The ten, each paired with the misremembered rule behind it — because these are
+ * almost never carelessness. They're rules people learned slightly wrong, which
+ * is why the same ten recur.
+ */
+const violations = [
+  { n: 1, item: "Box fill exceeded", rule: "314.16", cause: "Device yokes count twice; grounds count once collectively" },
+  { n: 2, item: "Neutral bonded in a subpanel", rule: "250.24(A)(5)", cause: "Exactly one bond belongs in the system, at the service" },
+  { n: 3, item: "Missing AFCI or GFCI", rule: "210.12 / 210.8", cause: "Dual-function needed where both apply" },
+  { n: 4, item: "Conductor and OCPD mismatch", rule: "240.4(D)", cause: "14 AWG caps at 15 A, 12 at 20 A, 10 at 30 A" },
+  { n: 5, item: "No neutral at a switch box", rule: "404.2(C)", cause: "Required in most locations, not just where a dimmer goes" },
+  { n: 6, item: "Cable support and staples", rule: "334.30", cause: "Within 12 in of a box, then every 4.5 ft" },
+  { n: 7, item: "Backfed breaker unsecured", rule: "408.36(D)", cause: "Needs a fastener requiring more than a pull" },
+  { n: 8, item: "Panel not legibly labelled", rule: "408.4(A)", cause: "Every circuit, at the panel, in a durable form" },
+  { n: 9, item: "No disconnect at a detached building", rule: "225.31", cause: "A garage subpanel needs a main breaker" },
+  { n: 10, item: "Working space obstructed", rule: "110.26", cause: "30 in wide, 36 in deep, 6 ft 7 in high — and kept clear" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" fill="none" aria-hidden="true">
+  <title>The ten electrical violations flagged most often</title>
+  <desc>
+    Box fill exceeded under 314.16, because device yokes count twice and grounds count once collectively. A neutral
+    bonded in a subpanel violating 250.24(A)(5). Missing AFCI or GFCI protection under 210.12 and 210.8. Conductor and
+    overcurrent device mismatches under 240.4(D). No neutral at a switch box under 404.2(C). Cable support and staple
+    spacing under 334.30. An unsecured backfed breaker under 408.36(D). An unlabelled panel under 408.4(A). No
+    disconnect at a detached building under 225.31. And obstructed working space under 110.26.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="324" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Ten items, and the misremembered rule behind each</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">These are rarely carelessness. They're rules learned slightly wrong, which is why the same ten recur.</text>
+
+  {violations.map((v, i) => {
+    const y = 62 + i * 27;
+    const accent = i < 3 ? C.red : i < 6 ? C.orange : C.blue;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="23" rx="5" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="23" rx="2" fill={accent} />
+        <text x="40" y={y + 15} fill={accent} font-family={FONT} font-size="9" font-weight="800">{v.n}</text>
+        <text x="58" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{v.item}</text>
+        <text x="272" y={y + 15} fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">{v.rule}</text>
+        <text x="368" y={y + 15} fill={C.muted} font-family={FONT} font-size="8">{v.cause}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="326" fill={C.muted} font-family={FONT} font-size="10">Not a ranked survey — a practitioner's list. Your AHJ will have its own favourites worth asking about.</text>
+</svg>

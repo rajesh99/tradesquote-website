@@ -1,0 +1,89 @@
+---
+import { SQRT3, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Where √3 comes from, drawn as phasors. The line-to-line voltage is the vector
+ * difference of two line-to-neutral voltages 120° apart, and that difference is
+ * √3 times either one. Every nominal system voltage pair is this ratio.
+ */
+const systems = [
+  { ln: 120, ll: 208, label: "208Y/120 V" },
+  { ln: 277, ll: 480, label: "480Y/277 V" },
+  { ln: 347, ll: 600, label: "600Y/347 V" },
+];
+
+const rows = systems.map((s) => ({
+  ...s,
+  exact: s.ln * SQRT3,
+  error: ((s.ll - s.ln * SQRT3) / (s.ln * SQRT3)) * 100,
+}));
+
+const CX = 148;
+const CY = 150;
+const R = 74;
+const phasors = [
+  { deg: 0, name: "A", accent: C.red },
+  { deg: 120, name: "B", accent: C.green },
+  { deg: 240, name: "C", accent: C.blue },
+].map((p) => ({
+  ...p,
+  x: CX + R * Math.cos((p.deg * Math.PI) / 180),
+  y: CY - R * Math.sin((p.deg * Math.PI) / 180),
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where the square root of three comes from</title>
+  <desc>
+    Three line-to-neutral voltages sit 120 degrees apart. The line-to-line voltage is the vector difference between
+    two of them, which is the square root of three — 1.732 — times either one. So 120 volts line-to-neutral gives
+    207.85 volts line-to-line, nominally 208; 277 volts gives 479.78, nominally 480; and 347 volts gives 601.02,
+    nominally 600. Every standard system voltage pair is this same ratio, rounded.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">√3 is a vector sum, not a fudge factor</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Line-to-line voltage is the vector difference of two line-to-neutral voltages 120° apart.</text>
+
+  {/* phasor diagram */}
+  <circle cx={CX} cy={CY} r={R} fill="none" stroke={C.border} stroke-width="1.1" stroke-dasharray="4 3" />
+  {phasors.map((p) => (
+    <g>
+      <line x1={CX} y1={CY} x2={p.x} y2={p.y} stroke={p.accent} stroke-width="3.4" />
+      <text x={p.x + (p.deg === 0 ? 10 : p.deg === 120 ? -16 : -16)} y={p.y + (p.deg === 240 ? 14 : p.deg === 120 ? -4 : 4)} fill={p.accent} font-family={FONT} font-size="10.5" font-weight="800">
+        {p.name}
+      </text>
+    </g>
+  ))}
+  {/* the line-to-line vector between A and B */}
+  <line x1={phasors[0].x} y1={phasors[0].y} x2={phasors[1].x} y2={phasors[1].y} stroke={C.dark} stroke-width="2.4" stroke-dasharray="5 3" />
+  <text x={(phasors[0].x + phasors[1].x) / 2 - 4} y={(phasors[0].y + phasors[1].y) / 2 - 8} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="800">
+    A−B
+  </text>
+  <circle cx={CX} cy={CY} r="3.4" fill={C.dark} />
+  <text x={CX} y={CY + 96} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{`|A − B| = √3 × |A| = ${fmt(SQRT3, 4)} × |A|`}</text>
+
+  {/* the systems table */}
+  <text x="288" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SYSTEM</text>
+  <text x="404" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">V L-N</text>
+  <text x="474" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">× √3</text>
+  <text x="576" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NOMINAL L-L</text>
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 34;
+    return (
+      <g>
+        <rect x="284" y={y} width="412" height="28" rx="6" fill={C.white} stroke={C.border} />
+        <text x="298" y={y + 18} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{r.label}</text>
+        <text x="404" y={y + 18} fill={C.dark} font-family={FONT} font-size="10">{`${r.ln} V`}</text>
+        <text x="474" y={y + 18} fill={C.blue} font-family={FONT} font-size="10" font-weight="700">{`${fmt(r.exact, 2)} V`}</text>
+        <text x="576" y={y + 18} fill={C.primary} font-family={FONT} font-size="10" font-weight="800">{`${r.ll} V`}</text>
+      </g>
+    );
+  })}
+
+  <text x="284" y="204" fill={C.muted} font-family={FONT} font-size="9">The nominal figures are these values rounded — 208 and 480 are not exact.</text>
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">Same reason the power formula carries √3: three phases each contribute, but 120° out of step.</text>
+</svg>
