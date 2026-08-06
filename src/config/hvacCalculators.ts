@@ -811,7 +811,7 @@ export const hvacFaqs = [
   {
     question: "Are these HVAC calculators really free?",
     answer:
-      "Yes. All thirty-two are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. Every one of them is completely free, runs instantly in your browser, and requires no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which HVAC calculator should I use first?",
