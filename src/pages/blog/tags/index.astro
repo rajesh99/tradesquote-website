@@ -5,17 +5,37 @@ import { humanize } from "@/lib/utils/textConverter";
 
 import { FaHashtag } from "react-icons/fa";
 
+export const prerender = true;
+
 const tags = await getTaxonomy("posts", "tags");
+
+const intro = [
+  "Browse every topic tag on the TradesQuote blog — from HVAC sizing, duct design, and efficiency ratings to NEC basics, wire sizing, and contractor estimating. Tags help you jump straight to the guides that match the question on your desk.",
+  "Each tag page lists related articles with short summaries, related calculator links, and FAQs so you can learn the concept, then move into tools for numbers. Use tags when you already know the keyword (for example Manual J, CFM, SEER2, ampacity, or replacement cost).",
+  "Prefer a broader view? Start with the HVAC or electrical category hubs, or open the main blog index for the latest posts. TradesQuote also offers free trade calculators and an AI estimator when you are ready to turn a job description into a professional line-item quote.",
+];
 ---
 
-<Base title={"Tags"}>
+<Base
+  title="Tags"
+  meta_title="Blog Tags | TradesQuote"
+  description="Explore TradesQuote blog tags for HVAC and electrical contractors — sizing, load calculation, ductwork, SEER, NEC, wire size, cost estimating, and field diagnostics guides."
+>
   <section class="section">
-    <div class="container text-center">
-      <h1 class="h2 page-heading">Tags</h1>
-      <ul class="space-x-4">
+    <div class="container">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <h1 class="h2 page-heading">Tags</h1>
+        <div class="mt-6 space-y-4 text-left text-base leading-relaxed text-text">
+          {intro.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+        <p class="mt-6 text-sm text-text">
+          {tags.length} topics indexed from published contractor guides.
+        </p>
+      </div>
+      <ul class="space-x-4 text-center">
         {
           tags.map((tag) => (
-            <li class="inline-block">
+            <li class="inline-block mb-3">
               <a
                 href={`/blog/tags/${tag}`}
                 class="rounded-lg bg-light px-4 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
@@ -27,7 +47,27 @@ const tags = await getTaxonomy("posts", "tags");
           ))
         }
       </ul>
+      <div class="mx-auto mt-12 max-w-3xl text-left text-base leading-relaxed text-text space-y-4">
+        <h2 class="text-xl font-semibold text-dark">How to use blog tags</h2>
+        <p>
+          Tags are keyword labels attached to each article. Open a tag when you
+          care about one subject across multiple posts — for example every guide
+          that mentions tonnage, voltage drop, or AFUE — instead of scrolling the
+          full archive.
+        </p>
+        <p>
+          Inside a tag page you will find an introduction to the topic, featured
+          article summaries, links to related calculators where available, and the
+          full post grid. That structure is meant to help both readers and search
+          engines understand what the collection covers.
+        </p>
+        <p>
+          Popular HVAC starting points include cooling load, Manual J, CFM, duct
+          sizing, and SEER. Popular electrical starting points include NEC,
+          ampacity, wire size, and branch circuits. If you do not see the label you
+          expected, try a close synonym or browse categories instead.
+        </p>
+      </div>
     </div>
   </section>
 </Base>
-

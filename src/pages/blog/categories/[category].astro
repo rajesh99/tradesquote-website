@@ -1,11 +1,14 @@
 ---
 import Posts from "../../../layouts/components/Posts.astro";
+import BlogTaxonomyContent from "../../../layouts/components/BlogTaxonomyContent.astro";
+import BlogTaxonomyFaq from "../../../layouts/components/BlogTaxonomyFaq.astro";
 import Base from "../../../layouts/Base.astro";
 import { getSinglePage } from "../../../lib/contentParser.astro";
 import { getTaxonomy } from "../../../lib/taxonomyParser.astro";
 import { sortByDate } from "../../../lib/utils/sortFunctions";
 import taxonomyFilter from "../../../lib/utils/taxonomyFilter";
-import { humanize } from "../../../lib/utils/textConverter";
+import { resolveTaxonomySeo } from "../../../lib/blogTaxonomySeo";
+import { buildFaqPageSchema } from "../../../lib/calculatorFaq";
 
 export const prerender = true;
 
@@ -25,20 +28,34 @@ const posts = await getSinglePage("posts");
 const filterByCategory = taxonomyFilter(posts, "categories", category);
 const sortedPosts = sortByDate(filterByCategory);
 
-const title = humanize(category || "");
+const seo = resolveTaxonomySeo({
+  kind: "category",
+  slug: category || "",
+  posts: sortedPosts.map((post) => ({
+    id: post.id,
+    title: post.data.title,
+    description: post.data.description,
+  })),
+});
+
+const faqSchema = buildFaqPageSchema(seo.faqs);
 ---
 
 <Base
-  title={`${title} – TradesQuote Blog`}
-  meta_title={`${title} Articles | TradesQuote Blog`}
-  description={`${title} articles — sizing, cost, code, diagnostics, and estimating guides for contractors.`}
+  title={`${seo.title} – TradesQuote Blog`}
+  meta_title={`${seo.title} Articles | TradesQuote Blog`}
+  description={seo.description}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
   <div class="section">
     <div class="container">
       <p class="text-center text-2xl mb-4">Showing Posts From</p>
-      <h1 class="h2 mb-16 text-center text-primary">{title}</h1>
+      <h1 class="h2 mb-8 text-center text-primary">{seo.title}</h1>
+      <BlogTaxonomyContent seo={seo} kind="category" />
       <Posts posts={sortedPosts} />
+      <BlogTaxonomyFaq faqs={seo.faqs} title={seo.title} />
     </div>
   </div>
 </Base>
-
