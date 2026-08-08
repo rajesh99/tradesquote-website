@@ -1,7 +1,7 @@
 ---
 title: "Ohm's Law Explained: V, I, R, and the Power Wheel"
 meta_title: "Ohm's Law Explained: V, I, R and the Power Wheel (2026) | TradesQuote"
-description: "Two equations generate all twelve forms. The one that matters in the field is P = I²R — a loose 0.5 Ω termination at 20 A dissipates 200 W inside a plastic box."
+description: "Two equations generate all twelve forms. The one that matters in the field is P = I²R - a loose 0.5 Ω termination at 20 A dissipates 200 W inside a plastic box."
 image: /images/posts/ohms-law-explained-hero.svg
 date: 2026-08-04T15:15:00Z
 categories: ["electrical"]
@@ -43,7 +43,7 @@ On a 120 V circuit with 10 Ω of resistance:
 | Ohms | R = V÷I · R = V²÷P · R = P÷I² | 10 Ω |
 | Watts | P = VI · P = I²R · P = V²÷R | 1,440 W |
 
-Which form you reach for depends on what you can measure. In the field you usually know **volts and amps** (a meter gives you both) so P = VI is the default. When you know **amps and resistance** — a conductor of known size and length — P = I²R is the one.
+Which form you reach for depends on what you can measure. In the field you usually know **volts and amps** (a meter gives you both) so P = VI is the default. When you know **amps and resistance** - a conductor of known size and length - P = I²R is the one.
 
 ## The Form That Explains Burnt Connections
 
@@ -61,11 +61,11 @@ Which form you reach for depends on what you can measure. In the field you usual
 | Loose, 0.5 Ω | 12.5 W | 50 W | 112.5 W | **200 W** |
 | Failing, 1.0 Ω | 25 W | 100 W | 225 W | **400 W** |
 
-**Two hundred watts inside a wire nut.** That's a soldering iron, in a plastic box, behind drywall, with no ventilation. A joint that has gone from 0.01 Ω to 0.5 Ω — which is what a relaxed backstab or an under-torqued screw does — is dissipating **fifty times** what it did when it was tight, in the same physical space.
+**Two hundred watts inside a wire nut.** That's a soldering iron, in a plastic box, behind drywall, with no ventilation. A joint that has gone from 0.01 Ω to 0.5 Ω - which is what a relaxed backstab or an under-torqued screw does - is dissipating **fifty times** what it did when it was tight, in the same physical space.
 
 The squared term is what makes this vicious. Going from 10 A to 20 A on the same bad joint takes it from 50 W to 200 W. And heat increases resistance, which increases heat.
 
-Worth comparing against the conductor itself. **12 AWG copper is 1.93 Ω per 1,000 ft**, so a 100-foot run carries about 0.386 Ω of two-way resistance. At 15 A that's 87 W of heat — a similar number to the bad joint, but **spread over 200 feet of wire** rather than concentrated at one screw. Same watts, completely different consequence. Power density is the thing that matters, not power.
+Worth comparing against the conductor itself. **12 AWG copper is 1.93 Ω per 1,000 ft**, so a 100-foot run carries about 0.386 Ω of two-way resistance. At 15 A that's 87 W of heat - a similar number to the bad joint, but **spread over 200 feet of wire** rather than concentrated at one screw. Same watts, completely different consequence. Power density is the thing that matters, not power.
 
 This is exactly what an AFCI is listening for, and it's the reason **110.14(D)** requires terminations to be torqued to the manufacturer's specification with a calibrated tool. Diagnosis is in **[AFCI and GFCI Nuisance Tripping](/blog/afci-gfci-nuisance-tripping)**.
 
@@ -77,7 +77,7 @@ The most common professional use of V = IR is voltage drop, where the "resistor"
 VD = I × R_conductor    (× 2 for single-phase, out and back)
 ```
 
-12 AWG at 15 A over 100 feet: 15 × 0.386 = **5.79 V**, which is 4.8% of 120 V — past the conventional 3% design target.
+12 AWG at 15 A over 100 feet: 15 × 0.386 = **5.79 V**, which is 4.8% of 120 V - past the conventional 3% design target.
 
 The circular-mils shortcut you'll see everywhere is the same equation with resistance expressed through a constant:
 
@@ -103,13 +103,13 @@ K is just resistivity in ohm-circular-mils per foot, so this is V = IR wearing a
 | 1/0 AWG | 0.1220 | 0.0550 | 0.45 | 0.1327 |
 | 500 kcmil | 0.0258 | 0.0480 | **1.86** | 0.0472 |
 
-On AC, a conductor has **inductive reactance** as well as resistance, and the quantity in V = IR becomes **impedance**. On small conductors reactance is negligible — 12 AWG's X is 4% of its R, so treating it as a pure resistor is fine. **By 500 kcmil the reactance is nearly twice the resistance**, and ignoring it understates the drop badly.
+On AC, a conductor has **inductive reactance** as well as resistance, and the quantity in V = IR becomes **impedance**. On small conductors reactance is negligible - 12 AWG's X is 4% of its R, so treating it as a pure resistor is fine. **By 500 kcmil the reactance is nearly twice the resistance**, and ignoring it understates the drop badly.
 
 Two things about that table are worth pausing on.
 
 **The formula is Z = R·cos θ + X·sin θ, not √(R² + X²).** The magnitude form is only correct for a bolted fault where you want the total impedance; for voltage drop along a line you want the component in phase with the current. Getting this wrong is common and it is the subject of the **[Conductor Resistance Calculator](/calculators/electrical/electrical-conductor-resistance-calculator)**.
 
-**On small conductors a lagging power factor slightly *reduces* line drop.** Look at 12 AWG: its effective Z at PF 0.85 is 1.676, *below* its R of 1.93. That's because R·cos θ shrinks faster than X·sin θ grows when X is tiny. On large conductors the opposite holds — 500 kcmil's Z of 0.0472 is well above its R of 0.0258. The crossover sits near 1/0. This surprises people and it's a genuine consequence of the arithmetic.
+**On small conductors a lagging power factor slightly *reduces* line drop.** Look at 12 AWG: its effective Z at PF 0.85 is 1.676, *below* its R of 1.93. That's because R·cos θ shrinks faster than X·sin θ grows when X is tiny. On large conductors the opposite holds - 500 kcmil's Z of 0.0472 is well above its R of 0.0258. The crossover sits near 1/0. This surprises people and it's a genuine consequence of the arithmetic.
 
 And that's the doorway to power factor generally: once current and voltage are out of phase, volts × amps stops equalling watts. See **[kVA vs kW](/blog/kva-vs-kw)** and **[Three-Phase Power](/blog/three-phase-power-calculation)**. If the reason reactance exists on AC and not on DC isn't obvious yet, **[AC vs DC](/blog/ac-vs-dc-current)** starts from the waveform.
 
@@ -117,13 +117,13 @@ One more thing decides which quantity is shared before any of this arithmetic ap
 
 ## Practical Uses
 
-**Sizing a conductor by heat rather than by table.** Ampacity tables already encode I²R against an assumed thermal environment, which is why derating exists at all — see **[Wire Derating Explained](/blog/wire-derating-nec)**.
+**Sizing a conductor by heat rather than by table.** Ampacity tables already encode I²R against an assumed thermal environment, which is why derating exists at all - see **[Wire Derating Explained](/blog/wire-derating-nec)**.
 
 **Finding a bad connection by voltage.** Measure the voltage across a suspect joint while it carries load. Any measurable drop across a connection that should be a few milliohms tells you it isn't. This is a better test than resistance-checking a de-energised joint, because a bad connection often reads fine cold.
 
 **Checking a heating element.** A 4,500 W water heater element on 240 V should read 240² ÷ 4,500 = **12.8 Ω**. Open circuit means a failed element; substantially low means a partial short.
 
-**Estimating load from resistance.** Anything purely resistive — heaters, incandescent lamps, elements — follows P = V²÷R exactly. Motors and electronics don't, because they're not resistive.
+**Estimating load from resistance.** Anything purely resistive - heaters, incandescent lamps, elements - follows P = V²÷R exactly. Motors and electronics don't, because they're not resistive.
 
 ## Common Mistakes
 
@@ -138,7 +138,7 @@ One more thing decides which quantity is shared before any of this arithmetic ap
 
 ## Run the Numbers
 
-> **[Ohm's Law Calculator](/calculators/electrical/electrical-ohms-law-calculator)** — enter any two of volts, amps, ohms and watts and it returns the other two, showing which form it used.
+> **[Ohm's Law Calculator](/calculators/electrical/electrical-ohms-law-calculator)** - enter any two of volts, amps, ohms and watts and it returns the other two, showing which form it used.
 
 For the AC cases use the **[Conductor Resistance Calculator](/calculators/electrical/electrical-conductor-resistance-calculator)** (Table 8 resistance, Table 9 reactance, and effective impedance at a given power factor) and the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)**. The **[Electrical Formulas Cheat Sheet](/blog/electrical-formulas-cheat-sheet)** collects every formula in one place, and **[Watts to Amps](/blog/watts-to-amps)** covers the conversion direction most often needed on site.
 
@@ -150,7 +150,7 @@ For the AC cases use the **[Conductor Resistance Calculator](/calculators/electr
 
 ### What is Ohm's law?
 
-V = I × R: the voltage across a resistance equals the current through it times that resistance. Combined with P = V × I, it generates the twelve rearrangements of the power wheel. Those two equations are all you need to memorise — the rest are substitutions.
+V = I × R: the voltage across a resistance equals the current through it times that resistance. Combined with P = V × I, it generates the twelve rearrangements of the power wheel. Those two equations are all you need to memorise - the rest are substitutions.
 
 ### What are the 12 formulas of the power wheel?
 
@@ -158,15 +158,15 @@ Three each for volts, amps, ohms and watts. Volts: IR, P÷I, √(PR). Amps: V÷R
 
 ### Why does a loose connection get hot?
 
-Because power dissipated is I²R, and a loose connection has far more resistance than a tight one. A tight joint of about 0.01 Ω carrying 20 A dissipates 4 watts. The same joint gone loose at 0.5 Ω dissipates 200 watts — fifty times as much, concentrated in the volume of a wire nut with no ventilation. That's what an AFCI detects and why 110.14(D) requires a torque specification.
+Because power dissipated is I²R, and a loose connection has far more resistance than a tight one. A tight joint of about 0.01 Ω carrying 20 A dissipates 4 watts. The same joint gone loose at 0.5 Ω dissipates 200 watts - fifty times as much, concentrated in the volume of a wire nut with no ventilation. That's what an AFCI detects and why 110.14(D) requires a torque specification.
 
 ### Does Ohm's law apply to AC circuits?
 
-Yes, but the resistance term becomes impedance, which combines resistance with inductive reactance. On small conductors the difference is negligible — 12 AWG's reactance is about 4% of its resistance. On 500 kcmil the reactance is nearly twice the resistance, so using resistance alone significantly understates voltage drop.
+Yes, but the resistance term becomes impedance, which combines resistance with inductive reactance. On small conductors the difference is negligible - 12 AWG's reactance is about 4% of its resistance. On 500 kcmil the reactance is nearly twice the resistance, so using resistance alone significantly understates voltage drop.
 
 ### How do I calculate voltage drop with Ohm's law?
 
-Multiply the current by the conductor's resistance, doubling the length for single-phase because current goes out and returns. 12 AWG copper is 1.93 Ω per 1,000 ft, so 100 feet is 0.386 Ω two-way, and at 15 A that's 5.79 V — 4.8% of 120 V. The circular-mils formula VD = 2KIL ÷ cmil is the same calculation with resistance expressed through a constant.
+Multiply the current by the conductor's resistance, doubling the length for single-phase because current goes out and returns. 12 AWG copper is 1.93 Ω per 1,000 ft, so 100 feet is 0.386 Ω two-way, and at 15 A that's 5.79 V - 4.8% of 120 V. The circular-mils formula VD = 2KIL ÷ cmil is the same calculation with resistance expressed through a constant.
 
 ### Why is effective impedance not the square root of R squared plus X squared?
 
@@ -174,7 +174,7 @@ Because that gives the *magnitude* of the impedance, which is what you want for 
 
 ### How do I check a heating element with Ohm's law?
 
-Use R = V² ÷ P. A 4,500 W element on 240 V should measure about 12.8 Ω. An open circuit means the element has failed; a reading well below 12.8 Ω suggests a partial short. This works because heating elements are purely resistive — the same approach applied to a motor gives meaningless answers.
+Use R = V² ÷ P. A 4,500 W element on 240 V should measure about 12.8 Ω. An open circuit means the element has failed; a reading well below 12.8 Ω suggests a partial short. This works because heating elements are purely resistive - the same approach applied to a motor gives meaningless answers.
 
 ### Can I use Ohm's law to find a bad connection?
 

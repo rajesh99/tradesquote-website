@@ -14,7 +14,7 @@ import HeatFormulasDiagram from "@/components/blog/hvac-formulas/HeatFormulasDia
 import ConstantsDiagram from "@/components/blog/hvac-formulas/ConstantsDiagram.astro";
 import TonnageCfmDiagram from "@/components/blog/hvac-formulas/TonnageCfmDiagram.astro";
 
-Most of HVAC field work and system design comes back to a handful of formulas. Memorize these basic HVAC formulas and you can size equipment, balance airflow, diagnose a charge, and check efficiency without reaching for anything more exotic. This cheat sheet collects the common HVAC formulas in one place — each one stated clearly, with what every variable means, where the constant comes from, and a one-line worked example.
+Most of HVAC field work and system design comes back to a handful of formulas. Memorize these basic HVAC formulas and you can size equipment, balance airflow, diagnose a charge, and check efficiency without reaching for anything more exotic. This cheat sheet collects the common HVAC formulas in one place - each one stated clearly, with what every variable means, where the constant comes from, and a one-line worked example.
 
 If you want the interactive versions that do the arithmetic for you, the **[HVAC Formulas reference](/calculators/hvac/formulas)** page lists every equation with its own calculator. This post is the readable companion: the math and the reasoning behind it.
 
@@ -22,36 +22,36 @@ If you want the interactive versions that do the arithmetic for you, the **[HVAC
 
 Almost every HVAC calculation is a heat-transfer problem, and three formulas cover the bulk of them. All three multiply airflow (CFM) by a property change, with a constant out front that turns the units into BTU per hour.
 
-**Sensible heat — the temperature change:**
+**Sensible heat - the temperature change:**
 
 **Qs = 1.08 × CFM × ΔT**
 
-- **Qs** — sensible heat, BTU/hr
-- **CFM** — airflow in cubic feet per minute
-- **ΔT** — dry-bulb temperature difference across the coil or duct (°F)
-- **1.08** — a constant for standard air (explained below)
+- **Qs** - sensible heat, BTU/hr
+- **CFM** - airflow in cubic feet per minute
+- **ΔT** - dry-bulb temperature difference across the coil or duct (°F)
+- **1.08** - a constant for standard air (explained below)
 
 *Example:* 1,200 CFM across a coil dropping the air 20°F removes 1.08 × 1,200 × 20 = **25,920 BTU/hr** of sensible heat.
 
-**Latent heat — the moisture change:**
+**Latent heat - the moisture change:**
 
 **Ql = 0.68 × CFM × ΔGrains**
 
-- **Ql** — latent heat, BTU/hr
-- **ΔGrains** — difference in humidity ratio, in grains of water per pound of dry air
-- **0.68** — the latent-heat constant for standard air
+- **Ql** - latent heat, BTU/hr
+- **ΔGrains** - difference in humidity ratio, in grains of water per pound of dry air
+- **0.68** - the latent-heat constant for standard air
 
 *Example:* 1,200 CFM removing 30 grains of moisture handles 0.68 × 1,200 × 30 = **24,480 BTU/hr** of latent load.
 
-**Total heat — sensible plus latent, via enthalpy:**
+**Total heat - sensible plus latent, via enthalpy:**
 
 **Qt = 4.5 × CFM × Δh**
 
-- **Qt** — total heat, BTU/hr
-- **Δh** — change in enthalpy (total heat content) of the air, BTU/lb of dry air
-- **4.5** — the total-heat constant for standard air
+- **Qt** - total heat, BTU/hr
+- **Δh** - change in enthalpy (total heat content) of the air, BTU/lb of dry air
+- **4.5** - the total-heat constant for standard air
 
-*Example:* 1,200 CFM with a 9 BTU/lb enthalpy drop moves 4.5 × 1,200 × 9 = **48,600 BTU/hr** total — close to the sensible plus latent figures above combined.
+*Example:* 1,200 CFM with a 9 BTU/lb enthalpy drop moves 4.5 × 1,200 × 9 = **48,600 BTU/hr** total - close to the sensible plus latent figures above combined.
 
 <BlogInfographic
   title="The three heat formulas"
@@ -62,18 +62,18 @@ Almost every HVAC calculation is a heat-transfer problem, and three formulas cov
 
 ## Where the Constants Come From
 
-The 1.08, 0.68, and 4.5 are not magic numbers — they are bundled air properties at standard conditions (sea level, roughly 70°F, air density 0.075 lb/ft³). Knowing their origin tells you when to adjust them, such as at high altitude where air is thinner.
+The 1.08, 0.68, and 4.5 are not magic numbers - they are bundled air properties at standard conditions (sea level, roughly 70°F, air density 0.075 lb/ft³). Knowing their origin tells you when to adjust them, such as at high altitude where air is thinner.
 
 **1.08** = 0.24 × 60 × 0.075
 
-- **0.24** — specific heat of air, BTU/(lb·°F)
-- **60** — minutes per hour (CFM is per minute, BTU/hr is per hour)
-- **0.075** — density of standard air, lb/ft³
+- **0.24** - specific heat of air, BTU/(lb·°F)
+- **60** - minutes per hour (CFM is per minute, BTU/hr is per hour)
+- **0.075** - density of standard air, lb/ft³
 
 **0.68** = (0.075 × 60 × 1,061) ÷ 7,000
 
-- **1,061** — latent heat of vaporization of water, BTU/lb
-- **7,000** — grains of water per pound (the unit conversion for ΔGrains)
+- **1,061** - latent heat of vaporization of water, BTU/lb
+- **7,000** - grains of water per pound (the unit conversion for ΔGrains)
 
 **4.5** = 60 × 0.075
 
@@ -90,7 +90,7 @@ All three assume standard air. At elevation, lower density drops the constants, 
 
 ## Airflow and CFM
 
-The sensible-heat formula rearranges into the most-used sizing equation in the trade — solving for the airflow a given load needs:
+The sensible-heat formula rearranges into the most-used sizing equation in the trade - solving for the airflow a given load needs:
 
 **CFM = BTU/hr ÷ (1.08 × ΔT)**
 
@@ -102,7 +102,7 @@ Airflow also ties to duct geometry through velocity:
 
 **CFM = velocity (fpm) × area (ft²)**
 
-This is why an anemometer reading converts straight to CFM, and why it drives duct sizing. A 200 CFM branch at a 600 fpm target needs 200 ÷ 600 = 0.33 ft² of area — about an 8" round duct. For a deeper walk-through of **[what CFM is and how to calculate airflow](/blog/what-is-cfm-hvac)**, see the dedicated explainer.
+This is why an anemometer reading converts straight to CFM, and why it drives duct sizing. A 200 CFM branch at a 600 fpm target needs 200 ÷ 600 = 0.33 ft² of area - about an 8" round duct. For a deeper walk-through of **[what CFM is and how to calculate airflow](/blog/what-is-cfm-hvac)**, see the dedicated explainer.
 
 ## Tonnage and the Cooling Rules of Thumb
 
@@ -132,25 +132,25 @@ Treat both as sanity checks, not substitutes for a load calculation.
 
 **ΔT = T_return − T_supply**
 
-A properly charged system with correct airflow and load lands at **16–22°F**. A reading below ~14°F points to low airflow or an overcharge; above ~22°F points to low charge or restricted airflow. Our guide to **[HVAC delta T](/blog/hvac-delta-t-explained)** explains how to read these numbers in the field. Verify against the system's target before condemning a charge — the **[Delta T Calculator](/calculators/hvac/hvac-delta-t-calculator)** factors in indoor wet-bulb and return dry-bulb.
+A properly charged system with correct airflow and load lands at **16–22°F**. A reading below ~14°F points to low airflow or an overcharge; above ~22°F points to low charge or restricted airflow. Our guide to **[HVAC delta T](/blog/hvac-delta-t-explained)** explains how to read these numbers in the field. Verify against the system's target before condemning a charge - the **[Delta T Calculator](/calculators/hvac/hvac-delta-t-calculator)** factors in indoor wet-bulb and return dry-bulb.
 
 **Total external static pressure (TESP):** the total resistance the blower fights, measured across the air handler.
 
 **TESP = SP_supply + |SP_return|**
 
-Add the positive supply-plenum pressure to the absolute value of the negative return-plenum pressure. Most residential equipment is rated at 0.5 in.w.c.; readings above about 0.8 in.w.c. choke airflow and CFM falls off the blower table. It is the airflow equivalent of blood pressure — the first thing to measure when something feels off. See **[HVAC static pressure](/blog/hvac-static-pressure)** for how to take the reading and what high TESP is telling you.
+Add the positive supply-plenum pressure to the absolute value of the negative return-plenum pressure. Most residential equipment is rated at 0.5 in.w.c.; readings above about 0.8 in.w.c. choke airflow and CFM falls off the blower table. It is the airflow equivalent of blood pressure - the first thing to measure when something feels off. See **[HVAC static pressure](/blog/hvac-static-pressure)** for how to take the reading and what high TESP is telling you.
 
 ## Efficiency Formulas (EER, SEER, SEER2)
 
-**EER — efficiency at a single rating point:**
+**EER - efficiency at a single rating point:**
 
 **EER = BTU/hr ÷ watts**
 
 *Example:* a unit delivering 24,000 BTU/hr while drawing 2,000 watts has an EER of 24,000 ÷ 2,000 = **12**. Higher is better.
 
-**SEER — seasonal efficiency:** the same idea averaged over a cooling season's range of conditions, so it is always higher than the steady-state EER for the same equipment.
+**SEER - seasonal efficiency:** the same idea averaged over a cooling season's range of conditions, so it is always higher than the steady-state EER for the same equipment.
 
-**SEER2 — the current test standard (M1):**
+**SEER2 - the current test standard (M1):**
 
 **SEER2 ≈ SEER × 0.95**
 
@@ -174,7 +174,7 @@ The 2023 DOE testing change (M1) raised external static pressure during the test
 
 ## Use the Free Calculators
 
-> **[HVAC Formulas reference](/calculators/hvac/formulas)** — every formula on this page with its own interactive calculator.
+> **[HVAC Formulas reference](/calculators/hvac/formulas)** - every formula on this page with its own interactive calculator.
 
 Skip the arithmetic: the **[Sensible & Latent Heat Calculator](/calculators/hvac/hvac-sensible-latent-heat-calculator)**, **[CFM Calculator](/calculators/hvac/hvac-cfm-calculator)**, **[Tonnage Calculator](/calculators/hvac/hvac-tonnage-calculator)**, and **[Delta T Calculator](/calculators/hvac/hvac-delta-t-calculator)** each plug straight into the equations above.
 

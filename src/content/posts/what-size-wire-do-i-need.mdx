@@ -14,9 +14,9 @@ import WireSizeTwoTestsDiagram from "@/components/blog/wire-size/WireSizeTwoTest
 import WireSizeMaxRunDiagram from "@/components/blog/wire-size/WireSizeMaxRunDiagram.astro";
 import WireSizeCopperAluminumDiagram from "@/components/blog/wire-size/WireSizeCopperAluminumDiagram.astro";
 
-Almost every wire size chart on the internet answers half the question. It tells you 12 AWG copper handles a 20-amp circuit, which is true — right up until that circuit runs 140 feet out to a detached garage, where 12 AWG will pass inspection on ampacity and still leave your tools starving at the far end.
+Almost every wire size chart on the internet answers half the question. It tells you 12 AWG copper handles a 20-amp circuit, which is true - right up until that circuit runs 140 feet out to a detached garage, where 12 AWG will pass inspection on ampacity and still leave your tools starving at the far end.
 
-Wire sizing is two separate tests against the same load. The first asks whether the conductor can carry the current without overheating. The second asks whether it can carry it that far without losing too much voltage. You run both, and **the larger of the two answers is your wire size** — never the average, never the first one you happened to look up.
+Wire sizing is two separate tests against the same load. The first asks whether the conductor can carry the current without overheating. The second asks whether it can carry it that far without losing too much voltage. You run both, and **the larger of the two answers is your wire size** - never the average, never the first one you happened to look up.
 
 <BlogInfographic
   title="The two tests that decide wire size"
@@ -29,17 +29,17 @@ Wire sizing is two separate tests against the same load. The first asks whether 
 
 The usual mistake is working backwards from a breaker somebody already picked. Sizing starts with the **load** in amps, and the code adds a margin depending on how that load behaves.
 
-Per **210.19(A)**, a branch circuit conductor must have an ampacity of at least 125% of the continuous load plus 100% of the non-continuous load. A **continuous load** is one expected to run for three hours or more — think shop lighting, an EV charger, or a commercial sign. A dryer or a range cycles, so it's non-continuous and takes no 125% adder.
+Per **210.19(A)**, a branch circuit conductor must have an ampacity of at least 125% of the continuous load plus 100% of the non-continuous load. A **continuous load** is one expected to run for three hours or more - think shop lighting, an EV charger, or a commercial sign. A dryer or a range cycles, so it's non-continuous and takes no 125% adder.
 
 So a 40-amp continuous load needs conductors good for 50 amps, while a 40-amp non-continuous load needs conductors good for 40 amps. Same nameplate, different wire.
 
 ## Test 1: Ampacity
 
-Ampacity is the current a conductor can carry continuously without exceeding its temperature rating. It comes from **NEC Table 310.16**, which gives three columns per size — 60 °C, 75 °C, and 90 °C — depending on the insulation.
+Ampacity is the current a conductor can carry continuously without exceeding its temperature rating. It comes from **NEC Table 310.16**, which gives three columns per size - 60 °C, 75 °C, and 90 °C - depending on the insulation.
 
 Here's the part that trips people up: you almost never get to use the 90 °C column. Under **110.14(C)**, the whole circuit is limited by the lowest temperature rating of any termination in it, and virtually all breakers and lugs in residential and light commercial work are rated 75 °C. So even though the THHN in your hand is 90 °C wire, you size it from the **75 °C column**. The 90 °C rating still earns its keep as the starting point for derating, which is what the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** works from.
 
-There's a second limit on small conductors. **240.4(D)** caps overcurrent protection at 15 A for 14 AWG copper, 20 A for 12 AWG, and 30 A for 10 AWG, regardless of what the table says those wires could carry. That's why 12 AWG copper shows 25 A at 75 °C but still lives on a 20-amp breaker — the subject of **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)**.
+There's a second limit on small conductors. **240.4(D)** caps overcurrent protection at 15 A for 14 AWG copper, 20 A for 12 AWG, and 30 A for 10 AWG, regardless of what the table says those wires could carry. That's why 12 AWG copper shows 25 A at 75 °C but still lives on a 20-amp breaker - the subject of **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)**.
 
 Put those together and you get the working chart:
 
@@ -58,7 +58,7 @@ Put those together and you get the working chart:
 
 Table 310.16, 75 °C column, with the 240.4(D) caps applied. The full size-by-size version is in the **[Wire Size Chart](/blog/wire-size-chart-amps)**.
 
-One important exception lives at the bottom of that chart. For a **dwelling service**, or for the single feeder that carries the entire load of a one-family dwelling, **Table 310.12** permits conductors sized at 83% of the service rating — which lands a 200-amp service on 2/0 copper instead of 3/0. That allowance is narrower than most people assume, and applying it to an ordinary subpanel is a genuine code violation. Both cases get walked through in **[200 Amp Service Wire Size](/blog/200-amp-service-wire-size)** and **[What Size Wire for a 100 Amp Sub Panel](/blog/what-size-wire-for-100-amp-subpanel)**.
+One important exception lives at the bottom of that chart. For a **dwelling service**, or for the single feeder that carries the entire load of a one-family dwelling, **Table 310.12** permits conductors sized at 83% of the service rating - which lands a 200-amp service on 2/0 copper instead of 3/0. That allowance is narrower than most people assume, and applying it to an ordinary subpanel is a genuine code violation. Both cases get walked through in **[200 Amp Service Wire Size](/blog/200-amp-service-wire-size)** and **[What Size Wire for a 100 Amp Sub Panel](/blog/what-size-wire-for-100-amp-subpanel)**.
 
 ## Test 2: Voltage Drop
 
@@ -68,9 +68,9 @@ The approximation the trade uses:
 
 **VD = 2 × K × I × L ÷ CM**
 
-where **K** is 12.9 for copper and 21.2 for aluminum, **I** is the load in amps, **L** is the one-way run in feet, and **CM** is the conductor's area in circular mils. The 2 accounts for current going out and coming back — on a three-phase circuit it becomes 1.732 instead.
+where **K** is 12.9 for copper and 21.2 for aluminum, **I** is the load in amps, **L** is the one-way run in feet, and **CM** is the conductor's area in circular mils. The 2 accounts for current going out and coming back - on a three-phase circuit it becomes 1.732 instead.
 
-Worth being precise about the target: the NEC does **not** mandate a voltage drop limit for ordinary branch circuits. The familiar 3% figure lives in **informational notes** to 210.19(A) and 215.2(A), which recommend no more than 3% on a branch circuit and 5% total across feeder plus branch. Informational notes aren't enforceable code text. In practice, 3% is the number everyone designs to, several jurisdictions have adopted it as a local amendment, and it's a sound engineering target regardless — so treat it as a real constraint, just don't tell an inspector the NEC requires it.
+Worth being precise about the target: the NEC does **not** mandate a voltage drop limit for ordinary branch circuits. The familiar 3% figure lives in **informational notes** to 210.19(A) and 215.2(A), which recommend no more than 3% on a branch circuit and 5% total across feeder plus branch. Informational notes aren't enforceable code text. In practice, 3% is the number everyone designs to, several jurisdictions have adopted it as a local amendment, and it's a sound engineering target regardless - so treat it as a real constraint, just don't tell an inspector the NEC requires it.
 
 <BlogInfographic
   title="How far each gauge runs before 3% drop"
@@ -79,11 +79,11 @@ Worth being precise about the target: the NEC does **not** mandate a voltage dro
   <WireSizeMaxRunDiagram />
 </BlogInfographic>
 
-Two things fall straight out of that formula. **Voltage matters enormously** — the same 12 AWG carrying 20 amps reaches about 45 feet on a 120-volt circuit and about 91 feet on 240 volts, because the allowable drop in volts doubles while the loss per foot doesn't change. And **doubling the wire area roughly doubles the distance**, since CM sits in the denominator.
+Two things fall straight out of that formula. **Voltage matters enormously** - the same 12 AWG carrying 20 amps reaches about 45 feet on a 120-volt circuit and about 91 feet on 240 volts, because the allowable drop in volts doubles while the loss per foot doesn't change. And **doubling the wire area roughly doubles the distance**, since CM sits in the denominator.
 
 ### Worked Example: A 50-Amp Circuit 100 Feet Out
 
-Say you're feeding a 50-amp, 240-volt load — a welder outlet or a small subpanel — 100 feet from the panel, in copper.
+Say you're feeding a 50-amp, 240-volt load - a welder outlet or a small subpanel - 100 feet from the panel, in copper.
 
 **Ampacity test.** 50 amps non-continuous needs 50 amps of conductor. 8 AWG copper is exactly 50 A at 75 °C. Test 1 says 8 AWG.
 
@@ -91,15 +91,15 @@ Say you're feeding a 50-amp, 240-volt load — a welder outlet or a small subpan
 
 VD = 2 × 12.9 × 50 × 100 ÷ 16,510 = **7.81 volts**
 
-On a 240-volt circuit that's **3.26%** — over the target. Step up to 6 AWG at 26,240 circular mils:
+On a 240-volt circuit that's **3.26%** - over the target. Step up to 6 AWG at 26,240 circular mils:
 
 VD = 2 × 12.9 × 50 × 100 ÷ 26,240 = **4.92 volts**, or **2.05%**. That passes.
 
-**Answer: 6 AWG copper.** Ampacity alone would have told you 8 AWG, and it would have been legal, and the load would still have been down almost 8 volts. This is the single most common way a correctly-inspected circuit ends up underperforming — the mechanics are in **[Voltage Drop](/blog/voltage-drop-calculation)**.
+**Answer: 6 AWG copper.** Ampacity alone would have told you 8 AWG, and it would have been legal, and the load would still have been down almost 8 volts. This is the single most common way a correctly-inspected circuit ends up underperforming - the mechanics are in **[Voltage Drop](/blog/voltage-drop-calculation)**.
 
 ## Copper or Aluminum
 
-Aluminum carries less current per unit of area, so it needs a bigger conductor for the same job — one trade size up on small circuits, two by the time you reach service sizes.
+Aluminum carries less current per unit of area, so it needs a bigger conductor for the same job - one trade size up on small circuits, two by the time you reach service sizes.
 
 <BlogInfographic
   title="Copper vs aluminum for the same load"
@@ -108,13 +108,13 @@ Aluminum carries less current per unit of area, so it needs a bigger conductor f
   <WireSizeCopperAluminumDiagram />
 </BlogInfographic>
 
-Aluminum loses twice on a long run, because K is 21.2 against copper's 12.9 — so an aluminum conductor of the same gauge drops about 64% more voltage. Size it up for ampacity first, then re-run the drop calculation on the size you landed on.
+Aluminum loses twice on a long run, because K is 21.2 against copper's 12.9 - so an aluminum conductor of the same gauge drops about 64% more voltage. Size it up for ampacity first, then re-run the drop calculation on the size you landed on.
 
 None of which makes aluminum a bad choice. On service entrance and feeder work it's dramatically cheaper per amp, and it's what most utilities and a lot of panel feeders use as a matter of course. It just wants **AL-rated terminations**, proper torque, and antioxidant compound where the listing calls for it. What you must never do is put aluminum on a device rated CU-only.
 
 ## Don't Forget the Ground
 
-Sizing the ungrounded conductors doesn't size the ground. The equipment grounding conductor comes off **Table 250.122**, keyed to the **breaker rating** rather than the wire you chose — 14 AWG copper for a 15-amp circuit, 12 for 20 A, 10 for up to 60 A, 8 for up to 100 A, 6 for up to 200 A. Upsizing the phase conductors for voltage drop generally means upsizing the EGC proportionally too, per **250.122(B)**. The **[Ground Wire Size Calculator](/calculators/electrical/electrical-ground-wire-size-calculator)** handles both that table and the proportional bump.
+Sizing the ungrounded conductors doesn't size the ground. The equipment grounding conductor comes off **Table 250.122**, keyed to the **breaker rating** rather than the wire you chose - 14 AWG copper for a 15-amp circuit, 12 for 20 A, 10 for up to 60 A, 8 for up to 100 A, 6 for up to 200 A. Upsizing the phase conductors for voltage drop generally means upsizing the EGC proportionally too, per **250.122(B)**. The **[Ground Wire Size Calculator](/calculators/electrical/electrical-ground-wire-size-calculator)** handles both that table and the proportional bump.
 
 ## Common Mistakes
 
@@ -122,16 +122,16 @@ Sizing the ungrounded conductors doesn't size the ground. The equipment groundin
 - **Using the 90 °C column.** The terminations are 75 °C, so the circuit is 75 °C. 110.14(C) is not optional.
 - **Forgetting the 125% continuous adder.** An EV charger runs for hours; that's continuous, and it changes the size.
 - **Applying the 83% dwelling allowance to a subpanel.** Table 310.12 covers services and whole-dwelling feeders, not a garage panel.
-- **Derating on a hot roof or in a crowded raceway, then ignoring it.** Ambient correction and bundling adjustment come off the 90 °C base and can easily cost you a size — the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** applies both.
+- **Derating on a hot roof or in a crowded raceway, then ignoring it.** Ambient correction and bundling adjustment come off the 90 °C base and can easily cost you a size - the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** applies both.
 - **Matching the ground to the phase conductor by eye.** It comes off the breaker, from Table 250.122.
 
 ## Size the Wire
 
-> **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** — enter load, length, voltage, and material; it runs both tests and tells you which one governed.
+> **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** - enter load, length, voltage, and material; it runs both tests and tells you which one governed.
 
 The **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** does exactly what this article describes: it finds the ampacity-governed size from Table 310.16, finds the voltage-drop-governed size for your run length, and returns the larger with the reasoning shown. From there, the **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** matches the OCPD, and the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)** checks a size you've already got in mind.
 
-*Sources & standards: NEC (NFPA 70) 2023 — Table 310.16, Table 310.12, 110.14(C), 210.19(A), 215.2(A), 240.4(D), Table 250.122, 250.122(B). Local amendments override the model code, and the AHJ has final say.*
+*Sources & standards: NEC (NFPA 70) 2023 - Table 310.16, Table 310.12, 110.14(C), 210.19(A), 215.2(A), 240.4(D), Table 250.122, 250.122(B). Local amendments override the model code, and the AHJ has final say.*
 
 ---
 
@@ -143,7 +143,7 @@ The **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calcul
 
 ### Does voltage drop override the ampacity answer?
 
-Neither overrides the other — you satisfy both. Run the ampacity test and the voltage drop test separately and use whichever demands the larger conductor. Ampacity governs short runs, voltage drop governs long ones, and the crossover is usually somewhere around 100 feet.
+Neither overrides the other - you satisfy both. Run the ampacity test and the voltage drop test separately and use whichever demands the larger conductor. Ampacity governs short runs, voltage drop governs long ones, and the crossover is usually somewhere around 100 feet.
 
 ### Why can't I use the 90 °C column on THHN?
 
@@ -151,7 +151,7 @@ Because 110.14(C) limits the circuit to the lowest-rated termination in it, and 
 
 ### How far can I run 12 gauge wire?
 
-Carrying a full 20 amps, about 45 feet on a 120-volt circuit and about 91 feet on 240 volts before voltage drop reaches 3%. At lighter loads it goes much farther — drop is proportional to current, so 10 amps doubles those distances.
+Carrying a full 20 amps, about 45 feet on a 120-volt circuit and about 91 feet on 240 volts before voltage drop reaches 3%. At lighter loads it goes much farther - drop is proportional to current, so 10 amps doubles those distances.
 
 ### Is aluminum wire okay to use?
 
@@ -159,4 +159,4 @@ Yes, where it's terminated correctly. Aluminum is standard for service entrance 
 
 ### What size ground wire goes with it?
 
-The equipment grounding conductor comes from Table 250.122 based on the breaker rating, not the conductor size — 12 AWG copper for a 20-amp circuit, 10 AWG up to 60 A, 8 AWG up to 100 A, 6 AWG up to 200 A. If you upsized the phase conductors for voltage drop, 250.122(B) requires you to upsize the EGC proportionally.
+The equipment grounding conductor comes from Table 250.122 based on the breaker rating, not the conductor size - 12 AWG copper for a 20-amp circuit, 10 AWG up to 60 A, 8 AWG up to 100 A, 6 AWG up to 200 A. If you upsized the phase conductors for voltage drop, 250.122(B) requires you to upsize the EGC proportionally.

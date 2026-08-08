@@ -14,11 +14,11 @@ import BreakerSizingFlowDiagram from "@/components/blog/breaker-size/BreakerSizi
 import BreakerStandardSizesDiagram from "@/components/blog/breaker-size/BreakerStandardSizesDiagram.astro";
 import BreakerConductorPairDiagram from "@/components/blog/breaker-size/BreakerConductorPairDiagram.astro";
 
-The most important thing to understand about breaker sizing is what the breaker is actually for. It is **not** there to protect your appliance — the appliance has its own protection. It's there to protect **the wire in the wall** from carrying more current than it can dissipate as heat.
+The most important thing to understand about breaker sizing is what the breaker is actually for. It is **not** there to protect your appliance - the appliance has its own protection. It's there to protect **the wire in the wall** from carrying more current than it can dissipate as heat.
 
 That reframes the whole question. The load tells you the *minimum* breaker you need. The conductor tells you the *maximum* you're allowed. Your answer is a standard rating that satisfies both.
 
-What the device does once it reaches that number — a bimetal strip for sustained overload, a solenoid for a short circuit, and a second rating nobody reads — is in **[How a Circuit Breaker Works](/blog/how-a-circuit-breaker-works)**.
+What the device does once it reaches that number - a bimetal strip for sustained overload, a solenoid for a short circuit, and a second rating nobody reads - is in **[How a Circuit Breaker Works](/blog/how-a-circuit-breaker-works)**.
 
 <BlogInfographic
   title="The order the checks run in"
@@ -29,18 +29,18 @@ What the device does once it reaches that number — a bimetal strip for sustain
 
 ## Step 1: Find the Actual Load
 
-Not the breaker that's there now, and not a guess. Either read the nameplate — appliances list amps, or watts you can divide by voltage — or run a calculation for a circuit serving several things.
+Not the breaker that's there now, and not a guess. Either read the nameplate - appliances list amps, or watts you can divide by voltage - or run a calculation for a circuit serving several things.
 
 ## Step 2: Add 25% If the Load Is Continuous
 
 **210.20(A)** requires the overcurrent device to be rated at least 125% of the continuous load plus 100% of the non-continuous load. A **continuous load** is one expected to operate for **three hours or more**.
 
-This is the same arithmetic behind the "80% rule" you'll hear on job sites — a 20-amp breaker being good for 16 amps of continuous load is just 20 ÷ 1.25 stated backwards. Breakers aren't derated to 80% for ordinary intermittent loads; the 125% adder applies to the continuous portion only.
+This is the same arithmetic behind the "80% rule" you'll hear on job sites - a 20-amp breaker being good for 16 amps of continuous load is just 20 ÷ 1.25 stated backwards. Breakers aren't derated to 80% for ordinary intermittent loads; the 125% adder applies to the continuous portion only.
 
 What's continuous in practice:
 
-- **Continuous** — EV charging (**625.41** requires it be treated as continuous), commercial and shop lighting, electric signs, pool pumps on long cycles, server and network gear
-- **Not continuous** — ranges, ovens, dryers, dishwashers, disposals, most residential receptacle circuits, well pumps
+- **Continuous** - EV charging (**625.41** requires it be treated as continuous), commercial and shop lighting, electric signs, pool pumps on long cycles, server and network gear
+- **Not continuous** - ranges, ovens, dryers, dishwashers, disposals, most residential receptacle circuits, well pumps
 
 ## Step 3: Round Up to a Standard Rating
 
@@ -59,14 +59,14 @@ Per **240.4**, conductors have to be protected at their ampacity. So once you ha
 
 <BlogInfographic
   title="Breaker to minimum conductor"
-  caption="Table 310.16 at 75 °C with the 240.4(D) caps applied. Long runs may need more — that's voltage drop, not ampacity."
+  caption="Table 310.16 at 75 °C with the 240.4(D) caps applied. Long runs may need more - that's voltage drop, not ampacity."
 >
   <BreakerConductorPairDiagram />
 </BlogInfographic>
 
-There's a useful allowance here. **240.4(B)** lets you go up to the **next higher standard rating** when the conductor's ampacity doesn't land exactly on a standard size — provided the rating is 800 A or less and the circuit doesn't supply receptacles for cord-and-plug-connected loads.
+There's a useful allowance here. **240.4(B)** lets you go up to the **next higher standard rating** when the conductor's ampacity doesn't land exactly on a standard size - provided the rating is 800 A or less and the circuit doesn't supply receptacles for cord-and-plug-connected loads.
 
-Example: 2 AWG copper is 115 A at 75 °C. There's no 115-amp breaker. Rather than dropping to 110, 240.4(B) permits **125 A** on that conductor. Above 800 A the allowance disappears — **240.4(C)** requires the device not to exceed the conductor ampacity at all.
+Example: 2 AWG copper is 115 A at 75 °C. There's no 115-amp breaker. Rather than dropping to 110, 240.4(B) permits **125 A** on that conductor. Above 800 A the allowance disappears - **240.4(C)** requires the device not to exceed the conductor ampacity at all.
 
 ## Step 5: Apply the Small-Conductor Cap
 
@@ -80,7 +80,7 @@ Example: 2 AWG copper is 115 A at 75 °C. There's no 115-amp breaker. Rather tha
 | 12 AWG aluminum | 15 A |
 | 10 AWG aluminum | 25 A |
 
-12 AWG copper reads 25 A in the ampacity table and still never exceeds a 20-amp breaker on a general circuit. That gap is the most-argued detail in the whole code — **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)** works through it.
+12 AWG copper reads 25 A in the ampacity table and still never exceeds a 20-amp breaker on a general circuit. That gap is the most-argued detail in the whole code - **[12 Gauge Wire Amps](/blog/12-gauge-wire-amps)** works through it.
 
 ## Worked Examples
 
@@ -94,13 +94,13 @@ A 30-amp dryer is non-continuous, so no adder: **30 A breaker**, **10 AWG copper
 
 ### A feeder on 2 AWG copper
 
-Load calculation says 118 A. Next standard rating is 125 A, and 2 AWG copper is 115 A — so on the face of it the breaker exceeds the wire. But 115 A isn't a standard rating, the feeder is under 800 A, and it doesn't supply cord-and-plug receptacles, so **240.4(B) permits the 125 A breaker** on 2 AWG.
+Load calculation says 118 A. Next standard rating is 125 A, and 2 AWG copper is 115 A - so on the face of it the breaker exceeds the wire. But 115 A isn't a standard rating, the feeder is under 800 A, and it doesn't supply cord-and-plug receptacles, so **240.4(B) permits the 125 A breaker** on 2 AWG.
 
-### A 5 HP motor — where the rules invert
+### A 5 HP motor - where the rules invert
 
 Motor circuits work differently, and the numbers look alarming until you see why.
 
-A 5 HP, 230 V single-phase motor has a table full-load current of **28 A** (**Table 430.248** — and note **430.6(A)** says you use the *table* value, not the nameplate, for conductor and OCPD sizing). Conductors get 125% of that per **430.22**: **35 A minimum ampacity**. But **Table 430.52** permits an inverse-time breaker at up to **250% of FLC** — that's **70 A**.
+A 5 HP, 230 V single-phase motor has a table full-load current of **28 A** (**Table 430.248** - and note **430.6(A)** says you use the *table* value, not the nameplate, for conductor and OCPD sizing). Conductors get 125% of that per **430.22**: **35 A minimum ampacity**. But **Table 430.52** permits an inverse-time breaker at up to **250% of FLC** - that's **70 A**.
 
 A 70-amp breaker on a conductor rated 35 A. That's legal and correct, because the breaker is only doing short-circuit and ground-fault protection; **overload** protection comes from a separate device sized to the motor (typically 115–125% of FLC). Without that separate overload relay, the arrangement would be dangerous. **240.4(G)** is what routes motor circuits to Article 430 and out of the normal rules.
 
@@ -110,17 +110,17 @@ Air conditioning equipment works the same way through **Article 440**: size from
 
 Sizing gets you the amperage. You still have to choose the right device:
 
-- **Standard thermal-magnetic** — general circuits with no special requirement
-- **AFCI** — required by **210.12** for most dwelling living-area circuits
-- **GFCI** — required by **210.8** in bathrooms, kitchens, garages, outdoors, basements, laundry areas and more; can be a breaker or a receptacle
-- **Dual-function (AFCI + GFCI)** — increasingly the simplest way to satisfy both
-- **Tandem / twin** — two circuits in one slot, only where the panel is listed for them and only up to the panel's circuit limit
+- **Standard thermal-magnetic** - general circuits with no special requirement
+- **AFCI** - required by **210.12** for most dwelling living-area circuits
+- **GFCI** - required by **210.8** in bathrooms, kitchens, garages, outdoors, basements, laundry areas and more; can be a breaker or a receptacle
+- **Dual-function (AFCI + GFCI)** - increasingly the simplest way to satisfy both
+- **Tandem / twin** - two circuits in one slot, only where the panel is listed for them and only up to the panel's circuit limit
 
 The breaker also has to be **listed for the panel** it goes in, and its **interrupting rating (AIC)** has to equal or exceed the available fault current at that point.
 
 ## Never Upsize a Breaker to Stop It Tripping
 
-This deserves saying plainly, because it's the most dangerous mistake on this topic. A breaker that trips repeatedly is reporting a real condition: too much load, a fault, or a failing device. Fitting a bigger breaker doesn't fix any of those — it removes the protection from a conductor that is already being overloaded, and the wire in the wall becomes the fuse.
+This deserves saying plainly, because it's the most dangerous mistake on this topic. A breaker that trips repeatedly is reporting a real condition: too much load, a fault, or a failing device. Fitting a bigger breaker doesn't fix any of those - it removes the protection from a conductor that is already being overloaded, and the wire in the wall becomes the fuse.
 
 The correct fixes are to move load to another circuit, add a circuit, or find the fault. The only time a larger breaker is right is when you're **also** upsizing the conductor to match.
 
@@ -131,16 +131,16 @@ The correct fixes are to move load to another circuit, add a circuit, or find th
 - **Forgetting the 125% continuous adder.** An EV charger without it is undersized from day one.
 - **Reading the ampacity table past the 240.4(D) cap.** 12 AWG is a 20-amp conductor.
 - **Using nameplate FLA for motor sizing.** 430.6(A) sends you to Table 430.248/430.250 instead.
-- **Ignoring voltage drop.** Ampacity and OCPD say nothing about distance — see **[Voltage Drop](/blog/voltage-drop-calculation)**.
+- **Ignoring voltage drop.** Ampacity and OCPD say nothing about distance - see **[Voltage Drop](/blog/voltage-drop-calculation)**.
 - **Assuming any breaker fits any panel.** It must be listed for that panelboard, with an adequate AIC rating.
 
 ## Size the Breaker
 
-> **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** — enter the load, mark it continuous or not, and get the standard OCPD rating with the minimum conductor beside it.
+> **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** - enter the load, mark it continuous or not, and get the standard OCPD rating with the minimum conductor beside it.
 
-The **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** applies the 125% adder, rounds to the next 240.6(A) rating, and checks the conductor — including the 240.4(D) cap. Working from the other direction, the **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** sizes the conductor from the load and run length, and the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** gives you the maximum breaker for a conductor in specific conditions. Full method in **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** and the tables in the **[Wire Size Chart](/blog/wire-size-chart-amps)**.
+The **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-calculator)** applies the 125% adder, rounds to the next 240.6(A) rating, and checks the conductor - including the 240.4(D) cap. Working from the other direction, the **[Wire Size Calculator](/calculators/electrical/electrical-wire-size-calculator)** sizes the conductor from the load and run length, and the **[Ampacity Calculator](/calculators/electrical/electrical-ampacity-calculator)** gives you the maximum breaker for a conductor in specific conditions. Full method in **[What Size Wire Do I Need](/blog/what-size-wire-do-i-need)** and the tables in the **[Wire Size Chart](/blog/wire-size-chart-amps)**.
 
-*Sources & standards: NEC (NFPA 70) 2023 — 240.4, 240.4(B), 240.4(C), 240.4(D), 240.4(G), 240.6(A), 210.8, 210.12, 210.20(A), Table 310.16, 430.6(A), 430.22, Table 430.52, Table 430.248, 440.22, 625.41. Local amendments override the model code, and the AHJ has final say.*
+*Sources & standards: NEC (NFPA 70) 2023 - 240.4, 240.4(B), 240.4(C), 240.4(D), 240.4(G), 240.6(A), 210.8, 210.12, 210.20(A), Table 310.16, 430.6(A), 430.22, Table 430.52, Table 430.248, 440.22, 625.41. Local amendments override the model code, and the AHJ has final say.*
 
 ---
 
@@ -148,15 +148,15 @@ The **[Breaker Size Calculator](/calculators/electrical/electrical-breaker-size-
 
 ### What size breaker do I need for a 20 amp load?
 
-If the 20 amps is non-continuous, a 20-amp breaker on 12 AWG copper. If it's continuous — three hours or more — 210.20(A) requires 125% of it, so 20 × 1.25 = 25 A, meaning a 25-amp breaker on 10 AWG copper.
+If the 20 amps is non-continuous, a 20-amp breaker on 12 AWG copper. If it's continuous - three hours or more - 210.20(A) requires 125% of it, so 20 × 1.25 = 25 A, meaning a 25-amp breaker on 10 AWG copper.
 
 ### How do I know what size breaker my circuit needs?
 
-Take the actual load in amps, multiply the continuous portion by 1.25, round up to the next standard rating in 240.6(A), then confirm the conductor's ampacity covers that rating and respect the 240.4(D) cap on 14, 12 and 10 AWG. Special equipment — motors, A/C — follows Article 430 or 440 instead.
+Take the actual load in amps, multiply the continuous portion by 1.25, round up to the next standard rating in 240.6(A), then confirm the conductor's ampacity covers that rating and respect the 240.4(D) cap on 14, 12 and 10 AWG. Special equipment - motors, A/C - follows Article 430 or 440 instead.
 
 ### Can I put a bigger breaker on an existing circuit?
 
-Only if the conductor supports it. A larger breaker on the same wire removes the protection that wire depends on, and an overloaded conductor then heats up with nothing to stop it. If a breaker keeps tripping, the answer is to reduce the load, add a circuit, or find the fault — not to fit a bigger device.
+Only if the conductor supports it. A larger breaker on the same wire removes the protection that wire depends on, and an overloaded conductor then heats up with nothing to stop it. If a breaker keeps tripping, the answer is to reduce the load, add a circuit, or find the fault - not to fit a bigger device.
 
 ### What is the 80% rule for breakers?
 
@@ -168,4 +168,4 @@ Because motor circuits split the two protection jobs. Table 430.52 lets an inver
 
 ### What size breaker for a 50 amp circuit?
 
-A 50-amp breaker, on 8 AWG copper or 6 AWG aluminum — 8 AWG copper is exactly 50 A at 75 °C. If the load is continuous you'd need 50 × 1.25 = 62.5 A, rounding to a 70-amp breaker and 4 AWG copper.
+A 50-amp breaker, on 8 AWG copper or 6 AWG aluminum - 8 AWG copper is exactly 50 A at 75 °C. If the load is continuous you'd need 50 × 1.25 = 62.5 A, rounding to a 70-amp breaker and 4 AWG copper.

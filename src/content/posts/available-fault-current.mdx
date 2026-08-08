@@ -1,7 +1,7 @@
 ---
 title: "Available Fault Current: The Point-to-Point Method and AIC Ratings"
 meta_title: "Available Fault Current: Point-to-Point Method and AIC (2026) | TradesQuote"
-description: "A 300 kVA 480 V transformer delivers 11,455 A at its secondary. After 100 ft of 4/0 it's 8,626 A — and at 50 ft the requirement already drops from 22 kA equipment to 10 kA."
+description: "A 300 kVA 480 V transformer delivers 11,455 A at its secondary. After 100 ft of 4/0 it's 8,626 A - and at 50 ft the requirement already drops from 22 kA equipment to 10 kA."
 image: /images/posts/available-fault-current-hero.svg
 date: 2026-08-04T16:45:00Z
 categories: ["electrical"]
@@ -14,7 +14,7 @@ import FaultTransformerDiagram from "@/components/blog/fault-current/FaultTransf
 import FaultDownRunDiagram from "@/components/blog/fault-current/FaultDownRunDiagram.astro";
 import FaultMethodLimitsDiagram from "@/components/blog/fault-current/FaultMethodLimitsDiagram.astro";
 
-Every breaker has two current ratings, and one of them gets ignored. The **trip rating** is the number on the handle. The **interrupting rating** — the AIC — is how much fault current the device can safely clear without failing, and it's printed much smaller.
+Every breaker has two current ratings, and one of them gets ignored. The **trip rating** is the number on the handle. The **interrupting rating** - the AIC - is how much fault current the device can safely clear without failing, and it's printed much smaller.
 
 Install a 10 kA breaker where 15 kA is available and the device may not open the fault. It can rupture instead. **110.9** requires equipment intended to interrupt current at fault levels to have an adequate interrupting rating, and **110.24** requires service equipment to be field-marked with the available fault current.
 
@@ -46,7 +46,7 @@ Note the impedance used: **3.15%, not the 3.5% on the nameplate.**
 | Nameplate as marked | 3.50% | 10,310 A | 22,000 A |
 | **NEMA −10% tolerance** | **3.15%** | **11,455 A** | **22,000 A** |
 
-**NEMA permits ±10% on transformer impedance, and the low side is the worst case** — lower impedance means *more* fault current. Using the nameplate figure understates the available fault current by **11.1%**, and on a marginal AIC check that's exactly the error that gets equipment specified one band too low.
+**NEMA permits ±10% on transformer impedance, and the low side is the worst case** - lower impedance means *more* fault current. Using the nameplate figure understates the available fault current by **11.1%**, and on a marginal AIC check that's exactly the error that gets equipment specified one band too low.
 
 This is counter-intuitive if you think of impedance as a good thing. For voltage regulation, low impedance is better. For fault duty, low impedance is worse. You don't get to choose which one you want.
 
@@ -68,9 +68,9 @@ This is counter-intuitive if you think of impedance as a good thing. For voltage
 | 200 ft | 6,917 A | 10,000 A |
 | 400 ft | 4,954 A | 10,000 A |
 
-**100 feet of 4/0 sheds 25% of the fault current.** And because the standard AIC bands are coarse — 10 kA, 22 kA, 25 kA, 42 kA, 65 kA — a modest reduction can move you across a band boundary and change what you're permitted to install. Here the boundary falls at about 50 feet.
+**100 feet of 4/0 sheds 25% of the fault current.** And because the standard AIC bands are coarse - 10 kA, 22 kA, 25 kA, 42 kA, 65 kA - a modest reduction can move you across a band boundary and change what you're permitted to install. Here the boundary falls at about 50 feet.
 
-That's a real design lever. Where a panel is marginal on interrupting rating, **moving it further from the transformer** is sometimes cheaper than specifying higher-rated equipment throughout — though obviously you're then buying conductor, and the voltage-drop consequence follows you.
+That's a real design lever. Where a panel is marginal on interrupting rating, **moving it further from the transformer** is sometimes cheaper than specifying higher-rated equipment throughout - though obviously you're then buying conductor, and the voltage-drop consequence follows you.
 
 ### The method
 
@@ -88,29 +88,29 @@ The version used here is algebraically the same thing but derived from real impe
 2. **Compute the run's impedance** from Chapter 9 Table 8 resistance and Table 9 reactance.
 3. **f = Z_run ÷ Z_source**, and **M = 1 ÷ (1 + f)**.
 
-At 100 feet: Z_run = 0.00794 Ω, Z_source = 0.02419 Ω, so f = 0.3280 and **M = 0.7530** — the 25% reduction. Using the real tables rather than *C* values means the same calculation works for any conductor in the tables, and it's the approach in the **[Conductor Resistance Calculator](/calculators/electrical/electrical-conductor-resistance-calculator)**.
+At 100 feet: Z_run = 0.00794 Ω, Z_source = 0.02419 Ω, so f = 0.3280 and **M = 0.7530** - the 25% reduction. Using the real tables rather than *C* values means the same calculation works for any conductor in the tables, and it's the approach in the **[Conductor Resistance Calculator](/calculators/electrical/electrical-conductor-resistance-calculator)**.
 
 One detail worth stating: **three-phase uses the phase voltage against a one-way conductor impedance**, while a single-phase line-to-line fault uses the full voltage and both conductors. Getting that wrong by a factor of two is easy.
 
 ## What Reduces Fault Current, and What Doesn't
 
-**Reduces it:** conductor length, smaller conductors, higher transformer impedance, fewer parallel sets. Also nonmagnetic raceway versus steel, slightly — steel raceway increases reactance.
+**Reduces it:** conductor length, smaller conductors, higher transformer impedance, fewer parallel sets. Also nonmagnetic raceway versus steel, slightly - steel raceway increases reactance.
 
 **Increases it:** shorter runs, larger conductors, parallel conductors, lower transformer impedance, a larger transformer, multiple sources in parallel.
 
-**Doesn't change it:** the breaker's trip rating, the load, the power factor of the load. Fault current is set by the source and the impedance between it and the fault — not by what's normally drawing current.
+**Doesn't change it:** the breaker's trip rating, the load, the power factor of the load. Fault current is set by the source and the impedance between it and the fault - not by what's normally drawing current.
 
 **A common surprise: upsizing conductors for voltage drop raises the fault current downstream.** The two design goals pull against each other, and on a long feeder to a subpanel it's worth checking both.
 
 ## Where the Numbers Are Required
 
-**110.24** — service equipment in other than dwelling units must be field-marked with the maximum available fault current, including the date, and the marking must be updated when modifications change it. This is frequently missing on older installations and is a routine inspection item.
+**110.24** - service equipment in other than dwelling units must be field-marked with the maximum available fault current, including the date, and the marking must be updated when modifications change it. This is frequently missing on older installations and is a routine inspection item.
 
-**110.9** — interrupting rating adequate for the available fault current at the point of application.
+**110.9** - interrupting rating adequate for the available fault current at the point of application.
 
-**110.10** — the circuit impedance, short-circuit current ratings and other characteristics must be selected so the fault is cleared without extensive damage. This is the **series-rating** and **SCCR** territory.
+**110.10** - the circuit impedance, short-circuit current ratings and other characteristics must be selected so the fault is cleared without extensive damage. This is the **series-rating** and **SCCR** territory.
 
-**409.110 and 440.4(B)** — industrial control panels and A/C equipment must be marked with a **short-circuit current rating (SCCR)**, and installing an assembly with a 5 kA SCCR where 11 kA is available is a violation even if every breaker in it is adequately rated. SCCR is an assembly rating, and it's usually the lowest-rated component that sets it.
+**409.110 and 440.4(B)** - industrial control panels and A/C equipment must be marked with a **short-circuit current rating (SCCR)**, and installing an assembly with a 5 kA SCCR where 11 kA is available is a violation even if every breaker in it is adequately rated. SCCR is an assembly rating, and it's usually the lowest-rated component that sets it.
 
 **Series ratings** let a downstream device with a lower individual AIC be used behind a specific upstream device, but **only for tested combinations documented by the manufacturer.** You cannot reason your way to a series rating; you look it up.
 
@@ -118,16 +118,16 @@ One detail worth stating: **three-phase uses the phase voltage against a one-way
 
 <BlogInfographic
   title="A planning tool, and it's worth knowing its edges"
-  caption="Conservative by design — but not a substitute for an engineered study."
+  caption="Conservative by design - but not a substitute for an engineered study."
 >
   <FaultMethodLimitsDiagram />
 </BlogInfographic>
 
 Being explicit, because a point-to-point figure gets misused:
 
-**What it gives you** — symmetrical RMS fault current for one transformer and one run. Enough for an interrupting-rating check and for planning.
+**What it gives you** - symmetrical RMS fault current for one transformer and one run. Enough for an interrupting-rating check and for planning.
 
-**Where it's conservative on purpose** — an **infinite primary source** overstates the fault current, since the utility's actual impedance is not zero. The **−10% impedance** assumption is the worst case. No credit is taken for upstream conductor length. All three errors point the safe way.
+**Where it's conservative on purpose** - an **infinite primary source** overstates the fault current, since the utility's actual impedance is not zero. The **−10% impedance** assumption is the worst case. No credit is taken for upstream conductor length. All three errors point the safe way.
 
 **What it does not model:**
 
@@ -152,11 +152,11 @@ Being explicit, because a point-to-point figure gets misused:
 
 ## Run the Calculation
 
-> **[Short Circuit Calculator](/calculators/electrical/electrical-short-circuit-calculator)** — enter the transformer kVA, secondary voltage, phase and impedance with or without the tolerance margin, then the conductor size, material, raceway type and run length. It returns the fault current at the secondary and at the far end, the *f* factor and multiplier, and the minimum standard interrupting rating for each point.
+> **[Short Circuit Calculator](/calculators/electrical/electrical-short-circuit-calculator)** - enter the transformer kVA, secondary voltage, phase and impedance with or without the tolerance margin, then the conductor size, material, raceway type and run length. It returns the fault current at the secondary and at the far end, the *f* factor and multiplier, and the minimum standard interrupting rating for each point.
 
 Pair it with the **[Transformer Sizing Calculator](/calculators/electrical/electrical-transformer-sizing-calculator)** and the **[Conductor Resistance Calculator](/calculators/electrical/electrical-conductor-resistance-calculator)**. See **[Transformer Sizing](/blog/transformer-sizing-calculation)** for the source, **[Motor Circuit Sizing](/blog/motor-circuit-sizing)** for the loads that contribute, and **[Ohm's Law Explained](/blog/ohms-law-explained)** for why effective impedance is R·cos θ + X·sin θ rather than the magnitude.
 
-*Sources & standards: NEC (NFPA 70) 2023 — 110.9, 110.10, 110.24, 409.110, 440.4(B), and Chapter 9 Tables 8 and 9 for conductor resistance and reactance. The ±10% transformer impedance tolerance is NEMA practice. Arc-flash incident energy is IEEE 1584 and outside the scope of this method. This is a planning calculation; marginal ratings, coordination studies and arc-flash labelling require a licensed engineer.*
+*Sources & standards: NEC (NFPA 70) 2023 - 110.9, 110.10, 110.24, 409.110, 440.4(B), and Chapter 9 Tables 8 and 9 for conductor resistance and reactance. The ±10% transformer impedance tolerance is NEMA practice. Arc-flash incident energy is IEEE 1584 and outside the scope of this method. This is a planning calculation; marginal ratings, coordination studies and arc-flash labelling require a licensed engineer.*
 
 ---
 
@@ -164,11 +164,11 @@ Pair it with the **[Transformer Sizing Calculator](/calculators/electrical/elect
 
 ### What is available fault current?
 
-The maximum current that would flow if a bolted short circuit occurred at a given point. It's set by the source and the impedance between the source and the fault — not by the connected load. It matters because every protective device has an interrupting rating, and installing a device where more fault current is available than it can clear risks the device failing violently instead of opening.
+The maximum current that would flow if a bolted short circuit occurred at a given point. It's set by the source and the impedance between the source and the fault - not by the connected load. It matters because every protective device has an interrupting rating, and installing a device where more fault current is available than it can clear risks the device failing violently instead of opening.
 
 ### How do I calculate fault current at a transformer secondary?
 
-Divide the secondary full-load current by the per-unit impedance. A 300 kVA 480 V three-phase transformer has an FLA of 360.8 A, and at 3.5% impedance that's 360.8 ÷ 0.035 = 10,310 A. Apply the NEMA −10% impedance tolerance and the effective impedance becomes 3.15%, raising the figure to 11,455 A — which is the number to use for an interrupting-rating check.
+Divide the secondary full-load current by the per-unit impedance. A 300 kVA 480 V three-phase transformer has an FLA of 360.8 A, and at 3.5% impedance that's 360.8 ÷ 0.035 = 10,310 A. Apply the NEMA −10% impedance tolerance and the effective impedance becomes 3.15%, raising the figure to 11,455 A - which is the number to use for an interrupting-rating check.
 
 ### Why use the −10% impedance instead of the nameplate value?
 
@@ -176,15 +176,15 @@ Because NEMA allows ±10% on transformer impedance, and lower impedance produces
 
 ### What is an AIC rating?
 
-The ampere interrupting capacity — how much fault current a protective device can safely interrupt. It's separate from and much larger than the trip rating: a 20 A breaker might have a 10,000 A interrupting rating. NEC 110.9 requires it to be adequate for the fault current available at that point. Standard bands are 10 kA, 22 kA, 25 kA, 42 kA, 65 kA and 100 kA.
+The ampere interrupting capacity - how much fault current a protective device can safely interrupt. It's separate from and much larger than the trip rating: a 20 A breaker might have a 10,000 A interrupting rating. NEC 110.9 requires it to be adequate for the fault current available at that point. Standard bands are 10 kA, 22 kA, 25 kA, 42 kA, 65 kA and 100 kA.
 
 ### How much does fault current drop over a conductor run?
 
-More than people expect. From an 11,455 A source, 4/0 copper in steel raceway gives 10,587 A at 25 ft, 9,841 A at 50 ft and 8,626 A at 100 ft — a 25% reduction over 100 feet. Because AIC bands are coarse, that's often enough to cross a boundary: in this example the requirement drops from 22 kA to 10 kA equipment at about 50 feet.
+More than people expect. From an 11,455 A source, 4/0 copper in steel raceway gives 10,587 A at 25 ft, 9,841 A at 50 ft and 8,626 A at 100 ft - a 25% reduction over 100 feet. Because AIC bands are coarse, that's often enough to cross a boundary: in this example the requirement drops from 22 kA to 10 kA equipment at about 50 feet.
 
 ### What is the point-to-point method?
 
-A hand calculation for fault current at successive points in a system. It computes f = (1.732 × L × I) ÷ (C × n × V) for three-phase, then a multiplier M = 1 ÷ (1 + f), and applies that multiplier to the upstream fault current. It's algebraically the same as inferring the source impedance from the upstream fault current, adding the run's own impedance from Chapter 9 Tables 8 and 9, and recomputing — which avoids needing proprietary C constants.
+A hand calculation for fault current at successive points in a system. It computes f = (1.732 × L × I) ÷ (C × n × V) for three-phase, then a multiplier M = 1 ÷ (1 + f), and applies that multiplier to the upstream fault current. It's algebraically the same as inferring the source impedance from the upstream fault current, adding the run's own impedance from Chapter 9 Tables 8 and 9, and recomputing - which avoids needing proprietary C constants.
 
 ### Does this calculation cover arc flash?
 
@@ -192,4 +192,4 @@ No. Arc-flash incident energy is a separate calculation under IEEE 1584 that dep
 
 ### What is SCCR and how is it different?
 
-Short-circuit current rating — an *assembly* rating marked on industrial control panels under 409.110 and on A/C equipment under 440.4(B). It's usually set by the lowest-rated component in the assembly, so a panel full of 22 kA breakers can still have a 5 kA SCCR. Installing that assembly where 11 kA is available is a violation even though every individual breaker is adequate.
+Short-circuit current rating - an *assembly* rating marked on industrial control panels under 409.110 and on A/C equipment under 440.4(B). It's usually set by the lowest-rated component in the assembly, so a panel full of 22 kA breakers can still have a 5 kA SCCR. Installing that assembly where 11 kA is available is a violation even though every individual breaker is adequate.

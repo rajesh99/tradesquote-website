@@ -16,7 +16,7 @@ import StringColdLadderDiagram from "@/components/blog/solar-string/StringColdLa
 
 A string is squeezed between two temperatures, and the two ends are not equally forgiving.
 
-**Cold sets the maximum.** Open-circuit voltage rises as cells chill, and if the string exceeds the inverter's maximum input the inverter is destroyed — not on commissioning day, but on the first cold clear morning of its first winter.
+**Cold sets the maximum.** Open-circuit voltage rises as cells chill, and if the string exceeds the inverter's maximum input the inverter is destroyed - not on commissioning day, but on the first cold clear morning of its first winter.
 
 **Heat sets the minimum.** Maximum-power voltage falls as cells warm, and if the string drops below the MPPT window the inverter stops tracking and the array's output collapses.
 
@@ -31,7 +31,7 @@ Get the bottom wrong and you lose an afternoon of production. Get the top wrong 
   <StringBoundsDiagram />
 </BlogInfographic>
 
-Take a common residential module — 49.5 V Voc, 41.5 V Vmp, coefficients of −0.27%/°C and −0.35%/°C — on a 600 V string inverter with an 80 V MPPT floor, at a site whose record low is −10°C.
+Take a common residential module - 49.5 V Voc, 41.5 V Vmp, coefficients of −0.27%/°C and −0.35%/°C - on a 600 V string inverter with an 80 V MPPT floor, at a site whose record low is −10°C.
 
 ```
 cold:  49.5 × [1 + (−0.0027)(−10 − 25)]  = 54.18 V per module
@@ -41,24 +41,24 @@ hot:   41.5 × [1 + (−0.0035)(65 − 25)]   = 35.69 V per module
        80 ÷ 35.69 = 2.24    →  3 modules minimum
 ```
 
-Anything from **3 to 11 modules** is electrically valid. Note how much wider the band is than most people expect — the MPPT floor is rarely the binding constraint on a modern inverter, and the real design question is almost always how close to the ceiling you dare to go.
+Anything from **3 to 11 modules** is electrically valid. Note how much wider the band is than most people expect - the MPPT floor is rarely the binding constraint on a modern inverter, and the real design question is almost always how close to the ceiling you dare to go.
 
 Eleven modules reach **595.96 V** at −10°C. That is four volts under a 600 V ceiling.
 
 ## Why Cold Is the Dangerous End
 
 <BlogInfographic
-  title="Cold raises voltage — that is the whole problem"
+  title="Cold raises voltage - that is the whole problem"
   caption="An 11-module string of 49.5 V modules at −0.27%/°C, against a 600 V inverter."
 >
   <StringVocRiseDiagram />
 </BlogInfographic>
 
-Silicon's open-circuit voltage carries a **negative temperature coefficient**, typically around −0.27%/°C. Below the 25°C standard test condition, voltage climbs above nameplate. The same eleven-module string that sits at a comfortable 544.5 V on the test bench reaches 603 V at −15°C — over the inverter's rating with the array producing nothing unusual.
+Silicon's open-circuit voltage carries a **negative temperature coefficient**, typically around −0.27%/°C. Below the 25°C standard test condition, voltage climbs above nameplate. The same eleven-module string that sits at a comfortable 544.5 V on the test bench reaches 603 V at −15°C - over the inverter's rating with the array producing nothing unusual.
 
 The cruel part is the coincidence. The coldest mornings are frequently the clearest, so peak voltage and full irradiance arrive together, and the array is at open circuit for the moment before the inverter picks up. That is precisely the condition NEC **690.7** is written for: maximum voltage shall be calculated at the **lowest expected ambient temperature**.
 
-Note the word *ambient*, not cell. At dawn in winter a module sits at air temperature — there is no sun on it yet to warm it. This is the one place in PV design where ambient is the right input.
+Note the word *ambient*, not cell. At dawn in winter a module sits at air temperature - there is no sun on it yet to warm it. This is the one place in PV design where ambient is the right input.
 
 The hot end is the reverse. A roof-mounted module in July runs **25 to 35°C above the surrounding air**, so a 30°C afternoon means a 60°C cell. Using ambient for the hot case badly understates the voltage drop and can put a short string outside the MPPT window in service.
 
@@ -66,14 +66,14 @@ The hot end is the reverse. A roof-mounted module in July runs **25 to 35°C abo
 
 The **record low**, not the average winter minimum. The string has to survive the worst morning in its twenty-five-year life, not a typical January.
 
-The usual source is the **ASHRAE Extreme Annual Mean Minimum Design Dry Bulb Temperature** for the nearest station — the same dataset heating load calculations draw on. Plenty of jurisdictions and utilities specify it directly.
+The usual source is the **ASHRAE Extreme Annual Mean Minimum Design Dry Bulb Temperature** for the nearest station - the same dataset heating load calculations draw on. Plenty of jurisdictions and utilities specify it directly.
 
 If the figure is genuinely uncertain, build one module shorter. The production cost of a 10-module string against an 11-module one is a few percent; the cost of being wrong is the inverter.
 
 ## The Table 690.7(A) Trap
 
 <BlogInfographic
-  title="What the cold costs — and what the fallback table costs"
+  title="What the cold costs - and what the fallback table costs"
   caption="Solid blocks use the module's own coefficient. A hollow block is one the Table 690.7(A) method gives away."
 >
   <StringColdLadderDiagram />
@@ -88,7 +88,7 @@ If the figure is genuinely uncertain, build one module shorter. The production c
 | −30°C | 56.85 V | 10 | ×1.21 | 10 |
 | −40°C | 58.19 V | 10 | ×1.25 | **9** |
 
-**Table 690.7(A) is a fallback**, for crystalline silicon when the manufacturer's coefficient is unavailable. Since every datasheet published in the last two decades gives one, that situation is essentially theoretical — and yet the table gets used routinely, out of habit or because a plan-check reviewer asked for it.
+**Table 690.7(A) is a fallback**, for crystalline silicon when the manufacturer's coefficient is unavailable. Since every datasheet published in the last two decades gives one, that situation is essentially theoretical - and yet the table gets used routinely, out of habit or because a plan-check reviewer asked for it.
 
 It is deliberately conservative. At −10°C it applies a flat ×1.14, giving 56.43 V against the 54.18 V the real coefficient produces. **That difference costs a module: ten instead of eleven.** On a twenty-string commercial array, that is twenty modules of capacity given away for no safety benefit whatsoever, since the datasheet figure is the manufacturer's own tested value.
 
@@ -96,7 +96,7 @@ Use the coefficient. Show the arithmetic on the plan set.
 
 ## Sizing the Conductors
 
-While the voltage question decides string length, the current question decides everything downstream — and it has its own trap.
+While the voltage question decides string length, the current question decides everything downstream - and it has its own trap.
 
 **PV conductors are sized at 156% of Isc**, arrived at in two steps that people frequently apply only once:
 
@@ -105,11 +105,11 @@ While the voltage question decides string length, the current question decides e
 
 The two compound: 1.25 × 1.25 = **1.5625**. Applying only one of them undersizes the conductor by a fifth.
 
-Rooftop conduit also runs hot, and **310.15(B)(1)** ambient correction is not optional there — a raceway on a dark roof in summer easily sees 50 °C or more. Work it through with the **[Ampacity & Derating Calculator](/calculators/electrical/electrical-ampacity-calculator)**, and the DC home run with the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)**. The general principle is covered in **[Wire Derating Explained](/blog/wire-derating-nec)**.
+Rooftop conduit also runs hot, and **310.15(B)(1)** ambient correction is not optional there - a raceway on a dark roof in summer easily sees 50 °C or more. Work it through with the **[Ampacity & Derating Calculator](/calculators/electrical/electrical-ampacity-calculator)**, and the DC home run with the **[Voltage Drop Calculator](/calculators/electrical/electrical-voltage-drop-calculator)**. The general principle is covered in **[Wire Derating Explained](/blog/wire-derating-nec)**.
 
 ## Practical Design Notes
 
-**String length is voltage, not power.** Ten modules in series and two strings of five produce identical watts. What length buys is **lower current for the same power** — thinner conductors, less voltage drop, fewer combiner terminations. That is the only reason to push toward the ceiling, and it is a real one on large arrays.
+**String length is voltage, not power.** Ten modules in series and two strings of five produce identical watts. What length buys is **lower current for the same power** - thinner conductors, less voltage drop, fewer combiner terminations. That is the only reason to push toward the ceiling, and it is a real one on large arrays.
 
 **Strings on one MPPT must match.** Different lengths, orientations or shading on a shared input get dragged to a single operating point, and the weakest string pulls the rest down with it. Separate roof faces belong on separate MPPT inputs, or on module-level electronics.
 
@@ -131,11 +131,11 @@ Rooftop conduit also runs hot, and **310.15(B)(1)** ambient correction is not op
 
 ## Size a String
 
-> **[Solar String Sizing Calculator](/calculators/electrical/electrical-solar-string-calculator)** — enter the module's Voc, Vmp and both temperature coefficients along with your record low, the expected hot cell temperature and the inverter's limits. It returns the maximum and minimum modules per string, shows the temperature-corrected voltages, and runs the Table 690.7(A) comparison alongside so you can see exactly what the fallback would cost you.
+> **[Solar String Sizing Calculator](/calculators/electrical/electrical-solar-string-calculator)** - enter the module's Voc, Vmp and both temperature coefficients along with your record low, the expected hot cell temperature and the inverter's limits. It returns the maximum and minimum modules per string, shows the temperature-corrected voltages, and runs the Table 690.7(A) comparison alongside so you can see exactly what the fallback would cost you.
 
-Once the array is designed, check the panel will actually accept it with the **[Solar 120% Rule Calculator](/calculators/electrical/electrical-solar-interconnection-calculator)** — the busbar arithmetic is worked through in **[The Solar 120% Rule](/blog/solar-120-percent-rule)**.
+Once the array is designed, check the panel will actually accept it with the **[Solar 120% Rule Calculator](/calculators/electrical/electrical-solar-interconnection-calculator)** - the busbar arithmetic is worked through in **[The Solar 120% Rule](/blog/solar-120-percent-rule)**.
 
-*Sources & standards: NEC (NFPA 70) 2023 — Article 690, including 690.7 (maximum voltage, calculated at the lowest expected ambient temperature using the module's temperature coefficient where supplied, with Table 690.7(A) as the crystalline-silicon fallback), 690.8(A) and 690.8(B) (circuit current and conductor sizing, whose 125% factors compound to 156%), and 310.15(B)(1) for ambient correction on rooftop raceways. The MPPT minimum voltage is an inverter specification rather than a code requirement — falling below it costs production, not compliance. Record-low ambient temperatures should come from a recognised source such as the ASHRAE extreme annual mean minimum design dry-bulb data. Local amendments override the model code and the AHJ has final say. Have PV systems designed and installed by qualified personnel under permit.*
+*Sources & standards: NEC (NFPA 70) 2023 - Article 690, including 690.7 (maximum voltage, calculated at the lowest expected ambient temperature using the module's temperature coefficient where supplied, with Table 690.7(A) as the crystalline-silicon fallback), 690.8(A) and 690.8(B) (circuit current and conductor sizing, whose 125% factors compound to 156%), and 310.15(B)(1) for ambient correction on rooftop raceways. The MPPT minimum voltage is an inverter specification rather than a code requirement - falling below it costs production, not compliance. Record-low ambient temperatures should come from a recognised source such as the ASHRAE extreme annual mean minimum design dry-bulb data. Local amendments override the model code and the AHJ has final say. Have PV systems designed and installed by qualified personnel under permit.*
 
 ---
 
@@ -147,27 +147,27 @@ As many as fit under the inverter's maximum input voltage at the coldest tempera
 
 ### Why does cold weather limit string length?
 
-Because silicon's open-circuit voltage has a negative temperature coefficient — around −0.27%/°C — so voltage rises as cells chill. An 11-module string sitting at 544.5 V under standard test conditions reaches 603 V at −15°C. NEC 690.7 requires maximum voltage to be calculated at the lowest expected ambient temperature for exactly this reason, and exceeding the inverter's input rating destroys it.
+Because silicon's open-circuit voltage has a negative temperature coefficient - around −0.27%/°C - so voltage rises as cells chill. An 11-module string sitting at 544.5 V under standard test conditions reaches 603 V at −15°C. NEC 690.7 requires maximum voltage to be calculated at the lowest expected ambient temperature for exactly this reason, and exceeding the inverter's input rating destroys it.
 
 ### What sets the minimum number of modules in a string?
 
-Heat. Maximum-power voltage falls as cells warm, and if the string drops below the bottom of the inverter's MPPT window the inverter stops tracking and output collapses. Cell temperature drives this, not ambient — a roof-mounted module runs 25 to 35°C above the air. At a 65°C cell a 41.5 V module gives 35.69 V, so an 80 V MPPT floor needs three modules.
+Heat. Maximum-power voltage falls as cells warm, and if the string drops below the bottom of the inverter's MPPT window the inverter stops tracking and output collapses. Cell temperature drives this, not ambient - a roof-mounted module runs 25 to 35°C above the air. At a 65°C cell a 41.5 V module gives 35.69 V, so an 80 V MPPT floor needs three modules.
 
 ### Should I use the module's temperature coefficient or Table 690.7(A)?
 
-The module's own coefficient, whenever the datasheet provides one — and it always does. Table 690.7(A) is a deliberately conservative fallback for crystalline silicon when no coefficient is available. At −10°C the table applies a flat ×1.14 against the real figure's ×1.0945, which costs one module per string. Across a twenty-string array that is twenty modules of capacity given away for no safety gain.
+The module's own coefficient, whenever the datasheet provides one - and it always does. Table 690.7(A) is a deliberately conservative fallback for crystalline silicon when no coefficient is available. At −10°C the table applies a flat ×1.14 against the real figure's ×1.0945, which costs one module per string. Across a twenty-string array that is twenty modules of capacity given away for no safety gain.
 
 ### What temperature should I use for string sizing?
 
-For the cold limit, the record low ambient at the site — typically the ASHRAE Extreme Annual Mean Minimum Design Dry Bulb Temperature for the nearest station, not the average winter minimum. For the hot limit, an expected cell temperature, which runs 25 to 35°C above ambient on a roof mount. The two ends legitimately use different temperatures, and mixing them up is a common error.
+For the cold limit, the record low ambient at the site - typically the ASHRAE Extreme Annual Mean Minimum Design Dry Bulb Temperature for the nearest station, not the average winter minimum. For the hot limit, an expected cell temperature, which runs 25 to 35°C above ambient on a roof mount. The two ends legitimately use different temperatures, and mixing them up is a common error.
 
 ### Does a longer string produce more power?
 
-No. String length changes voltage, not watts — ten modules in series and two strings of five produce the same power. What longer strings buy is lower current for the same output, which means smaller conductors, less voltage drop and fewer combiner terminations. That is why designers push toward the maximum, and why the cost of overshooting is an inverter rather than lost production.
+No. String length changes voltage, not watts - ten modules in series and two strings of five produce the same power. What longer strings buy is lower current for the same output, which means smaller conductors, less voltage drop and fewer combiner terminations. That is why designers push toward the maximum, and why the cost of overshooting is an inverter rather than lost production.
 
 ### What current do I size PV conductors for?
 
-156% of the module's short-circuit current, in two compounding steps. NEC 690.8(A) sets the circuit current at 125% of rated Isc — a correction for irradiance above 1000 W/m², not a continuous-load factor. Then 690.8(B) applies the ordinary 125% continuous-load factor on top. Applying only one of them undersizes the conductor by a fifth. Rooftop ambient derating applies as well.
+156% of the module's short-circuit current, in two compounding steps. NEC 690.8(A) sets the circuit current at 125% of rated Isc - a correction for irradiance above 1000 W/m², not a continuous-load factor. Then 690.8(B) applies the ordinary 125% continuous-load factor on top. Applying only one of them undersizes the conductor by a fifth. Rooftop ambient derating applies as well.
 
 ### Can strings of different lengths share an inverter?
 

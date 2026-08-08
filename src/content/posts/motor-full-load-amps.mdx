@@ -16,7 +16,7 @@ import MotorWhyTableDiagram from "@/components/blog/motor-fla/MotorWhyTableDiagr
 
 There's a motor on the wall with **13.0 A** printed on its nameplate. NEC Table 430.250 says a 10 HP three-phase motor at 460 V draws **14.0 A**. Which number do you use?
 
-**Both — for different things, and that's the rule people get wrong.**
+**Both - for different things, and that's the rule people get wrong.**
 
 - **Conductors and the overcurrent device use the table value.** 430.6(A)(1) says so explicitly: the values in Tables 430.247 through 430.250 "shall be used instead of the actual current rating marked on the motor nameplate."
 - **The overload device uses the nameplate.** 430.32 sizes overload protection from the motor's marked full-load current.
@@ -66,7 +66,7 @@ Two details in that table worth holding onto.
 
 **The two 10 HP rows are the striking comparison: 50 A single-phase against 14 A on three-phase 460 V.** Same mechanical output, 6 AWG versus 14 AWG, and a 125 A device versus a 35 A one. That's why anything of size runs three-phase where three-phase exists, and it's the arithmetic behind **[Three-Phase Power](/blog/three-phase-power-calculation)**.
 
-Note also that a **1 HP single-phase motor at 115 V draws 16 A** — more than a 10 HP three-phase motor at 460 V. Horsepower alone tells you almost nothing about current.
+Note also that a **1 HP single-phase motor at 115 V draws 16 A** - more than a 10 HP three-phase motor at 460 V. Horsepower alone tells you almost nothing about current.
 
 ## Where the Tables Live
 
@@ -79,7 +79,7 @@ Four tables, and picking the wrong one is easy:
 | **430.249** | Two-phase AC motors |
 | **430.250** | Three-phase AC motors |
 
-All are indexed by horsepower and voltage. Read across the voltage column that matches your system: **460 V, not 480 V.** The tables use motor nameplate voltages — 115, 200, 208, 230, 460, 575 — which sit slightly below the nominal system voltages of 120, 208, 240, 480 and 600. A 480 V system runs 460 V motors, and you read the 460 V column.
+All are indexed by horsepower and voltage. Read across the voltage column that matches your system: **460 V, not 480 V.** The tables use motor nameplate voltages - 115, 200, 208, 230, 460, 575 - which sit slightly below the nominal system voltages of 120, 208, 240, 480 and 600. A 480 V system runs 460 V motors, and you read the 460 V column.
 
 One useful property, worth knowing because it's a good sanity check: **the values scale inversely with voltage.** The 460 V column is very close to half the 230 V column throughout, because the same power at double the voltage is half the current.
 
@@ -94,25 +94,25 @@ One useful property, worth knowing because it's a good sanity check: **the value
 
 The reasoning matters because it tells you when to be careful.
 
-**Conductors use the table because the circuit outlives the motor.** A motor gets replaced; the conductors in the wall don't. If the branch circuit were sized to one machine's nameplate, the next motor of the same rating — from a different manufacturer, with a different nameplate — might not fit the wire. The table bounds the whole product class, and it lets the circuit be designed before the motor is even selected.
+**Conductors use the table because the circuit outlives the motor.** A motor gets replaced; the conductors in the wall don't. If the branch circuit were sized to one machine's nameplate, the next motor of the same rating - from a different manufacturer, with a different nameplate - might not fit the wire. The table bounds the whole product class, and it lets the circuit be designed before the motor is even selected.
 
 **The overload uses the nameplate because it protects one specific machine.** An overload device has to trip at the thermal limit of the motor actually installed. Setting it from a generic table value would let the real motor run above its own limit, which is the entire failure mode overload protection exists to prevent.
 
-**And here's the case that catches people: sometimes the nameplate exceeds the table.** High-efficiency and inverter-duty motors occasionally have marked currents above the table figure. 430.6(A)(1) still sends you to the table for the conductor and device — but 430.22 also requires the conductors to have adequate ampacity for the load, so if the nameplate is higher, size to the nameplate. Take the larger of the two and you're never wrong.
+**And here's the case that catches people: sometimes the nameplate exceeds the table.** High-efficiency and inverter-duty motors occasionally have marked currents above the table figure. 430.6(A)(1) still sends you to the table for the conductor and device - but 430.22 also requires the conductors to have adequate ampacity for the load, so if the nameplate is higher, size to the nameplate. Take the larger of the two and you're never wrong.
 
 ## The Other Nameplate Fields
 
 Three more markings that do real work:
 
-**Service factor.** 1.15 or greater qualifies the motor for the 125% overload setting rather than 115%. A motor with no service factor marking and no temperature-rise marking gets **115%** — a meaningfully tighter setting, and easy to miss.
+**Service factor.** 1.15 or greater qualifies the motor for the 125% overload setting rather than 115%. A motor with no service factor marking and no temperature-rise marking gets **115%** - a meaningfully tighter setting, and easy to miss.
 
-**Locked-rotor amps (LRA) or code letter.** This is the inrush figure, typically 4–6× the running current. It doesn't enter the FLC calculation but it's what decides whether the 250% device will actually hold on starting, and it's the number that matters for generator sizing — see **[What Size Generator Do I Need](/blog/what-size-generator-do-i-need)**.
+**Locked-rotor amps (LRA) or code letter.** This is the inrush figure, typically 4–6× the running current. It doesn't enter the FLC calculation but it's what decides whether the 250% device will actually hold on starting, and it's the number that matters for generator sizing - see **[What Size Generator Do I Need](/blog/what-size-generator-do-i-need)**.
 
 **Design letter.** Design B is the energy-efficient squirrel-cage type and by far the most common; it gets a higher instantaneous-trip allowance (1100% versus 800%) in Table 430.52 because its inrush is higher. Wound-rotor and DC motors get much lower percentages across the board.
 
 ## Multiple Motors and Special Cases
 
-**Several motors on one feeder.** 430.24 sizes the feeder at 125% of the **largest** motor's FLC plus the sum of the others' FLCs — the 125% applies once, not to every motor.
+**Several motors on one feeder.** 430.24 sizes the feeder at 125% of the **largest** motor's FLC plus the sum of the others' FLCs - the 125% applies once, not to every motor.
 
 **Duty cycle.** 430.22(E) allows reduced conductor sizing for short-time, intermittent and varying-duty motors, with percentages from Table 430.22(E). A crane or a valve actuator doesn't need 125% continuous.
 
@@ -126,7 +126,7 @@ Three more markings that do real work:
 
 - **Using the nameplate for conductors.** 430.6(A)(1) requires the table value.
 - **Using the table for the overload.** 430.32 requires the nameplate value.
-- **Reading the 480 V column.** There isn't one — motors are 460 V, and that's the column.
+- **Reading the 480 V column.** There isn't one - motors are 460 V, and that's the column.
 - **Assuming 125% overload always applies.** Without a 1.15 service factor or 40 °C rise marking, it's 115%.
 - **Ignoring a nameplate above the table value.** Take the larger; 430.22 still requires adequate ampacity.
 - **Applying 240.4(D) to motor conductors.** 240.4(G) exempts them, which is why 14 AWG on a 35 A device is legal.
@@ -136,11 +136,11 @@ Three more markings that do real work:
 
 ## Look Up a Motor
 
-> **[Motor FLA Calculator](/calculators/electrical/electrical-motor-fla-calculator)** — enter horsepower, phase, voltage and the nameplate current. It returns the Table 430.248/430.250 value, the 125% conductor current with a size, and the overload setting and maximum from the nameplate — keeping the two sources visibly separate.
+> **[Motor FLA Calculator](/calculators/electrical/electrical-motor-fla-calculator)** - enter horsepower, phase, voltage and the nameplate current. It returns the Table 430.248/430.250 value, the 125% conductor current with a size, and the overload setting and maximum from the nameplate - keeping the two sources visibly separate.
 
 Then size the rest of the circuit with the **[Motor Circuit Calculator](/calculators/electrical/electrical-motor-circuit-calculator)**, and see **[Motor Circuit Sizing](/blog/motor-circuit-sizing)** for the overcurrent device, **[Transformer Sizing](/blog/transformer-sizing-calculation)** for the supply, and the **[NEC Tables reference](/calculators/electrical/nec-tables)** for the underlying data.
 
-*Sources & standards: NEC (NFPA 70) 2023 — 430.6(A)(1) and (A)(2), 430.6(B), 430.22 and 430.22(B) and (E), 430.24, 430.32 and 430.32(C), 430.52 and Table 430.52, 240.4(D), 240.4(G), and Tables 430.247, 430.248, 430.249 and 430.250. Local amendments override the model code and the AHJ has final say. Have motor circuits designed and installed by a licensed electrician under permit.*
+*Sources & standards: NEC (NFPA 70) 2023 - 430.6(A)(1) and (A)(2), 430.6(B), 430.22 and 430.22(B) and (E), 430.24, 430.32 and 430.32(C), 430.52 and Table 430.52, 240.4(D), 240.4(G), and Tables 430.247, 430.248, 430.249 and 430.250. Local amendments override the model code and the AHJ has final say. Have motor circuits designed and installed by a licensed electrician under permit.*
 
 ---
 
@@ -148,7 +148,7 @@ Then size the rest of the circuit with the **[Motor Circuit Calculator](/calcula
 
 ### Do I use the motor nameplate or the NEC table for full load amps?
 
-Both, for different purposes. NEC 430.6(A)(1) requires the table value — Tables 430.247 to 430.250 — for sizing branch-circuit conductors and the overcurrent device. NEC 430.32 requires the nameplate value for setting the overload device. On a 10 HP 460 V motor those are 14.0 A and 13.0 A respectively.
+Both, for different purposes. NEC 430.6(A)(1) requires the table value - Tables 430.247 to 430.250 - for sizing branch-circuit conductors and the overcurrent device. NEC 430.32 requires the nameplate value for setting the overload device. On a 10 HP 460 V motor those are 14.0 A and 13.0 A respectively.
 
 ### Why does the NEC use a table instead of the nameplate?
 
@@ -156,15 +156,15 @@ Because the circuit outlives the motor. A motor gets replaced, often with a diff
 
 ### Which table do I use for a three-phase motor?
 
-Table 430.250. Table 430.248 covers single-phase, 430.249 two-phase and 430.247 DC. Read the column matching the *motor* voltage, not the system voltage — a 480 V system runs 460 V motors, so you read the 460 V column. There is no 480 V column.
+Table 430.250. Table 430.248 covers single-phase, 430.249 two-phase and 430.247 DC. Read the column matching the *motor* voltage, not the system voltage - a 480 V system runs 460 V motors, so you read the 460 V column. There is no 480 V column.
 
 ### What is the full load amps of a 10 HP motor?
 
-It depends entirely on voltage and phase. At 460 V three-phase, Table 430.250 gives 14 A. At 230 V single-phase, Table 430.248 gives 50 A — more than three times as much for the same mechanical output. That's why the conductor is 14 AWG in one case and 6 AWG in the other.
+It depends entirely on voltage and phase. At 460 V three-phase, Table 430.250 gives 14 A. At 230 V single-phase, Table 430.248 gives 50 A - more than three times as much for the same mechanical output. That's why the conductor is 14 AWG in one case and 6 AWG in the other.
 
 ### How do I size the overload for a motor?
 
-From the nameplate current, at 125% where the motor is marked with a service factor of 1.15 or greater or a temperature rise of 40 °C or less, and at 115% otherwise. On a 13.0 A nameplate that's 16.25 A. NEC 430.32(C) permits increasing to a maximum of 140% — 18.20 A here — where the motor won't start or carry its load at the lower setting.
+From the nameplate current, at 125% where the motor is marked with a service factor of 1.15 or greater or a temperature rise of 40 °C or less, and at 115% otherwise. On a 13.0 A nameplate that's 16.25 A. NEC 430.32(C) permits increasing to a maximum of 140% - 18.20 A here - where the motor won't start or carry its load at the lower setting.
 
 ### What if the nameplate current is higher than the table value?
 
@@ -172,7 +172,7 @@ Take the larger. 430.6(A)(1) still sends you to the table for the conductor and 
 
 ### How do I size a feeder for several motors?
 
-NEC 430.24: 125% of the largest motor's full-load current, plus the sum of the full-load currents of all the others. The 125% factor applies once, to the largest motor only — not to each motor. It exists to cover the starting current of whichever motor starts last.
+NEC 430.24: 125% of the largest motor's full-load current, plus the sum of the full-load currents of all the others. The 125% factor applies once, to the largest motor only - not to each motor. It exists to cover the starting current of whichever motor starts last.
 
 ### Does the 14 AWG conductor really go on a 35 amp breaker?
 
