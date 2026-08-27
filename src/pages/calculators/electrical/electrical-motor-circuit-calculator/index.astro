@@ -1,0 +1,659 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { MOTOR_DEVICE_LABELS, TABLE_430_52, fmtSmart, motorFlc, prevStandardOcpd } from "@/lib/nec";
+
+const title = "Motor Circuit Calculator — Conductor, OCPD & Overload (NEC 430) | TradesQuote";
+const description =
+  "Free motor circuit calculator. Conductor at 430.22, branch-circuit device at Table 430.52, overload at 430.32, and the EGC — including why the breaker is legally far larger than the wire's ampacity.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-motor-circuit-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Motor Circuit Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Motor Circuit Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online motor branch-circuit calculator. Sizes the conductor at 125% of table full-load current, the short-circuit and ground-fault device from Table 430.52, the overload device from nameplate amperes, and the equipment grounding conductor from Table 250.122.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "Why is the breaker so much bigger than the wire can carry?",
+    answer:
+      "Because on a motor circuit the breaker is not there to protect the conductor against overload — the <strong>overload device</strong> is. The breaker only has to clear a short circuit or ground fault, and it has to be large enough to let the motor's starting inrush through without tripping. <strong>NEC 240.4(G)</strong> routes motor conductors out of the normal overcurrent rules to Article 430 precisely so this is permitted. A 10 HP motor on 14 AWG behind a 35 A breaker is fully compliant.",
+  },
+  {
+    question: "What are the three protective devices on a motor circuit?",
+    answer:
+      "<strong>Short-circuit and ground-fault protection</strong> (the breaker or fuses, sized by Table 430.52) clears faults. <strong>Overload protection</strong> (heaters or an electronic overload relay in the starter, sized by 430.32 from the nameplate) protects against a mechanically overloaded or stalled motor. <strong>The disconnecting means</strong> (430 Part IX) provides isolation. All three are separate requirements and a single breaker does not satisfy them all.",
+  },
+  {
+    question: "Which Table 430.52 column do I use?",
+    answer:
+      "The one matching your device. An ordinary molded-case breaker is an <strong>inverse-time breaker</strong> — 250% of full-load current for most motors. A <strong>dual-element (time-delay) fuse</strong> is only 175%, because its own time delay handles the inrush. A <strong>non-time-delay fuse</strong> gets 300%. An <strong>instantaneous-trip breaker</strong> is 800% (1100% for Design B) but 430.52(C)(3) only permits it as part of a listed combination motor controller.",
+  },
+  {
+    question: "Can I go above the Table 430.52 percentage?",
+    answer:
+      "Yes, where the motor will not start on it — <strong>430.52(C)(1) Exception No. 2</strong> allows an inverse-time breaker up to 400% for full-load currents of 100 A or less (300% above that), a time-delay fuse to 225%, and a non-time-delay fuse to 400%. It is a permission for a demonstrated starting problem, not a default. Start at the table value and only step up if the motor genuinely trips it on acceleration.",
+  },
+  {
+    question: "Do I use the table FLC or the nameplate for the overload?",
+    answer:
+      "The <strong>nameplate</strong>. This is the single exception in Article 430, set by <strong>430.32</strong>: overload devices are matched to the actual machine because they are protecting that machine's windings. Conductors and the branch-circuit device use the table value per 430.6(A)(1). Getting these backwards is the commonest motor-circuit error.",
+  },
+  {
+    question: "Is 14 AWG really acceptable on a 10 HP motor?",
+    answer:
+      "By the letter of the code, yes — 430.22 requires 17.5 A of ampacity for a 14 A table FLC, and 14 AWG copper at 75 °C provides 20 A, with 240.4(D) switched off by 240.4(G). In practice almost nobody does it: <strong>12 AWG is the normal minimum</strong> for mechanical robustness, most specifications require it, and voltage drop on a long motor feed frequently pushes it larger still. Treat the calculated size as a floor.",
+  },
+  {
+    question: "How is the equipment grounding conductor sized?",
+    answer:
+      "From <strong>Table 250.122</strong>, keyed to the rating of the branch-circuit protective device — which on a motor circuit is the large one. A 35 A breaker lands in the 60 A row, giving 10 AWG copper. That is larger than you would expect from the phase conductors, and it is correct: the EGC has to carry fault current until that oversized device operates.",
+  },
+  {
+    question: "What about several motors on one feeder?",
+    answer:
+      "<strong>430.24</strong> sizes a feeder at 125% of the largest motor's full-load current plus the sum of the other motors' full-load currents. <strong>430.62</strong> sizes the feeder protective device at the largest branch-circuit device rating plus the sum of the other motors' full-load currents. This calculator handles a single motor branch circuit; the feeder is a separate calculation.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Motor circuit designed? Price the install.";
+const ctaDescription =
+  "Starter, overloads, disconnect, conduit, conductors, terminations, and commissioning — motor work has a long bill of materials and easy places to lose margin. TradesQuote turns the scope into a line-item estimate with quantities and totals.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-motor-fla-calculator",
+    title: "Motor Full Load Amps Calculator",
+    description: "The table FLC every other number derives from.",
+  },
+  {
+    href: "/calculators/electrical/electrical-short-circuit-calculator",
+    title: "Available Fault Current Calculator",
+    description: "The interrupting rating the device has to carry.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+    title: "Ground Wire Size Calculator",
+    description: "EGC and GEC from Tables 250.122 and 250.66.",
+  },
+  {
+    href: "/calculators/electrical/electrical-conduit-fill-calculator",
+    title: "Conduit Fill Calculator",
+    description: "Fit the motor feed and its ground in a raceway.",
+  },
+];
+
+/** Table 430.52 rendered from the data, with the ceilings computed for a 10 HP 460 V motor. */
+const exampleFlc = motorFlc(10, "3ph", 460) ?? 14;
+const deviceOrder = ["nonTimeDelayFuse", "dualElementFuse", "instantTrip", "inverseTime"] as const;
+const typeOrder = ["singlePhase", "squirrelCage", "designB", "synchronous", "woundRotor", "dc"] as const;
+const ocpdRows = deviceOrder.map((device) => ({
+  device,
+  label: MOTOR_DEVICE_LABELS[device],
+  percent: TABLE_430_52.designB[device],
+  ceiling: (exampleFlc * TABLE_430_52.designB[device]) / 100,
+  pick: prevStandardOcpd((exampleFlc * TABLE_430_52.designB[device]) / 100),
+}));
+
+const styles = electricalAccentStyles.orange;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Motor Circuit Calculator — Conductor, OCPD & Overload (NEC 430)" />
+    <meta
+      property="og:description"
+      content="Conductor, branch-circuit device, overload and EGC for a motor circuit — and why the breaker is legally far larger than the wire."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Motor Circuit Calculator" />
+    <meta name="twitter:description" content="The complete NEC Article 430 motor branch circuit. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Motor Circuit Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Motor Circuit Calculator <span class="text-orange-600">— NEC Article 430</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A motor circuit breaks every rule you learned on lighting circuits. The breaker is deliberately
+              <strong>far larger than the conductor's ampacity</strong>, and that is not a violation — it is
+              <strong>240.4(G)</strong> working as designed, because a separate overload device is what protects
+              the wire. This tool sizes all four parts and shows you the arithmetic.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Size the motor branch circuit
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="mcc-phase" class="text-sm font-medium text-slate-700">Supply</label>
+                  <select
+                    id="mcc-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="1ph">Single-phase</option>
+                    <option value="3ph" selected>Three-phase</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mcc-volts" class="text-sm font-medium text-slate-700">Motor voltage</label>
+                  <select
+                    id="mcc-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="115">115 V</option>
+                    <option value="200">200 V</option>
+                    <option value="208">208 V</option>
+                    <option value="230">230 V</option>
+                    <option value="460" selected>460 V</option>
+                    <option value="575">575 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mcc-hp" class="text-sm font-medium text-slate-700">Horsepower</label>
+                  <select
+                    id="mcc-hp"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="0.5">1/2 HP</option>
+                    <option value="0.75">3/4 HP</option>
+                    <option value="1">1 HP</option>
+                    <option value="1.5">1-1/2 HP</option>
+                    <option value="2">2 HP</option>
+                    <option value="3">3 HP</option>
+                    <option value="5">5 HP</option>
+                    <option value="7.5">7-1/2 HP</option>
+                    <option value="10" selected>10 HP</option>
+                    <option value="15">15 HP</option>
+                    <option value="20">20 HP</option>
+                    <option value="25">25 HP</option>
+                    <option value="30">30 HP</option>
+                    <option value="40">40 HP</option>
+                    <option value="50">50 HP</option>
+                    <option value="60">60 HP</option>
+                    <option value="75">75 HP</option>
+                    <option value="100">100 HP</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mcc-nameplate" class="text-sm font-medium text-slate-700">Nameplate FLA</label>
+                  <input
+                    id="mcc-nameplate"
+                    type="number"
+                    min="0"
+                    max="600"
+                    step="0.1"
+                    value="13"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="mcc-motor-type" class="text-sm font-medium text-slate-700">Motor type</label>
+                  <select
+                    id="mcc-motor-type"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="singlePhase">Single-phase, no code letter</option>
+                    <option value="squirrelCage">Squirrel-cage, other than Design B</option>
+                    <option value="designB" selected>Design B energy-efficient</option>
+                    <option value="synchronous">Synchronous</option>
+                    <option value="woundRotor">Wound rotor</option>
+                    <option value="dc">DC, constant voltage</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mcc-device" class="text-sm font-medium text-slate-700">Protective device</label>
+                  <select
+                    id="mcc-device"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="inverseTime" selected>Inverse-time breaker</option>
+                    <option value="dualElementFuse">Dual-element (time-delay) fuse</option>
+                    <option value="nonTimeDelayFuse">Non-time-delay fuse</option>
+                    <option value="instantTrip">Instantaneous-trip breaker</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mcc-overload-class" class="text-sm font-medium text-slate-700">Nameplate marking</label>
+                  <select
+                    id="mcc-overload-class"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="serviceFactor115" selected>Service factor 1.15 or more — 125%</option>
+                    <option value="tempRise40">Temperature rise 40 °C or less — 125%</option>
+                    <option value="other">All other motors — 115%</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="mcc-material" class="text-sm font-medium text-slate-700">Conductor material</label>
+                  <select
+                    id="mcc-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="mcc-length" class="text-sm font-semibold text-slate-800">One-way run length</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="mcc-length"
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value="100"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="mcc-length-range"
+                  type="range"
+                  min="0"
+                  max="1000"
+                  step="10"
+                  value="100"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-orange-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0 ft</span><span>1,000 ft</span>
+                </div>
+              </div>
+
+              <button
+                id="mcc-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Branch-circuit device</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="mcc-ocpd" class="text-5xl font-extrabold tracking-tight text-orange-600">35 A</span>
+              </div>
+              <p class="mt-1 text-sm font-semibold text-slate-700">Short-circuit and ground-fault protection only</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Conductor</p>
+                  <p id="mcc-conductor" class="mt-1 text-2xl font-bold text-slate-900">14 AWG</p>
+                </div>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Overload device</p>
+                  <p id="mcc-overload" class="mt-1 text-2xl font-bold text-slate-900">16.25 A</p>
+                </div>
+                <div class="col-span-2 rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Equipment grounding conductor</p>
+                  <p id="mcc-egc" class="mt-1 text-2xl font-bold text-slate-900">10 AWG copper</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-orange-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Table FLC</span><span id="mcc-bd-flc" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>430.22 ampacity</span><span id="mcc-bd-conductor-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor</span><span id="mcc-bd-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>430.52 ceiling</span><span id="mcc-bd-ocpd-ceiling" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Device selected</span><span id="mcc-bd-ocpd-pick" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Exception No. 2 ceiling</span><span id="mcc-bd-ocpd-max" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>430.32 overload</span><span id="mcc-bd-overload" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>EGC</span><span id="mcc-bd-egc" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Voltage drop</span><span id="mcc-bd-drop" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="mcc-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                That is a 35 A device protecting a conductor rated 20 A — and entirely correct.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Conductors — 430.22</div>
+            <div>required&nbsp;ampacity&nbsp;=&nbsp;<span class="text-orange-300">table</span>&nbsp;FLC&nbsp;×&nbsp;1.25</div>
+            <div class="mt-4 text-cyan-300"># Short-circuit / ground-fault device — Table 430.52</div>
+            <div>ceiling&nbsp;=&nbsp;table&nbsp;FLC&nbsp;×&nbsp;(150%&nbsp;to&nbsp;1100%,&nbsp;by&nbsp;device&nbsp;and&nbsp;motor&nbsp;type)</div>
+            <div class="mt-4 text-cyan-300"># Overload device — 430.32</div>
+            <div>setting&nbsp;=&nbsp;<span class="text-orange-300">nameplate</span>&nbsp;FLA&nbsp;×&nbsp;115%&nbsp;or&nbsp;125%</div>
+            <div class="mt-4 text-cyan-300"># Why the mismatch is legal — 240.4(G)</div>
+            <div>the&nbsp;<span class="text-orange-300">overload</span>&nbsp;protects&nbsp;the&nbsp;conductor,&nbsp;not&nbsp;the&nbsp;breaker</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Three devices, three jobs</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The breaker clears faults. The overload relay protects the windings. The disconnect provides
+                isolation. One breaker does not satisfy all three requirements.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Time-delay fuses need less headroom</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A dual-element fuse gets only 175% because its own delay rides through inrush. A non-time-delay
+                fuse needs 300% to do the same job.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The EGC follows the big device</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Table 250.122 is keyed to the protective device rating, so an oversized motor breaker gives a
+                larger ground than the phase conductors suggest. That is intentional.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Treat the size as a floor</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                12 AWG is the normal practical minimum whatever the arithmetic says, and voltage drop on a long
+                feed regularly pushes the conductor larger.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 10 HP 460 V motor with a 13.0 A nameplate, protected three different ways.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Inverse-time breaker — the defaults</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              table FLC = 14 A · conductor: 14 × 1.25 = 17.5 A → 14 AWG Cu (20 A)<br />
+              OCPD: 250% × 14 = 35.0 A → <span class="font-bold text-orange-700">35 A breaker</span><br />
+              overload: 13.0 × 125% = 16.25 A · EGC: 10 AWG Cu
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 35 A breaker on a conductor rated 20 A —
+              1.8× its ampacity. Legal, standard, and the reason motor circuits confuse people.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Dual-element time-delay fuses instead</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              OCPD: 175% × 14 = 24.5 A → <span class="font-bold text-orange-700">20 A fuses</span><br />
+              EGC now follows a 20 A device: 12 AWG Cu
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the fuse's own time delay handles inrush,
+              so it needs far less headroom — and the smaller device permits a smaller ground. Better fault
+              protection, at the cost of carrying spare fuses.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">A wound-rotor motor</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 430.52 wound rotor = 150% on every device type<br />
+              OCPD: 150% × 14 = 21.0 A → <span class="font-bold text-orange-700">20 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a wound-rotor motor starts with resistance
+              in the rotor circuit, so it has far gentler inrush and needs almost no headroom. The motor type
+              matters as much as the device type.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Table 430.52 — device ceiling by type
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Maximum rating as a percentage of the motor's table full-load current. The ceiling and device columns
+            below are computed for the {fmtSmart(exampleFlc)} A full-load current of a 10 HP 460 V Design B motor.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Device</th>
+                  <th class="py-3 px-4 font-semibold">Design B</th>
+                  <th class="py-3 px-4 font-semibold">Ceiling at 14 A</th>
+                  <th class="py-3 px-4 font-semibold">Largest standard</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ocpdRows.map((row, index) => (
+                    <tr class={index === ocpdRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-4">{row.percent}%</td>
+                      <td class="py-3 px-4">{fmtSmart(row.ceiling)} A</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.pick} A</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Motor type</th>
+                  <th class="py-3 px-4 font-semibold">Non-delay fuse</th>
+                  <th class="py-3 px-4 font-semibold">Time-delay fuse</th>
+                  <th class="py-3 px-4 font-semibold">Instant trip</th>
+                  <th class="py-3 px-4 font-semibold">Inverse time</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  typeOrder.map((key, index) => (
+                    <tr class={index === typeOrder.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{TABLE_430_52[key].label}</td>
+                      <td class="py-3 px-4">{TABLE_430_52[key].nonTimeDelayFuse}%</td>
+                      <td class="py-3 px-4">{TABLE_430_52[key].dualElementFuse}%</td>
+                      <td class="py-3 px-4">{TABLE_430_52[key].instantTrip}%</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{TABLE_430_52[key].inverseTime}%</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — <strong>430.6(A)(1)</strong>, <strong>430.22</strong>,
+            <strong>430.24</strong> and <strong>430.62</strong> (feeders serving several motors),
+            <strong>Table 430.52</strong> with <strong>430.52(C)(1) Exception No. 2</strong> and
+            <strong>430.52(C)(3)</strong> (instantaneous-trip breakers only in a listed combination controller),
+            <strong>430.32</strong>, <strong>240.4(G)</strong>, <strong>Table 250.122</strong>, and
+            <strong>Table 310.16</strong>. Hermetic refrigerant motor-compressors follow
+            <strong>Article 440</strong> instead. Local amendments override the model code, and the AHJ has final
+            say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about motor branch circuits."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalMotorCircuitCalculator } from "@/scripts/calculators/electrical-motor-circuit-calculator";
+    initElectricalMotorCircuitCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

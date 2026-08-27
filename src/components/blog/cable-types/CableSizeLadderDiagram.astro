@@ -1,0 +1,68 @@
+---
+import { ampacityOf, smallConductorCap, CONDUCTOR_SIZES, sizeLabel } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Where the 60 °C ceiling actually costs you a conductor size. Computed rather
+ * than transcribed, and the pattern is not monotonic — 70 A happens to land on
+ * 4 AWG both ways, so the gap opens and closes as the table rounds.
+ */
+function minSize(amps: number, column: 60 | 75) {
+  return CONDUCTOR_SIZES.find((s) => {
+    const a = ampacityOf(s, "copper", column);
+    if (a === null) return false;
+    const cap = smallConductorCap(s.label, "copper");
+    return (cap === null ? a : Math.min(a, cap)) >= amps;
+  })!;
+}
+
+const rows = [20, 30, 40, 50, 60, 70, 80, 100, 125].map((amps) => {
+  const nm = minSize(amps, 60);
+  const conduit = minSize(amps, 75);
+  return {
+    amps,
+    nm: nm.label,
+    conduit: conduit.label,
+    differs: nm.label !== conduit.label,
+    apart: CONDUCTOR_SIZES.indexOf(nm) - CONDUCTOR_SIZES.indexOf(conduit),
+  };
+});
+
+const differing = rows.filter((r) => r.differs).length;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 328" fill="none" aria-hidden="true">
+  <title>Where NM cable needs a larger conductor than conduit</title>
+  <desc>
+    Copper conductor size by circuit rating. At 20, 30, 40 and 70 amps NM cable and THHN in conduit need the same
+    size. At 50 amps NM needs 6 AWG against 8, at 60 amps 4 against 6, at 80 amps 3 against 4, at 100 amps 1 against
+    3 and at 125 amps 1/0 against 1. Five of the nine ratings differ, and the gap opens and closes rather than
+    growing steadily.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="312" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where the 60 °C ceiling costs you a conductor size</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Minimum copper size for each circuit rating, with the 240.4(D) small-conductor limits applied.</text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CIRCUIT</text>
+  <text x="160" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NM-B CABLE</text>
+  <text x="330" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MC / THHN IN CONDUIT</text>
+  <text x="560" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DIFFERENCE</text>
+
+  {rows.map((r, i) => {
+    const y = 90 + i * 24;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="20" rx="5" fill={r.differs ? C.orangeLight : C.white} stroke={r.differs ? C.orange : C.border} stroke-width={r.differs ? 1.5 : 1} />
+        <text x="38" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{`${r.amps} A`}</text>
+        <text x="160" y={y + 14} fill={r.differs ? C.orange : C.dark} font-family={FONT} font-size="10" font-weight="800">{sizeLabel(r.nm)}</text>
+        <text x="330" y={y + 14} fill={C.primary} font-family={FONT} font-size="10" font-weight="800">{sizeLabel(r.conduit)}</text>
+        <text x="560" y={y + 14} fill={r.differs ? C.orange : C.muted} font-family={FONT} font-size="9" font-weight={r.differs ? 700 : 500}>
+          {r.differs ? `${r.apart} size larger in NM` : "no difference"}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="314" fill={C.muted} font-family={FONT} font-size="10">{`${differing} of the ${rows.length} ratings differ. Below 50 A the choice is about cost and labour, not legality.`}</text>
+</svg>

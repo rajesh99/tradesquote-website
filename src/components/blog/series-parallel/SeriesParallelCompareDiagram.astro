@@ -1,0 +1,88 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same three 40 Ω elements wired both ways on 120 V. Series shares one
+ * current and splits the voltage; parallel shares the voltage and splits the
+ * current. Every number below is computed, not transcribed.
+ */
+const V = 120;
+const R = 40;
+const N = 3;
+
+const seriesR = R * N;
+const seriesI = V / seriesR;
+const seriesEach = seriesI * R;
+const seriesW = V * seriesI;
+
+const parR = R / N;
+const branchI = V / R;
+const parI = branchI * N;
+const parW = V * parI;
+
+const SERIES_X = [100, 176, 252];
+const BRANCH_X = [490, 565, 640];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Three identical elements wired in series and in parallel</title>
+  <desc>
+    Three 40 ohm elements on 120 volts. Wired in series the total resistance is 120 ohms, one amp flows through all
+    three, each drops 40 volts and the group dissipates 120 watts. Wired in parallel the total resistance is 13.3 ohms,
+    each element sees the full 120 volts and draws 3 amps, the supply delivers 9 amps and the group dissipates 1,080
+    watts.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One current or one voltage — that is the whole difference</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Three ${R} Ω elements on ${V} V, wired both ways.`}</text>
+
+  <text x="28" y="78" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">SERIES — ONE PATH, SHARED CURRENT</text>
+  <text x="376" y="78" fill={C.green} font-family={FONT} font-size="9" font-weight="700">PARALLEL — THREE PATHS, SHARED VOLTAGE</text>
+
+  <g stroke={C.dark} stroke-width="1.6">
+    <path d="M54 118 L54 100 L330 100 L330 180 L54 180 L54 162" />
+  </g>
+  <rect x="32" y="118" width="44" height="44" rx="6" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="54" y="145" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${V} V`}</text>
+
+  {SERIES_X.map((x) => (
+    <g>
+      <rect x={x} y="87" width="56" height="26" rx="5" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+      <text x={x + 28} y="104" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="700">{`${R} Ω`}</text>
+      <text x={x + 28} y="128" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{`${seriesEach.toFixed(0)} V`}</text>
+    </g>
+  ))}
+  <text x="192" y="198" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="700">{`I = ${seriesI.toFixed(2)} A through all three`}</text>
+
+  <g stroke={C.dark} stroke-width="1.6">
+    <path d="M402 118 L402 100 L660 100" />
+    <path d="M402 162 L402 180 L660 180" />
+    {BRANCH_X.map((x) => <path d={`M${x} 100 L${x} 180`} />)}
+  </g>
+  <rect x="380" y="118" width="44" height="44" rx="6" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="402" y="145" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${V} V`}</text>
+
+  {BRANCH_X.map((x) => (
+    <g>
+      <rect x={x - 26} y="118" width="52" height="26" rx="5" fill={C.greenLight} stroke={C.green} stroke-width="1.6" />
+      <text x={x} y="135" text-anchor="middle" fill={C.green} font-family={FONT} font-size="10.5" font-weight="700">{`${R} Ω`}</text>
+      <text x={x} y="164" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{`${branchI.toFixed(2)} A`}</text>
+    </g>
+  ))}
+  <text x="536" y="198" text-anchor="middle" fill={C.green} font-family={FONT} font-size="10.5" font-weight="700">{`${V} V across every element`}</text>
+
+  <rect x="28" y="210" width="316" height="34" rx="7" fill={C.white} stroke={C.orange} stroke-width="1.4" />
+  <text x="186" y="232" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">
+    {`R ${seriesR} Ω · supply ${seriesI.toFixed(2)} A · ${seriesW.toFixed(0)} W total`}
+  </text>
+
+  <rect x="376" y="210" width="316" height="34" rx="7" fill={C.white} stroke={C.green} stroke-width="2.2" />
+  <text x="534" y="232" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">
+    {`R ${parR.toFixed(1)} Ω · supply ${parI.toFixed(2)} A · ${parW.toLocaleString("en-US")} W total`}
+  </text>
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">
+    {`Same three parts. Parallel draws ${parI.toFixed(2)} A against ${seriesI.toFixed(2)} A and makes ${(parW / seriesW).toFixed(0)}× the heat — topology, not components.`}
+  </text>
+</svg>

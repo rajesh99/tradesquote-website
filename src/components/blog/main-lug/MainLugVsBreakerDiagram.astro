@@ -1,0 +1,87 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The physical difference in one picture. Both panels have their busbar
+ * protected; the only question is whether the protecting device sits inside the
+ * enclosure or upstream of it. Everything else people believe about MLO panels
+ * follows from confusing that with "unprotected".
+ */
+const panels = [
+  {
+    accent: C.blue,
+    name: "Main breaker panel",
+    x: 60,
+    disconnect: "200 A main breaker",
+    inside: true,
+    protects: "Its own main protects the busbar",
+    use: "Service equipment · detached buildings",
+  },
+  {
+    accent: C.orange,
+    name: "Main lug only (MLO)",
+    x: 400,
+    disconnect: "feeder breaker upstream",
+    inside: false,
+    protects: "The upstream feeder breaker protects the busbar",
+    use: "Subpanels in the same building",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Main breaker and main lug panels compared</title>
+  <desc>
+    A main breaker panel contains its own disconnect, which protects the busbar and serves as service equipment or as
+    the required disconnect at a detached building. A main lug only panel has no internal disconnect; the feeder
+    breaker in the upstream panel protects its busbar. Both busbars are protected — the difference is only where the
+    protecting device sits.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Both busbars are protected. Only the location differs.</text>
+
+  {panels.map((p) => (
+    <g>
+      <text x={p.x} y="66" fill={p.accent} font-family={FONT} font-size="12" font-weight="800">{p.name}</text>
+
+      {/* upstream source */}
+      <rect x={p.x} y="76" width="120" height="26" rx="6" fill={p.inside ? C.white : p.accent} opacity={p.inside ? 1 : 0.16} stroke={p.inside ? C.border : "none"} />
+      <rect x={p.x} y="76" width="120" height="26" rx="6" fill="none" stroke={p.inside ? C.border : p.accent} stroke-width={p.inside ? 1 : 1.8} />
+      <text x={p.x + 60} y="93" text-anchor="middle" fill={p.inside ? C.muted : p.accent} font-family={FONT} font-size="8.5" font-weight={p.inside ? 500 : 800}>
+        {p.inside ? "utility service" : "feeder breaker"}
+      </text>
+      <line x1={p.x + 60} y1="102" x2={p.x + 60} y2="118" stroke={p.accent} stroke-width="1.6" />
+
+      {/* the panel */}
+      <rect x={p.x} y="118" width="220" height="130" rx="8" fill={C.white} stroke={p.accent} stroke-width="1.8" />
+
+      {p.inside ? (
+        <g>
+          <rect x={p.x + 14} y="130" width="192" height="26" rx="5" fill={p.accent} opacity="0.16" />
+          <rect x={p.x + 14} y="130" width="192" height="26" rx="5" fill="none" stroke={p.accent} stroke-width="1.6" />
+          <text x={p.x + 110} y="147" text-anchor="middle" fill={p.accent} font-family={FONT} font-size="9" font-weight="800">MAIN BREAKER</text>
+        </g>
+      ) : (
+        <g>
+          <rect x={p.x + 14} y="130" width="192" height="26" rx="5" fill="none" stroke={C.border} stroke-width="1.2" stroke-dasharray="4 3" />
+          <text x={p.x + 110} y="147" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">LUGS ONLY — NO MAIN</text>
+        </g>
+      )}
+
+      <rect x={p.x + 14} y="164" width="192" height="7" rx="3" fill={C.dark} opacity="0.55" />
+      <text x={p.x + 110} y="184" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5" font-weight="700">BUSBAR</text>
+
+      {[0, 1, 2].map((k) => (
+        <g>
+          <rect x={p.x + 14 + k * 66} y="194" width="58" height="18" rx="4" fill={C.panelBg} stroke={C.border} />
+          <rect x={p.x + 14 + k * 66} y="216" width="58" height="18" rx="4" fill={C.panelBg} stroke={C.border} />
+        </g>
+      ))}
+      <text x={p.x + 110} y="245" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5">branch breakers</text>
+
+      <text x={p.x} y="268" fill={C.dark} font-family={FONT} font-size="9" font-weight="700">{p.protects}</text>
+      <text x={p.x} y="282" fill={C.muted} font-family={FONT} font-size="8.5">{p.use}</text>
+    </g>
+  ))}
+</svg>

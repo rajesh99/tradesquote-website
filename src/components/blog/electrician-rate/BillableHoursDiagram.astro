@@ -1,0 +1,60 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The strongest lever in the whole calculation, and the one nobody adjusts. Same
+ * wage, same burden, same overhead, same margin — only the billable fraction moves.
+ */
+const WAGE = 32;
+const PAID_HOURS = 2080;
+const TOTAL_COST = WAGE * PAID_HOURS * 1.35 + 9000;
+const MARGIN_PCT = 0.4;
+
+const fractions = [0.6, 0.7, 0.75, 0.85, 0.9];
+const rows = fractions.map((f) => {
+  const billableHours = PAID_HOURS * f;
+  const loaded = TOTAL_COST / billableHours;
+  return {
+    pct: f,
+    hours: billableHours,
+    rate: loaded / (1 - MARGIN_PCT),
+    baseline: f === 0.75,
+  };
+});
+
+const peak = Math.max(...rows.map((r) => r.rate));
+const BAR_MAX = 340;
+const bars = rows.map((r) => ({ ...r, width: Math.round((r.rate / peak) * BAR_MAX) }));
+const swing = rows[0].rate - rows[rows.length - 1].rate;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>How billable hours change the required billing rate</title>
+  <desc>
+    With the same wage, burden, overhead and margin, only the billable fraction changing: at 60 percent billable
+    the required rate is 132 dollars 02 cents an hour; at 70 percent, 113 dollars 16; at 75 percent, 105 dollars
+    62; at 85 percent, 93 dollars 19; and at 90 percent, 88 dollars 01. That is a swing of about 44 dollars an
+    hour on an identical wage, making billable utilisation the strongest lever in the calculation.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The lever nobody pulls — billable utilisation</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`Same $${WAGE} wage, same burden, same overhead, same 40% margin. Only billable hours move.`}</text>
+
+  {bars.map((r, i) => {
+    const y = 74 + i * 40;
+    const accent = r.baseline ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="11.5" font-weight={r.baseline ? "800" : "700"}>{`${(r.pct * 100).toFixed(0)}% billable`}</text>
+        <text x="28" y={y + 34} fill={C.muted} font-family={FONT} font-size="8.5">{`${r.hours.toLocaleString("en-US")} h`}</text>
+        <rect x="152" y={y + 4} width={r.width} height="28" rx="7" fill={accent} opacity="0.14" />
+        <rect x="152" y={y + 4} width={r.width} height="28" rx="7" fill="none" stroke={accent} stroke-width={r.baseline ? "2" : "1.4"} />
+        <text x={152 + r.width - 12} y={y + 23} text-anchor="end" fill={C.dark} font-family={FONT} font-size="13.5" font-weight="800">{`$${r.rate.toFixed(2)}`}</text>
+        {r.baseline && <text x="164" y={y + 23} fill={C.primary} font-family={FONT} font-size="9.5" font-weight="800">typical</text>}
+      </g>
+    );
+  })}
+
+  <text x="24" y="290" fill={C.muted} font-family={FONT} font-size="10">{`A ${swing.toFixed(0)} dollar/hour swing on an identical wage — cutting drive time and unpaid estimating beats raising prices.`}</text>
+</svg>

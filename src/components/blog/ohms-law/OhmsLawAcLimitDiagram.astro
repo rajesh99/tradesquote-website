@@ -1,0 +1,61 @@
+---
+import { effectiveImpedance, TABLE_8_DC_RESISTANCE, TABLE_9_REACTANCE, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Where the DC form stops being enough. On small conductors R dominates and
+ * V = IR is fine; on large ones reactance is comparable to resistance and using
+ * R alone understates the drop badly. Computed from Table 8 and Table 9 so the
+ * crossover is real rather than asserted.
+ */
+const PF = 0.85;
+const sizes = ["12", "6", "1/0", "500 kcmil"];
+
+const rows = sizes.map((size) => {
+  const r = TABLE_8_DC_RESISTANCE[size]?.copper ?? 0;
+  const x = TABLE_9_REACTANCE[size]?.steel ?? 0;
+  const ze = effectiveImpedance(r, x, PF);
+  return { size, r, x, ze, ratio: x / r, understated: ((ze - r * PF) / ze) * 100 };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where resistance alone stops being enough on AC</title>
+  <desc>
+    Resistance and reactance per thousand feet from Chapter 9 Tables 8 and 9, in steel raceway. On 12 AWG the
+    reactance is a small fraction of the resistance, so treating the conductor as pure resistance is close enough. By
+    500 kcmil the reactance exceeds the resistance, and the effective impedance at 0.85 power factor is dominated by
+    it. Ohm's law still holds, but the quantity to use is impedance, not resistance.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">On AC, the R in V = IR becomes Z</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Chapter 9 Table 8 resistance and Table 9 reactance, steel raceway, per 1,000 ft, at PF ${PF}.`}</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SIZE</text>
+  <text x="130" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">R (Ω/kft)</text>
+  <text x="248" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">X (Ω/kft)</text>
+  <text x="366" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">X ÷ R</text>
+  <text x="470" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">EFFECTIVE Z</text>
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 32;
+    const reactive = r.ratio > 0.5;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="28" rx="6" fill={reactive ? C.orangeLight : C.white} stroke={reactive ? C.orange : C.border} stroke-width={reactive ? 1.5 : 1} />
+        <text x="38" y={y + 18} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.size}</text>
+        <text x="130" y={y + 18} fill={C.dark} font-family={FONT} font-size="10">{fmt(r.r, 4)}</text>
+        <text x="248" y={y + 18} fill={C.dark} font-family={FONT} font-size="10">{fmt(r.x, 4)}</text>
+        <text x="366" y={y + 18} fill={reactive ? C.orange : C.muted} font-family={FONT} font-size="10" font-weight={reactive ? 800 : 500}>{fmt(r.ratio, 2)}</text>
+        <text x="470" y={y + 18} fill={C.blue} font-family={FONT} font-size="10" font-weight="700">{fmt(r.ze, 4)}</text>
+        <text x="558" y={y + 18} fill={C.muted} font-family={FONT} font-size="8.5">
+          {reactive ? "reactance dominates — use Z" : "resistive — R is close enough"}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="220" width="672" height="30" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="40" y="239" fill={C.dark} font-family={FONT} font-size="10">Z = R·cos θ + X·sin θ, not √(R² + X²) — the magnitude form is only right for a bolted fault.</text>
+</svg>

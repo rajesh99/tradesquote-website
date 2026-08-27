@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * What a labour unit covers and what it doesn't. The exclusions are where small
+ * contractors lose money, because they're real hours that never appear on any
+ * takeoff line.
+ */
+const columns = [
+  {
+    accent: C.green,
+    heading: "Inside the unit",
+    items: [
+      "Handling material at the work face",
+      "Measuring, cutting, drilling, mounting",
+      "Making up and terminating",
+      "Normal breaks and fatigue allowance",
+      "Cleaning up that work",
+    ],
+  },
+  {
+    accent: C.red,
+    heading: "NOT in the unit",
+    items: [
+      "Travel to and from site",
+      "Mobilisation and demobilisation",
+      "Layout and coordination drawings",
+      "Supervision and foreman time",
+      "Permits, inspections, punch list",
+    ],
+  },
+  {
+    accent: C.blue,
+    heading: "Where those hours belong",
+    items: [
+      "Travel: a line item or a trip charge",
+      "Layout: a separate takeoff line",
+      "Supervision: a % of field hours",
+      "Permits: a direct cost line",
+      "Or all of it in overhead — consistently",
+    ],
+  },
+];
+
+const LANE_X = [24, 256, 488];
+const LANE_W = 208;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>What a labour unit includes and excludes</title>
+  <desc>
+    A labour unit covers handling material at the work face, measuring, cutting, drilling and mounting, making up and
+    terminating, normal breaks and fatigue allowance, and cleaning up that work. It does not cover travel,
+    mobilisation, layout and coordination, supervision, or permits and inspections. Those hours belong in separate line
+    items or in overhead — but they must be captured somewhere consistently, or they are simply lost.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A labour unit is narrower than people assume</text>
+
+  {columns.map((col, j) => (
+    <g>
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="152" rx="10" fill={col.accent} opacity="0.07" />
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="152" rx="10" fill="none" stroke={col.accent} stroke-width="1.6" />
+      <text x={LANE_X[j] + 14} y="70" fill={col.accent} font-family={FONT} font-size="10.5" font-weight="800">{col.heading}</text>
+      {col.items.map((item, k) => (
+        <g>
+          <circle cx={LANE_X[j] + 20} cy={95 + k * 22} r="2.3" fill={col.accent} />
+          <text x={LANE_X[j] + 30} y={98 + k * 22} fill={C.dark} font-family={FONT} font-size="8">{item}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">Every excluded hour is real. Capture it in a line item or in overhead — but capture it, and always the same way.</text>
+</svg>

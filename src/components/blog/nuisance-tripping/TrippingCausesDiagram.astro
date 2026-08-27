@@ -1,0 +1,90 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Causes ordered by how often they turn out to be the answer, with an honest
+ * column for whether the trip was a genuine fault. The point of the ordering is
+ * that the top three are all real problems the device correctly found.
+ */
+const causes = [
+  {
+    cause: "Loose terminal screw",
+    devices: "AFCI",
+    real: true,
+    detail: "Series arcing at a backstabbed or under-torqued termination. The commonest genuine AFCI find.",
+  },
+  {
+    cause: "Shared neutral",
+    devices: "both",
+    real: true,
+    detail: "Return current doesn't match outgoing current. A wiring error, not a device fault.",
+  },
+  {
+    cause: "Neutral touching ground downstream",
+    devices: "both",
+    real: true,
+    detail: "A bonded subpanel neutral, a pinched conductor, or a bootleg ground at a receptacle.",
+  },
+  {
+    cause: "Cumulative leakage",
+    devices: "GFCI",
+    real: false,
+    detail: "Many appliances each leaking legitimately, totalling 4–6 mA. Split the circuit.",
+  },
+  {
+    cause: "Driver or motor inrush",
+    devices: "both",
+    real: false,
+    detail: "Trips on energisation only. LED drivers charging capacitors, or a motor starting.",
+  },
+  {
+    cause: "Damaged cable in the wall",
+    devices: "AFCI",
+    real: true,
+    detail: "A drywall screw or a staple through the sheath. Insulation resistance testing finds it.",
+  },
+  {
+    cause: "Brush-motor appliance",
+    devices: "AFCI",
+    real: false,
+    detail: "Vacuums and treadmills produce arc signatures by design. Older devices were worse at this.",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Causes of AFCI and GFCI tripping, most common first</title>
+  <desc>
+    A loose terminal screw causing series arcing is the most common genuine AFCI cause. A shared neutral trips both
+    device types and is a wiring error. A neutral touching ground downstream, from a bonded subpanel neutral or a
+    bootleg ground, also trips both. Cumulative appliance leakage totalling 4 to 6 milliamps trips GFCIs without a
+    fault present. Driver or motor inrush trips on energisation only. Damaged cable in a wall trips AFCIs and is
+    found by insulation resistance testing. Brush motors in vacuums and treadmills produce arc signatures by design.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What it usually turns out to be</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Ordered by frequency. The first three are genuine faults the device correctly found.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CAUSE</text>
+  <text x="286" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TRIPS</text>
+  <text x="346" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">REAL FAULT?</text>
+
+  {causes.map((c, i) => {
+    const y = 84 + i * 29;
+    const accent = c.real ? C.red : C.orange;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="25" rx="6" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="25" rx="2" fill={accent} />
+        <text x="40" y={y + 11} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{c.cause}</text>
+        <text x="40" y={y + 21} fill={C.muted} font-family={FONT} font-size="7.5">{c.detail}</text>
+        <rect x="286" y={y + 6} width="46" height="14" rx="4" fill={c.devices === "both" ? C.blue : C.primary} opacity="0.16" />
+        <text x="309" y={y + 16} text-anchor="middle" fill={c.devices === "both" ? C.blue : C.primary} font-family={FONT} font-size="7.5" font-weight="800">{c.devices}</text>
+        <text x="346" y={y + 16} fill={accent} font-family={FONT} font-size="8.5" font-weight="700">{c.real ? "yes — fix the circuit" : "no — design or load issue"}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">Swapping the breaker addresses none of these. It removes the evidence and leaves the fault in the wall.</text>
+</svg>

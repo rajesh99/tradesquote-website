@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The four bends you actually make, with the number each one costs against the
+ * 360° budget between pull points. That budget is the design constraint nobody
+ * mentions in bending tutorials, and it's what decides where the pull boxes go.
+ */
+const bends = [
+  {
+    name: "Stub-up (90°)",
+    degrees: 90,
+    key: "Subtract the bender's take-up from the stub height",
+    detail: "Take-up is stamped on the bender — commonly 5 in for ½ in EMT, 6 in for ¾ in, 8 in for 1 in.",
+    accent: C.primary,
+  },
+  {
+    name: "Offset (two bends)",
+    degrees: 60,
+    key: "Marks apart = height × csc θ",
+    detail: "Shown at 30° each. Shrink = height × (csc θ − cot θ) — pull the whole run that much shorter.",
+    accent: C.blue,
+  },
+  {
+    name: "Three-bend saddle",
+    degrees: 90,
+    key: "Centre 45°, two outer 22.5°, outer marks 2.5 × height each side",
+    detail: "Shrink is 3∕16 in per inch of obstruction. Centre mark goes on the obstruction centre.",
+    accent: C.orange,
+  },
+  {
+    name: "Four-bend saddle",
+    degrees: 120,
+    key: "Two offsets back to back",
+    detail: "Use where the obstruction is wide. Costs the most degrees, so watch the 360° budget.",
+    accent: C.red,
+  },
+];
+
+const BUDGET = 360;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The four bends and what each costs against the 360 degree limit</title>
+  <desc>
+    A stub-up is a single 90 degree bend and you subtract the bender's take-up from the stub height. An offset is two
+    bends whose marks are the offset height times the cosecant of the angle apart, costing 60 degrees at 30 degrees
+    each. A three-bend saddle uses a 45 degree centre and two 22.5 degree outer bends with outer marks 2.5 times the
+    obstruction height each side, costing 90 degrees. A four-bend saddle is two offsets back to back and costs 120
+    degrees. No more than 360 degrees of bends is permitted between pull points.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four bends, and what each spends of your 360°</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`358.26 and its siblings allow no more than ${BUDGET}° of bends between pull points.`}</text>
+
+  {bends.map((b, i) => {
+    const y = 64 + i * 56;
+    const share = Math.round((b.degrees / BUDGET) * 100);
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="48" rx="9" fill={C.white} stroke={b.accent} stroke-width="1.4" />
+        <rect x="24" y={y} width="4" height="48" rx="2" fill={b.accent} />
+        <text x="40" y={y + 19} fill={b.accent} font-family={FONT} font-size="11" font-weight="800">{b.name}</text>
+        <text x="40" y={y + 40} fill={C.muted} font-family={FONT} font-size="8.5">{b.detail}</text>
+        <text x="238" y={y + 19} fill={C.dark} font-family={FONT} font-size="9.5">{b.key}</text>
+        <rect x="600" y={y + 8} width="82" height="32" rx="6" fill={b.accent} opacity="0.12" />
+        <text x="641" y={y + 24} text-anchor="middle" fill={b.accent} font-family={FONT} font-size="12.5" font-weight="800">{`${b.degrees}°`}</text>
+        <text x="641" y={y + 35} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5">{`${share}% of budget`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">Four 90s spends the whole budget with nothing left for an offset. Plan pull points before you bend.</text>
+</svg>

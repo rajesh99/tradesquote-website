@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The five questions that set the price, in the order an estimator should ask
+ * them. Each one is a fork that roughly doubles or halves the hours, which is why
+ * a phone quote for "an outlet" is meaningless.
+ */
+const drivers = [
+  {
+    q: "Is there a circuit with capacity nearby?",
+    cheap: "Tap an existing circuit — 1.5 h",
+    dear: "New home run to the panel — 4 h or more",
+    accent: C.primary,
+  },
+  {
+    q: "Are the walls open?",
+    cheap: "Unfinished basement or garage — drill and staple",
+    dear: "Finished drywall — fish, fire blocks, patch, paint",
+    accent: C.blue,
+  },
+  {
+    q: "How far from the panel?",
+    cheap: "Same room, 15 ft of cable",
+    dear: "Two floors up and across — plus a route to find",
+    accent: C.orange,
+  },
+  {
+    q: "Does the panel have a spare space?",
+    cheap: "Slot free, breaker in",
+    dear: "Full panel — tandems, a subpanel, or an upgrade",
+    accent: C.red,
+  },
+  {
+    q: "What protection does it need?",
+    cheap: "Ordinary AFCI branch circuit",
+    dear: "GFCI, weatherproof, in-use cover, or both devices",
+    accent: C.muted,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The five questions that set the price of an outlet</title>
+  <desc>
+    Five questions decide the cost. Whether a circuit with capacity is nearby, which is the difference between 1.5
+    hours and 4 or more. Whether the walls are open, which separates drilling and stapling from fishing, fire blocks
+    and patching. How far the run is from the panel. Whether the panel has a spare space, since a full panel can mean
+    tandem breakers, a subpanel or an upgrade. And what protection the location requires — an ordinary AFCI circuit
+    against GFCI with a weatherproof in-use cover.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Five questions, asked in this order, give you the price</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Each is a fork that roughly doubles or halves the hours — which is why a phone quote means little.</text>
+
+  <text x="288" y="74" fill={C.green} font-family={FONT} font-size="8" font-weight="700">CHEAPER BRANCH</text>
+  <text x="500" y="74" fill={C.red} font-family={FONT} font-size="8" font-weight="700">DEARER BRANCH</text>
+
+  {drivers.map((d, i) => {
+    const y = 80 + i * 35;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="30" rx="7" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="30" rx="2" fill={d.accent} />
+        <text x="38" y={y + 19} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{d.q}</text>
+        <text x="288" y={y + 19} fill={C.green} font-family={FONT} font-size="8.5">{d.cheap}</text>
+        <text x="500" y={y + 19} fill={C.red} font-family={FONT} font-size="8.5">{d.dear}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">Walk the route before quoting. The answer to question two is usually visible from the doorway.</text>
+</svg>

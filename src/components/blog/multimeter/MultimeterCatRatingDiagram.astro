@@ -1,0 +1,62 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * CAT ratings describe WHERE in the distribution system a meter may be used,
+ * because available transient energy rises as you move toward the source. The
+ * category matters more than the voltage number printed beside it.
+ */
+const ZONES = [
+  { cat: "CAT IV", accent: C.red, where: "Origin of the installation", examples: "Service drop, meter socket, service entrance, outdoor conductors" },
+  { cat: "CAT III", accent: C.orange, where: "Fixed distribution", examples: "Panelboards, feeders, hard-wired equipment, motor controls" },
+  { cat: "CAT II", accent: C.blue, where: "Receptacle-connected loads", examples: "Appliances, portable tools, anything on a cord and plug" },
+  { cat: "CAT I", accent: C.green, where: "Protected electronics", examples: "Secondary circuits, isolated from the mains, low-energy signals" },
+];
+
+const W = 162;
+const GAP = 8;
+const X0 = 24;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Measurement category ratings across the distribution system</title>
+  <desc>
+    CAT IV covers the origin of the installation — service drop, meter socket and service entrance. CAT III covers fixed
+    distribution such as panelboards, feeders and hard-wired equipment. CAT II covers receptacle-connected loads and
+    portable tools. CAT I covers protected electronics not connected directly to the mains. Available transient energy
+    is highest at the service and falls downstream.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The CAT rating says where, not how much voltage</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Categories track available transient energy, which is highest at the service and falls as you move downstream.</text>
+
+  <line x1={X0 + 6} y1="76" x2={X0 + 3 * (W + GAP) + W - 6} y2="76" stroke={C.border} stroke-width="8" stroke-linecap="round" />
+  <line x1={X0 + 6} y1="76" x2={X0 + W} y2="76" stroke={C.red} stroke-width="8" stroke-linecap="round" opacity="0.7" />
+  <text x={X0 + 6} y="68" fill={C.red} font-family={FONT} font-size="8.5" font-weight="700">MOST AVAILABLE ENERGY</text>
+  <text x={X0 + 3 * (W + GAP) + W - 6} y="68" text-anchor="end" fill={C.green} font-family={FONT} font-size="8.5" font-weight="700">LEAST</text>
+
+  {ZONES.map((z, i) => {
+    const x = X0 + i * (W + GAP);
+    return (
+      <g>
+        <rect x={x} y="94" width={W} height="96" rx="9" fill={z.accent} opacity="0.08" />
+        <rect x={x} y="94" width={W} height="96" rx="9" fill="none" stroke={z.accent} stroke-width="2" />
+        <text x={x + W / 2} y="120" text-anchor="middle" fill={z.accent} font-family={FONT} font-size="15" font-weight="800">{z.cat}</text>
+        <text x={x + W / 2} y="140" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{z.where}</text>
+        {z.examples.split(", ").slice(0, 4).map((ex, j) => (
+          <text x={x + W / 2} y={158 + j * 12} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{ex}</text>
+        ))}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="202" width="672" height="30" rx="7" fill={C.white} stroke={C.primary} stroke-width="1.6" />
+  <text x="360" y="221" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+    A higher category at a lower voltage is the tougher rating — CAT III 600 V outranks CAT II 1000 V.
+  </text>
+
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">
+    Match the category to where the probe lands, not to the voltage you expect to read there.
+  </text>
+</svg>

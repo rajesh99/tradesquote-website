@@ -1,0 +1,89 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Five conductors with names that are deliberately similar and jobs that are
+ * completely different. The grounded/grounding pair is the worst of it: one
+ * carries current all day and the other carries none until something breaks.
+ */
+const conductors = [
+  {
+    abbr: "EGC",
+    name: "Equipment grounding conductor",
+    job: "Carries fault current from equipment back to the source",
+    sized: "Table 250.122, by OCPD rating",
+    current: "None — until a fault",
+    accent: C.green,
+  },
+  {
+    abbr: "GEC",
+    name: "Grounding electrode conductor",
+    job: "Connects the system to the earth electrode",
+    sized: "Table 250.66, by service conductor size",
+    current: "None — surges only",
+    accent: C.blue,
+  },
+  {
+    abbr: "MBJ",
+    name: "Main bonding jumper",
+    job: "Ties the EGC system to the neutral at the service",
+    sized: "250.28, by service conductor size",
+    current: "All fault current",
+    accent: C.primary,
+  },
+  {
+    abbr: "—",
+    name: "Grounded conductor (neutral)",
+    job: "Carries unbalanced load current, normally",
+    sized: "220 load calculation, 250.24(C) minimum",
+    current: "Continuously",
+    accent: C.orange,
+  },
+  {
+    abbr: "BJ",
+    name: "Bonding jumper",
+    job: "Ties metal parts together — pipe, steel, gas, pools",
+    sized: "250.104, by circuit or service size",
+    current: "None — until a fault",
+    accent: C.muted,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Five similarly named conductors with different jobs</title>
+  <desc>
+    The equipment grounding conductor carries fault current back to the source and is sized from Table 250.122 by the
+    overcurrent device rating. The grounding electrode conductor connects the system to earth and is sized from Table
+    250.66 by the service conductor size. The main bonding jumper ties the two systems together at the service and
+    carries all fault current. The grounded conductor, or neutral, carries unbalanced load current continuously.
+    Bonding jumpers tie metal parts together and carry nothing until a fault.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Grounded, grounding, bonding — five conductors, five jobs</text>
+
+  <text x="82" y="56" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CONDUCTOR</text>
+  <text x="304" y="56" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SIZED BY</text>
+  <text x="530" y="56" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CARRIES CURRENT</text>
+
+  {conductors.map((c, i) => {
+    const y = 64 + i * 37;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="32" rx="7" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="32" rx="2" fill={c.accent} />
+        <rect x="36" y={y + 8} width="38" height="16" rx="4" fill={c.accent} opacity="0.16" />
+        <text x="55" y={y + 20} text-anchor="middle" fill={c.accent} font-family={FONT} font-size="8.5" font-weight="800">{c.abbr}</text>
+        <text x="82" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{c.name}</text>
+        <text x="82" y={y + 27} fill={C.muted} font-family={FONT} font-size="8">{c.job}</text>
+        <text x="304" y={y + 21} fill={C.dark} font-family={FONT} font-size="8.5">{c.sized}</text>
+        <text x="530" y={y + 21} fill={c.current === "Continuously" ? C.orange : C.muted} font-family={FONT} font-size="8.5" font-weight={c.current === "Continuously" ? 700 : 500}>
+          {c.current}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="254" fill={C.muted} font-family={FONT} font-size="10">Only the neutral carries current in normal use. Confusing it with the EGC is the root of most bonding errors.</text>
+</svg>

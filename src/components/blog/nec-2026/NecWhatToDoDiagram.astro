@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Practical sequencing, because a newly published edition is a planning input
+ * rather than a working document for most contractors — adoption is years away in
+ * most jurisdictions.
+ */
+const actions = [
+  {
+    when: "Now",
+    do: "Learn the edition you're inspected against",
+    why: "For most jurisdictions that's 2020 or 2023, not 2026",
+    accent: C.primary,
+  },
+  {
+    when: "Now",
+    do: "Read your state's amendment document",
+    why: "It tells you whether 210.8(D) and 210.8(F) apply to you",
+    accent: C.primary,
+  },
+  {
+    when: "This year",
+    do: "Track your state's 2026 adoption process",
+    why: "Public comment is where amendments get made — and you can participate",
+    accent: C.blue,
+  },
+  {
+    when: "Before designing to 2026",
+    do: "Read the actual text, not a summary",
+    why: "Change summaries — including this one — compress and lose exceptions",
+    accent: C.orange,
+  },
+  {
+    when: "On every ambiguous job",
+    do: "Ask the AHJ in writing",
+    why: "90.4 gives them interpretive authority. An email settles it",
+    accent: C.green,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>What to do about a newly published code edition</title>
+  <desc>
+    Now, learn the edition you are actually inspected against, which for most jurisdictions is 2020 or 2023 rather than
+    2026, and read your state's amendment document to establish whether the contested GFCI provisions apply. This year,
+    track your state's adoption process, since public comment is where amendments are made and contractors can
+    participate. Before designing to 2026, read the actual text rather than a summary, because change summaries compress
+    and lose exceptions. And on every ambiguous job, ask the authority having jurisdiction in writing.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A new edition is a planning input, not a working document</text>
+
+  {actions.map((a, i) => {
+    const y = 46 + i * 38;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="32" rx="7" fill={a.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="32" rx="7" fill="none" stroke={a.accent} stroke-width="1.4" />
+        <rect x="36" y={y + 7} width="146" height="18" rx="5" fill={a.accent} />
+        <text x="109" y={y + 20} text-anchor="middle" fill={C.white} font-family={FONT} font-size="8" font-weight="800">{a.when}</text>
+        <text x="194" y={y + 14} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{a.do}</text>
+        <text x="194" y={y + 26} fill={C.muted} font-family={FONT} font-size="8">{a.why}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="238" fill={C.muted} font-family={FONT} font-size="10">Adoption processes take public comment. Contractors who show up shape the amendments they'll work under.</text>
+</svg>

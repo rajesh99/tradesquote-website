@@ -1,0 +1,638 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import {
+  K_ALUMINUM,
+  K_COPPER,
+  TABLE_8_DC_RESISTANCE,
+  TABLE_9_REACTANCE,
+  cmilOf,
+  effectiveImpedance,
+  fmt,
+} from "@/lib/nec";
+
+const title = "Conductor Resistance Calculator — NEC Chapter 9 Tables 8 & 9 | TradesQuote";
+const description =
+  "Free conductor resistance and impedance calculator. Table 8 DC resistance with temperature correction, Table 9 reactance, the effective impedance that actually causes voltage drop, and I²R heat.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-conductor-resistance-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Conductor Resistance Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Conductor Resistance Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online conductor resistance and impedance calculator using NEC Chapter 9 Table 8 resistance and Table 9 reactance. Returns run resistance, reactance, effective impedance at the load power factor, voltage drop, and I-squared-R heat.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "Why not just use the K-constant voltage drop formula?",
+    answer:
+      "Because it models <strong>resistance only</strong>. At unity power factor that is exactly right — the effective impedance collapses to R and the two methods agree to a fraction of a percent. But on a lagging load, reactance contributes real drop, and above about 1/0 in a steel raceway the reactance is comparable to the resistance. On 500 kcmil copper in steel conduit the reactance is nearly twice the resistance, and the K formula simply cannot see it.",
+  },
+  {
+    question: "What is effective impedance and why is it not √(R² + X²)?",
+    answer:
+      "The impedance magnitude √(R² + X²) is the right quantity for a <strong>bolted fault</strong>, where current is limited only by impedance. For a normal load the drop along the line is <strong>Ze = R·cos θ + X·sin θ</strong>, because only the component of current in phase with the voltage produces IR drop and only the quadrature component produces IX drop. Using the magnitude overstates drop on a real load — sometimes substantially.",
+  },
+  {
+    question: "Does a low power factor always make voltage drop worse?",
+    answer:
+      "No, and this catches people out. Look at the formula: Ze = R·cos θ + X·sin θ. On a <strong>small, highly resistive conductor</strong> where R greatly exceeds X, a lagging power factor <em>reduces</em> line drop, because the R·cos θ term shrinks faster than the X·sin θ term grows. On a <strong>large conductor</strong> where X is comparable to R, it increases it. The crossover sits around 1/0.",
+  },
+  {
+    question: "Which resistance value does Table 8 give me?",
+    answer:
+      "<strong>DC resistance at 75 °C</strong>, in ohms per 1000 ft, listed separately for coated and uncoated copper and for aluminum, solid and stranded. This calculator uses the uncoated stranded values. A good sanity check: multiply the Table 8 resistance by the conductor's circular mils and divide by 1000, and you get back the familiar K constants — 12.9 for copper and 21.2 for aluminum, for every size in the table.",
+  },
+  {
+    question: "How do I correct resistance for temperature?",
+    answer:
+      "Chapter 9 Table 8's note gives R₂ = R₁[1 + α(T₂ − 75 °C)], with α of 0.00323 for copper and 0.00330 for aluminum. It is worth doing: 4/0 copper is 0.0608 Ω/kFT at 75 °C but only 0.0500 at 20 °C — <strong>18% lower</strong>. Conductors run hot when loaded, so voltage drop at full load is genuinely worse than a cold-resistance calculation suggests.",
+  },
+  {
+    question: "Why does a steel raceway increase reactance?",
+    answer:
+      "Because steel is magnetic, so it concentrates the magnetic field around the conductors and raises their inductance. Chapter 9 Table 9 lists separate reactance columns for steel and for PVC or aluminum raceway — roughly 25% higher in steel. It only matters on large conductors, where the reactance is a meaningful share of the total impedance.",
+  },
+  {
+    question: "What is I²R heat useful for?",
+    answer:
+      "Two things. It is real energy lost as heat — on the default 200 A run it is about 730 W, dissipated continuously into the raceway and the building. And it is the reason a loose connection is dangerous: the same formula applied to a half-ohm of contact resistance at 15 A gives 112 W inside a device box, which is a small heater with nothing overloaded.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Feeder sized? Price the run.";
+const ctaDescription =
+  "Conductor, raceway, terminations, supports, and the labor to pull it — feeders are where material takeoffs get expensive. TradesQuote turns the scope into a detailed line-item estimate with quantities and totals.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "The quick K-constant method for ordinary circuits.",
+  },
+  {
+    href: "/calculators/electrical/electrical-short-circuit-calculator",
+    title: "Available Fault Current Calculator",
+    description: "Where the impedance magnitude is the right quantity.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Ampacity and drop together, whichever governs.",
+  },
+  {
+    href: "/calculators/electrical/electrical-kwh-cost-calculator",
+    title: "kWh Cost Calculator",
+    description: "Put a price on the I²R heat you just calculated.",
+  },
+];
+
+/** Reference table built from the shared data, so the page cannot drift from the tool. */
+const tableRows = Object.entries(TABLE_8_DC_RESISTANCE).map(([label, r]) => {
+  const x = TABLE_9_REACTANCE[label];
+  return {
+    label: label.includes("kcmil") ? label : `${label} AWG`,
+    copper: r.copper,
+    aluminum: r.aluminum,
+    xSteel: x.steel,
+    xNonmagnetic: x.nonmagnetic,
+    kCheck: (r.copper * cmilOf(label)) / 1000,
+    zeCopper: effectiveImpedance(r.copper, x.steel, 0.85),
+  };
+});
+
+const conductorOptions = Object.keys(TABLE_8_DC_RESISTANCE);
+
+const styles = electricalAccentStyles.cyan;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Conductor Resistance Calculator — NEC Chapter 9 Tables 8 & 9" />
+    <meta
+      property="og:description"
+      content="Table 8 resistance with temperature correction, Table 9 reactance, and the effective impedance that actually causes voltage drop."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Conductor Resistance Calculator" />
+    <meta name="twitter:description" content="R, X, effective Z, voltage drop and I²R heat from Chapter 9. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Conductor Resistance Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 12h4l3-8 4 16 3-8h2" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Conductor Resistance <span class="text-cyan-600">— and the Reactance</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The familiar K-constant voltage-drop formula models <strong>resistance only</strong>. That is exactly
+              right at unity power factor — and increasingly wrong as conductors get large, because reactance
+              starts to rival resistance. This tool uses <strong>Chapter 9 Table 8</strong> resistance and
+              <strong>Table 9</strong> reactance, and computes the effective impedance that actually causes drop.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 12h4l3-8 4 16 3-8h2"></path>
+            </svg>
+            Calculate the run impedance
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="cr-size" class="text-sm font-medium text-slate-700">Conductor size</label>
+                  <select
+                    id="cr-size"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    {conductorOptions.map((label) => (
+                      <option value={label} selected={label === "4/0"}>
+                        {label.includes("kcmil") ? label : `${label} AWG`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-material" class="text-sm font-medium text-slate-700">Material</label>
+                  <select
+                    id="cr-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-raceway" class="text-sm font-medium text-slate-700">Raceway</label>
+                  <select
+                    id="cr-raceway"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="steel" selected>Steel (EMT, RMC)</option>
+                    <option value="nonmagnetic">PVC or aluminum</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-sets" class="text-sm font-medium text-slate-700">Parallel sets</label>
+                  <select
+                    id="cr-sets"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-temp" class="text-sm font-medium text-slate-700">Conductor temperature</label>
+                  <select
+                    id="cr-temp"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="20">20 °C — cold, unloaded</option>
+                    <option value="25">25 °C — ambient</option>
+                    <option value="60">60 °C — moderately loaded</option>
+                    <option value="75" selected>75 °C — Table 8 basis</option>
+                    <option value="90">90 °C — fully loaded</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-phase" class="text-sm font-medium text-slate-700">Circuit</label>
+                  <select
+                    id="cr-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="1ph">Single-phase</option>
+                    <option value="3ph" selected>Three-phase</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-volts" class="text-sm font-medium text-slate-700">Circuit voltage</label>
+                  <select
+                    id="cr-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="120">120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240">240 V</option>
+                    <option value="480" selected>480 V</option>
+                    <option value="600">600 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="cr-amps" class="text-sm font-medium text-slate-700">Load current</label>
+                  <input
+                    id="cr-amps"
+                    type="number"
+                    min="0"
+                    max="2000"
+                    value="200"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                </div>
+                <div class="sm:col-span-2">
+                  <label for="cr-pf" class="text-sm font-medium text-slate-700">Load power factor</label>
+                  <input
+                    id="cr-pf"
+                    type="number"
+                    min="0.1"
+                    max="1"
+                    step="0.01"
+                    value="0.85"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Set 1.0 for a resistive load — reactance then contributes nothing.</p>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="cr-length" class="text-sm font-semibold text-slate-800">One-way run length</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="cr-length"
+                      type="number"
+                      min="0"
+                      max="2000"
+                      value="100"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="cr-length-range"
+                  type="range"
+                  min="0"
+                  max="2000"
+                  step="10"
+                  value="100"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0 ft</span><span>2,000 ft</span>
+                </div>
+              </div>
+
+              <button
+                id="cr-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Voltage drop</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="cr-drop" class="text-5xl font-extrabold tracking-tight text-cyan-600">2.72 V</span>
+                <span id="cr-drop-percent" class="text-2xl font-bold text-slate-500">0.57%</span>
+              </div>
+              <p class="mt-1 text-sm font-semibold text-slate-700">From the effective impedance, not R alone</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Run resistance</p>
+                  <p id="cr-resistance" class="mt-1 text-2xl font-bold text-slate-900">0.00608 Ω</p>
+                </div>
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Run reactance</p>
+                  <p id="cr-reactance" class="mt-1 text-2xl font-bold text-slate-900">0.00510 Ω</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Table 8 resistance</span><span id="cr-bd-r-per-kft" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Table 9 reactance</span><span id="cr-bd-x-per-kft" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Over the run</span><span id="cr-bd-run" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Effective Z</span><span id="cr-bd-ze" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Voltage drop</span><span id="cr-bd-drop" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>K-constant method</span><span id="cr-bd-k" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">I²R heat</span><span id="cr-bd-loss" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="cr-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Reactance adds real drop at 0.85 power factor on a conductor this size.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Resistance — Chapter 9, Table 8, corrected for temperature</div>
+            <div>R&nbsp;=&nbsp;R₇₅&nbsp;×&nbsp;[1&nbsp;+&nbsp;α(T&nbsp;−&nbsp;75)]&nbsp;×&nbsp;length&nbsp;÷&nbsp;1000&nbsp;÷&nbsp;sets</div>
+            <div>α&nbsp;=&nbsp;0.00323&nbsp;copper&nbsp;·&nbsp;0.00330&nbsp;aluminum</div>
+            <div class="mt-4 text-cyan-300"># Reactance — Chapter 9, Table 9</div>
+            <div>X&nbsp;=&nbsp;X_table&nbsp;×&nbsp;length&nbsp;÷&nbsp;1000&nbsp;÷&nbsp;sets&nbsp;&nbsp;&nbsp;&nbsp;# steel raceway is higher</div>
+            <div class="mt-4 text-cyan-300"># What actually causes drop</div>
+            <div>Ze&nbsp;=&nbsp;R·cos&nbsp;θ&nbsp;+&nbsp;X·sin&nbsp;θ&nbsp;&nbsp;&nbsp;&nbsp;# NOT √(R² + X²)</div>
+            <div>VD&nbsp;=&nbsp;(1.732&nbsp;or&nbsp;2)&nbsp;×&nbsp;I&nbsp;×&nbsp;<span class="text-cyan-300">Ze</span></div>
+            <div class="mt-4 text-cyan-300"># The two limits worth remembering</div>
+            <div>PF&nbsp;=&nbsp;1.0&nbsp;&nbsp;→&nbsp;Ze&nbsp;=&nbsp;R&nbsp;exactly&nbsp;&nbsp;&nbsp;&nbsp;# why the K formula works</div>
+            <div>bolted&nbsp;fault&nbsp;→&nbsp;use&nbsp;√(R²&nbsp;+&nbsp;X²)&nbsp;&nbsp;&nbsp;&nbsp;# a different question</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Table 8 reproduces the K constants</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Multiply any Table 8 resistance by that size's circular mils and divide by 1000 and you get 12.9
+                for copper, 21.2 for aluminum — every size. The shortcut is the table, averaged.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Low power factor can help or hurt</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                On small conductors R dominates, so a lagging load slightly reduces drop. On large conductors X
+                rivals R and it increases it. The crossover is near 1/0.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Hot conductors drop more</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                4/0 copper is 18% less resistive at 20 °C than at 75 °C. A cold-resistance calculation flatters
+                the design; loaded conductors run hot.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">I²R is why loose lugs burn</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Half an ohm of contact resistance at 15 A dissipates 112 W inside a box. Nothing is overloaded —
+                the connection is simply a heater.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 4/0 copper run at 200 A over 100 ft, three-phase 480 V, in steel conduit.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">At 0.85 power factor — the defaults</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              R = 0.0608 × 100 ÷ 1000 = 0.00608 Ω · X = 0.051 × 100 ÷ 1000 = 0.00510 Ω<br />
+              Ze = 0.00608 × 0.85 + 0.00510 × 0.527 = 0.00785 Ω<br />
+              VD = 1.732 × 200 × 0.00785 = <span class="font-bold text-cyan-700">2.72 V (0.57%)</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 29% more drop than resistance alone would
+              give. On a 4/0 feeder in steel conduit the reactance is no longer a rounding error.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">The same run at unity power factor</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Ze = 0.00608 × 1.0 + 0.00510 × 0 = 0.00608 Ω — exactly R<br />
+              VD = 1.732 × 200 × 0.00608 = <span class="font-bold text-cyan-700">2.11 V (0.44%)</span><br />
+              K-constant method: 1.732 × 12.9 × 200 × 100 ÷ 211,600 = 2.11 V
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the two methods agree to 0.3%. This is the
+              proof that the K shortcut is a resistance-only model — and exactly right when the load is resistive.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">500 kcmil, where reactance takes over</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              R = 0.0258 Ω/kFT · X = 0.048 Ω/kFT in steel — <span class="font-bold text-cyan-700">X is nearly 2× R</span><br />
+              Ze at 0.85 PF = 0.0472 Ω/kFT, against 0.0258 from resistance alone
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 83% more drop than the K formula predicts.
+              On large feeders serving motor loads, a resistance-only calculation is not conservative — it is
+              simply wrong, and this is exactly why Chapter 9 Table 9 exists.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Chapter 9 Tables 8 and 9, per 1000 ft
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Rendered from the same data the calculator uses. The <strong>K check</strong> column multiplies the
+            copper resistance by the conductor's circular mils and divides by 1000. From 6 AWG up it lands between
+            12.84 and 12.90 — which is exactly where the familiar <strong>{K_COPPER}</strong> constant comes from
+            ({K_ALUMINUM} for aluminum). The 8 through 14 AWG rows sit about 2% lower, so the single averaged
+            constant is very slightly conservative on the smallest conductors.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-4 font-semibold">R copper</th>
+                  <th class="py-3 px-4 font-semibold">R aluminum</th>
+                  <th class="py-3 px-4 font-semibold">X steel</th>
+                  <th class="py-3 px-4 font-semibold">X PVC/Al</th>
+                  <th class="py-3 px-4 font-semibold">Ze Cu, 0.85 PF</th>
+                  <th class="py-3 px-4 font-semibold">K check</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  tableRows.map((row, index) => (
+                    <tr class={index === tableRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-4">{row.copper}</td>
+                      <td class="py-3 px-4">{row.aluminum ?? "—"}</td>
+                      <td class="py-3 px-4">{row.xSteel}</td>
+                      <td class="py-3 px-4">{row.xNonmagnetic}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{fmt(row.zeCopper, 4)}</td>
+                      <td class="py-3 px-4 text-slate-500">{fmt(row.kCheck, 2)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — <strong>Chapter 9 Table 8</strong> (direct-current
+            resistance at 75 °C, uncoated stranded conductors, with the temperature-correction note) and
+            <strong>Chapter 9 Table 9</strong> (alternating-current reactance for three single conductors in a
+            raceway at 60 Hz). Effective impedance is computed as Ze = R·cos θ + X·sin θ from those two tables
+            rather than read from Table 9's own effective-Z column, so the power factor is yours to set. Voltage
+            drop targets of 3% and 5% appear only in Informational Notes to <strong>210.19(A)</strong> and
+            <strong>215.2(A)</strong> and are not enforceable requirements. Local amendments override the model
+            code, and the AHJ has final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about conductor resistance, reactance and impedance."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalConductorResistanceCalculator } from "@/scripts/calculators/electrical-conductor-resistance-calculator";
+    initElectricalConductorResistanceCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

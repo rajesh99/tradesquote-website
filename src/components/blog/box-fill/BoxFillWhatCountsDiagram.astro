@@ -1,0 +1,60 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * 314.16(B)(1)–(5). The grouping rules are the ones that get missed: all clamps
+ * together count once, all equipment grounding conductors together count once, and a
+ * device yoke counts twice.
+ */
+const counts = [
+  { item: "Each conductor entering and terminating or spliced", allowance: "1 each", rule: "(B)(1)" },
+  { item: "Each conductor passing through unspliced", allowance: "1 each", rule: "(B)(1)" },
+  { item: "All internal cable clamps together", allowance: "1 total", rule: "(B)(2)" },
+  { item: "Each fixture stud or hickey", allowance: "1 each", rule: "(B)(3)" },
+  { item: "Each yoke or strap holding a device", allowance: "2 each", rule: "(B)(4)" },
+  { item: "All equipment grounding conductors together", allowance: "1 total", rule: "(B)(5)" },
+];
+
+const zero = [
+  "Wire connectors and wirenuts",
+  "Pigtails that begin and end inside the box",
+  "Locknuts, bushings and other small fittings",
+  "Cable clamps mounted outside the box",
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>What counts toward box fill under NEC 314.16(B)</title>
+  <desc>
+    Each conductor entering the box and terminating or being spliced counts one volume allowance, as does each
+    conductor passing through unspliced. All internal cable clamps together count one allowance. Each fixture
+    stud or hickey counts one. Each yoke or strap holding a device counts two. All equipment grounding
+    conductors together count one. Counting nothing at all: wire connectors and wirenuts, pigtails that begin
+    and end inside the box, locknuts and bushings, and cable clamps mounted outside the box.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What counts — and what doesn't</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The grouping rules are what people miss: clamps once, all grounds once, each device twice</text>
+
+  {counts.map((c, i) => {
+    const y = 72 + i * 30;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="26" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1" />
+        <text x="42" y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">{c.item}</text>
+        <rect x="524" y={y + 4} width="66" height="18" rx="5" fill={C.white} stroke={C.primary} stroke-width="1" />
+        <text x="557" y={y + 17} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9.5" font-weight="800">{c.allowance}</text>
+        <text x="640" y={y + 17} fill={C.muted} font-family={FONT} font-size="9">{c.rule}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="256" width="672" height="56" rx="9" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="42" y="274" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">Counts as nothing:</text>
+  <text x="150" y="274" fill={C.muted} font-family={FONT} font-size="9.5">
+    <tspan x="150" dy="0">{zero[0]} · {zero[1]}</tspan>
+    <tspan x="150" dy="14">{zero[2]} · {zero[3]}</tspan>
+  </text>
+  <text x="42" y="304" fill={C.muted} font-family={FONT} font-size="9">A pigtail is free because it adds no conductor crossing the box wall.</text>
+</svg>

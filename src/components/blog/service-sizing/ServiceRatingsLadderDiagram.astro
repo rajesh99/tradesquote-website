@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Standard residential service ratings, matching STANDARD_SERVICE_RATINGS in
+ * src/lib/nec.ts. 60 A is shown as legacy only — 230.79(C) requires at least 100 A
+ * for a one-family dwelling.
+ */
+const ratings = [
+  { amps: 60, kva: "14 kVA", use: "Legacy only — not permitted new", legacy: true },
+  { amps: 100, kva: "24 kVA", use: "Gas heat, gas range, gas water heater" },
+  { amps: 125, kva: "30 kVA", use: "Where the calc lands just over 100" },
+  { amps: 150, kva: "36 kVA", use: "Mixed fuel, one big electric load" },
+  { amps: 200, kva: "48 kVA", use: "The modern default — all-electric + EV", common: true },
+  { amps: 225, kva: "54 kVA", use: "All-electric with heat pump and EV" },
+  { amps: 320, kva: "77 kVA", use: "Large home — a 400 A class meter" },
+  { amps: 400, kva: "96 kVA", use: "Two panels, dual EV, electric heat" },
+];
+
+const BAR_MAX = 300;
+const peak = 400;
+const bars = ratings.map((r) => ({ ...r, width: Math.round((r.amps / peak) * BAR_MAX) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" fill="none" aria-hidden="true">
+  <title>Standard residential service ratings from 60 to 400 amps</title>
+  <desc>
+    Standard residential service ratings and their capacity at 240 volts: 60 amps is about 14 kilovolt-amperes
+    and is legacy only since 230.79(C) requires at least 100 amps for a one-family dwelling; 100 amps is 24
+    kVA and suits gas heat, range and water heater; 125 amps is 30 kVA; 150 amps is 36 kVA; 200 amps is 48 kVA
+    and is the modern default; 225 amps is 54 kVA; 320 amps is 77 kVA and comes as a 400 amp class meter; and
+    400 amps is 96 kVA for two panels, dual EV charging and electric heat.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="384" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Standard service ratings and what they cover</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Capacity is rating × 240 V. A load calculation picks the row — this is orientation, not a shortcut.</text>
+
+  {bars.map((r, i) => {
+    const y = 74 + i * 39;
+    const accent = r.legacy ? C.red : r.common ? C.primary : C.blue;
+    const bg = r.legacy ? C.redLight : r.common ? C.primaryLight : C.blueLight;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="12.5" font-weight={r.common ? "800" : "700"}>{`${r.amps} A`}</text>
+        <rect x="86" y={y + 4} width={r.width} height="26" rx="6" fill={bg} stroke={accent} stroke-width={r.common ? "1.8" : "1.2"} />
+        <text x="96" y={y + 22} fill={accent} font-family={FONT} font-size="11" font-weight="800">{r.kva}</text>
+        <text x={86 + r.width + 12} y={y + 22} fill={C.muted} font-family={FONT} font-size="10">{r.use}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="384" fill={C.muted} font-family={FONT} font-size="10">230.79(C) sets 100 A as the minimum service disconnect for a one-family dwelling — which is why 60 A services only ever appear on existing homes.</text>
+</svg>

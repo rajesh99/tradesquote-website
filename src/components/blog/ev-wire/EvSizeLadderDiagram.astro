@@ -1,0 +1,78 @@
+---
+import { findSizeByAmpacity, fmt, maxLengthForDrop, nextStandardOcpd, sizeLabel } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The whole ladder of common charger ratings, computed rather than transcribed. The
+ * 50 A row is the interesting one: two amps above 48 costs a breaker size and two
+ * conductor sizes, because 62.5 A rounds up to 70 A.
+ */
+const VOLTS = 240;
+
+const rows = [16, 24, 32, 40, 48, 50, 60, 80].map((amps) => {
+  const breaker = nextStandardOcpd(amps * 1.25);
+  const cu = findSizeByAmpacity(breaker, "copper", 75);
+  const al = findSizeByAmpacity(breaker, "aluminum", 75);
+  const reach = cu
+    ? maxLengthForDrop({ cmil: cu.cmil, material: "copper", amps, volts: VOLTS, phase: 1, limitPercent: 3 })
+    : 0;
+  return {
+    amps,
+    kw: (amps * VOLTS) / 1000,
+    breaker,
+    cu: cu ? sizeLabel(cu.label) : "—",
+    al: al ? sizeLabel(al.label) : "—",
+    reach,
+    highlight: amps === 48,
+    warn: amps === 50,
+  };
+});
+
+const cols = [
+  { x: 40, label: "CHARGER" },
+  { x: 130, label: "POWER" },
+  { x: 224, label: "×1.25" },
+  { x: 306, label: "BREAKER" },
+  { x: 404, label: "COPPER" },
+  { x: 512, label: "ALUMINUM" },
+  { x: 620, label: "3% REACH" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 322" fill="none" aria-hidden="true">
+  <title>Breaker and conductor by EV charger rating</title>
+  <desc>
+    A 16 amp charger needs a 20 amp breaker on 12 AWG copper. 24 amps needs 30 amps on 10 AWG. 32 amps needs 40
+    amps on 8 AWG. 40 amps needs 50 amps on 8 AWG. 48 amps needs 60 amps on 6 AWG copper or 4 AWG aluminum. 50 amps
+    needs 70 amps on 4 AWG, because 62.5 rounds up past the 60 amp rating. 60 amps needs 80 amps on 4 AWG, and 80
+    amps needs 100 amps on 3 AWG.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="306" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Every common charger rating, with the circuit it needs</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Conductors at the 75 °C column. Reach is the one-way run that keeps voltage drop within 3% at 240 V.</text>
+
+  {cols.map((c) => (
+    <text x={c.x} y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{c.label}</text>
+  ))}
+
+  {rows.map((r, i) => {
+    const y = 100 + i * 26;
+    const accent = r.highlight ? C.primary : r.warn ? C.red : C.dark;
+    const bg = r.highlight ? C.primaryLight : r.warn ? C.redLight : C.white;
+    return (
+      <g>
+        <rect x="24" y={y - 14} width="672" height="24" rx="5" fill={bg} stroke={r.highlight || r.warn ? accent : "none"} stroke-width={r.highlight || r.warn ? "1.2" : "0"} />
+        <text x={cols[0].x} y={y + 2} fill={accent} font-family={FONT} font-size="11" font-weight="800">{`${r.amps} A`}</text>
+        <text x={cols[1].x} y={y + 2} fill={C.muted} font-family={FONT} font-size="10">{`${fmt(r.kw, 2)} kW`}</text>
+        <text x={cols[2].x} y={y + 2} fill={C.muted} font-family={FONT} font-size="10">{`${fmt(r.amps * 1.25, 1)} A`}</text>
+        <text x={cols[3].x} y={y + 2} fill={accent} font-family={FONT} font-size="11" font-weight="800">{`${r.breaker} A`}</text>
+        <text x={cols[4].x} y={y + 2} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.cu}</text>
+        <text x={cols[5].x} y={y + 2} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.al}</text>
+        <text x={cols[6].x} y={y + 2} fill={C.muted} font-family={FONT} font-size="10">{`${fmt(r.reach, 0)} ft`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="306" fill={C.red} font-family={FONT} font-size="10" font-weight="700">Watch the 50 A row: two amps more than 48 pushes 62.5 A past the 60 A rating, costing a breaker size and two conductor sizes.</text>
+</svg>

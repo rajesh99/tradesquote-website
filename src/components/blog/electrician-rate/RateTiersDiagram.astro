@@ -1,0 +1,84 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Licence tiers and what each has to bill. Wage figures are illustrative points, not
+ * survey data — the billing rates are computed from them with the labor-rate maths so
+ * the relationship is exact even though the wages are examples.
+ */
+const PAID_HOURS = 2080;
+const TOTAL_EXTRA = 9000;
+const billRateFor = (wage: number) => {
+  const totalCost = wage * PAID_HOURS * 1.35 + TOTAL_EXTRA;
+  const loaded = totalCost / (PAID_HOURS * 0.75);
+  return loaded / 0.6;
+};
+
+const tiers = [
+  {
+    tier: "Apprentice",
+    accent: C.blue,
+    bg: C.blueLight,
+    wage: 22,
+    scope: ["Works under supervision. Paid a", "stepped percentage of journeyman", "scale, rising each period."],
+  },
+  {
+    tier: "Journeyman",
+    accent: C.primary,
+    bg: C.primaryLight,
+    wage: 32,
+    scope: ["Licensed to work unsupervised.", "The reference wage every other", "tier is set against."],
+  },
+  {
+    tier: "Master",
+    accent: C.orange,
+    bg: C.orangeLight,
+    wage: 42,
+    scope: ["Pulls permits, signs off work,", "supervises others. Carries the", "licence the business runs on."],
+  },
+];
+
+const rows = tiers.map((t) => ({ ...t, bill: billRateFor(t.wage) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Electrician licence tiers and the billing rate each supports</title>
+  <desc>
+    Three licence tiers. An apprentice works under supervision and is paid a stepped percentage of journeyman
+    scale that rises each period; at an illustrative 22 dollar wage the supported billing rate is about 75 dollars
+    62 cents. A journeyman is licensed to work unsupervised and is the reference wage; at 32 dollars the billing
+    rate is about 105 dollars 62. A master pulls permits, signs off work and supervises others; at 42 dollars the
+    billing rate is about 135 dollars 62. Each additional 10 dollars of wage adds about 30 dollars to the required
+    billing rate.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Licence tier, wage, and the rate it supports</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Wages are illustrative points; the billing rates are computed from them — every $10 of wage adds ~$30 of rate</text>
+
+  {rows.map((r, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="188" rx="10" fill={r.bg} stroke={r.accent} stroke-width="1.6" />
+        <text x={x + 16} y="98" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{r.tier}</text>
+        <line x1={x + 16} y1="108" x2={x + 192} y2="108" stroke={r.accent} stroke-opacity="0.35" />
+
+        <text x={x + 16} y="128" fill={C.muted} font-family={FONT} font-size="9">wage</text>
+        <text x={x + 16} y="148" fill={C.dark} font-family={FONT} font-size="17" font-weight="800">{`$${r.wage}/h`}</text>
+
+        <text x={x + 110} y="128" fill={C.muted} font-family={FONT} font-size="9">must bill</text>
+        <text x={x + 110} y="148" fill={r.accent} font-family={FONT} font-size="17" font-weight="800">{`$${r.bill.toFixed(0)}/h`}</text>
+
+        <text x={x + 16} y="180" fill={C.muted} font-family={FONT} font-size="9.5">
+          {r.scope.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+
+        <rect x={x + 16} y="226" width="176" height="22" rx="6" fill={C.white} stroke={r.accent} stroke-width="1.2" />
+        <text x={x + 104} y="241" text-anchor="middle" fill={r.accent} font-family={FONT} font-size="9.5" font-weight="800">{`${(r.bill / r.wage).toFixed(1)}× the wage`}</text>
+      </g>
+    );
+  })}
+</svg>

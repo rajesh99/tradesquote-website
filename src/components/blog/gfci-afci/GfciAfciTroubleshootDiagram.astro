@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Nuisance-trip triage. The point of the layout is that the two devices trip for
+ * completely different reasons, so "it keeps tripping" needs different diagnosis
+ * depending on which device it is.
+ */
+const columns = [
+  {
+    heading: "GFCI keeps tripping",
+    accent: C.blue,
+    bg: C.blueLight,
+    causes: [
+      "Moisture in an outdoor box or",
+      "a weatherproof cover left open",
+      "A long circuit — capacitive",
+      "leakage adds up over distance",
+      "A motor load with worn",
+      "insulation (pumps, freezers)",
+      "A shared neutral crossing",
+      "between two circuits",
+    ],
+  },
+  {
+    heading: "AFCI keeps tripping",
+    accent: C.orange,
+    bg: C.orangeLight,
+    causes: [
+      "A genuine damaged cord or a",
+      "cable nicked by a staple",
+      "A loose terminal screw —",
+      "the most common real cause",
+      "Motor brushes and some older",
+      "electronics mimic arc signatures",
+      "A shared neutral, again — the",
+      "single most common wiring fault",
+    ],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Diagnosing GFCI and AFCI nuisance tripping</title>
+  <desc>
+    A ground-fault device that keeps tripping usually points to moisture in an outdoor box, capacitive leakage
+    on a very long circuit, a motor load with worn insulation such as a pump or freezer, or a shared neutral
+    crossing between circuits. An arc-fault device that keeps tripping usually points to a genuinely damaged
+    cord or a cable nicked by a staple, a loose terminal screw, motor brushes or older electronics that mimic
+    an arc signature, or again a shared neutral. In both cases a repeated trip should be investigated rather
+    than bypassed.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Same complaint, different diagnosis</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A repeated trip is data. Work out which device it is before you start guessing.</text>
+
+  {columns.map((col, i) => {
+    const x = 24 + i * 340;
+    return (
+      <g>
+        <rect x={x} y="72" width="324" height="164" rx="10" fill={col.bg} stroke={col.accent} stroke-width="1.6" />
+        <text x={x + 20} y="96" fill={col.accent} font-family={FONT} font-size="12.5" font-weight="800">{col.heading}</text>
+        <line x1={x + 20} y1="106" x2={x + 304} y2="106" stroke={col.accent} stroke-opacity="0.35" />
+        <text x={x + 20} y="126" fill={C.muted} font-family={FONT} font-size="9.5">
+          {col.causes.map((line, li) => (
+            <tspan x={x + 20} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

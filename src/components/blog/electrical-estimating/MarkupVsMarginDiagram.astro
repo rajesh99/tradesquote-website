@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The single most expensive arithmetic error in contracting. Same break-even, same
+ * "25%", two different prices — computed here from the worked job.
+ */
+const breakEven = 2978.5;
+const PCT = 0.25;
+
+const marginPrice = breakEven / (1 - PCT);
+const markupPrice = breakEven * (1 + PCT);
+const gap = marginPrice - markupPrice;
+const actualMarginOfMarkup = (markupPrice - breakEven) / markupPrice;
+
+const BAR_MAX = 420;
+const peak = marginPrice;
+const bars = [
+  {
+    label: "Divide by 0.75 — margin",
+    sub: "break-even ÷ (1 − 0.25)",
+    value: marginPrice,
+    accent: C.green,
+    verdict: "25% margin, as intended",
+  },
+  {
+    label: "Multiply by 1.25 — markup",
+    sub: "break-even × (1 + 0.25)",
+    value: markupPrice,
+    accent: C.red,
+    verdict: `only ${(actualMarginOfMarkup * 100).toFixed(0)}% margin`,
+  },
+].map((b) => ({ ...b, width: Math.round((b.value / peak) * BAR_MAX) }));
+
+const usd = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Markup versus margin on the same job</title>
+  <desc>
+    On a break-even of 2,979 dollars, dividing by 0.75 gives a price of 3,971 and a true 25 percent margin.
+    Multiplying by 1.25 instead gives 3,723 — which is only a 20 percent margin, and 248 dollars less profit on
+    exactly the same work. The two operations are not interchangeable and the gap widens as the percentage rises.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">"25%" two ways — same job, different money</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`Break-even ${usd(breakEven)} on both. The only difference is the operator.`}</text>
+
+  {bars.map((b, i) => {
+    const y = 78 + i * 62;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{b.label}</text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="9">{b.sub}</text>
+        <rect x="256" y={y} width={b.width} height="34" rx="8" fill={b.accent} opacity="0.14" />
+        <rect x="256" y={y} width={b.width} height="34" rx="8" fill="none" stroke={b.accent} stroke-width="1.7" />
+        <text x={256 + b.width - 14} y={y + 22} text-anchor="end" fill={C.dark} font-family={FONT} font-size="16" font-weight="800">{usd(b.value)}</text>
+        <text x="268" y={y + 22} fill={b.accent} font-family={FONT} font-size="10" font-weight="800">{b.verdict}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="196" width="672" height="42" rx="9" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="44" y="214" fill={C.red} font-family={FONT} font-size="12" font-weight="800">{`${usd(gap)} of profit, gone — on one job`}</text>
+  <text x="44" y="230" fill={C.muted} font-family={FONT} font-size="9.5">Repeat that across a year of jobs and it's the difference between a business that works and one that doesn't.</text>
+</svg>

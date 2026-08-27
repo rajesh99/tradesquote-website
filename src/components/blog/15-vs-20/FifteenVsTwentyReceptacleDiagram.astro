@@ -1,0 +1,52 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * NEC Table 210.21(B)(3) — receptacle ratings permitted on each circuit rating. The
+ * surprising row is 20 A, which accepts 15 A receptacles; the T-slot 20 A receptacle
+ * is only mandatory for a single receptacle on an individual branch circuit,
+ * per 210.21(B)(1).
+ */
+const rows = [
+  { circuit: "15 A", permitted: "15 A", note: "Nothing larger — a 20 A receptacle may not go here" },
+  { circuit: "20 A", permitted: "15 A or 20 A", note: "Both allowed; ordinary duplexes are 15 A", highlight: true },
+  { circuit: "30 A", permitted: "30 A", note: "Exact match required" },
+  { circuit: "40 A", permitted: "40 A or 50 A", note: "Range and oven territory" },
+  { circuit: "50 A", permitted: "50 A", note: "Exact match required" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Table 210.21(B)(3) receptacle ratings by circuit rating</title>
+  <desc>
+    Receptacle ratings permitted on each branch circuit rating. A 15 amp circuit takes only 15 amp
+    receptacles. A 20 amp circuit takes either 15 or 20 amp receptacles, which is why ordinary 15 amp
+    duplexes are legal on 20 amp circuits. A 30 amp circuit requires a 30 amp receptacle, a 40 amp circuit
+    takes 40 or 50 amp, and a 50 amp circuit requires 50 amp.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Which receptacles may go on which circuit — Table 210.21(B)(3)</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The 20 A row is the one that surprises people: 15 A receptacles are perfectly legal there</text>
+
+  <text x="46" y="86" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">CIRCUIT</text>
+  <text x="152" y="86" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">RECEPTACLE PERMITTED</text>
+  <line x1="24" y1="94" x2="696" y2="94" stroke={C.border} />
+
+  {rows.map((r, i) => {
+    const y = 104 + i * 32;
+    const fill = r.highlight ? C.primaryLight : C.white;
+    const stroke = r.highlight ? C.primary : C.border;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="27" rx="6" fill={fill} stroke={stroke} stroke-width={r.highlight ? "1.6" : "0.8"} />
+        <text x="46" y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{r.circuit}</text>
+        <text x="152" y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight={r.highlight ? "800" : "600"}>{r.permitted}</text>
+        <text x="330" y={y + 18} fill={C.muted} font-family={FONT} font-size="9.5">{r.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">Exception: a <tspan font-weight="700">single</tspan> receptacle alone on an individual branch circuit must be rated at least the circuit rating — 210.21(B)(1).</text>
+  <text x="24" y="268" fill={C.muted} font-family={FONT} font-size="10">So a lone simplex on a dedicated 20 A circuit does need to be a 20 A device.</text>
+</svg>

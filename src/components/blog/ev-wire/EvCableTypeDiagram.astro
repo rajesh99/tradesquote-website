@@ -1,0 +1,71 @@
+---
+import { ampacityOf, findSizeByAmpacity, nextStandardOcpd, sizeLabel } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The trap nobody mentions: NEC 334.80 limits NM cable to the 60 °C column, so the
+ * conductor that works in conduit is often a size too small in Romex. Both columns
+ * are computed from Table 310.16 rather than transcribed.
+ */
+const rows = [16, 32, 40, 48, 60].map((chargerAmps) => {
+  const breaker = nextStandardOcpd(chargerAmps * 1.25);
+  const nm = findSizeByAmpacity(breaker, "copper", 60);
+  const thhn = findSizeByAmpacity(breaker, "copper", 75);
+  const naive = findSizeByAmpacity(breaker, "copper", 75);
+  const naiveAt60 = naive ? (ampacityOf(naive, "copper", 60) ?? 0) : 0;
+  return {
+    chargerAmps,
+    breaker,
+    nm: nm ? sizeLabel(nm.label) : "—",
+    thhn: thhn ? sizeLabel(thhn.label) : "—",
+    // NM needs a bigger conductor than conduit wherever the 75 °C pick falls short at 60 °C.
+    mismatch: nm && naive ? nm.label !== naive.label : false,
+    naiveAt60,
+  };
+});
+
+const cols = { charger: 40, breaker: 156, nm: 264, thhn: 400, verdict: 520 };
+const flagged = rows.find((r) => r.mismatch && r.chargerAmps === 48);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Cable type changes the conductor size</title>
+  <desc>
+    NEC 334.80 requires NM cable to be used at its 60 degree ampacity. For a 20 amp circuit both NM and conduit
+    use 12 AWG, and for a 40 amp circuit both use 8 AWG. At 50 amps NM needs 6 AWG where conduit needs 8. At 60
+    amps, for a 48 amp charger, NM needs 4 AWG because 6 AWG copper is only 55 amps at 60 degrees, while 6 AWG THHN
+    in conduit is 65 amps and is fine. At 80 amps NM needs 3 AWG where conduit needs 4.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Romex and conduit are not the same wire size</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">NEC 334.80 holds NM cable to the 60 °C column. THHN in conduit gets the 75 °C column.</text>
+
+  <text x={cols.charger} y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CHARGER</text>
+  <text x={cols.breaker} y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CIRCUIT</text>
+  <text x={cols.nm} y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NM CABLE (60 °C)</text>
+  <text x={cols.thhn} y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CONDUIT (75 °C)</text>
+  <text x={cols.verdict} y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SAME SIZE?</text>
+
+  {rows.map((r, i) => {
+    const y = 102 + i * 30;
+    const accent = r.mismatch ? C.red : C.green;
+    const bg = r.mismatch ? C.redLight : C.white;
+    return (
+      <g>
+        <rect x="24" y={y - 15} width="672" height="26" rx="5" fill={bg} stroke={accent} stroke-width="1.1" opacity={r.mismatch ? "1" : "0.55"} />
+        <text x={cols.charger} y={y + 2} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`${r.chargerAmps} A`}</text>
+        <text x={cols.breaker} y={y + 2} fill={C.muted} font-family={FONT} font-size="10.5">{`${r.breaker} A`}</text>
+        <text x={cols.nm} y={y + 2} fill={r.mismatch ? C.red : C.dark} font-family={FONT} font-size="11" font-weight="800">{r.nm}</text>
+        <text x={cols.thhn} y={y + 2} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{r.thhn}</text>
+        <text x={cols.verdict} y={y + 2} fill={accent} font-family={FONT} font-size="10" font-weight="700">{r.mismatch ? "No — NM is one size up" : "Yes"}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="214" width="672" height="56" rx="10" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="44" y="236" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{flagged ? `The common error: 6/3 NM on a ${flagged.breaker} A charger circuit` : "The common error"}</text>
+  <text x="44" y="254" fill={C.muted} font-family={FONT} font-size="9.5">{flagged ? `6 AWG copper is only ${flagged.naiveAt60} A at 60 °C, short of the ${flagged.breaker} A needed. Use ${flagged.nm} NM, or ${flagged.thhn} THWN-2 in conduit — what most installers run.` : ""}</text>
+
+  <text x="24" y="296" fill={C.muted} font-family={FONT} font-size="9.5">Note that a 32 A charger on a 40 A circuit is fine in 8/3 NM — 8 AWG copper is exactly 40 A at 60 °C. The problem starts at 60 A.</text>
+</svg>

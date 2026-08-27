@@ -1,0 +1,567 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { busbarAllowance, fmt } from "@/lib/nec";
+
+const title = "Solar 120% Rule Calculator — NEC 705.12 Busbar | TradesQuote";
+const description =
+  "Free NEC 705.12(B)(3)(2) calculator. Check whether a panel busbar can take a PV interconnection — main breaker plus backfed PV breaker against 120% of the busbar rating — and find the largest inverter it will accept.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-solar-interconnection-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Solar 120% Rule Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Solar 120% Rule Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC 705.12 busbar calculator returning the PV backfed breaker size, the 120% busbar allowance, whether the interconnection is permitted, and the maximum inverter current the panel will accept.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is the solar 120% rule?",
+    answer:
+      "NEC <strong>705.12(B)(3)(2)</strong> lets the main overcurrent device and the backfed PV breaker together total up to <strong>120% of the busbar rating</strong>, on one condition: the PV breaker must be at the <strong>opposite end of the busbar from the main supply</strong>. A 200 A busbar with a 200 A main therefore allows 240 A of total supply, leaving exactly 40 A for solar. That 40 A breaker backs a 32 A inverter — roughly 7.6 kW at 240 V.",
+  },
+  {
+    question: "Why is 120% allowed at all?",
+    answer:
+      "Because of where the current goes, not how much of it there is. With the main at one end and the PV at the other, power flows <em>inward from both ends</em> toward the loads in between. No single section of busbar ever carries the arithmetic sum of the two devices — the worst-case section carries the larger of them. The opposite-end placement is not a formality; it is the entire engineering basis of the allowance, which is why 705.12(B)(3)(2) makes it a condition and why the panel needs a permanent label saying so.",
+  },
+  {
+    question: "How big an inverter can a 200 amp panel take?",
+    answer:
+      "With a 200 A main on a 200 A busbar, <strong>32 A of continuous inverter output</strong> — about 7.6 kW at 240 V. The arithmetic: 200 × 120% = 240 A allowance, minus the 200 A main leaves 40 A, and a 40 A breaker backs 40 ÷ 1.25 = 32 A of inverter. Going one step up to a 40 A inverter needs a 50 A breaker and lands at 250 A, which fails. Those two amps are the whole difference.",
+  },
+  {
+    question: "What if the 120% rule doesn't work?",
+    answer:
+      "Three routes, roughly in order of cost. <strong>Derate the main breaker</strong> — dropping a 200 A main to 175 A on a 200 A busbar opens up a 60 A PV breaker, and most houses never come close to 175 A of actual demand. <strong>Use a supply-side (line-side) tap</strong> under 705.11, which connects ahead of the service disconnect and bypasses the busbar rule entirely. Or <strong>fit a smaller inverter</strong>. A main derate is usually cheapest, and NEC 220.87 measured demand is how you prove it is safe.",
+  },
+  {
+    question: "Do I use the inverter's rated output or its breaker size?",
+    answer:
+      "Both, in order. The rule compares <em>breaker ratings</em>, so the number that goes into the sum is the PV breaker. But you size that breaker from the inverter's <strong>continuous output current at 125%</strong> per 690.8(A) and 705.28 — a 32 A inverter needs 32 × 1.25 = 40 A. Using the inverter's nameplate kW without the 125% factor is the most common way this calculation goes wrong.",
+  },
+  {
+    question: "Does the 120% rule apply to batteries too?",
+    answer:
+      "Yes. NEC 2020 rewrote Article 705 to cover all power production sources, and energy storage systems interconnected on the load side face the same busbar arithmetic. A battery inverter that can export is a source. Note that a system able to both charge and discharge may need consideration in both directions, and that 705.13 power control systems are an increasingly common way around a busbar that will not otherwise take the interconnection.",
+  },
+  {
+    question: "Is the 120% rule the only option in 705.12?",
+    answer:
+      "No — and treating it as the only one is why some interconnections get refused unnecessarily. 705.12(B)(3) contains several paths, including the <strong>sum rule</strong> (all breakers excluding the main not exceeding the busbar rating), a <strong>centre-fed panelboard</strong> allowance, and a path under <strong>engineering supervision</strong>. This calculator models the 120% option only, because it is the one nearly every residential job uses. If it fails here, the others are worth reading before reaching for a service upgrade.",
+  },
+  {
+    question: "Where exactly does the PV breaker have to go?",
+    answer:
+      "At the <strong>opposite end of the busbar from the input feeder conductor or main breaker</strong>. In a typical residential load centre with the main at the top, that means the very bottom pair of spaces. Not near the bottom — the last position. If a full-size breaker already occupies it, that breaker moves. Inspectors check this specifically, and the required warning label spells the rule out for whoever opens the panel next.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Interconnection cleared? Quote the install.";
+const ctaDescription =
+  "Solar work is equipment-heavy and labour-light, so margin lives in the takeoff. TradesQuote turns a system design into a line-item estimate — modules, racking, conductors, disconnects, labour — validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-solar-string-calculator",
+    title: "Solar String Sizing Calculator",
+    description: "Modules per string from the temperature extremes.",
+  },
+  {
+    href: "/calculators/electrical/electrical-existing-load-calculator",
+    title: "Existing Load Calculator",
+    description: "Prove a main derate is safe with 220.87 demand.",
+  },
+  {
+    href: "/calculators/electrical/electrical-panel-schedule-calculator",
+    title: "Panel Spaces & Tandem Breakers",
+    description: "Check there is a space at the far end of the bar.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "Size the PV breaker from continuous output.",
+  },
+];
+
+/** The busbar ladder, computed from the same helper the calculator uses. */
+const busbarRows = [100, 125, 150, 200, 225, 400].map((rating) => {
+  const r = busbarAllowance({ busbarRating: rating, mainBreaker: rating, inverterAmps: 0 });
+  return {
+    rating,
+    allowance: r.allowance,
+    maxPvBreaker: r.maxPvBreaker,
+    maxInverter: r.maxInverterAmps,
+    kw240: (r.maxInverterAmps * 240) / 1000,
+  };
+});
+
+const styles = electricalAccentStyles.amber;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Solar 120% Rule Calculator — NEC 705.12 Busbar" />
+    <meta
+      property="og:description"
+      content="Main breaker plus PV breaker against 120% of the busbar — and the largest inverter the panel will accept."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Solar 120% Rule Calculator" />
+    <meta name="twitter:description" content="Can your panel take a solar interconnection? Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Solar 120% Rule Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2M5.6 5.6l1.4 1.4m10 10l1.4 1.4M3 12h2m14 0h2M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Solar 120% Rule <span class="text-amber-600">— NEC 705.12 Busbar Check</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The main breaker and the backfed PV breaker may add up to <strong>120% of the busbar rating</strong> —
+              provided the PV breaker sits at the <strong>opposite end of the bar from the main</strong>. On a
+              200&nbsp;A panel with a 200&nbsp;A main that leaves exactly 40&nbsp;A, and not one amp more.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2M5.6 5.6l1.4 1.4m10 10l1.4 1.4M3 12h2m14 0h2M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            Check the busbar
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="si-busbar" class="text-sm font-semibold text-slate-800">Busbar rating</label>
+                  <select
+                    id="si-busbar"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    <option value="100">100 A</option>
+                    <option value="125">125 A</option>
+                    <option value="150">150 A</option>
+                    <option value="200" selected>200 A</option>
+                    <option value="225">225 A</option>
+                    <option value="400">400 A</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="si-main" class="text-sm font-semibold text-slate-800">Main breaker</label>
+                  <select
+                    id="si-main"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    <option value="100">100 A</option>
+                    <option value="125">125 A</option>
+                    <option value="150">150 A</option>
+                    <option value="175">175 A</option>
+                    <option value="200" selected>200 A</option>
+                    <option value="225">225 A</option>
+                    <option value="400">400 A</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="si-inverter" class="text-sm font-semibold text-slate-800">
+                    Inverter continuous output
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="si-inverter"
+                      type="number"
+                      min="0"
+                      max="200"
+                      step="1"
+                      value="32"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">A</span>
+                  </div>
+                </div>
+                <input
+                  id="si-inverter-range"
+                  type="range"
+                  min="0"
+                  max="200"
+                  step="1"
+                  value="32"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-amber-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0 A</span><span>200 A</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                Use the inverter's rated <em>continuous AC output current</em>, from its nameplate — not the array's
+                DC kW. At 240 V, 32 A is roughly a 7.6 kW inverter. The breaker is then sized at 125% of that figure
+                under 690.8(A) and 705.28.
+              </p>
+
+              <button
+                id="si-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-amber-100 bg-amber-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">705.12(B)(3)(2) verdict</p>
+              <div class="mt-2">
+                <span id="si-verdict" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-emerald-600">
+                  Fits exactly
+                </span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">PV breaker</p>
+                  <p id="si-pv-breaker" class="mt-1 text-2xl font-bold text-slate-900">40 A</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Max inverter</p>
+                  <p id="si-max-inverter" class="mt-1 text-2xl font-bold text-slate-900">32.0 A</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Main + PV</p>
+                  <p id="si-total" class="mt-1 text-2xl font-bold text-slate-900">240 A</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">120% allowance</p>
+                  <p id="si-allowance" class="mt-1 text-2xl font-bold text-slate-900">240 A</p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-xl border border-amber-100 bg-white p-4">
+                <p class="text-xs text-slate-500">Headroom</p>
+                <p id="si-headroom" class="mt-1 text-2xl font-bold text-slate-900">0 A</p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-amber-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Inverter</span><span id="si-bd-inverter" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>PV breaker at 125%</span><span id="si-bd-breaker" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Busbar allowance</span><span id="si-bd-allowance" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Sum of devices</span><span id="si-bd-sum" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Result</span><span id="si-bd-result" class="font-bold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Largest that fits</span><span id="si-bd-max" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="si-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The PV breaker must land at the opposite end of the busbar from the main.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The method, explained in plain English</h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Size the PV breaker — 690.8(A), 705.28</div>
+            <div>PV breaker&nbsp;=&nbsp;inverter output × <span class="text-amber-300">1.25</span> → next standard rating</div>
+            <div class="mt-4 text-cyan-300"># The 705.12(B)(3)(2) test</div>
+            <div>allowance&nbsp;=&nbsp;busbar × <span class="text-amber-300">120%</span></div>
+            <div>main + PV breaker&nbsp;≤&nbsp;allowance</div>
+            <div class="mt-4 text-cyan-300"># The condition that makes it legal</div>
+            <div>PV breaker at the <span class="text-amber-300">opposite end</span> of the busbar from the main</div>
+            <div>+ permanent warning label on the panel</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Current enters from both ends</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                That is the whole justification. With the sources at opposite ends, no section of bar carries the
+                sum — the worst section carries the larger source alone.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Position is not a formality</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Put the PV breaker anywhere but the far end and the allowance evaporates, because loads between the
+                two sources no longer split the current.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Breakers, not kilowatts</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The rule compares device ratings. Get there from the inverter's continuous AC output at 125% — never
+                from the array's DC nameplate.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A main derate is the cheap fix</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                200 A down to 175 A opens a 60 A PV breaker. Prove the house never needs 175 A with 220.87 measured
+                demand and it costs one breaker.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 200 A panel three ways — and the two amps that decide the job.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">200 A panel, 7.6 kW inverter — fits exactly</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults. 200 A busbar, 200 A main, 32 A of inverter output.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              PV breaker: 32 × 1.25 = 40 A<br />
+              allowance: 200 × 120% = 240 A<br />
+              sum: 200 + 40 = 240 A<br />
+              <span class="font-bold text-emerald-700">240 ≤ 240 — permitted, with zero headroom</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> landing exactly on the limit is legal — the
+              code says "shall not exceed", and this equals. This is why 7.6 kW is such a common residential inverter
+              size: it is the largest that drops into a stock 200 A panel with no other work.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Same panel, 9.6 kW inverter — fails by ten amps</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Nothing changes but the inverter: 40 A of continuous output.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              PV breaker: 40 × 1.25 = 50 A<br />
+              sum: 200 + 50 = 250 A vs 240 A allowance<br />
+              <span class="font-bold text-red-700">250 &gt; 240 — not permitted</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> eight extra amps of inverter cost a breaker
+              size and break the rule. Either accept 7.6 kW, derate the main, or go to a supply-side tap — this is
+              the decision point on most residential retrofits.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Main derated to 175 A — 11.5 kW now fits</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">200 A busbar kept, main breaker swapped to 175 A.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              allowance: still 240 A · main now 175 A<br />
+              room for PV: 240 − 175 = 65 → <span class="font-bold text-amber-700">60 A breaker</span><br />
+              inverter: 60 ÷ 1.25 = <span class="font-bold text-emerald-700">48 A, about 11.5 kW</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a $60 breaker bought 50% more solar. Confirm
+              the house genuinely stays under 175 A first — twelve months of utility peak demand at 125% per NEC
+              220.87 is the accepted way to show it, and most homes are nowhere near.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Maximum solar by panel size</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Assuming the main breaker equals the busbar rating, which is the usual case. Inverter kW shown at 240 V
+            single-phase.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Busbar / main</th>
+                  <th class="py-3 px-4 font-semibold">120% allowance</th>
+                  <th class="py-3 px-4 font-semibold">Max PV breaker</th>
+                  <th class="py-3 px-4 font-semibold">Max inverter</th>
+                  <th class="py-3 px-4 font-semibold">≈ kW at 240 V</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  busbarRows.map((row, index) => (
+                    <tr class={index === busbarRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.rating} A</td>
+                      <td class="py-3 px-4">{fmt(row.allowance, 0)} A</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.maxPvBreaker} A</td>
+                      <td class="py-3 px-4">{fmt(row.maxInverter, 1)} A</td>
+                      <td class="py-3 px-4">{fmt(row.kw240, 1)} kW</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 <strong>Article 705</strong> — load-side interconnection
+            <strong>705.12</strong>, with the busbar options in <strong>705.12(B)(3)</strong> and the 120% allowance
+            at <strong>705.12(B)(3)(2)</strong>; supply-side connection <strong>705.11</strong>; power control
+            systems <strong>705.13</strong>; circuit current and overcurrent protection <strong>690.8</strong> and
+            <strong>705.28</strong>. This tool models the <strong>120% option only</strong> — the sum rule, the
+            centre-fed allowance, and the engineering-supervision path in 705.12(B)(3) are separate routes with
+            their own conditions, and one of them may permit an interconnection this check rejects. The opposite-end
+            busbar placement and the permanent warning label are conditions of the allowance, not suggestions. Local
+            amendments, the utility's own interconnection agreement, and the AHJ all have final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about the 120% rule and load-side PV interconnection."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalSolarInterconnectionCalculator } from "@/scripts/calculators/electrical-solar-interconnection-calculator";
+    initElectricalSolarInterconnectionCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

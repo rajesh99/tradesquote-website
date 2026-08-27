@@ -1,0 +1,71 @@
+---
+import { usd, fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Five real retrofits, computed from the same kWh arithmetic the energy cost
+ * calculator uses. The ordering by payback rather than by size makes the point:
+ * the retail halogen job beats the warehouse metal-halide job despite saving a
+ * third as much power, because it costs a fifth as much to do.
+ */
+const RATE = 0.17;
+const LABOR_RATE = 95;
+
+const cases = [
+  { label: "Home, 20 × 60 W incandescent → 9 W", count: 20, oldW: 60, newW: 9, hrs: 3, days: 365, unit: 6, labor: 0 },
+  { label: "Retail, 12 × 100 W halogen → 15 W", count: 12, oldW: 100, newW: 15, hrs: 14, days: 360, unit: 18, labor: 3 },
+  { label: "Warehouse, 6 × 400 W MH → 150 W", count: 6, oldW: 400, newW: 150, hrs: 24, days: 365, unit: 220, labor: 12 },
+  { label: "Parking, 8 × 150 W flood → 50 W", count: 8, oldW: 150, newW: 50, hrs: 12, days: 365, unit: 95, labor: 6 },
+  { label: "Office, 40 × 36 W T8 → 18 W tube", count: 40, oldW: 36, newW: 18, hrs: 12, days: 260, unit: 12, labor: 4 },
+].map((c) => {
+  const wattsSaved = c.count * (c.oldW - c.newW);
+  const annualHours = c.hrs * c.days;
+  const kwh = (wattsSaved * annualHours) / 1000;
+  const saving = kwh * RATE;
+  const cost = c.count * c.unit + c.labor * LABOR_RATE;
+  return { ...c, wattsSaved, annualHours, kwh, saving, cost, years: cost / saving };
+}).sort((a, b) => a.years - b.years);
+
+const peak = Math.max(...cases.map((c) => c.years));
+const BAR_X = 262;
+const BAR_MAX = 280;
+const bars = cases.map((c) => ({ ...c, width: Math.max(22, Math.round((c.years / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Payback period for five LED retrofits</title>
+  <desc>
+    At 17 cents per kilowatt-hour: a retail retrofit of 12 hundred-watt halogens to 15 watt LEDs running 14 hours a
+    day saves 874 dollars a year against a 501 dollar cost, paying back in 0.57 years. Twenty household incandescents
+    to 9 watt LEDs pays back in 0.63 years. Six 400 watt metal halides to 150 watt LEDs running continuously saves
+    2,234 dollars a year against 2,460 dollars, paying back in 1.10 years. Parking floods take 2.23 years and an
+    office fluorescent retrofit 2.25 years.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Five retrofits, ranked by payback — at $${RATE}/kWh`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Lamp cost plus labour at $95/h, against the annual energy saving. Shorter is better.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RETROFIT</text>
+  <text x="196" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SAVING/YR</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PAYBACK</text>
+
+  {bars.map((c, i) => {
+    const y = 86 + i * 32;
+    const fast = c.years < 1;
+    const accent = fast ? C.green : c.years < 2 ? C.blue : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{c.label}</text>
+        <text x="28" y={y + 24} fill={C.muted} font-family={FONT} font-size="7.5">{`${fmtInt(c.wattsSaved)} W × ${fmtInt(c.annualHours)} h = ${fmtInt(Math.round(c.kwh))} kWh · cost ${usd(c.cost)}`}</text>
+        <text x="196" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{usd(c.saving)}</text>
+        <rect x={BAR_X} y={y + 1} width={c.width} height="19" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={c.width} height="19" rx="5" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{`${fmt(c.years, 2)} yr`}</text>
+        <text x={BAR_X + c.width + 8} y={y + 15} fill={C.muted} font-family={FONT} font-size="8">{`${fmt(c.years * 12, 0)} months`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">The retail job beats the warehouse job despite saving a third as much power — because it costs a fifth as much to do.</text>
+</svg>

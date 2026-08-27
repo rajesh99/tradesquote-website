@@ -1,0 +1,47 @@
+---
+import { nextStandardOcpd, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The "80% rule" and the code's 125% factor are the same statement inverted.
+ * Worth showing because the two framings diverge in one place that matters:
+ * sizing UP from a load lands on a standard rating, sizing DOWN from a breaker
+ * does not, so the round-up direction is the one that gives a legal answer.
+ */
+const LOAD = 40;
+const up = LOAD * 1.25;
+const breaker = nextStandardOcpd(up);
+const headroom = breaker * 0.8;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>The 80 percent rule is the 125 percent rule inverted</title>
+  <desc>
+    A 40 amp continuous load times 125 percent is 50 amps, which is a standard breaker rating. Working the other way,
+    a 50 amp breaker times 80 percent allows 40 amps of continuous load. One divided by 0.8 equals 1.25 exactly, so
+    the two statements are identical arithmetic in opposite directions. Sizing up from the load is the safer habit
+    because it lands on a standard rating.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two ways to say the same thing</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`A ${LOAD} A continuous load — a commercial lighting circuit, a heater, an EV charger.`}</text>
+
+  <rect x="24" y="76" width="456" height="58" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.4" />
+  <text x="42" y="98" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">SIZE UP FROM THE LOAD · 210.20(A)</text>
+  <text x="42" y="120" fill={C.dark} font-family={FONT} font-size="12">{`${LOAD} A × 1.25 = ${fmt(up, 0)} A minimum device`}</text>
+  <rect x="496" y="76" width="200" height="58" rx="9" fill={C.white} stroke={C.blue} stroke-width="2.4" />
+  <text x="596" y="106" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="19" font-weight="800">{`${breaker} A`}</text>
+  <text x="596" y="124" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">a standard 240.6(A) rating</text>
+
+  <rect x="24" y="146" width="456" height="58" rx="9" fill={C.greenLight} stroke={C.green} stroke-width="1.4" />
+  <text x="42" y="168" fill={C.green} font-family={FONT} font-size="9.5" font-weight="800">SIZE DOWN FROM THE BREAKER · THE "80% RULE"</text>
+  <text x="42" y="190" fill={C.dark} font-family={FONT} font-size="12">{`${breaker} A × 0.80 = ${fmt(headroom, 0)} A of continuous load`}</text>
+  <rect x="496" y="146" width="200" height="58" rx="9" fill={C.white} stroke={C.green} stroke-width="1.4" />
+  <text x="596" y="176" text-anchor="middle" fill={C.green} font-family={FONT} font-size="19" font-weight="800">{`${fmt(headroom, 0)} A`}</text>
+  <text x="596" y="194" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">back where we started</text>
+
+  <rect x="24" y="216" width="672" height="58" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="240" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">1 ÷ 0.80 = 1.25 — the same factor, read in opposite directions</text>
+  <text x="44" y="260" fill={C.muted} font-family={FONT} font-size="9.5">Size up from the load. It lands on a standard rating; sizing down from a breaker often doesn't.</text>
+</svg>

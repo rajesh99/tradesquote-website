@@ -1,3 +1,6 @@
+import { electricalCalculators } from "@/config/electricalCalculators";
+import { hvacCalculators } from "@/config/hvacCalculators";
+
 export type CalculatorAccent =
   | "blue"
   | "amber"
@@ -23,7 +26,8 @@ export const calculatorCategories: CalculatorCategory[] = [
     name: "HVAC",
     description:
       "Sizing, airflow, diagnostics, psychrometrics, ventilation, humidity control, efficiency, and cost — BTU load, tonnage, unit converter, heat pump & mini-split sizing, furnace BTU, CFM, duct size, Delta T, static pressure, superheat & subcooling, refrigerant charge, dew point, sensible & latent heat, fan laws, ventilation, humidity control, SEER, HSPF & AFUE savings, operating cost, replacement cost, and job pricing.",
-    toolCount: 32,
+    // Derived so the card can never disagree with the number of calculators shipped.
+    toolCount: hvacCalculators.length,
     status: "live",
     accent: "blue",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>`,
@@ -59,8 +63,10 @@ export const calculatorCategories: CalculatorCategory[] = [
     slug: "electrical",
     name: "Electrical",
     description:
-      "Wire gauge, circuit load, conduit fill, and voltage drop calculators for electrical installations.",
-    status: "coming-soon",
+      "Conductor sizing, protection, load calculations, and pricing built on the NEC — wire size by ampacity and voltage drop, derating for ambient and bundling, breaker sizing, service and feeder conductors, equipment and electrode grounding, conduit and box fill, residential load calculation, service sizing, EV charger circuits, watts-to-amps and Ohm's law conversions, kVA and three-phase power, power-factor correction, running cost, panel upgrade and rewiring cost, labor rate, and job pricing.",
+    // Derived so the card can never disagree with the number of calculators shipped.
+    toolCount: electricalCalculators.length,
+    status: "live",
     accent: "sky",
     icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
   },

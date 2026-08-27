@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The 180 VA per strap math from 220.14(I), for non-dwelling occupancies. The
+ * continuous variant applies the 125% rule inversely (× 0.8) before dividing.
+ */
+const VA_PER_OUTLET = 180;
+const rows = [
+  { circuit: "15 A · 120 V", va: 1800, continuous: false },
+  { circuit: "20 A · 120 V", va: 2400, continuous: false },
+  { circuit: "15 A · 120 V", va: 1800, continuous: true },
+  { circuit: "20 A · 120 V", va: 2400, continuous: true },
+];
+
+const computed = rows.map((r) => {
+  const usable = r.continuous ? r.va * 0.8 : r.va;
+  return { ...r, usable, count: Math.floor(usable / VA_PER_OUTLET) };
+});
+
+const BAR_PER_OUTLET = 26;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>The 180 volt-ampere per outlet math for commercial circuits</title>
+  <desc>
+    Using 180 volt-amperes per receptacle strap: a 15 amp 120 volt circuit at 1,800 volt-amperes permits 10
+    outlets, and a 20 amp circuit at 2,400 volt-amperes permits 13. Where the circuit is treated as a
+    continuous load, multiply by 0.8 first: the 15 amp circuit drops to 8 outlets and the 20 amp circuit to
+    10.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">180 VA per strap — the commercial calculation</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A duplex counts once. A four-plex on two straps counts twice.</text>
+
+  {computed.map((r, i) => {
+    const y = 74 + i * 46;
+    const width = r.count * BAR_PER_OUTLET;
+    const accent = r.continuous ? C.orange : C.primary;
+    const bg = r.continuous ? C.orangeLight : C.primaryLight;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">{r.circuit}</text>
+        <text x="28" y={y + 34} fill={C.muted} font-family={FONT} font-size="9">{r.continuous ? "continuous" : "non-continuous"}</text>
+        <rect x="132" y={y + 4} width={width} height="28" rx="6" fill={bg} stroke={accent} stroke-width="1.3" />
+        <text x="142" y={y + 22} fill={C.muted} font-family={FONT} font-size="9.5">{`${Math.round(r.usable).toLocaleString("en-US")} VA ÷ 180`}</text>
+        <text x={132 + width + 12} y={y + 23} fill={accent} font-family={FONT} font-size="15" font-weight="800">{`${r.count} outlets`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="270" fill={C.muted} font-family={FONT} font-size="10">In a dwelling none of this applies — 220.14(J) already accounts for the receptacles, and no count limit exists.</text>
+</svg>

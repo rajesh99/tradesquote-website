@@ -1,0 +1,633 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { usd } from "@/lib/nec";
+
+const title = "Standby Generator Installation Cost Calculator | TradesQuote";
+const description =
+  "Free standby generator installation cost calculator. Price a whole-house standby line by line — the set, transfer switch, gas run, pad, permit, and labor — and see what share the generator itself really is.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-generator-install-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Standby Generator Installation Cost", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Standby Generator Installation Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online standby generator installation cost calculator building a total from generator size, transfer switch type, fuel run length, pad, permit, labor, and a regional multiplier.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to install a standby generator?",
+    answer:
+      "A whole-house air-cooled standby typically runs <strong>$8,000 to $15,000 installed</strong>, and the defaults here — a 22 kW set with a 200 A service-rated transfer switch, 40 ft of gas, a precast pad and 16 hours of labor — land at <strong>$10,990</strong>. Small essential-circuits systems start near $6,500; liquid-cooled sets above 26 kW pass $20,000 quickly. The single biggest driver after the machine is the transfer switch.",
+  },
+  {
+    question: "Why is installation so much more than the generator?",
+    answer:
+      "Because a standby is five trades in one job. The <strong>transfer switch</strong> is $700 to $3,200 depending on whether it is a small essential-circuits panel or a 400 A service-rated switch. The <strong>fuel run</strong> is plumbing at roughly $28 per foot for natural gas. There is a <strong>pad</strong>, a <strong>permit</strong> and usually two inspections, and a day or two of <strong>labour</strong> across electrical and gas. On a 10 kW set the installation is around 62% of the total, and the machine only becomes the majority of the invoice at 22 kW and above.",
+  },
+  {
+    question: "What size standby generator do I need?",
+    answer:
+      'That is a load question, not a cost one, and it is usually decided by <strong>motor starting rather than running load</strong> — a house drawing 9.2 kW running can need a 20 kW set purely to start its air conditioner. Work it out first with the <a href="/calculators/electrical/electrical-generator-sizing-calculator" class="font-semibold text-orange-700 underline decoration-orange-300 hover:decoration-orange-600">Generator Sizing Calculator</a>, because moving one size down usually saves more than every other line item combined.',
+  },
+  {
+    question: "Do I need a whole-house transfer switch?",
+    answer:
+      "No, and this is the cheapest real decision on the job. A <strong>service-rated whole-house switch</strong> transfers everything and costs $1,600 to $3,200. An <strong>essential-circuits switch</strong> backs up eight or ten selected circuits for $700 to $900. Better still, <strong>NEC 702.4(B)(2) permits a generator that cannot carry the full load</strong> where automatic load management sheds the rest — which frequently lets a smaller machine and a cheaper switch do the same practical job.",
+  },
+  {
+    question: "Natural gas or propane?",
+    answer:
+      "Natural gas if the street has it. The run costs about the same per foot, but propane adds a <strong>buried tank at roughly $1,200</strong> plus refills, and a generator on LP derates slightly against its natural-gas rating. Natural gas has no tank, no delivery, and no runtime limit — which matters most in exactly the multi-day outage a standby exists for. Propane wins only where there is no gas main.",
+  },
+  {
+    question: "Do I need a permit for a standby generator?",
+    answer:
+      "Almost always two, and sometimes three: <strong>electrical</strong>, <strong>gas or plumbing</strong>, and in many jurisdictions a <strong>mechanical or zoning</strong> review for the set's placement. Placement rules are stricter than people expect — manufacturers require clearance from openable windows, doors, and combustible walls, and local ordinances may add property-line setbacks and noise limits. Confirm placement before quoting; discovering it at install is expensive.",
+  },
+  {
+    question: "What ongoing costs come after installation?",
+    answer:
+      "Budget for <strong>annual service</strong> at $200 to $500 — oil, filters, plugs, valve check — plus the fuel the weekly self-test burns, typically 10 to 20 minutes running. Batteries last three to five years. None of that appears in an install quote, and over a fifteen-year life the maintenance total is a meaningful fraction of the original purchase.",
+  },
+  {
+    question: "Is a portable generator with an interlock cheaper?",
+    answer:
+      "Substantially — a quality portable plus an inlet box and a <strong>listed panel interlock kit</strong> is usually $1,500 to $3,000 installed against $11,000 for standby. The trade-offs are that someone has to be home to start it, refuel it every few hours, and it will not carry a whole house. What matters for safety is that the interlock is <em>listed for that specific panel</em>: a homemade one or a suicide cord backfeeds the utility line and can kill a lineman.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Scoped the job? Quote it properly.";
+const ctaDescription =
+  "Generator work spans electrical, gas, and concrete, which is exactly where estimates leak. TradesQuote builds the line-item estimate across all of it — equipment, materials, permits, and labour — validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-generator-sizing-calculator",
+    title: "Generator Sizing Calculator",
+    description: "Get the kW right before pricing it.",
+  },
+  {
+    href: "/calculators/electrical/electrical-existing-load-calculator",
+    title: "Existing Load Calculator",
+    description: "What the service actually draws today.",
+  },
+  {
+    href: "/calculators/electrical/electrical-panel-upgrade-cost-calculator",
+    title: "Panel Upgrade Cost Calculator",
+    description: "If the service needs work first.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Estimate Calculator",
+    description: "Price the job with overhead and margin.",
+  },
+];
+
+/**
+ * Cost by generator size at the default install conditions — 200 A service-rated
+ * switch, 40 ft of natural gas, precast pad, $350 permit, 16 h at $95. Computed
+ * from the same constants the script uses so the table cannot drift.
+ */
+const FIXED_INSTALL = 1600 + 40 * 28 + 600 + 350 + 16 * 95;
+const sizeRows = [
+  { kw: 10, unit: 3200 },
+  { kw: 14, unit: 4200 },
+  { kw: 18, unit: 5000 },
+  { kw: 22, unit: 5800 },
+  { kw: 26, unit: 7400 },
+  { kw: 36, unit: 11500 },
+  { kw: 48, unit: 15000 },
+].map((r) => {
+  const total = r.unit + FIXED_INSTALL;
+  return { ...r, total, installShare: Math.round((FIXED_INSTALL / total) * 100) };
+});
+
+const styles = electricalAccentStyles.orange;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Standby Generator Installation Cost Calculator" />
+    <meta
+      property="og:description"
+      content="Price a whole-house standby line by line — and see how little of the invoice is the generator."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Standby Generator Installation Cost" />
+    <meta name="twitter:description" content="What a standby generator really costs to install. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Standby Generator Installation Cost"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Standby Generator Cost <span class="text-orange-600">— Installed, Line by Line</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The generator is usually about <strong>half the invoice</strong>. The transfer switch, gas run, pad,
+              permit and labour are the other half — which is why comparing quotes on the machine alone tells you
+              nothing useful.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Build the quote
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="gi-size" class="text-sm font-semibold text-slate-800">Generator size</label>
+                  <select
+                    id="gi-size"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="10">10 kW — essential circuits</option>
+                    <option value="14">14 kW</option>
+                    <option value="18">18 kW</option>
+                    <option value="22" selected>22 kW — typical whole-house</option>
+                    <option value="26">26 kW — largest air-cooled</option>
+                    <option value="36">36 kW — liquid-cooled</option>
+                    <option value="48">48 kW — liquid-cooled</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="gi-ats" class="text-sm font-semibold text-slate-800">Transfer switch</label>
+                  <select
+                    id="gi-ats"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="essential-100">100 A essential circuits</option>
+                    <option value="essential-150">150 A essential circuits</option>
+                    <option value="whole-200" selected>200 A service-rated</option>
+                    <option value="whole-400">400 A service-rated</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="gi-fuel" class="text-sm font-semibold text-slate-800">Fuel</label>
+                  <select
+                    id="gi-fuel"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="natural" selected>Natural gas — $28/ft</option>
+                    <option value="propane">Propane — $32/ft + tank</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="gi-pad" class="text-sm font-semibold text-slate-800">Pad</label>
+                  <select
+                    id="gi-pad"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="gravel">Gravel bed</option>
+                    <option value="precast" selected>Precast composite</option>
+                    <option value="poured">Poured concrete</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="gi-run" class="text-sm font-semibold text-slate-800">Fuel run length</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="gi-run"
+                      type="number"
+                      min="0"
+                      max="200"
+                      step="5"
+                      value="40"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="gi-run-range"
+                  type="range"
+                  min="0"
+                  max="200"
+                  step="5"
+                  value="40"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-orange-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0 ft</span><span>200 ft</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="gi-permit" class="text-sm font-semibold text-slate-800">Permits ($)</label>
+                  <input
+                    id="gi-permit"
+                    type="number"
+                    min="0"
+                    step="25"
+                    value="350"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gi-hours" class="text-sm font-semibold text-slate-800">Labor (h)</label>
+                  <input
+                    id="gi-hours"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="16"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gi-rate" class="text-sm font-semibold text-slate-800">Rate ($/h)</label>
+                  <input
+                    id="gi-rate"
+                    type="number"
+                    min="0"
+                    step="5"
+                    value="95"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label for="gi-region" class="text-sm font-semibold text-slate-800">Region</label>
+                <select
+                  id="gi-region"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                >
+                  <option value="0.85">Low cost of living — ×0.85</option>
+                  <option value="1" selected>National average — ×1.00</option>
+                  <option value="1.25">High cost metro — ×1.25</option>
+                  <option value="1.5">Very high cost metro — ×1.50</option>
+                </select>
+              </div>
+
+              <button
+                id="gi-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Installed cost</p>
+              <div class="mt-2">
+                <span id="gi-total" class="text-5xl font-extrabold tracking-tight text-orange-600">$10,990</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-3 gap-3">
+                <div class="rounded-xl border border-orange-100 bg-white p-3">
+                  <p class="text-xs text-slate-500">Low</p>
+                  <p id="gi-low" class="mt-1 text-xl font-bold text-slate-900">$9,342</p>
+                </div>
+                <div class="rounded-xl border border-orange-100 bg-white p-3">
+                  <p class="text-xs text-slate-500">High</p>
+                  <p id="gi-high" class="mt-1 text-xl font-bold text-slate-900">$12,638</p>
+                </div>
+                <div class="rounded-xl border border-orange-100 bg-white p-3">
+                  <p class="text-xs text-slate-500">Is the set</p>
+                  <p id="gi-unit-share" class="mt-1 text-xl font-bold text-slate-900">53%</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-orange-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Generator</span><span id="gi-bd-unit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Transfer switch</span><span id="gi-bd-ats" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Fuel run</span><span id="gi-bd-fuel" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>LP tank</span><span id="gi-bd-tank" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Pad</span><span id="gi-bd-pad" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Permits</span><span id="gi-bd-permit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Labor</span><span id="gi-bd-labor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Subtotal</span><span id="gi-bd-subtotal" class="font-bold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Regional</span><span id="gi-bd-region" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="gi-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The generator is roughly half of a standby install. The rest is installation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Where the money goes</h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># The five install lines nobody quotes for</div>
+            <div>transfer switch&nbsp;=&nbsp;$700 (essential) to $3,200 (400 A service-rated)</div>
+            <div>fuel run&nbsp;=&nbsp;feet × $28 natural / $32 LP <span class="text-slate-400">+ $1,200 LP tank</span></div>
+            <div>pad&nbsp;=&nbsp;$250 gravel / $600 precast / $900 poured</div>
+            <div>permits&nbsp;=&nbsp;electrical + gas, often mechanical too</div>
+            <div>labor&nbsp;=&nbsp;hours × rate <span class="text-slate-400">two trades, two inspections</span></div>
+            <div class="mt-4 text-cyan-300"># then</div>
+            <div>total&nbsp;=&nbsp;(set + the five above) × regional multiplier</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The switch is the real choice</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Essential-circuits versus whole-house is a $900 decision on hardware alone, and it usually decides
+                the generator size too. Make it first.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">702.4(B)(2) is the cheap route</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The code permits a set that cannot carry the whole load, provided load management sheds the rest.
+                One size down often beats every other saving combined.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Placement before price</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Clearances from windows, doors and combustible walls, plus setbacks and noise limits, decide where
+                the set goes — and therefore how long the gas run is.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">26 to 36 kW is a cliff</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It is the jump from air-cooled to liquid-cooled — a different machine, not a bigger one. The price
+                step is $4,100 for 10 kW.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">Three real shapes of standby job, at a $95/hour labour rate.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">22 kW whole-house — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">200 A service-rated switch, 40 ft of natural gas, precast pad, 16 hours.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              set $5,800 + switch $1,600 + gas 40 × $28 = $1,120<br />
+              + pad $600 + permits $350 + labor 16 × $95 = $1,520<br />
+              <span class="font-bold text-orange-700">$10,990</span> · band $9,342–$12,638 · set is 53%
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the most common residential standby job in
+              the US, and the machine is barely half of it.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">10 kW essential circuits — installation dominates</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">100 A essential-circuits switch, same 40 ft gas run, gravel bed, 10 hours.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              set $3,200 + switch $700 + gas $1,120<br />
+              + pad $250 + permits $350 + labor 10 × $95 = $950<br />
+              <span class="font-bold text-orange-700">$6,570</span> · set is only 49%
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> halving the generator did not halve the job.
+              The fixed costs — gas, permit, pad, a day on site — do not scale down, which is why the smallest
+              standby is rarely the best value.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">36 kW liquid-cooled on propane — every line grows</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">400 A switch, 60 ft of LP with a buried tank, poured pad, 24 hours.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              set $11,500 + switch $3,200 + LP 60 × $32 = $1,920 + tank $1,200<br />
+              + pad $900 + permits $350 + labor 24 × $95 = $2,280<br />
+              <span class="font-bold text-orange-700">$21,350</span> · set is 54%
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the share stays near half even here. Before
+              committing to a machine this size, check whether load management under NEC 702.4(B)(2) lets a
+              26 kW air-cooled set do the job for roughly $8,000 less.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Installed cost by generator size</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Holding the installation constant at the defaults — 200 A service-rated switch, 40 ft of natural gas, a
+            precast pad, $350 of permits and 16 hours at $95, or {usd(FIXED_INSTALL)} of installation.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-4 font-semibold">Set</th>
+                  <th class="py-3 px-4 font-semibold">Installation</th>
+                  <th class="py-3 px-4 font-semibold">Total</th>
+                  <th class="py-3 px-4 font-semibold">Install share</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  sizeRows.map((row, index) => (
+                    <tr class={index === sizeRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.kw} kW</td>
+                      <td class="py-3 px-4">{usd(row.unit)}</td>
+                      <td class="py-3 px-4">{usd(FIXED_INSTALL)}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{usd(row.total)}</td>
+                      <td class="py-3 px-4">{row.installShare}%</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: costs are <strong>2026 US market planning figures, not quotes</strong> —
+            equipment pricing, gas piping rates, permit fees and labour rates all vary widely by region, and the
+            regional multiplier is a blunt instrument. Code references: NEC (NFPA 70) 2023 <strong>Article 702</strong>
+            for optional standby systems, including <strong>702.4(B)(2)</strong>, which permits a generator with
+            insufficient capacity for the full load where automatic load management is provided;
+            <strong>Article 700</strong> and <strong>701</strong> cover emergency and legally required standby, which
+            are different systems with stricter rules. Transfer equipment must be listed for the application, and
+            service-rated switches are required where the switch serves as the service disconnect. Generator
+            placement clearances come from the manufacturer's installation instructions, which
+            <strong>110.3(B)</strong> makes enforceable. Local amendments, gas-fitting licensing rules and the AHJ
+            have final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about standby generator cost and installation."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalGeneratorInstallCostCalculator } from "@/scripts/calculators/electrical-generator-install-cost-calculator";
+    initElectricalGeneratorInstallCostCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

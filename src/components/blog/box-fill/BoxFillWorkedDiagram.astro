@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A single-gang box with two 12/2 NM cables, internal clamps and one duplex
+ * receptacle. Every line is computed from the Table 314.16(B) allowance for 12 AWG so
+ * the total cannot drift from the prose.
+ */
+const V12 = 2.25;
+
+const lines = [
+  { label: "4 insulated conductors", detail: "2 hots + 2 neutrals, 314.16(B)(1)", qty: 4, each: V12 },
+  { label: "All equipment grounds", detail: "both count as one, 314.16(B)(5)", qty: 1, each: V12 },
+  { label: "All internal clamps", detail: "together count as one, 314.16(B)(2)", qty: 1, each: V12 },
+  { label: "Duplex receptacle yoke", detail: "double allowance, 314.16(B)(4)", qty: 2, each: V12 },
+];
+
+const rows = lines.map((l) => ({ ...l, total: l.qty * l.each }));
+const total = rows.reduce((sum, r) => sum + r.total, 0);
+
+// Smallest standard box that holds it — mirrors smallestBoxFor() in nec.ts.
+const BOXES = [
+  { label: '3" × 2" × 2-1/2" device box', volume: 12.5 },
+  { label: '3" × 2" × 2-3/4" device box', volume: 14.0 },
+  { label: '3" × 2" × 3-1/2" device box', volume: 18.0 },
+  { label: "Single-gang plastic, 20.3 in³", volume: 20.3 },
+];
+const chosen = BOXES.find((b) => b.volume >= total);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>Box fill worked example for a single gang receptacle box</title>
+  <desc>
+    A single-gang box with two 12/2 cables, internal clamps and one duplex receptacle. Four insulated
+    conductors at 2.25 cubic inches each give 9.00. Both equipment grounding conductors together count once for
+    2.25. All internal clamps together count once for 2.25. The receptacle yoke counts double for 4.50. The
+    total is 18.00 cubic inches, which needs at least a 3 by 2 by 3.5 inch device box rated 18.0 cubic inches.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One box, four allowances — worked</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Single gang · two 12/2 NM cables in and out · internal clamps · one duplex receptacle</text>
+
+  {rows.map((r, i) => {
+    const y = 74 + i * 38;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="33" rx="6" fill={C.white} stroke={C.border} stroke-width="0.9" />
+        <text x="42" y={y + 15} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.label}</text>
+        <text x="42" y={y + 27} fill={C.muted} font-family={FONT} font-size="9">{r.detail}</text>
+        <text x="512" y={y + 21} fill={C.muted} font-family={FONT} font-size="10.5">{`${r.qty} × ${r.each.toFixed(2)}`}</text>
+        <text x="676" y={y + 21} text-anchor="end" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{`${r.total.toFixed(2)} in³`}</text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="232" x2="696" y2="232" stroke={C.dark} stroke-width="1.2" />
+
+  <rect x="24" y="242" width="330" height="66" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="264" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Minimum box volume</text>
+  <text x="44" y="294" fill={C.primary} font-family={FONT} font-size="26" font-weight="800">{`${total.toFixed(2)} in³`}</text>
+
+  <rect x="366" y="242" width="330" height="66" rx="10" fill={C.greenLight} stroke={C.green} stroke-width="1.8" />
+  <text x="386" y="264" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Smallest box that works</text>
+  <text x="386" y="286" fill={C.green} font-family={FONT} font-size="12.5" font-weight="800">{chosen?.label}</text>
+  <text x="386" y="301" fill={C.muted} font-family={FONT} font-size="9">A shallow 12.5 in³ or 14 in³ device box is not enough</text>
+</svg>

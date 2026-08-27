@@ -1,0 +1,63 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * One transformer, five loads. The kVA is fixed because that's what the iron and
+ * the copper can carry; the useful output swings by 30% depending on the load's
+ * power factor. This is exactly why the nameplate says kVA.
+ */
+const KVA = 100;
+
+const rows = [1.0, 0.95, 0.9, 0.85, 0.8, 0.7].map((pf) => {
+  const kw = KVA * pf;
+  const kvar = KVA * Math.sin(Math.acos(pf));
+  return { pf, kw, kvar, wasted: KVA - kw };
+});
+
+const BAR_X = 200;
+const BAR_MAX = 420;
+const bars = rows.map((r) => ({
+  ...r,
+  kwW: Math.round((r.kw / KVA) * BAR_MAX),
+  total: BAR_MAX,
+}));
+const spread = rows[0].kw - rows[rows.length - 1].kw;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>The same transformer delivering different real power</title>
+  <desc>
+    A 100 kVA transformer delivers 100 kilowatts at unity power factor, 95 at 0.95, 90 at 0.9, 85 at 0.85, 80 at 0.8
+    and 70 at 0.7. The apparent power is fixed by what the windings can carry, so the useful output swings by 30
+    kilowatts across that range purely because of the load's power factor — which is why the nameplate is rated in
+    kVA rather than kW.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`One ${KVA} kVA transformer, six different answers`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`The full bar is the ${KVA} kVA the windings carry. The solid part is the real power that reaches the load.`}</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LOAD POWER FACTOR</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">REAL POWER DELIVERED</text>
+
+  {bars.map((r, i) => {
+    const y = 86 + i * 28;
+    const accent = r.pf >= 0.95 ? C.green : r.pf >= 0.85 ? C.blue : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`PF ${r.pf.toFixed(2)}`}</text>
+        <text x="80" y={y + 15} fill={C.muted} font-family={FONT} font-size="8.5">
+          {r.pf === 1 ? "resistive — heaters, elements" : r.pf >= 0.9 ? "corrected, or mostly resistive" : "motor-heavy"}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={r.total} height="19" rx="5" fill={C.border} opacity="0.4" />
+        <rect x={BAR_X} y={y + 2} width={r.kwW} height="19" rx="5" fill={accent} opacity="0.22" />
+        <rect x={BAR_X} y={y + 2} width={r.kwW} height="19" rx="5" fill="none" stroke={accent} stroke-width="1.6" />
+        <text x={BAR_X + 8} y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(r.kw, 0)} kW`}</text>
+        <text x={BAR_X + r.total - 8} y={y + 16} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8.5">{`${fmt(r.kvar, 0)} kVAR reactive`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="262" fill={C.muted} font-family={FONT} font-size="10">{`A ${fmt(spread, 0)} kW spread on identical equipment. The transformer can't know the load's power factor, so it's rated in kVA.`}</text>
+</svg>

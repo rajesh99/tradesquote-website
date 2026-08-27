@@ -1,0 +1,55 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * NEC 240.4(D) — the small-conductor rule. For 14, 12, and 10 AWG the overcurrent
+ * device is capped below what Table 310.16 says the conductor could carry, which is
+ * why the chart value and the breaker on the wall disagree.
+ */
+const rows = [
+  { size: "14 AWG Cu", table: 20, cap: 15 },
+  { size: "12 AWG Cu", table: 25, cap: 20 },
+  { size: "10 AWG Cu", table: 35, cap: 30 },
+  { size: "12 AWG Al", table: 20, cap: 15 },
+  { size: "10 AWG Al", table: 30, cap: 25 },
+];
+
+const SCALE = 11; // px per amp
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>NEC 240.4(D) small conductor breaker caps</title>
+  <desc>
+    For small conductors the breaker is capped below the table ampacity. 14 AWG copper shows 20 amps at
+    75 degrees but is limited to a 15 amp breaker; 12 AWG copper shows 25 amps and is limited to 20; 10
+    AWG copper shows 35 amps and is limited to 30; 12 AWG aluminum shows 20 amps and is limited to 15;
+    and 10 AWG aluminum shows 30 amps and is limited to 25 amps.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where the chart and the breaker disagree — 240.4(D)</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The shaded tail is ampacity the conductor has but the small-conductor rule won't let you protect at</text>
+
+  <!-- Legend -->
+  <rect x="470" y="28" width="12" height="12" rx="3" fill={C.primary} />
+  <text x="488" y="38" fill={C.muted} font-family={FONT} font-size="10">Breaker allows</text>
+  <rect x="580" y="28" width="12" height="12" rx="3" fill={C.redLight} stroke={C.red} stroke-width="1.2" stroke-dasharray="3 2" />
+  <text x="598" y="38" fill={C.muted} font-family={FONT} font-size="10">Unusable</text>
+
+  {rows.map((r, i) => {
+    const y = 78 + i * 42;
+    const capW = r.cap * SCALE;
+    const tailW = (r.table - r.cap) * SCALE;
+    return (
+      <g>
+        <text x="28" y={y + 22} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r.size}</text>
+        <rect x="140" y={y + 6} width={capW} height="26" rx="5" fill={C.primaryLight} stroke={C.primary} stroke-width="1.3" />
+        <text x={140 + capW / 2} y={y + 24} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${r.cap} A breaker`}</text>
+        <rect x={140 + capW} y={y + 6} width={tailW} height="26" rx="5" fill={C.redLight} stroke={C.red} stroke-width="1.2" stroke-dasharray="3 2" />
+        <text x={140 + capW + tailW + 10} y={y + 24} fill={C.muted} font-family={FONT} font-size="11">{`table: ${r.table} A`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="10">Exceptions exist for motor circuits and a few specific loads (240.4(E)–(G)) — but not for general branch circuits.</text>
+</svg>

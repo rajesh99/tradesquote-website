@@ -1,0 +1,75 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("wstt");
+
+// Two independent tests; the one demanding more copper sets the size.
+const tests = [
+  {
+    n: "1",
+    label: "Ampacity test",
+    accent: C.primary,
+    bg: C.primaryLight,
+    lines: ["Table 310.16 at the 75 °C", "termination column — can the", "wire carry the current safely?"],
+    y: 74,
+  },
+  {
+    n: "2",
+    label: "Voltage drop test",
+    accent: C.orange,
+    bg: C.orangeLight,
+    lines: ["2 × K × I × L ÷ cmil — does the", "run stay inside 3%? Long runs", "fail here, not on ampacity."],
+    y: 176,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The two tests that decide wire size</title>
+  <desc>
+    Wire size is set by two separate tests run against the same load. The ampacity test uses NEC Table
+    310.16 at the 75 degree Celsius termination column to check the conductor can carry the current.
+    The voltage drop test checks the run length keeps drop within about 3 percent. Whichever test
+    demands the larger conductor governs the size.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two tests, and the bigger answer wins</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A chart that only answers the ampacity half will undersize any long run</text>
+
+  <!-- Load -->
+  <rect x="24" y="112" width="118" height="76" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1.5" />
+  <text x="83" y="140" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">Load in amps</text>
+  <text x="83" y="160" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">× 1.25 if the load</text>
+  <text x="83" y="174" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">is continuous</text>
+
+  <!-- Load → tests -->
+  <path d="M148 140 L 196 112" stroke={C.border} stroke-width="1.5" marker-end="url(#wstt-arrow-muted)" />
+  <path d="M148 160 L 196 210" stroke={C.border} stroke-width="1.5" marker-end="url(#wstt-arrow-muted)" />
+
+  {tests.map((t) => (
+    <g>
+      <rect x="204" y={t.y} width="248" height="84" rx="10" fill={t.bg} stroke={t.accent} stroke-width="1.5" />
+      <circle cx="228" cy={t.y + 26} r="13" fill={C.white} stroke={t.accent} stroke-width="1.5" />
+      <text x="228" y={t.y + 31} text-anchor="middle" fill={t.accent} font-family={FONT} font-size="13" font-weight="800">{t.n}</text>
+      <text x="250" y={t.y + 30} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{t.label}</text>
+      <text x="220" y={t.y + 52} fill={C.muted} font-family={FONT} font-size="10">
+        {t.lines.map((line, li) => (
+          <tspan x="220" dy={li === 0 ? "0" : "14"}>{line}</tspan>
+        ))}
+      </text>
+    </g>
+  ))}
+
+  <!-- Tests → result -->
+  <path d="M458 116 L 506 140" stroke={C.primary} stroke-width="1.5" marker-end="url(#wstt-arrow-primary)" />
+  <path d="M458 218 L 506 162" stroke={C.orange} stroke-width="1.5" marker-end="url(#wstt-arrow-orange)" />
+
+  <!-- Result -->
+  <rect x="516" y="106" width="180" height="88" rx="10" fill={C.greenLight} stroke={C.green} stroke-width="1.8" />
+  <text x="606" y="134" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">Take the larger</text>
+  <text x="606" y="156" text-anchor="middle" fill={C.green} font-family={FONT} font-size="18" font-weight="800">AWG wins</text>
+  <text x="606" y="176" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">Never the average of the two</text>
+</svg>

@@ -1,0 +1,623 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { stringSizing, fmt } from "@/lib/nec";
+
+const title = "Solar String Sizing Calculator — Voc & Vmp Limits | TradesQuote";
+const description =
+  "Free solar string sizing calculator. Maximum modules from cold-weather Voc against the inverter ceiling per NEC 690.7, minimum from hot-cell Vmp against the MPPT window floor — with the Table 690.7(A) comparison.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-solar-string-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Solar String Sizing Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Solar String Sizing Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online PV string sizing calculator returning maximum and minimum modules per string from temperature-corrected open-circuit and maximum-power voltages, checked against inverter input limits.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many solar panels can go in one string?",
+    answer:
+      "As many as fit under the inverter's maximum input voltage <em>at the coldest temperature the site ever sees</em>. Open-circuit voltage rises as cells get colder, so the limit is set on a freezing clear morning, not on a hot afternoon. With a 49.5 V module at −0.27%/°C and a 600 V inverter, a −10°C record low gives 54.18 V per module and <strong>11 modules maximum</strong>. Drop the design temperature to −25°C and the same string falls to 10.",
+  },
+  {
+    question: "Why does cold weather limit string length?",
+    answer:
+      "Silicon's open-circuit voltage has a <strong>negative temperature coefficient</strong> — typically around −0.27%/°C for Voc. Below the 25°C standard test condition the voltage climbs above nameplate, and it climbs most on exactly the kind of cold clear morning that also produces full irradiance. NEC <strong>690.7</strong> therefore requires maximum system voltage be calculated at the <strong>lowest expected ambient temperature</strong>. Get it wrong and the inverter's input stage fails — not on commissioning day, but on the coldest sunny morning of its first winter.",
+  },
+  {
+    question: "What sets the minimum number of modules?",
+    answer:
+      "Heat. Maximum-power voltage falls as cells warm, and if the string drops below the bottom of the inverter's MPPT window the inverter stops tracking and array output collapses. Cell temperature — not ambient — drives it, and a roof-mounted module runs <strong>25 to 35°C above ambient</strong>. At a 65°C cell temperature a 41.5 V module at −0.35%/°C delivers 35.69 V, so an 80 V MPPT floor needs a minimum of <strong>3 modules</strong>.",
+  },
+  {
+    question: "Should I use the temperature coefficient or Table 690.7(A)?",
+    answer:
+      "The module's own coefficient, whenever the datasheet gives you one — and it always does. <strong>Table 690.7(A) is a fallback</strong> for crystalline silicon when the manufacturer's figure is unavailable, and it is deliberately conservative. At −10°C the table applies a flat ×1.14, giving 56.43 V against the 54.18 V the real coefficient produces. That difference costs a module: 10 instead of 11. On a 20-string commercial array, using the table instead of the datasheet throws away 20 modules of capacity for no safety benefit.",
+  },
+  {
+    question: "What temperature should I design to?",
+    answer:
+      "The <strong>lowest expected ambient</strong> at the site, which is a record low rather than an average winter minimum. The usual source is the ASHRAE Extreme Annual Mean Minimum Design Dry Bulb Temperature for the nearest station — the same dataset load calculations use. Do not use the average January low; the string has to survive the worst morning in the design life, not a typical one. If the record low is genuinely uncertain, one module fewer costs a few percent of production and removes the risk entirely.",
+  },
+  {
+    question: "Does a longer string produce more power?",
+    answer:
+      "No — string length moves voltage, not power. Ten modules in series and two strings of five produce the same watts. What longer strings buy is <strong>lower current for the same power</strong>, which means smaller conductors, less voltage drop, and fewer combiner terminations. That is why designers push toward the maximum. The cost of pushing too far is an inverter, so the sensible practice is to design one module below the calculated ceiling unless the record-low figure is solid.",
+  },
+  {
+    question: "What current do I size the PV conductors for?",
+    answer:
+      "<strong>156% of the module's short-circuit current</strong>, arrived at in two steps that people frequently apply only once. NEC <strong>690.8(A)</strong> sets the circuit current at 125% of rated Isc — a correction for irradiance above 1000 W/m², not a continuous-load factor. Then <strong>690.8(B)</strong> applies the ordinary 125% continuous-load factor on top. The two compound: 1.25 × 1.25 = 1.5625.",
+  },
+  {
+    question: "Do strings on different roof faces have to match?",
+    answer:
+      "Not in length, but they must not share an MPPT input unless they do. Strings of different lengths, orientations, or shading on the same MPPT are dragged to a single operating point and the weaker one drags down the stronger. Different faces belong on <strong>separate MPPT inputs</strong>, or on module-level electronics. Where strings do share an input, keep length, azimuth, and tilt identical.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Array designed? Quote it line by line.";
+const ctaDescription =
+  "Solar estimating is a quantity game — modules, optimisers, racking feet, rail, conductors, disconnects, and labour per string. TradesQuote turns the design into a detailed estimate, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-solar-interconnection-calculator",
+    title: "Solar 120% Rule Calculator",
+    description: "Check the busbar will take the interconnection.",
+  },
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "Size the DC home run and the AC feeder.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ampacity-calculator",
+    title: "Ampacity & Derating Calculator",
+    description: "Rooftop conduit runs hot — derate for it.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Estimate Calculator",
+    description: "Price the install with overhead and margin.",
+  },
+];
+
+/** Cold-temperature ladder, computed from the same helper the calculator uses. */
+const MODULE = { vocStc: 49.5, vmpStc: 41.5, tempCoeffVoc: -0.27, tempCoeffVmp: -0.35 };
+const tempRows = [10, 0, -10, -20, -30, -40].map((t) => {
+  const r = stringSizing({
+    ...MODULE,
+    lowAmbientC: t,
+    hotCellC: 65,
+    inverterMaxVolts: 600,
+    mpptMinVolts: 80,
+  });
+  return {
+    t,
+    vocCold: r.vocCold,
+    maxModules: r.maxModules,
+    tableFactor: r.tableFactor,
+    tableMax: r.tableMaxModules,
+  };
+});
+
+const styles = electricalAccentStyles.amber;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Solar String Sizing Calculator — Voc & Vmp Limits" />
+    <meta
+      property="og:description"
+      content="Cold sets the maximum, heat sets the minimum. Modules per string from the two temperature extremes."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Solar String Sizing Calculator" />
+    <meta name="twitter:description" content="How many modules per string. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Solar String Sizing Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v10H4zM4 9h16M9 4v10M15 4v10M8 20h8M12 14v6" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Solar String Sizing <span class="text-amber-600">— Cold Voc, Hot Vmp</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A string is bounded at both ends by temperature. <strong>Cold sets the maximum</strong> — Voc rises as
+              cells chill and must stay under the inverter's ceiling. <strong>Heat sets the minimum</strong> — Vmp
+              falls and must stay above the MPPT window. Miss the top and you destroy an inverter.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v10H4zM4 9h16M9 4v10M15 4v10M8 20h8M12 14v6"></path>
+            </svg>
+            Size the string
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="ss-voc" class="text-sm font-semibold text-slate-800">Module Voc at STC (V)</label>
+                  <input
+                    id="ss-voc"
+                    type="number"
+                    min="1"
+                    step="0.1"
+                    value="49.5"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ss-vmp" class="text-sm font-semibold text-slate-800">Module Vmp at STC (V)</label>
+                  <input
+                    id="ss-vmp"
+                    type="number"
+                    min="1"
+                    step="0.1"
+                    value="41.5"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="ss-coeff-voc" class="text-sm font-semibold text-slate-800">Voc coeff (%/°C)</label>
+                  <input
+                    id="ss-coeff-voc"
+                    type="number"
+                    max="0"
+                    step="0.01"
+                    value="-0.27"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ss-coeff-vmp" class="text-sm font-semibold text-slate-800">Vmp coeff (%/°C)</label>
+                  <input
+                    id="ss-coeff-vmp"
+                    type="number"
+                    max="0"
+                    step="0.01"
+                    value="-0.35"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ss-low-temp" class="text-sm font-semibold text-slate-800">
+                    Record low ambient
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ss-low-temp"
+                      type="number"
+                      min="-40"
+                      max="24"
+                      step="1"
+                      value="-10"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">°C</span>
+                  </div>
+                </div>
+                <input
+                  id="ss-low-temp-range"
+                  type="range"
+                  min="-40"
+                  max="24"
+                  step="1"
+                  value="-10"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-amber-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>−40°C</span><span>24°C</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="ss-hot-cell" class="text-sm font-semibold text-slate-800">Hot cell (°C)</label>
+                  <input
+                    id="ss-hot-cell"
+                    type="number"
+                    min="25"
+                    max="95"
+                    step="1"
+                    value="65"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ss-max-volts" class="text-sm font-semibold text-slate-800">Inverter max</label>
+                  <select
+                    id="ss-max-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    <option value="600" selected>600 V</option>
+                    <option value="1000">1000 V</option>
+                    <option value="1500">1500 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ss-mppt-min" class="text-sm font-semibold text-slate-800">MPPT min (V)</label>
+                  <input
+                    id="ss-mppt-min"
+                    type="number"
+                    min="1"
+                    step="5"
+                    value="80"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                Cell temperature, not ambient, drives the hot case — a roof-mounted module runs 25 to 35°C above
+                the air around it. Use the module datasheet's own coefficients; Table 690.7(A) is only a fallback.
+              </p>
+
+              <button
+                id="ss-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-amber-100 bg-amber-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Modules per string</p>
+              <div class="mt-2">
+                <span id="ss-range" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-amber-600">
+                  3–11
+                </span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Maximum (cold)</p>
+                  <p id="ss-max-modules" class="mt-1 text-2xl font-bold text-slate-900">11</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Minimum (hot)</p>
+                  <p id="ss-min-modules" class="mt-1 text-2xl font-bold text-slate-900">3</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Voc when cold</p>
+                  <p id="ss-voc-cold" class="mt-1 text-2xl font-bold text-slate-900">54.18 V</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Vmp when hot</p>
+                  <p id="ss-vmp-hot" class="mt-1 text-2xl font-bold text-slate-900">35.69 V</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-amber-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Cold delta</span><span id="ss-bd-cold-delta" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Voc corrected</span><span id="ss-bd-voc-cold" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Maximum</span><span id="ss-bd-max" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Hot delta</span><span id="ss-bd-hot-delta" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Vmp corrected</span><span id="ss-bd-vmp-hot" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Minimum</span><span id="ss-bd-min" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Table 690.7(A) instead</span><span id="ss-bd-table" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="ss-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Design one module below the ceiling unless the record-low figure is solid.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The method, explained in plain English</h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Cold end — the maximum, per NEC 690.7</div>
+            <div>Voc(cold)&nbsp;=&nbsp;Voc(STC) × [1 + β<sub>Voc</sub> × (T<sub>min</sub> − 25)]</div>
+            <div>max modules&nbsp;=&nbsp;⌊ inverter max V ÷ Voc(cold) ⌋</div>
+            <div class="mt-4 text-cyan-300"># Hot end — the minimum, set by the MPPT window</div>
+            <div>Vmp(hot)&nbsp;=&nbsp;Vmp(STC) × [1 + β<sub>Vmp</sub> × (T<sub>cell</sub> − 25)]</div>
+            <div>min modules&nbsp;=&nbsp;⌈ MPPT min V ÷ Vmp(hot) ⌉</div>
+            <div class="mt-4 text-cyan-300"># β is negative for silicon — that is why cold raises voltage</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Cold is the dangerous end</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Exceeding the MPPT floor costs production for an afternoon. Exceeding the maximum input voltage costs
+                an inverter, and does it on the first cold clear morning.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Ambient for cold, cell for hot</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At dawn in winter a module sits at ambient. On a July afternoon it runs 25–35°C above it. The two
+                ends of the calculation legitimately use different temperatures.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Use the datasheet, not the table</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Table 690.7(A) is a conservative fallback for when no coefficient is published. At −10°C it costs a
+                module per string against the real figure.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Length is voltage, not power</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Longer strings mean less current for the same watts — thinner conductors and fewer terminations.
+                That is the only reason to push toward the limit.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A 49.5 V / 41.5 V module on a 600 V inverter with an 80 V MPPT floor, in three situations.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Temperate site, −10°C record low — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Voc coefficient −0.27%/°C, Vmp −0.35%/°C, 65°C hot cell.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              cold: 49.5 × [1 + (−0.0027)(−35)] = 54.18 V → 600 ÷ 54.18 = 11.07 → <span class="font-bold text-amber-700">11 max</span><br />
+              hot: 41.5 × [1 + (−0.0035)(40)] = 35.69 V → 80 ÷ 35.69 = 2.24 → <span class="font-bold text-amber-700">3 min</span><br />
+              a string of 11 reaches <span class="font-bold text-slate-900">595.96 V</span> — 4.04 V of headroom
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> legal, but four volts from the ceiling. If
+              the −10°C figure came from anywhere less solid than an ASHRAE extreme-minimum table, build 10.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Cold-climate site, −30°C — one module fewer</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Identical hardware, moved somewhere with real winters.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              cold: 49.5 × [1 + (−0.0027)(−55)] = 56.85 V<br />
+              600 ÷ 56.85 = 10.55 → <span class="font-bold text-amber-700">10 max</span><br />
+              string of 10 = 568.5 V, 31.5 V of headroom
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> twenty degrees of extra cold costs one module
+              per string — about 9% of the array's series capacity. On a large site that is a real design constraint,
+              and the usual answer is a 1000 V or 1500 V inverter.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Table 690.7(A) instead of the datasheet — at −10°C</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Same site as example 1, using the fallback table.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              −6°C to −10°C band → factor <span class="font-bold text-slate-900">1.14</span><br />
+              49.5 × 1.14 = 56.43 V → 600 ÷ 56.43 = 10.63 → <span class="font-bold text-amber-700">10 max</span><br />
+              datasheet coefficient gave <span class="font-bold text-emerald-700">11</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the table costs a module per string for no
+              safety gain, because the datasheet figure is the manufacturer's tested value. Across a 20-string array
+              that is 20 modules of capacity given away.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Maximum string length by design temperature</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A 49.5 V Voc module at −0.27%/°C on a 600 V inverter. The last column applies Table 690.7(A) instead of
+            the module's own coefficient, so the gap between the two columns is what the fallback costs you.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Record low</th>
+                  <th class="py-3 px-4 font-semibold">Voc corrected</th>
+                  <th class="py-3 px-4 font-semibold">Max modules</th>
+                  <th class="py-3 px-4 font-semibold">T690.7 factor</th>
+                  <th class="py-3 px-4 font-semibold">By the table</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  tempRows.map((row, index) => (
+                    <tr class={index === tempRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.t}°C</td>
+                      <td class="py-3 px-4">{fmt(row.vocCold, 2)} V</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.maxModules}</td>
+                      <td class="py-3 px-4">×{row.tableFactor}</td>
+                      <td class="py-3 px-4">{row.tableMax}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 <strong>Article 690</strong> — maximum voltage
+            <strong>690.7</strong>, which requires the calculation be made at the lowest expected ambient
+            temperature using the module's temperature coefficient where supplied, with
+            <strong>Table 690.7(A)</strong> as the crystalline-silicon fallback; circuit current and conductor
+            sizing <strong>690.8(A)</strong> and <strong>690.8(B)</strong>, whose 125% factors compound to 156%.
+            The MPPT minimum is an <em>inverter specification, not a code requirement</em> — falling below it costs
+            production rather than compliance. Record-low ambient temperatures should come from a recognised source
+            such as the ASHRAE extreme annual mean minimum design dry-bulb data, not from an average winter
+            minimum. Local amendments and the AHJ have final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about PV string sizing and temperature correction."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalSolarStringCalculator } from "@/scripts/calculators/electrical-solar-string-calculator";
+    initElectricalSolarStringCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

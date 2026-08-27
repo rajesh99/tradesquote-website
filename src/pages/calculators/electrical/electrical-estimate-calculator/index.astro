@@ -1,0 +1,661 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+
+const title = "Electrical Estimate Calculator — Price Jobs at Your Target Margin | TradesQuote";
+const description =
+  "Free electrical job pricing calculator for contractors. Turn labor hours, material, and fixtures into a quoted price at your target gross margin — and see exactly what charging markup instead of margin costs you on the same job.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-estimate-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Electrical Estimate Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Electrical Estimate Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online electrical job pricing calculator that converts labor hours, loaded rate, fixtures, material, and overhead into a quoted price at a target gross margin, with a markup-versus-margin comparison.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do electricians price jobs?",
+    answer:
+      "Three common models. <strong>Hourly plus materials</strong> suits diagnostics and unpredictable work, usually with a one-hour minimum or a flat service-call fee. <strong>Flat rate per task</strong> suits standard installs — outlets, fans, EV chargers — where the time is known. <strong>Bid or contract pricing</strong> suits new construction and remodels, built from a takeoff and labor units. All three should arrive at the same place: total cost divided by one minus your target margin.",
+  },
+  {
+    question: "What's a good profit margin on electrical work?",
+    answer:
+      "Residential service work commonly targets <strong>30–50% gross margin</strong>; new-construction and bid work runs thinner, often <strong>15–25%</strong>, because volume and predictability offset it. Gross margin is what remains after direct job costs and must still cover office overhead, vehicles, insurance, licensing, unbillable time, and owner profit. A 20% gross margin on service work is usually a business losing money slowly.",
+  },
+  {
+    question: "What should my hourly rate be?",
+    answer:
+      "Not your wage, and not your competitor's number. Start from the <strong>loaded cost</strong> of an hour: wage plus payroll taxes, insurance, workers' comp, vehicle, tools, and phone — typically 1.5 to 2 times base wage — then divide by <strong>billable</strong> hours, not paid hours. A tech paid 40 hours a week who bills 28 has a loaded cost per billable hour far above their wage. 2026 US market rates run roughly $50–$130 per hour with a $100–$200 service-call fee for the first hour.",
+  },
+  {
+    question: "Markup or margin — which do I use?",
+    answer:
+      "<strong>Margin</strong>, always, when you are setting price. Markup is cost multiplied by a factor; margin is profit as a percentage of the <em>selling price</em>. They are not the same number, and confusing them silently underprices every job. A 25% margin requires a 33% markup. This calculator shows both figures side by side so the gap is visible — on the default job it is over $240.",
+  },
+  {
+    question: "How do I price a panel upgrade?",
+    answer:
+      'Build it from parts rather than guessing at a total: panel and breakers, service conductors, meter socket if it changes, grounding materials, permit and inspection fees, then labor hours including utility coordination and circuit re-termination. 2026 market data puts residential panel and service upgrades at roughly <strong>$1,300 to $5,000</strong> installed, with most 100 A to 200 A jobs near $3,000. Use the <a href="/calculators/electrical/electrical-service-size-calculator" class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Service Size Calculator</a> first to confirm the upgrade is actually needed.',
+  },
+  {
+    question: "Should I charge a flat rate or time and materials?",
+    answer:
+      "<strong>Flat rate</strong> wherever the work is repeatable. It rewards efficiency, removes the customer's fear of an open-ended bill, and makes your pricing defensible — but it requires knowing your real times, which means tracking them. <strong>Time and materials</strong> is honest for troubleshooting, old-work rewiring, and anything where opening a wall changes the scope. Most successful shops run flat rate for their catalogue and T&M for diagnostics.",
+  },
+  {
+    question: "How do I account for permits and inspection time?",
+    answer:
+      "As explicit line items, never absorbed into overhead. Permit fees are a direct pass-through cost, so put them in the material or fixtures field. The <em>time</em> — pulling the permit, meeting the inspector, waiting, and any re-inspection — is billable labor and belongs in your hours. Shops that forget the inspection visit lose two to four hours on every permitted job, which on a $3,000 panel upgrade is most of the profit.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Priced the job? Let TradesQuote write the whole estimate.";
+const ctaDescription =
+  "This calculator gets you to a number. TradesQuote gets you to a document your customer can sign — describe the job or upload photos, and our AI produces a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent and delivered ready for online signature.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Confirm the upgrade before you quote it.",
+  },
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "The calculation behind a service quote.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ev-charger-calculator",
+    title: "EV Charger Circuit Calculator",
+    description: "Scope an EVSE install before pricing it.",
+  },
+  {
+    href: "/calculators/hvac/hvac-estimate-calculator",
+    title: "HVAC Estimate Calculator",
+    description: "The same pricing math for HVAC jobs.",
+  },
+];
+
+/** 2026 US market benchmarks — ranges, not quotes. */
+const benchmarks = [
+  { item: "Electrician hourly rate", range: "$50 – $130 / hr", note: "Apprentice to master; market dependent" },
+  { item: "Service call fee (first hour)", range: "$100 – $200", note: "Often separate from the hourly rate" },
+  { item: "Loaded cost per billable hour", range: "2.5 – 3× base wage", note: "Burden plus unbillable time" },
+  { item: "Panel or service upgrade", range: "$1,300 – $5,000", note: "100 A → 200 A typically near $3,000" },
+  { item: "New dedicated circuit", range: "$250 – $900", note: "Depends on run length and access" },
+  { item: "Outlet install or replace", range: "$100 – $185", note: "Per device, existing wiring" },
+  { item: "Whole-house rewire", range: "$5 – $17 / sq ft", note: "$8,000 – $30,000 total; access drives it" },
+  { item: "Level 2 EV charger install", range: "$500 – $2,500", note: "Most land near $1,200" },
+  { item: "After-hours / emergency", range: "1.5× – 2× rate", note: "Standard multiplier" },
+];
+
+const styles = electricalAccentStyles.rose;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Electrical Estimate Calculator — Price Jobs at Your Margin" />
+    <meta
+      property="og:description"
+      content="Turn labor hours, material, and fixtures into a quoted price at your target gross margin — and see what markup instead of margin costs you."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Electrical Estimate Calculator — Price Jobs at Your Margin" />
+    <meta
+      name="twitter:description"
+      content="Labor, material, overhead, and margin — the price your electrical job should carry. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Electrical Estimate Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · For Contractors · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Electrical Estimate Calculator <span class="text-rose-600">— Price at Your Margin</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every priced job is the same four inputs — labor, fixtures, material, overhead — and one
+              decision: the gross margin you need to survive. The arithmetic that trips shops up is the last
+              step, because <strong>margin and markup are not the same number</strong>. Divide by one minus your
+              margin; do not multiply by one plus it. This calculator shows both so you can see the gap.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            Price the job
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="est-hours" class="text-sm font-semibold text-slate-800">Labor hours</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="est-hours"
+                      type="number"
+                      min="0"
+                      max="400"
+                      step="0.5"
+                      value="12"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">hrs</span>
+                  </div>
+                </div>
+                <input
+                  id="est-hours-range"
+                  type="range"
+                  min="1"
+                  max="120"
+                  step="0.5"
+                  value="12"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>120 hrs</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Include permit pulling, the inspection visit, and travel — not just wire time.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="est-rate" class="text-sm font-semibold text-slate-800">Loaded labor rate</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="est-rate"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="95"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">/hr</span>
+                  </div>
+                  <p class="mt-1 text-xs text-slate-500">Cost per billable hour, not wage.</p>
+                </div>
+
+                <div>
+                  <label for="est-fixtures" class="text-sm font-semibold text-slate-800">Fixtures & equipment</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="est-fixtures"
+                      type="number"
+                      min="0"
+                      max="200000"
+                      value="600"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <p class="mt-1 text-xs text-slate-500">Panel, breakers, EVSE, light fixtures.</p>
+                </div>
+
+                <div>
+                  <label for="est-material" class="text-sm font-semibold text-slate-800">Material</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="est-material"
+                      type="number"
+                      min="0"
+                      max="200000"
+                      value="850"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <p class="mt-1 text-xs text-slate-500">Wire, conduit, boxes, devices, permit fees.</p>
+                </div>
+
+                <div>
+                  <label for="est-overhead" class="text-sm font-semibold text-slate-800">Overhead</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="est-overhead"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value="15"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">%</span>
+                  </div>
+                  <p class="mt-1 text-xs text-slate-500">Office, vehicles, insurance, licensing.</p>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="est-margin" class="text-sm font-semibold text-slate-800">Target gross margin</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="est-margin"
+                      type="number"
+                      min="0"
+                      max="90"
+                      value="25"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">%</span>
+                  </div>
+                </div>
+                <input
+                  id="est-margin-range"
+                  type="range"
+                  min="0"
+                  max="70"
+                  step="1"
+                  value="25"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0%</span><span>70%</span>
+                </div>
+              </div>
+
+              <button
+                id="est-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-rose-100 bg-rose-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Quoted price</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="est-price" class="text-5xl font-extrabold tracking-tight text-rose-600">$3,971</span>
+              </div>
+              <p id="est-margin-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Charging 25% as markup instead of margin would price this at $3,723 — $248 less profit on the
+                same job.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Gross profit</p>
+                  <p id="est-profit" class="mt-1 text-2xl font-bold text-slate-900">$993</p>
+                </div>
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Break-even</p>
+                  <p id="est-break-even" class="mt-1 text-2xl font-bold text-slate-900">$2,979</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-rose-100 bg-white" open>
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Labor</span><span id="est-bd-labor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Fixtures & equipment</span><span id="est-bd-fixtures" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Material</span><span id="est-bd-material" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Overhead</span><span id="est-bd-overhead" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Break-even</span><span id="est-bd-break-even" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Divide by</span><span id="est-bd-divisor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Quoted price</span><span id="est-bd-price" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Gross margin still has to cover office overhead beyond the percentage entered here, unbillable
+                time, bad debt, and owner profit. Treat this as a floor, not a target.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Add up what the job costs you, add overhead, then divide — never multiply — by one minus your margin.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Direct job cost</div>
+            <div>labor&nbsp;=&nbsp;hours × loaded rate</div>
+            <div>direct&nbsp;=&nbsp;labor + fixtures + material</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Add overhead</div>
+            <div>break-even&nbsp;=&nbsp;direct × (1 + overhead%)</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Apply margin (the right way)</div>
+            <div>price&nbsp;=&nbsp;break-even ÷ (<span class="text-amber-300">1 − margin%</span>)</div>
+            <div class="mt-4 text-rose-300"># The wrong way — this is markup, not margin</div>
+            <div>price&nbsp;=&nbsp;break-even × (1 + margin%)&nbsp;&nbsp;<span class="text-slate-400">← always lower</span></div>
+            <div class="mt-4 text-cyan-300"># Converting between them</div>
+            <div>markup&nbsp;=&nbsp;margin ÷ (1 − margin)&nbsp;&nbsp;·&nbsp;&nbsp;margin&nbsp;=&nbsp;markup ÷ (1 + markup)</div>
+            <div>
+              20% margin = <span class="text-amber-300">25%</span> markup&nbsp;·&nbsp;25% margin =
+              <span class="text-amber-300">33%</span> markup&nbsp;·&nbsp;40% margin =
+              <span class="text-amber-300">67%</span> markup
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Margin is a share of price</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Markup is measured against cost; margin against the selling price. Applying a margin percentage
+                as a markup underprices every job by a widening amount as the percentage rises.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Billable hours, not paid hours</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A tech paid 40 hours who bills 28 has a loaded cost per billable hour roughly 43% above the
+                naive figure. Divide burdened wage by hours you can actually invoice.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Permits are two costs</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The fee is a pass-through in material. The time — pulling it, meeting the inspector, any
+                re-inspection — is billable labor. Forgetting the second is why permitted jobs come in thin.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Low margin needs volume</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At 10% margin you need ten jobs to make what one 50% job makes. Bid work can live at 15–25%
+                because it is predictable; a service truck cannot.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A subpanel job, a panel upgrade at service-work margin, and a small job priced so thin it isn't worth
+          doing.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Subpanel and three circuits — 12 hours</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              $95/hr loaded · $600 fixtures · $850 material · 15% overhead · 25% margin. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              labor = 12 × $95 = $1,140<br />
+              direct = 1,140 + 600 + 850 = $2,590<br />
+              overhead = 2,590 × 0.15 = $388.50<br />
+              break-even = $2,978.50<br />
+              price = 2,978.50 ÷ 0.75 = <span class="font-bold text-rose-700">$3,971</span> · profit $993
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> using 25% as a markup instead would have
+              quoted $3,723 — the same work for <strong>$248 less profit</strong>. That gap is the entire reason
+              to get this arithmetic right.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">200 A panel upgrade — service-work margin</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              10 hours at $95 · $900 panel and breakers · $400 conductors, grounding, and permit · 15% overhead ·
+              30% margin.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              labor = 10 × $95 = $950<br />
+              direct = 950 + 900 + 400 = $2,250<br />
+              break-even = 2,250 × 1.15 = $2,587.50<br />
+              price = 2,587.50 ÷ 0.70 = <span class="font-bold text-rose-700">$3,696</span> · profit $1,109
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> right in the middle of the $1,300–$5,000
+              market range for a residential service upgrade. Note the 10 hours includes utility coordination and
+              the inspection visit — quoting 6 hours of wire time is how this job loses money.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">One added circuit at 10% margin — the trap</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              3 hours at $95 · $120 material · 15% overhead · 10% margin.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              labor = 3 × $95 = $285 · direct = $405<br />
+              break-even = 405 × 1.15 = $465.75<br />
+              price = 465.75 ÷ 0.90 = <span class="font-bold text-rose-700">$518</span> · profit
+              <span class="font-bold text-rose-700">$52</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> $52 of gross profit for half a day, a
+              truck roll, and the warranty exposure. At 40% margin the same job prices at $776 and returns $311 —
+              still inside the $250–$900 market range for a dedicated circuit. Small jobs are where thin margins
+              do the most damage.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">2026 US market benchmarks</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Ranges from published 2026 US market data, for sanity-checking your own numbers.
+            <strong>These are not quotes</strong> — local labor rates, material costs, permit fees, and access
+            move every one of them significantly.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Item</th>
+                  <th class="py-3 px-5 font-semibold">Typical range</th>
+                  <th class="py-3 px-5 font-semibold">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  benchmarks.map((row, index) => (
+                    <tr class={index === benchmarks.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.item}</td>
+                      <td class="py-3 px-5">{row.range}</td>
+                      <td class="py-3 px-5 text-slate-500">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NECA Manual of Labor Units for installation labor units; U.S. Bureau of
+            Labor Statistics wage data; 2026 US market cost data from
+            <a
+              href="https://homeguide.com/costs/electrician-cost-per-hour"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600"
+              >HomeGuide</a
+            >,
+            <a
+              href="https://www.angi.com/articles/how-much-does-it-cost-hire-electrician.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Angi</a
+            >, and
+            <a
+              href="https://www.housecallpro.com/resources/how-to-price-electrical-work/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600"
+              >Housecall Pro</a
+            >. Ranges are market observations, not quotes, and move with region and scope.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about pricing electrical work, margin, and labor rates."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalEstimateCalculator } from "@/scripts/calculators/electrical-estimate-calculator";
+    initElectricalEstimateCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

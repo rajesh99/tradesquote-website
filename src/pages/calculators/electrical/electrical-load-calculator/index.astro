@@ -1,0 +1,751 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+
+const title = "Residential Load Calculator — NEC 220.82 Optional Method | TradesQuote";
+const description =
+  "Free residential electrical load calculator using the NEC 220.82 optional method. Enter square footage and appliance nameplates to get the calculated load in VA and amps, and the minimum service size — first 10 kVA at 100%, remainder at 40%.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-load-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Residential Load Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Residential Load Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC 220.82 optional-method residential load calculator returning the calculated load in volt-amperes and amperes plus the minimum standard service size, with a full step-by-step breakdown.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I calculate the electrical load of a house?",
+    answer:
+      "The <strong>NEC 220.82 optional method</strong> is the practical route for a single dwelling. Add 3 VA per square foot of living area, 1,500 VA for each small-appliance circuit (minimum two) and each laundry circuit (minimum one), plus the nameplate rating of every fastened-in-place appliance. Take the <strong>first 10,000 VA at 100% and everything above that at 40%</strong>. Then add the largest of the heating or cooling options from 220.82(C) at its stated percentage. Divide the total by 240 for amps.",
+  },
+  {
+    question: "What's the difference between the standard and optional methods?",
+    answer:
+      "The <strong>standard method</strong> (220.40 through 220.55) itemises every load and applies a separate demand factor to each category — general lighting, ranges, dryers, motors — and is required for multi-family and commercial work. The <strong>optional method</strong> (220.82) is a simplified path available for a single dwelling served at 100 A or more: one broad demand factor covers everything except heating and cooling. The optional method is usually the <em>smaller</em> answer, which is why it is what most residential electricians run.",
+  },
+  {
+    question: "Why is the remainder only counted at 40%?",
+    answer:
+      "Because nothing in a house runs at once. The range, the dryer, the water heater, and the dishwasher all have full nameplate ratings, but the odds of all of them peaking simultaneously are negligible. The 40% demand factor is the Code's statistical allowance for that diversity, and decades of field experience support it — houses with 24,000 VA of calculated load routinely peak under 60 A in real metering.",
+  },
+  {
+    question: "Do I include the EV charger at full nameplate?",
+    answer:
+      "Yes, as a fastened-in-place appliance in the general load — where it then benefits from the 40% remainder factor. This is why adding an EV charger often does <em>not</em> require a service upgrade: a 48 A charger is 11,520 VA of nameplate but only adds about 4,600 VA to the calculated load once the 40% factor applies. Some jurisdictions require EVSE to be treated separately or demand an energy management system instead — check locally, and see the <a href=\"/calculators/electrical/electrical-ev-charger-calculator\" class=\"font-semibold text-indigo-700 underline decoration-indigo-300 hover:decoration-indigo-600\">EV Charger Circuit Calculator</a>.",
+  },
+  {
+    question: "What size service does a 2,000 sq ft house need?",
+    answer:
+      "A typical 2,000 sq ft home with gas heat, an electric range, dryer, and water heater calculates to about <strong>101 A</strong>, which technically fits a 125 A service. Almost nobody installs 125 A — <strong>200 A</strong> is the practical standard because it costs little more and leaves headroom for an EV charger, a heat pump, or an induction range later. Go all-electric on that same house and the calculation jumps past 150 A.",
+  },
+  {
+    question: "Is 100 amps enough for a modern home?",
+    answer:
+      "For a gas-heated house with modest electric appliances, often yes on paper. For an all-electric house, or one adding EV charging and a heat pump, usually no. The honest test is to run the calculation, not to guess from the panel label. If the existing service is 100 A and you have twelve months of utility data, <strong>NEC 220.87</strong> lets you use measured peak demand instead of the estimated calculation, and it frequently proves the existing service is adequate.",
+  },
+  {
+    question: "Does a load calculation require a licensed electrician?",
+    answer:
+      "The calculation itself is arithmetic anyone can follow, and this tool reproduces it faithfully. But the <em>inputs</em> require judgement — what counts as living area, which appliances are fastened in place, whether heating and cooling can operate simultaneously — and the output is normally part of a permit submittal that a licensed electrician signs. Use this to understand and sanity-check the number; have a licensed electrician confirm it before anyone specifies equipment or pulls a permit.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load calculated? Quote the service upgrade in seconds.";
+const ctaDescription =
+  "A load calculation tells you what the house needs. TradesQuote tells the customer what it costs — describe the job or upload photos and our AI builds a detailed line-item estimate for the panel, conductors, grounding, permit, and labor, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Turn this load into a service rating and headroom.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "Conductors for the service you just sized.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ev-charger-calculator",
+    title: "EV Charger Circuit Calculator",
+    description: "Check whether a charger fits this load.",
+  },
+  {
+    href: "/calculators/hvac/hvac-manual-j-calculator",
+    title: "Manual J Load Calculator",
+    description: "The HVAC load that feeds the electrical one.",
+  },
+];
+
+/** NEC 220.82(C) heating and cooling options — take the largest. */
+const hvacOptions = [
+  { option: "220.82(C)(1)", description: "Air conditioning and cooling equipment", percent: "100%" },
+  {
+    option: "220.82(C)(2)",
+    description: "Heat pump compressor plus supplemental heat, where both can run together",
+    percent: "100%",
+  },
+  {
+    option: "220.82(C)(3)",
+    description: "Heat pump compressor plus supplemental heat, where the controller prevents simultaneous operation",
+    percent: "100% + 65% of supplemental",
+  },
+  {
+    option: "220.82(C)(4)",
+    description: "Electric space heating, three or fewer separately controlled units",
+    percent: "65%",
+  },
+  {
+    option: "220.82(C)(5)",
+    description: "Electric space heating, four or more separately controlled units",
+    percent: "40%",
+  },
+  { option: "220.82(C)(6)", description: "Heat-storage or other heating systems", percent: "100%" },
+];
+
+/** Typical nameplate ratings for the appliance fields. */
+const nameplateTable = [
+  { appliance: "Electric range / oven", va: "8,000 – 16,000", note: "12,000 VA is a common single unit" },
+  { appliance: "Cooktop only", va: "6,000 – 11,000", note: "Induction runs at the high end" },
+  { appliance: "Wall oven", va: "4,000 – 5,000", note: "Per oven" },
+  { appliance: "Electric clothes dryer", va: "5,000 – 5,760", note: "Minimum 5,000 VA per 220.54" },
+  { appliance: "Electric water heater", va: "4,500 – 5,500", note: "Tank type, 240 V" },
+  { appliance: "Heat pump water heater", va: "1,500 – 4,500", note: "Lower in heat-pump-only mode" },
+  { appliance: "Dishwasher", va: "1,200 – 1,800", note: "Includes the heating element" },
+  { appliance: "Garbage disposal", va: "600 – 1,000", note: "" },
+  { appliance: "Microwave (built-in)", va: "1,200 – 1,800", note: "Only if fastened in place" },
+  { appliance: "EV charger (Level 2)", va: "3,840 – 19,200", note: "Charger amps × 240 — 48 A = 11,520 VA" },
+  { appliance: "Central AC (3 ton)", va: "4,000 – 5,500", note: "Use the nameplate, not the tonnage" },
+  { appliance: "Heat pump (3 ton)", va: "4,500 – 6,000", note: "Plus supplemental strip heat" },
+  { appliance: "Electric strip heat", va: "5,000 – 20,000", note: "1 kW = 1,000 VA" },
+  { appliance: "Hot tub / spa", va: "9,600 – 11,500", note: "40 A or 48 A at 240 V" },
+  { appliance: "Well pump (1 hp)", va: "1,900 – 2,400", note: "" },
+];
+
+const styles = electricalAccentStyles.indigo;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Residential Load Calculator — NEC 220.82" />
+    <meta
+      property="og:description"
+      content="Whole-house calculated load in VA and amps by the NEC 220.82 optional method, with the minimum service size and a full step-by-step breakdown."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Residential Load Calculator — NEC 220.82" />
+    <meta
+      name="twitter:description"
+      content="First 10 kVA at 100%, remainder at 40%, plus the largest HVAC term. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Residential Load Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Residential Load Calculator <span class="text-indigo-600">— NEC 220.82</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              This is the number that decides the service size, and it is far smaller than the sum of the
+              nameplates — because nothing in a house runs at once. The <strong>220.82 optional method</strong>
+              adds up general lighting, small-appliance and laundry circuits, and every fastened-in-place
+              appliance, then takes the <strong>first 10 kVA at 100% and the rest at 40%</strong>. Heating and
+              cooling are added separately, at whichever 220.82(C) option is largest.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+            Calculate the whole-house load
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="lc-area" class="text-sm font-semibold text-slate-800">Living area</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="lc-area"
+                      type="number"
+                      min="0"
+                      max="20000"
+                      value="2000"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">sq ft</span>
+                  </div>
+                </div>
+                <input
+                  id="lc-area-range"
+                  type="range"
+                  min="500"
+                  max="8000"
+                  step="50"
+                  value="2000"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-indigo-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>500</span><span>8,000 sq ft</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Outside dimensions of habitable space — excludes open porches, garages, and unfinished
+                  basements not adaptable for use.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="lc-sac" class="text-sm font-semibold text-slate-800">
+                    Small-appliance circuits
+                  </label>
+                  <input
+                    id="lc-sac"
+                    type="number"
+                    min="2"
+                    max="10"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Minimum 2 · 1,500 VA each</p>
+                </div>
+
+                <div>
+                  <label for="lc-laundry" class="text-sm font-semibold text-slate-800">Laundry circuits</label>
+                  <input
+                    id="lc-laundry"
+                    type="number"
+                    min="1"
+                    max="5"
+                    value="1"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Minimum 1 · 1,500 VA each</p>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold text-slate-800">Fastened-in-place appliances (VA)</p>
+                <p class="mt-1 text-xs text-slate-500">Use nameplate ratings. Watts and VA are interchangeable here.</p>
+                <div class="mt-3 grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="lc-range" class="text-xs font-medium text-slate-600">Range / oven</label>
+                    <input
+                      id="lc-range"
+                      type="number"
+                      min="0"
+                      max="60000"
+                      value="12000"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lc-dryer" class="text-xs font-medium text-slate-600">Clothes dryer</label>
+                    <input
+                      id="lc-dryer"
+                      type="number"
+                      min="0"
+                      max="20000"
+                      value="5000"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lc-wh" class="text-xs font-medium text-slate-600">Water heater</label>
+                    <input
+                      id="lc-wh"
+                      type="number"
+                      min="0"
+                      max="30000"
+                      value="4500"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lc-dishwasher" class="text-xs font-medium text-slate-600">Dishwasher</label>
+                    <input
+                      id="lc-dishwasher"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      value="1200"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lc-ev" class="text-xs font-medium text-slate-600">EV charger</label>
+                    <input
+                      id="lc-ev"
+                      type="number"
+                      min="0"
+                      max="30000"
+                      value="0"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lc-other" class="text-xs font-medium text-slate-600">Everything else</label>
+                    <input
+                      id="lc-other"
+                      type="number"
+                      min="0"
+                      max="60000"
+                      value="0"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold text-slate-800">Heating and cooling (VA)</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Only the larger of the two is counted, per NEC 220.82(C).
+                </p>
+                <div class="mt-3 grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="lc-ac" class="text-xs font-medium text-slate-600">A/C or heat pump</label>
+                    <input
+                      id="lc-ac"
+                      type="number"
+                      min="0"
+                      max="40000"
+                      value="5000"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lc-heat" class="text-xs font-medium text-slate-600">Electric heat</label>
+                    <input
+                      id="lc-heat"
+                      type="number"
+                      min="0"
+                      max="60000"
+                      value="0"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="lc-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6 lg:sticky lg:top-6">
+              <p class="text-sm font-medium text-slate-600">Calculated load</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="lc-amps" class="text-5xl font-extrabold tracking-tight text-indigo-600">101.2 A</span>
+              </div>
+              <p id="lc-note" class="mt-1 text-sm font-semibold text-slate-700">
+                125 A meets code today. A 150 A service leaves room for an EV charger or heat pump later.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Total VA</p>
+                  <p id="lc-va" class="mt-1 text-2xl font-bold text-slate-900">24,280 VA</p>
+                </div>
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Service size</p>
+                  <p id="lc-service" class="mt-1 text-2xl font-bold text-slate-900">125 A minimum</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white" open>
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>General lighting</span><span id="lc-bd-general" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Small appliance</span><span id="lc-bd-sac" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Laundry</span><span id="lc-bd-laundry" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Appliances</span><span id="lc-bd-appliances" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Subtotal</span><span id="lc-bd-subtotal" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>First 10 kVA</span><span id="lc-bd-first-tier" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Remainder at 40%</span><span id="lc-bd-remainder" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Largest HVAC term</span><span id="lc-bd-hvac" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Calculated load</span><span id="lc-bd-total" class="font-bold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Amps at 240 V</span><span id="lc-bd-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The 220.82 optional method requires a single dwelling served at 100 A or more. Multi-family and
+                commercial work must use the standard method. Confirm with a licensed electrician before
+                specifying equipment or pulling a permit.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Add everything up, discount most of it, then add heating or cooling back at full weight.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — General load (220.82(B))</div>
+            <div>general&nbsp;=&nbsp;<span class="text-amber-300">3</span> VA/ft² × living area</div>
+            <div>
+              &nbsp;&nbsp;+ <span class="text-amber-300">1,500</span> VA × small-appliance circuits
+              <span class="text-slate-400">(min 2)</span>
+            </div>
+            <div>
+              &nbsp;&nbsp;+ <span class="text-amber-300">1,500</span> VA × laundry circuits
+              <span class="text-slate-400">(min 1)</span>
+            </div>
+            <div>&nbsp;&nbsp;+ nameplate VA of every fastened-in-place appliance</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Apply the demand factor (220.82(B))</div>
+            <div>
+              demand&nbsp;=&nbsp;first <span class="text-amber-300">10,000</span> VA at
+              <span class="text-amber-300">100%</span> + remainder at <span class="text-amber-300">40%</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Add heating or cooling (220.82(C))</div>
+            <div>hvac&nbsp;=&nbsp;the <span class="text-amber-300">largest</span> of the 220.82(C) options, at its stated percentage</div>
+            <div class="mt-4 text-cyan-300"># Step 4 — Convert to amps</div>
+            <div>amps&nbsp;=&nbsp;(demand + hvac) ÷ <span class="text-amber-300">240</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 3 VA per square foot</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It is the general-lighting unit load for dwellings in NEC Table 220.12, covering lighting and
+                general-use receptacles. LED lighting means real usage is far lower, but the figure also
+                absorbs plug-in loads that have no nameplate.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The 40% is diversity, not slack</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It encodes the statistical near-impossibility of every appliance peaking together. This is
+                also why adding a large appliance moves the calculated load by less than its nameplate.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">HVAC sits outside the discount</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Heating and cooling are added after the demand factor at their own percentages, because unlike
+                a dryer they genuinely do run for hours at a stretch during a design day.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Heat or cool, not both</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                220.82(C) takes only the largest option, because a house is never heating and cooling at the
+                same time. All-electric homes are dominated by the heating term, not the AC.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 2,000 sq ft house three ways — gas heat, gas heat plus an EV charger, and fully electrified.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Gas-heated 2,000 sq ft home</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Range 12,000 · dryer 5,000 · water heater 4,500 · dishwasher 1,200 · AC 5,000 VA. The defaults
+              above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              general 6,000 + small appliance 3,000 + laundry 1,500 + appliances 22,700 = 33,200 VA<br />
+              first 10,000 at 100% = 10,000<br />
+              remainder 23,200 × 0.40 = 9,280<br />
+              + AC at 100% = 5,000<br />
+              total = 24,280 VA ÷ 240 = <span class="font-bold text-indigo-700">101.2 A → 125 A service</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 101 A of calculated load from 33,200 VA
+              of connected nameplate. In practice this house gets a 200 A service, because the incremental cost
+              over 125 A is small and the headroom is worth having.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Same house plus a 48 A EV charger</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Adding 11,520 VA of EVSE nameplate (48 A × 240 V).</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              subtotal = 33,200 + 11,520 = 44,720 VA<br />
+              first 10,000 = 10,000 · remainder 34,720 × 0.40 = 13,888<br />
+              + AC 5,000<br />
+              total = 28,888 VA ÷ 240 = <span class="font-bold text-indigo-700">120.4 A → still 125 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 11,520 VA of charger added only 4,608 VA
+              to the calculated load, because the 40% factor applies. This is the arithmetic that kills a great
+              many unnecessary panel upgrades — and it is worth showing a customer who has been told they need
+              one.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Fully electrified — heat pump with strip backup</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Same appliances, no EV charger, but a 10 kW heat pump with 10 kW of supplemental strip heat that
+              can run together — so 220.82(C)(2) applies at 100% of both.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              subtotal = 33,200 VA → 10,000 + (23,200 × 0.40) = 19,280<br />
+              heating term = 10,000 + 10,000 = 20,000 VA at 100%<br />
+              total = 39,280 VA ÷ 240 = <span class="font-bold text-indigo-700">163.7 A → 200 A service</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> electrifying the heat is what forces the
+              service upgrade, not the EV charger. Note that a controller preventing simultaneous strip and
+              compressor operation moves you to 220.82(C)(3), which counts only 65% of the strip heat and drops
+              the total to 35,780 VA, or 149 A.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Reference tables</h2>
+
+          <h3 class="mt-8 text-xl font-bold text-slate-900">NEC 220.82(C) — heating and cooling options</h3>
+          <p class="mt-2 text-slate-600">Include only the largest of these in the calculation.</p>
+          <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Article</th>
+                  <th class="py-3 px-5 font-semibold">What it covers</th>
+                  <th class="py-3 px-5 font-semibold">Counted at</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  hvacOptions.map((row, index) => (
+                    <tr class={index === hvacOptions.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-mono text-xs font-semibold text-slate-900">{row.option}</td>
+                      <td class="py-3 px-5">{row.description}</td>
+                      <td class="py-3 px-5 font-semibold text-indigo-700">{row.percent}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="mt-12 text-xl font-bold text-slate-900">Typical appliance nameplate ratings</h3>
+          <p class="mt-2 text-slate-600">
+            Use the actual nameplate whenever you have it — these are planning figures for when you don't.
+          </p>
+          <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Appliance</th>
+                  <th class="py-3 px-5 font-semibold">Typical VA</th>
+                  <th class="py-3 px-5 font-semibold">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  nameplateTable.map((row, index) => (
+                    <tr class={index === nameplateTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.appliance}</td>
+                      <td class="py-3 px-5">{row.va}</td>
+                      <td class="py-3 px-5 text-slate-500">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — 220.82 optional calculation for dwelling units,
+            220.82(B) general load and demand factor, 220.82(C) heating and cooling options, Table 220.12
+            general lighting unit load, 220.52 small-appliance and laundry branch circuits, 220.54 dryer load,
+            220.55 range demand factors, 220.87 existing-load determination from measured demand, 230.79
+            service disconnect rating. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about NEC 220.82, demand factors, and service sizing."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalLoadCalculator } from "@/scripts/calculators/electrical-load-calculator";
+    initElectricalLoadCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

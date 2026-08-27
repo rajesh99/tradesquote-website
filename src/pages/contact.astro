@@ -2,18 +2,77 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { buildFaqPageSchema } from '../lib/calculatorFaq';
 
 export const prerender = false;
 
 const env = (Astro.locals as App.Locals).runtime?.env;
 // Use Cloudflare test site key as fallback for local dev without wrangler bindings
 const turnstileSiteKey = env?.TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+
+const helpTopics = [
+  {
+    title: 'Sales and product questions',
+    body: 'Curious whether TradesQuote fits your estimating workflow? Ask about AI estimating, pricing, HVAC calculators, or how line-item quotes look for your trade. We will walk through what the product does today and what is on the roadmap.',
+  },
+  {
+    title: 'Integrations and setup',
+    body: 'Need help connecting Simpro, Jobber, QuickBooks, Xero, or Zapier? Tell us which tools you already run and we can point you to the right setup path or flag when a human hand-off would help.',
+  },
+  {
+    title: 'Billing and account support',
+    body: 'Questions about subscriptions, invoices, seats, or changing plans belong here. Include your account email so we can find you quickly and reply with a clear next step.',
+  },
+  {
+    title: 'Partnerships and agencies',
+    body: 'If you advise contractors, resell trade software, or want to collaborate on content or integrations, introduce your firm and audience. We review partnership notes during business hours and reply with whether there is a fit.',
+  },
+];
+
+const resourceLinks = [
+  { label: 'HVAC calculators', href: '/calculators/hvac/', detail: 'Sizing, SEER savings, ductwork, Manual J, and more free tools.' },
+  { label: 'HVAC AI estimator', href: '/hvac-ai-estimator', detail: 'See how plain-language job descriptions become line-item estimates.' },
+  { label: 'Blog guides', href: '/blog/', detail: 'Contractor articles on load calculation, code, cost, and field diagnostics.' },
+  { label: 'About TradesQuote', href: '/about', detail: 'Why we build estimating software for the trades from the ground up.' },
+];
+
+const contactFaqs = [
+  {
+    question: 'How quickly will you reply?',
+    answer: 'We typically respond within 24 hours on business days (Monday–Friday, 9am–6pm GMT). Messages sent over the weekend are usually answered on the next business day.',
+  },
+  {
+    question: 'Who is TradesQuote for?',
+    answer: 'TradesQuote is built for HVAC, electrical, plumbing, and similar trade contractors who need faster, cleaner estimates — plus anyone evaluating AI estimating, calculators, or integrations with Simpro, Jobber, QuickBooks, Xero, or Zapier.',
+  },
+  {
+    question: 'Can I request a demo or walkthrough?',
+    answer: 'Yes. Use the form and mention that you want a demo. Include your trade, team size, and which estimating or job-management tools you use today so we can tailor the conversation.',
+  },
+  {
+    question: 'What should I include in my message?',
+    answer: 'A short description of what you need is enough — product questions, billing details, integration setup, partnership ideas, or feedback. Adding your company name and preferred contact method helps us respond faster.',
+  },
+  {
+    question: 'Is there another way to reach support?',
+    answer: 'You can email sales@veersoftsolutions.com directly. The contact form is the fastest path for most questions because it routes your message with the context we need to reply.',
+  },
+  {
+    question: 'Do you offer technical help for HVAC calculators?',
+    answer: 'Calculator pages are free self-serve tools with guides on-site. If something looks wrong, a formula is unclear, or you want a feature for your team, send the calculator URL and what you expected — we read those notes carefully.',
+  },
+];
+
+const faqSchema = buildFaqPageSchema(contactFaqs);
 ---
 
 <Layout
   title="Contact Us — TradesQuote"
-  description="Get in touch with the TradesQuote team. We typically respond within 24 hours."
+  description="Contact TradesQuote for sales, demos, billing, integrations, and partnership questions. Contractors get human replies within 24 hours on business days."
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
   <Header />
 
   <main>
@@ -272,6 +331,90 @@ const turnstileSiteKey = env?.TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- How we can help -->
+    <section class="w-full py-16 sm:py-20 px-6 bg-gray-50 border-t border-gray-100">
+      <div class="max-w-6xl mx-auto flex flex-col gap-10">
+        <div class="max-w-3xl flex flex-col gap-4">
+          <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
+            How we can help
+          </h2>
+          <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
+            TradesQuote builds AI estimating and trade-specific tools for contractors who need professional quotes without rebuilding their entire workflow. Whether you are comparing options, stuck on an integration, or exploring a partnership, tell us what you are trying to do and we will point you in the right direction.
+          </p>
+          <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
+            A real person on our team reads every message. We are not a chatbot front door — if your question needs product context, billing detail, or a follow-up call, we will say so clearly instead of sending a generic auto-reply.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {helpTopics.map((topic) => (
+            <div class="flex flex-col gap-2 p-6 rounded-2xl border border-gray-100 bg-white">
+              <h3 class="text-base font-bold text-gray-900">{topic.title}</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">{topic.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Useful links -->
+    <section class="w-full py-16 sm:py-20 px-6 bg-white border-t border-gray-100">
+      <div class="max-w-6xl mx-auto flex flex-col gap-10">
+        <div class="max-w-3xl flex flex-col gap-4">
+          <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
+            Explore while you wait
+          </h2>
+          <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
+            Many questions are answered by trying the product or reading a short guide. These pages are a good starting point if you want context before we reply — or if you simply need a free calculator or estimating overview right now.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {resourceLinks.map((link) => (
+            <a
+              href={link.href}
+              class="flex flex-col gap-1 p-5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-indigo-100 hover:shadow-sm transition-all duration-150"
+            >
+              <span class="text-sm font-bold text-indigo-600">{link.label}</span>
+              <span class="text-sm text-gray-600 leading-relaxed">{link.detail}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="w-full py-16 sm:py-20 px-6 bg-gray-50 border-t border-gray-100">
+      <div class="max-w-3xl mx-auto flex flex-col gap-8">
+        <div class="flex flex-col gap-3 text-center">
+          <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
+            Contact FAQ
+          </h2>
+          <p class="text-gray-600 text-base leading-relaxed">
+            Quick answers about response times, demos, and what to include when you write to us.
+          </p>
+        </div>
+        <div class="space-y-3">
+          {contactFaqs.map((faq) => (
+            <details class="group rounded-xl border border-gray-200 bg-white p-5">
+              <summary class="flex items-center justify-between cursor-pointer font-semibold text-gray-900">
+                {faq.question}
+                <svg
+                  class="h-5 w-5 shrink-0 text-indigo-500 transition-transform group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </summary>
+              <p class="mt-3 text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
 

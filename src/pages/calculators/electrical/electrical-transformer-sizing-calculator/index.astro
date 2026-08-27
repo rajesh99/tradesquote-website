@@ -1,0 +1,581 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { STANDARD_TRANSFORMER_KVA, fmt, fmtSmart, transformerFla, typicalPercentZ } from "@/lib/nec";
+
+const title = "Transformer Sizing Calculator — kVA, FLA & NEC 450.3(B) OCPD | TradesQuote";
+const description =
+  "Free transformer sizing calculator. Required kVA with a growth margin, primary and secondary full-load amps, and the NEC Table 450.3(B) overcurrent ceilings — including why the primary device may go to 250%.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-transformer-sizing-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Transformer Sizing Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Transformer Sizing Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online transformer sizing calculator. Selects a standard kVA rating from the connected load and a growth margin, computes primary and secondary full-load current, and applies the NEC Table 450.3(B) overcurrent protection ceilings.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I size a transformer in kVA?",
+    answer:
+      "Total the connected load in <strong>kVA</strong>, not kW — a transformer is limited by the current it carries, and only unity-power-factor loads make the two equal. Add a growth margin (20–25% is typical) and round up to the next standard rating. Sizing from kW understates the requirement on any motor or electronic load.",
+  },
+  {
+    question: "Why can the primary breaker be 250% of primary current?",
+    answer:
+      "Because of transformer <strong>magnetising inrush</strong> — energising a transformer draws a brief current spike many times its full-load rating, and a device sized at 125% would trip on it. <strong>Table 450.3(B)</strong> permits the primary device to go to 250% <em>provided</em> secondary protection is present at no more than 125% of secondary current. With primary protection only, the ceiling drops to 125% for primary currents of 9 A or more.",
+  },
+  {
+    question: "What if the primary current is very small?",
+    answer:
+      "Table 450.3(B) gets more generous as the current gets smaller, because inrush is proportionally harder to distinguish from a fault. With primary protection only: <strong>167%</strong> where primary current is 2 A up to 9 A, and <strong>300%</strong> where it is under 2 A. A 3 kVA 480 V three-phase transformer draws just 3.6 A, so its primary device may go to 167%.",
+  },
+  {
+    question: "Does 450.3 protect the secondary conductors?",
+    answer:
+      "No, and this is the distinction that catches people. <strong>Article 450 protects the transformer.</strong> The secondary conductors are a separate problem governed by <strong>240.21(C)</strong>, which is why the 10-foot and 25-foot tap rules exist. A compliant 450.3(B) primary device can leave secondary conductors unprotected — you have to satisfy both requirements.",
+  },
+  {
+    question: "Can I count the primary device as the secondary protection?",
+    answer:
+      "Only for a two-wire-to-two-wire transformer, where 450.3(B) Note 3 lets primary protection satisfy the secondary requirement because the current ratio is fixed and predictable. On a three-phase or multi-wire secondary it does not work, because an unbalanced secondary fault does not reflect predictably to the primary.",
+  },
+  {
+    question: "What impedance should I assume?",
+    answer:
+      "Always use the <strong>nameplate</strong>. As a planning figure, small dry-type units run about <strong>2.5%</strong> up to 75 kVA, <strong>3.5%</strong> to 300 kVA, <strong>4.5%</strong> to 750 kVA, and <strong>5.75%</strong> above that. Impedance matters twice: it sets the voltage regulation under load, and it sets the available fault current at the secondary — lower impedance means a stiffer supply and a much higher fault current.",
+  },
+  {
+    question: "Why is the secondary current so much higher than the primary?",
+    answer:
+      "Because power is conserved while voltage steps down, so current steps up by the same ratio. A 480 V to 208 V transformer has a 2.31:1 voltage ratio, so its secondary carries 2.31 times the primary current for the same kVA. This is why the secondary conductors and panel on a step-down transformer are dramatically larger than the primary feed.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Transformer specified? Price the installation.";
+const ctaDescription =
+  "Transformer work carries a heavy bill of materials — the unit, primary and secondary feeders, two protective devices, a distribution panel, grounding, and rigging. TradesQuote turns the scope into a line-item estimate with quantities and totals.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-short-circuit-calculator",
+    title: "Available Fault Current Calculator",
+    description: "What the transformer's impedance lets through on a fault.",
+  },
+  {
+    href: "/calculators/electrical/electrical-kva-calculator",
+    title: "kVA Calculator",
+    description: "kVA, kW and amps for one-phase and three-phase.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "Size the primary and secondary feeders.",
+  },
+  {
+    href: "/calculators/electrical/electrical-three-phase-power-calculator",
+    title: "Three-Phase Power Calculator",
+    description: "The √3 arithmetic behind these figures.",
+  },
+];
+
+/** Reference table computed from the shared data, so it cannot drift from the tool. */
+const sizeRows = STANDARD_TRANSFORMER_KVA.filter((k) => k >= 15).map((kva) => ({
+  kva,
+  pri480: transformerFla(kva, 480, "3ph"),
+  sec208: transformerFla(kva, 208, "3ph"),
+  sec480: transformerFla(kva, 480, "1ph"),
+  percentZ: typicalPercentZ(kva),
+}));
+
+const styles = electricalAccentStyles.red;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Transformer Sizing Calculator — kVA, FLA & NEC 450.3(B) OCPD" />
+    <meta
+      property="og:description"
+      content="Required kVA, primary and secondary full-load amps, and the Table 450.3(B) overcurrent ceilings that carry magnetising inrush."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Transformer Sizing Calculator" />
+    <meta name="twitter:description" content="kVA, FLA and NEC 450.3(B) overcurrent protection. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Transformer Sizing Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 10h8M8 14h8" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Transformer Sizing <span class="text-red-600">— kVA and 450.3(B)</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Two things about transformer protection surprise people. The primary device may be sized at
+              <strong>250% of primary current</strong>, not 125% — because magnetising inrush would trip anything
+              tighter. And <strong>Article 450 protects the transformer, not the secondary conductors</strong>;
+              those are 240.21(C)'s problem, which is where the tap rules come from.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 10h8M8 14h8"></path>
+            </svg>
+            Size the transformer
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="ts-load" class="text-sm font-medium text-slate-700">Connected load, kVA</label>
+                  <input
+                    id="ts-load"
+                    type="number"
+                    min="0"
+                    max="2000"
+                    step="0.5"
+                    value="60"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">kVA, not kW.</p>
+                </div>
+                <div>
+                  <label for="ts-phase" class="text-sm font-medium text-slate-700">Configuration</label>
+                  <select
+                    id="ts-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  >
+                    <option value="1ph">Single-phase</option>
+                    <option value="3ph" selected>Three-phase</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ts-primary" class="text-sm font-medium text-slate-700">Primary voltage</label>
+                  <select
+                    id="ts-primary"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  >
+                    <option value="600">600 V</option>
+                    <option value="480" selected>480 V</option>
+                    <option value="240">240 V</option>
+                    <option value="208">208 V</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ts-secondary" class="text-sm font-medium text-slate-700">Secondary voltage</label>
+                  <select
+                    id="ts-secondary"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  >
+                    <option value="480">480 V</option>
+                    <option value="240">240 V</option>
+                    <option value="208" selected>208 V</option>
+                    <option value="120">120 V</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ts-growth" class="text-sm font-semibold text-slate-800">Growth margin</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ts-growth"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value="25"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">%</span>
+                  </div>
+                </div>
+                <input
+                  id="ts-growth-range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value="25"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-red-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0%</span><span>100%</span>
+                </div>
+              </div>
+
+              <div>
+                <label for="ts-secondary-protection" class="text-sm font-semibold text-slate-800">
+                  Secondary protection at 125%?
+                </label>
+                <select
+                  id="ts-secondary-protection"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                >
+                  <option value="yes" selected>Yes — primary may go to 250%</option>
+                  <option value="no">No — primary protection only</option>
+                </select>
+              </div>
+
+              <button
+                id="ts-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-red-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-red-100 bg-red-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Transformer size</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ts-kva" class="text-5xl font-extrabold tracking-tight text-red-600">75 kVA</span>
+              </div>
+              <p class="mt-1 text-sm font-semibold text-slate-700">Next standard rating above the required kVA</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Primary FLA</p>
+                  <p id="ts-primary-fla" class="mt-1 text-2xl font-bold text-slate-900">90.21 A</p>
+                </div>
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Secondary FLA</p>
+                  <p id="ts-secondary-fla" class="mt-1 text-2xl font-bold text-slate-900">208.2 A</p>
+                </div>
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Primary OCPD max</p>
+                  <p id="ts-primary-ocpd" class="mt-1 text-2xl font-bold text-slate-900">225 A</p>
+                </div>
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Secondary OCPD max</p>
+                  <p id="ts-secondary-ocpd" class="mt-1 text-2xl font-bold text-slate-900">300 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-red-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Required kVA</span><span id="ts-bd-required" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Selected</span><span id="ts-bd-selected" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Primary FLA</span><span id="ts-bd-primary-fla" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Secondary FLA</span><span id="ts-bd-secondary-fla" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Primary ceiling</span><span id="ts-bd-primary-ceiling" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Secondary ceiling</span><span id="ts-bd-secondary-ceiling" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Primary conductor</span><span id="ts-bd-primary-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Secondary conductor</span><span id="ts-bd-secondary-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Impedance</span><span id="ts-bd-impedance" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="ts-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                With secondary protection at 125%, Table 450.3(B) lets the primary device go to 250%.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Size</div>
+            <div>required&nbsp;kVA&nbsp;=&nbsp;connected&nbsp;kVA&nbsp;×&nbsp;(1&nbsp;+&nbsp;growth)&nbsp;&nbsp;→&nbsp;next&nbsp;standard&nbsp;rating</div>
+            <div class="mt-4 text-cyan-300"># Full-load current, either winding</div>
+            <div>FLA&nbsp;=&nbsp;kVA&nbsp;×&nbsp;1000&nbsp;÷&nbsp;(V&nbsp;×&nbsp;<span class="text-red-300">1.732</span>&nbsp;on&nbsp;three-phase)</div>
+            <div class="mt-4 text-cyan-300"># Overcurrent protection — Table 450.3(B), 1000 V or less</div>
+            <div>with&nbsp;secondary&nbsp;protection&nbsp;at&nbsp;125%&nbsp;→&nbsp;primary&nbsp;≤&nbsp;<span class="text-red-300">250%</span></div>
+            <div>primary&nbsp;only,&nbsp;9&nbsp;A&nbsp;or&nbsp;more&nbsp;→&nbsp;125%&nbsp;·&nbsp;2–9&nbsp;A&nbsp;→&nbsp;167%&nbsp;·&nbsp;under&nbsp;2&nbsp;A&nbsp;→&nbsp;300%</div>
+            <div class="mt-4 text-cyan-300"># And separately, because 450.3 does not do it</div>
+            <div>secondary&nbsp;<span class="text-red-300">conductors</span>&nbsp;→&nbsp;240.21(C)&nbsp;tap&nbsp;rules</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Inrush is why 250% exists</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Energising a transformer draws a brief spike many times full-load current. A device at 125% trips
+                on it, which is why the code trades primary headroom for secondary protection.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">450.3 protects the transformer</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Not the secondary conductors. Those need 240.21(C) — the 10-foot and 25-foot tap rules exist
+                precisely because a compliant primary device can leave them unprotected.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Size in kVA, never kW</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The winding is limited by current. A load list in kW understates the requirement on anything that
+                is not purely resistive.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Impedance cuts both ways</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Lower impedance gives better voltage regulation but a much higher available fault current at the
+                secondary. Check the interrupting rating downstream.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">How the protection ceiling moves with the arrangement and the size.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">60 kVA of load, 480 V to 208 V — the defaults</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              60 × 1.25 = 75.0 kVA → <span class="font-bold text-red-700">75 kVA</span><br />
+              primary: 75,000 ÷ (1.732 × 480) = 90.21 A · secondary: ÷ (1.732 × 208) = 208.2 A<br />
+              primary OCPD: 250% × 90.21 = 225.5 A → 225 A<br />
+              secondary OCPD: 125% × 208.2 = 260.2 A → 300 A (Note 1)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the secondary carries 2.31× the primary
+              current — exactly the voltage ratio. That is why the secondary panel and feeder dwarf the primary
+              feed.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">The same transformer, primary protection only</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              primary FLA 90.21 A is 9 A or more → ceiling is 125%<br />
+              125% × 90.21 = <span class="font-bold text-red-700">112.8 A</span> instead of 225.5 A
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> half the headroom. A 100 A primary device
+              on a 75 kVA transformer will very likely trip on energisation, which is why fitting secondary
+              protection is the normal answer to inrush tripping.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">A small control transformer</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              3 kVA, 480 V three-phase: primary FLA = 3.61 A<br />
+              between 2 A and 9 A → ceiling is 167%<br />
+              167% × 3.61 = <span class="font-bold text-red-700">6.0 A</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the small-current bands exist because
+              inrush is proportionally harder to distinguish from a fault at low current. Below 2 A the allowance
+              rises again, to 300%.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Standard sizes and full-load current</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Computed from the same data the calculator uses. Impedance figures are planning values — always use the
+            nameplate.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">kVA</th>
+                  <th class="py-3 px-4 font-semibold">480 V 3φ primary</th>
+                  <th class="py-3 px-4 font-semibold">208 V 3φ secondary</th>
+                  <th class="py-3 px-4 font-semibold">480 V 1φ</th>
+                  <th class="py-3 px-4 font-semibold">Typical %Z</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  sizeRows.map((row, index) => (
+                    <tr class={index === sizeRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{fmt(row.kva, row.kva % 1 === 0 ? 0 : 1)}</td>
+                      <td class="py-3 px-4">{fmtSmart(row.pri480)} A</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{fmtSmart(row.sec208)} A</td>
+                      <td class="py-3 px-4">{fmtSmart(row.sec480)} A</td>
+                      <td class="py-3 px-4">{row.percentZ}%</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — <strong>Article 450</strong> and
+            <strong>Table 450.3(B)</strong> for transformers of 1000 V or less, including <strong>Note 1</strong>
+            (next higher standard rating on the 125% entries) and <strong>Note 3</strong> (primary protection
+            satisfying the secondary requirement only on a two-wire-to-two-wire transformer);
+            <strong>240.21(C)</strong> for secondary conductor protection; <strong>450.11</strong> for nameplate
+            marking; and <strong>Table 310.16</strong> for conductors. Impedance values are typical dry-type
+            planning figures, not code values. Local amendments override the model code, and the AHJ has final
+            say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="red"
+        subtitle="Common questions about sizing and protecting a transformer."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalTransformerSizingCalculator } from "@/scripts/calculators/electrical-transformer-sizing-calculator";
+    initElectricalTransformerSizingCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #dc2626;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #dc2626;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

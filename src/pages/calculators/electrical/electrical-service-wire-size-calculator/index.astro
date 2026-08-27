@@ -1,0 +1,563 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { TABLE_310_12, findSizeByAmpacity, sizeLabel } from "@/lib/nec";
+
+const title = "Service Wire Size Calculator — NEC Table 310.12 & the 83% Rule | TradesQuote";
+const description =
+  "Free service and feeder wire size calculator. Dwelling service conductors from NEC Table 310.12 — the 83% allowance that lets 4/0 aluminum carry a 200 amp service — with the neutral, the grounding electrode conductor, and a voltage-drop check.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-service-wire-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Service & Feeder Wire Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Service & Feeder Wire Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC service conductor calculator using Table 310.12 for dwelling services and main feeders, with fallback to Table 310.16, plus neutral sizing, grounding electrode conductor, and voltage-drop verification.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size wire for a 200 amp service?",
+    answer:
+      "For a <strong>dwelling</strong> service or the main feeder carrying the whole load, NEC <strong>Table 310.12</strong> allows <strong>2/0 copper or 4/0 aluminum</strong>. Both are one size smaller than Table 310.16 would require for 200 A, because Table 310.12 permits dwelling service conductors to be rated at 83% of the service rating. Aluminum 4/0 is the overwhelmingly common choice on residential 200 A services, for cost reasons.",
+  },
+  {
+    question: "What is the 83% rule?",
+    answer:
+      "It is the allowance behind <strong>NEC Table 310.12</strong>. A dwelling's service or main power feeder may use conductors sized for <strong>83% of the service rating</strong> rather than 100% — so a 200 A service needs conductors good for 166 A, not 200 A. The justification is diversity: a house's calculated load already includes demand factors, and the actual peak rarely approaches the service rating for long enough to matter thermally. Before the 2020 NEC this appeared as the 310.15(B)(7) allowance; it now has its own table.",
+  },
+  {
+    question: "Can 4/0 aluminum really carry 200 amps?",
+    answer:
+      "For a dwelling service, yes — that is exactly what Table 310.12 permits. On its own, Table 310.16 rates 4/0 aluminum at <strong>180 A</strong> at 75 °C, which is why the same conductor is <em>not</em> acceptable as a general-purpose 200 A feeder. The 83% allowance is specific to dwelling services and main power feeders, and applying it anywhere else is a genuine code violation.",
+  },
+  {
+    question: "Does the 83% rule apply to a subpanel feeder?",
+    answer:
+      "Only if that feeder carries the <strong>entire load</strong> of the dwelling. A feeder to a detached garage, a shop subpanel, or any panel serving part of the load falls back to <strong>Table 310.16</strong>. This is where most online advice goes wrong: 4/0 aluminum is fine for a 200 A house service but is only good for 180 A as a garage feeder, so a 200 A garage subpanel needs 250 kcmil aluminum or 2/0 copper.",
+  },
+  {
+    question: "Can the neutral be smaller than the hot conductors?",
+    answer:
+      'Usually yes. <strong>NEC 220.61</strong> permits the neutral to be sized for the maximum unbalanced load, which on a typical dwelling with 240 V appliances is less than the full ungrounded load. The floor is set by <strong>250.24(C)</strong>: the service neutral may never be smaller than the required grounding electrode conductor, because it carries fault current back to the source. In practice a 200 A service often uses a 2/0 aluminum neutral with 4/0 aluminum hots — which is what 4/0-4/0-2/0 SER and mobile-home feeder cable assemblies are built for.',
+  },
+  {
+    question: "Do I need to upsize for a long service run?",
+    answer:
+      'If drop pushes past 3%, yes — and long rural services from a pole often do. Set the run length above and the calculator upsizes automatically when the voltage-drop check fails, telling you it did so. Remember that upsizing the ungrounded conductors also triggers <strong>NEC 250.122(B)</strong> for the equipment grounding conductor on feeders; the <a href="/calculators/electrical/electrical-ground-wire-size-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">Ground Wire Size Calculator</a> handles that.',
+  },
+  {
+    question: "Copper or aluminum for a service?",
+    answer:
+      "Aluminum, almost always, on residential services — it costs substantially less for the same ampacity even after going up a size or two, and utility service drops are aluminum anyway. The requirements are that terminations be listed for aluminum (AL/CU or AL9CU marking) and that connections be made with the correct anti-oxidant compound and torque specification. Copper is preferred where space is very tight, in corrosive environments, or where a specification demands it.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Service conductors sized? Quote the upgrade in seconds.";
+const ctaDescription =
+  "A service upgrade is meter, panel, conductors, grounding, permit, and a day of labor. TradesQuote turns all of it into a detailed line-item estimate — quantities, unit prices, and totals — validated by a built-in quality control agent and ready for your client to sign.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Decide the service rating before sizing wire.",
+  },
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "The NEC 220.82 calculation behind the rating.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+    title: "Ground Wire Size Calculator",
+    description: "The GEC that goes with these conductors.",
+  },
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "Check a long service run before you pull it.",
+  },
+];
+
+/** Table 310.12 against the Table 310.16 equivalent, computed from the same data the script uses. */
+const comparisonTable = TABLE_310_12.map((row) => {
+  const cu16 = findSizeByAmpacity(row.rating, "copper", 75);
+  const al16 = findSizeByAmpacity(row.rating, "aluminum", 75);
+  return {
+    rating: row.rating,
+    cu12: sizeLabel(row.copper),
+    al12: sizeLabel(row.aluminum),
+    cu16: cu16 ? sizeLabel(cu16.label) : "parallel sets",
+    al16: al16 ? sizeLabel(al16.label) : "parallel sets",
+  };
+});
+
+const styles = electricalAccentStyles.blue;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Service Wire Size Calculator — NEC Table 310.12" />
+    <meta
+      property="og:description"
+      content="Dwelling service and feeder conductors from Table 310.12 and the 83% allowance, with neutral, GEC, and a voltage-drop check."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Service Wire Size Calculator — NEC Table 310.12" />
+    <meta
+      name="twitter:description"
+      content="What size wire for a 200 amp service, and why 4/0 aluminum works. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Service & Feeder Wire Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Service Wire Size Calculator <span class="text-blue-600">— The 83% Rule</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Dwelling services get their own conductor table. <strong>NEC Table 310.12</strong> permits a
+              house's service — or the single feeder carrying its entire load — to use conductors rated at
+              <strong>83%</strong> of the service rating, which is why 4/0 aluminum legitimately serves a 200 A
+              house. Get the type selector wrong and you get the wrong answer, so this calculator makes the
+              distinction explicit and falls back to Table 310.16 when the 83% allowance doesn't apply.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1M9 13h1m4 0h1M9 17h1m4 0h1"></path>
+            </svg>
+            Size the service conductors
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div>
+                <label for="sw-type" class="text-sm font-semibold text-slate-800">What is this feeding?</label>
+                <select
+                  id="sw-type"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                >
+                  <option value="dwelling" selected>
+                    Dwelling service, or the feeder carrying its entire load
+                  </option>
+                  <option value="other">Any other feeder — subpanel, garage, non-dwelling</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  This single choice decides whether the 83% allowance applies. It is the most common source of
+                  error on this calculation.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="sw-rating" class="text-sm font-semibold text-slate-800">Service or feeder rating</label>
+                  <select
+                    id="sw-rating"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    {
+                      TABLE_310_12.map((row) => (
+                        <option value={row.rating} selected={row.rating === 200}>
+                          {row.rating} A
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="sw-material" class="text-sm font-semibold text-slate-800">Conductor material</label>
+                  <select
+                    id="sw-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="aluminum" selected>Aluminum / copper-clad</option>
+                    <option value="copper">Copper</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="sw-length" class="text-sm font-semibold text-slate-800">One-way run length</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="sw-length"
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value="100"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="sw-voltage" class="text-sm font-semibold text-slate-800">System voltage</label>
+                  <select
+                    id="sw-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="240" selected>240 V</option>
+                    <option value="120">120 V</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="sw-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Ungrounded conductors</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sw-gauge" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-blue-600">
+                  4/0 AWG aluminum
+                </span>
+              </div>
+              <p id="sw-note" class="mt-1 text-sm font-semibold text-emerald-700">
+                Table 310.12 allows 4/0 AWG aluminum for a 200 A dwelling service — the 83% allowance.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Neutral</p>
+                  <p id="sw-neutral" class="mt-1 text-sm font-bold leading-snug text-slate-900">—</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Grounding electrode conductor</p>
+                  <p id="sw-gec" class="mt-1 text-sm font-bold leading-snug text-slate-900">—</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Table used</span><span id="sw-bd-table" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>83% requirement</span><span id="sw-bd-83" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Ungrounded</span><span id="sw-bd-ungrounded" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 text-right">
+                    <span class="shrink-0">Neutral</span><span id="sw-bd-neutral" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>GEC</span><span id="sw-bd-gec" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Voltage drop</span><span id="sw-bd-drop" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                GEC shown assumes a concrete-encased electrode. A rod-only electrode caps it at 6 AWG copper
+                (250.66(A)). Terminations must be listed for the conductor material, and aluminum needs the
+                correct compound and torque.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One decision, then one lookup. The decision matters more than the lookup.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># The decision</div>
+            <div>
+              dwelling service <span class="text-slate-400">or</span> feeder carrying the entire dwelling
+              load&nbsp;&nbsp;→&nbsp;&nbsp;<span class="text-amber-300">Table 310.12</span>
+            </div>
+            <div>anything else&nbsp;&nbsp;→&nbsp;&nbsp;<span class="text-amber-300">Table 310.16</span>, 75 °C column</div>
+            <div class="mt-4 text-cyan-300"># What Table 310.12 is doing</div>
+            <div>
+              required ampacity&nbsp;=&nbsp;service rating × <span class="text-amber-300">0.83</span
+              >&nbsp;&nbsp;·&nbsp;&nbsp;200 A → 166 A
+            </div>
+            <div class="mt-4 text-cyan-300"># Key rows (copper / aluminum)</div>
+            <div>100 A → 4 / 2&nbsp;·&nbsp;125 A → 2 / 1/0&nbsp;·&nbsp;150 A → 1 / 2/0</div>
+            <div>
+              <span class="text-amber-300">200 A → 2/0 / 4/0</span>&nbsp;·&nbsp;250 A → 4/0 / 300
+              kcmil&nbsp;·&nbsp;400 A → 400 / 600 kcmil
+            </div>
+            <div class="mt-4 text-cyan-300"># The neutral (220.61, 250.24(C))</div>
+            <div>sized for the maximum unbalanced load, but never smaller than the required GEC</div>
+            <div class="mt-4 text-cyan-300"># Then check the run</div>
+            <div>VD&nbsp;=&nbsp;2 × K × I × L ÷ CM&nbsp;&nbsp;→&nbsp;&nbsp;upsize if over 3%</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why dwellings get a break</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A house's calculated load already has demand factors baked in, and real peaks are short. The
+                83% allowance recognises that a 200 A residential service almost never sees 200 A long enough
+                to heat a conductor to its limit.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">"Entire load" is the test</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The allowance covers the service and the one feeder that carries everything. Split the load
+                across two feeders and neither qualifies — both go back to Table 310.16.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The reduced neutral</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                240 V loads like ranges, dryers, and AC put nothing on the neutral, so 220.61 lets it shrink.
+                That's why 4/0-4/0-2/0 aluminum SER exists as a stock item.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Long runs still bite</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A 200 A service 250 feet from the transformer needs more copper than the table says. Rural and
+                long-driveway services are where the voltage-drop check earns its keep.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The standard 200 A service, the garage subpanel that catches everyone, and a long run that beats the
+          table.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">200 A house service — 100 ft, aluminum</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Dwelling service · aluminum · 100 ft · 240 V. The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required ampacity = 200 × 0.83 = 166 A<br />
+              Table 310.12, 200 A aluminum → 4/0 AWG<br />
+              drop = 2 × 21.2 × 200 × 100 ÷ 211,600 = 4.01 V = 1.67% ✓<br />
+              GEC (Table 250.66, 4/0 Al service) = 4 AWG copper<br />
+              → <span class="font-bold text-blue-700">4/0 aluminum · 4 AWG copper GEC</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the most common residential service in
+              the United States. Note that Table 310.16 rates 4/0 aluminum at only 180 A — the 83% allowance is
+              what makes this legal.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">200 A detached garage subpanel — the trap</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Not a dwelling service and not carrying the whole load · aluminum · 240 V.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              83% allowance does <span class="font-bold text-rose-700">not</span> apply<br />
+              Table 310.16, 75 °C aluminum: 4/0 = 180 A &lt; 200 A ✗<br />
+              next size: 250 kcmil aluminum = 205 A ✓<br />
+              → <span class="font-bold text-blue-700">250 kcmil aluminum, or 2/0 copper</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same 4/0 aluminum that serves a
+              200 A house is <em>undersized</em> for a 200 A garage feeder. This is the single most common
+              error in online electrical advice, and it fails inspection.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">100 A service, 150 ft, copper — drop governs</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Dwelling service · copper · 150 ft · 240 V.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 310.12, 100 A copper → 4 AWG<br />
+              4 AWG drop = 2 × 12.9 × 100 × 150 ÷ 41,740 = 9.27 V =
+              <span class="font-bold text-rose-700">3.86% ✗</span><br />
+              3 AWG = 7.36 V = 3.06% ✗ · 2 AWG = 5.83 V = 2.43% ✓<br />
+              → <span class="font-bold text-blue-700">2 AWG copper — two sizes up from the table</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the table gets you 4 AWG; 150 feet of
+              run costs two more sizes. Long services from a pole or a distant transformer routinely land here.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Table 310.12 vs Table 310.16 — what the 83% allowance buys
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The left pair is what a dwelling service may use. The right pair is what the same rating needs as
+            any other feeder. The gap is usually one conductor size, and occasionally two.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-4 font-semibold">Rating</th>
+                  <th class="py-3 px-4 font-semibold">Cu — dwelling</th>
+                  <th class="py-3 px-4 font-semibold">Al — dwelling</th>
+                  <th class="py-3 px-4 font-semibold">Cu — other feeder</th>
+                  <th class="py-3 px-4 font-semibold">Al — other feeder</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  comparisonTable.map((row, index) => (
+                    <tr class={index === comparisonTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.rating} A</td>
+                      <td class="py-3 px-4 font-semibold text-blue-700">{row.cu12}</td>
+                      <td class="py-3 px-4 font-semibold text-blue-700">{row.al12}</td>
+                      <td class="py-3 px-4 text-slate-500">{row.cu16}</td>
+                      <td class="py-3 px-4 text-slate-500">{row.al16}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — Table 310.12 dwelling services and feeders, Table
+            310.16 conductor ampacities, 220.61 neutral load, 250.24(C) minimum service neutral, Table 250.66
+            grounding electrode conductor, 110.14(C) termination temperature, 230.42 service conductor sizing,
+            210.19(A) Informational Note on voltage drop. Local amendments and utility requirements override the
+            model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about service conductors, the 83% rule, and subpanel feeders."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalServiceWireSizeCalculator } from "@/scripts/calculators/electrical-service-wire-size-calculator";
+    initElectricalServiceWireSizeCalculator();
+  </script>
+</Layout>

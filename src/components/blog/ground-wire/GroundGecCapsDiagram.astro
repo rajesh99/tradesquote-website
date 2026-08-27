@@ -1,0 +1,72 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Table 250.66 with the 250.66(A)–(C) caps overlaid. The caps are the reason a 200 A
+ * service with driven rods only needs 6 AWG copper even though the table says 4 —
+ * mirrors gecSize() in src/lib/nec.ts.
+ */
+const tableRows = [
+  { copperService: "2 AWG or smaller", alService: "1/0 or smaller", gec: "8 AWG" },
+  { copperService: "1 or 1/0", alService: "2/0 or 3/0", gec: "6 AWG" },
+  { copperService: "2/0 or 3/0", alService: "4/0 or 250 kcmil", gec: "4 AWG", common: true },
+  { copperService: "over 3/0 – 350 kcmil", alService: "over 250 – 500 kcmil", gec: "2 AWG" },
+  { copperService: "over 350 – 600 kcmil", alService: "over 500 – 900 kcmil", gec: "1/0 AWG" },
+];
+
+const caps = [
+  { electrode: "Rod, pipe or plate", cap: "6 AWG Cu", rule: "250.66(A)", accent: C.primary },
+  { electrode: "Concrete-encased", cap: "4 AWG Cu", rule: "250.66(B)", accent: C.blue },
+  { electrode: "Ground ring", cap: "≤ the ring", rule: "250.66(C)", accent: C.orange },
+  { electrode: "Metal water pipe", cap: "no cap", rule: "full table", accent: C.red },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" fill="none" aria-hidden="true">
+  <title>Table 250.66 grounding electrode conductor sizes and the caps that reduce them</title>
+  <desc>
+    Grounding electrode conductor by the size of the largest ungrounded service-entrance conductor. A copper
+    service of 2 AWG or smaller takes an 8 AWG copper conductor; 1 or 1/0 takes 6 AWG; 2/0 or 3/0 takes 4 AWG;
+    over 3/0 through 350 kcmil takes 2 AWG; over 350 through 600 kcmil takes 1/0. The caps then apply by
+    electrode type: to a rod, pipe or plate the conductor need not exceed 6 AWG copper under 250.66(A); to a
+    concrete-encased electrode 4 AWG under 250.66(B); to a ground ring, no larger than the ring conductor
+    itself under 250.66(C); and to a metal water pipe there is no cap, so the full table size applies.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="364" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Grounding electrode conductor — Table 250.66, then the caps</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Read the table, then check whether your electrode caps it smaller</text>
+
+  <text x="44" y="86" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">COPPER SERVICE</text>
+  <text x="264" y="86" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">ALUMINUM SERVICE</text>
+  <text x="540" y="86" fill={C.primary} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">COPPER GEC</text>
+  <line x1="24" y1="94" x2="696" y2="94" stroke={C.border} />
+
+  {tableRows.map((r, i) => {
+    const y = 102 + i * 30;
+    const fill = r.common ? C.primaryLight : C.white;
+    const stroke = r.common ? C.primary : C.border;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="25" rx="5" fill={fill} stroke={stroke} stroke-width={r.common ? "1.5" : "0.8"} />
+        <text x="44" y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={r.common ? "700" : "600"}>{r.copperService}</text>
+        <text x="264" y={y + 17} fill={C.muted} font-family={FONT} font-size="10.5">{r.alService}</text>
+        <text x="540" y={y + 17} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{r.gec}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="278" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Then the electrode caps it — 250.66(A) through (C)</text>
+
+  {caps.map((c, i) => {
+    const x = 24 + i * 170;
+    return (
+      <g>
+        <rect x={x} y="290" width="156" height="66" rx="9" fill={C.white} stroke={c.accent} stroke-width="1.4" />
+        <text x={x + 12} y="310" fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{c.electrode}</text>
+        <text x={x + 12} y="332" fill={c.accent} font-family={FONT} font-size="14" font-weight="800">{c.cap}</text>
+        <text x={x + 12} y="348" fill={C.muted} font-family={FONT} font-size="8.5">{c.rule}</text>
+      </g>
+    );
+  })}
+</svg>

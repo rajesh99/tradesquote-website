@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Which equipment is rated in which unit, and why. The rule underneath is simple:
+ * anything limited by heating in its conductors is rated kVA, and anything
+ * limited by a prime mover's torque is rated kW.
+ */
+const items = [
+  {
+    kind: "kVA",
+    accent: C.blue,
+    what: "Transformers",
+    why: "Limited by winding heating, which follows current. The transformer cannot know the load's power factor.",
+  },
+  {
+    kind: "kVA",
+    accent: C.blue,
+    what: "UPS and inverters",
+    why: "Same reason — often dual-rated, e.g. 1,500 VA / 900 W, and the smaller number usually binds.",
+  },
+  {
+    kind: "kVA",
+    accent: C.blue,
+    what: "Service and feeder capacity",
+    why: "Conductors and breakers carry amps. NEC load calculations work in VA for exactly this reason.",
+  },
+  {
+    kind: "kW",
+    accent: C.green,
+    what: "Motors",
+    why: "Rated by mechanical output — horsepower or kW at the shaft. Input kVA is always higher.",
+  },
+  {
+    kind: "kW",
+    accent: C.green,
+    what: "Generators",
+    why: "Limited by engine torque. But 3-phase sets are rated at 0.8 PF, so a 20 kW set is 25 kVA.",
+  },
+  {
+    kind: "kW",
+    accent: C.green,
+    what: "Heaters and elements",
+    why: "Purely resistive, so kW and kVA are the same number and the distinction disappears.",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Which equipment is rated in kVA and which in kW</title>
+  <desc>
+    Transformers, UPS units and inverters, and service and feeder capacity are all rated in kVA because they are
+    limited by conductor and winding heating, which follows current regardless of power factor. Motors, generators and
+    resistive heaters are rated in kW because they are limited by mechanical output or are purely resistive. Note that
+    three-phase generators are rated at 0.8 power factor, so a 20 kilowatt set is a 25 kVA machine.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why the nameplate says one or the other</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Limited by conductor heating → kVA. Limited by mechanical output → kW.</text>
+
+  {items.map((it, i) => {
+    const y = 64 + i * 32;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="28" rx="6" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="28" rx="2" fill={it.accent} />
+        <rect x="38" y={y + 6} width="38" height="16" rx="4" fill={it.accent} opacity="0.18" />
+        <text x="57" y={y + 18} text-anchor="middle" fill={it.accent} font-family={FONT} font-size="8.5" font-weight="800">{it.kind}</text>
+        <text x="88" y={y + 18} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{it.what}</text>
+        <text x="256" y={y + 18} fill={C.muted} font-family={FONT} font-size="8.5">{it.why}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">The trap: reading a three-phase generator's kW figure as if it were kVA. At 0.8 PF they differ by 25%.</text>
+</svg>

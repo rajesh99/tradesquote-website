@@ -1,0 +1,70 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The direction that actually matters day to day: you decide a margin, and this
+ * is the markup that reaches it. The multipliers on the right are what to write
+ * on the inside of the van door.
+ */
+const rows = [10, 15, 20, 25, 30, 35, 40, 50].map((margin) => {
+  const markup = (margin / (100 - margin)) * 100;
+  return { margin, markup, multiplier: 1 / (1 - margin / 100) };
+});
+
+const peak = 100;
+const BAR_X = 128;
+const BAR_MAX = 320;
+const w = (v: number) => Math.max(4, Math.round((v / peak) * BAR_MAX));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>The markup needed to hit a target margin</title>
+  <desc>
+    To reach a 20 percent margin you need a 25 percent markup, or multiply break-even cost by 1.25. A 30 percent
+    margin needs a 42.9 percent markup or a multiplier of 1.429, a 40 percent margin needs a 66.7 percent markup,
+    and a 50 percent margin needs a 100 percent markup — doubling the cost.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="292" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Decide the margin, then find the markup
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    markup = margin ÷ (100 − margin). Or skip it: divide break-even cost by (1 − margin).
+  </text>
+
+  {rows.map((r, i) => {
+    const y = 68 + i * 26;
+    const notable = r.margin === 25 || r.margin === 30;
+    return (
+      <g>
+        <text
+          x="28"
+          y={y + 14}
+          fill={notable ? C.dark : C.muted}
+          font-family={FONT}
+          font-size="10"
+          font-weight={notable ? "800" : "600"}
+        >
+          {`${r.margin}% margin`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={w(r.markup)} height="16" rx="3" fill={C.blue} opacity="0.2" />
+        <rect x={BAR_X} y={y + 2} width={w(r.markup)} height="16" rx="3" fill="none" stroke={C.blue} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 14} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="800">
+          {`${r.markup.toFixed(1)}% markup`}
+        </text>
+        <text x={BAR_X + w(r.markup) + 12} y={y + 14} fill={C.primary} font-family={FONT} font-size="9.5" font-weight="700">
+          {`× ${r.multiplier.toFixed(3)}`}
+        </text>
+        <text x={BAR_X + w(r.markup) + 62} y={y + 14} fill={C.muted} font-family={FONT} font-size="8.5">
+          on break-even cost
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="282" x2="696" y2="282" stroke={C.border} />
+  <text x="28" y="298" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    Break-even must already include overhead. A margin applied to direct cost alone pays for no office.
+  </text>
+</svg>

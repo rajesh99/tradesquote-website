@@ -1,0 +1,648 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { CONDUCTOR_SIZES, STANDARD_OCPD, TABLE_250_66, TABLE_250_122, sizeLabel } from "@/lib/nec";
+
+const title = "Ground Wire Size Calculator — NEC 250.122 & 250.66 | TradesQuote";
+const description =
+  "Free ground wire size calculator. Equipment grounding conductor from the breaker rating (Table 250.122) and grounding electrode conductor from the service conductors (Table 250.66) — including the rod and concrete-encased electrode caps and the 250.122(B) proportional upsize.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-ground-wire-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Ground Wire Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Ground Wire Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC grounding conductor calculator covering equipment grounding conductors from Table 250.122 and grounding electrode conductors from Table 250.66, with the 250.66 electrode exceptions and the 250.122(B) proportional upsize.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size ground wire for a 200 amp service?",
+    answer:
+      "Two different answers, because a 200 A service involves two different grounding conductors. The <strong>equipment grounding conductor</strong> for a 200 A overcurrent device is <strong>6 AWG copper</strong> from Table 250.122. The <strong>grounding electrode conductor</strong> depends on the service conductors — for typical 2/0 or 3/0 copper it is <strong>4 AWG copper</strong> from Table 250.66, but if the only electrode is a driven ground rod, 250.66(A) caps it at <strong>6 AWG</strong>. People arguing about \"4 or 6\" are usually both right about different conductors.",
+  },
+  {
+    question: "What's the difference between an EGC and a GEC?",
+    answer:
+      "An <strong>equipment grounding conductor</strong> is the fault-return path: it bonds metal enclosures back to the source so a ground fault has a low-impedance route that trips the breaker. It is sized from the <strong>overcurrent device rating</strong> (Table 250.122), because its job is to carry fault current long enough to open that device. A <strong>grounding electrode conductor</strong> connects the system to earth — lightning, static, and voltage stabilisation. It is sized from the <strong>service-entrance conductors</strong> (Table 250.66). Different jobs, different tables, and neither substitutes for the other.",
+  },
+  {
+    question: "Does the ground wire have to match the hot wires?",
+    answer:
+      "No, and it is normally much smaller. An equipment grounding conductor only carries current during a fault, for the fraction of a second before the breaker opens — so it is sized for that brief duty, not for continuous load. A 200 A feeder on 3/0 copper takes only a 6 AWG EGC. The exception is when the ungrounded conductors are upsized, which triggers 250.122(B).",
+  },
+  {
+    question: "Why does a ground rod only need 6 AWG?",
+    answer:
+      "Because <strong>NEC 250.66(A)</strong> says the portion of a grounding electrode conductor that is the sole connection to a rod, pipe, or plate electrode need not be larger than <strong>6 AWG copper</strong>. The logic is that the rod itself is the limiting factor — a driven rod's contact resistance with the earth is measured in ohms, so a conductor larger than 6 AWG cannot improve the connection. Similar caps exist at 4 AWG for concrete-encased electrodes (250.66(B)) and at the ring size for a ground ring (250.66(C)).",
+  },
+  {
+    question: "Can I use aluminum for a grounding conductor?",
+    answer:
+      "Yes, with restrictions. Both tables list aluminum sizes. But <strong>NEC 250.64(A)</strong> prohibits aluminum or copper-clad aluminum grounding electrode conductors in direct contact with masonry or earth, or where subject to corrosive conditions, and requires them to be kept at least 18 inches above earth when used outdoors. In practice most GECs are copper for exactly this reason.",
+  },
+  {
+    question: "Do I upsize the ground when I upsize for voltage drop?",
+    answer:
+      '<strong>Yes.</strong> NEC 250.122(B) requires the EGC to be increased proportionally whenever the ungrounded conductors are increased in size — and it does not matter <em>why</em> you increased them. The ratio is by circular mils. If 12 AWG (6,530 cmil) goes to 8 AWG (16,510 cmil) for voltage drop, that is a factor of 2.53, so a 12 AWG EGC scales to 16,510 cmil and becomes 8 AWG. Toggle the upsize option above to run this. See the <a href="/calculators/electrical/electrical-voltage-drop-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Voltage Drop Calculator</a> for when upsizing is needed.',
+  },
+  {
+    question: "Is the neutral a grounding conductor?",
+    answer:
+      "No. The neutral is a <em>grounded</em> conductor — it carries normal unbalanced load current as part of the circuit. A <em>grounding</em> conductor carries current only during a fault. They are bonded together at exactly one point, the service disconnect, and must be kept separate everywhere downstream (NEC 250.24(A)(5) and 250.142). Bonding neutral to ground in a subpanel is one of the most common and most serious wiring errors, because it puts load current onto the grounding system.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Grounding sized? Price the service work in seconds.";
+const ctaDescription =
+  "Grounding is a handful of line items that inspectors always check. TradesQuote turns the whole job — conductors, clamps, rods, bonding, and labor — into a detailed line-item estimate with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "The conductors that set the GEC size.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "The OCPD rating that sets the EGC size.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size the ungrounded conductors first.",
+  },
+  {
+    href: "/calculators/electrical/electrical-box-fill-calculator",
+    title: "Box Fill Calculator",
+    description: "Where all the grounds count as one.",
+  },
+];
+
+const ocpdOptions = STANDARD_OCPD.filter((r) => r <= 600);
+const serviceOptions = CONDUCTOR_SIZES.filter((s) => s.cmil >= 16510).map((s) => s.label);
+const upsizeOptions = CONDUCTOR_SIZES.filter((s) => s.cmil <= 211600).map((s) => s.label);
+
+const styles = electricalAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ground Wire Size Calculator — NEC 250.122 & 250.66" />
+    <meta
+      property="og:description"
+      content="EGC from the breaker rating, GEC from the service conductors — with the rod and concrete-encased electrode caps and the 250.122(B) upsize."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ground Wire Size Calculator — NEC 250.122 & 250.66" />
+    <meta
+      name="twitter:description"
+      content="Two grounding conductors, two different tables, and the exceptions that catch people out. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Ground Wire Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Ground Wire Size Calculator <span class="text-emerald-600">— EGC and GEC</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              "What size ground wire?" has two answers, because there are two different grounding conductors
+              doing two different jobs. The <strong>equipment grounding conductor</strong> is sized from the
+              breaker (Table 250.122). The <strong>grounding electrode conductor</strong> is sized from the
+              service conductors (Table 250.66) — and then capped by the electrode you are connecting to. This
+              calculator does both, and shows you exactly where the exception overrides the table.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v10M5 15h14M7.5 18h9M10 21h4"></path>
+            </svg>
+            Size the grounding conductor
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div>
+                <label for="gw-mode" class="text-sm font-semibold text-slate-800">Which conductor?</label>
+                <select
+                  id="gw-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="EGC" selected>Equipment grounding conductor (EGC)</option>
+                  <option value="GEC">Grounding electrode conductor (GEC)</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  EGC = fault-return path to the breaker. GEC = connection to the earth electrode.
+                </p>
+              </div>
+
+              <div>
+                <label for="gw-material" class="text-sm font-semibold text-slate-800">Grounding conductor material</label>
+                <select
+                  id="gw-material"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="copper" selected>Copper</option>
+                  <option value="aluminum">Aluminum / copper-clad</option>
+                </select>
+              </div>
+
+              <div id="gw-egc-fields">
+                <label for="gw-ocpd" class="text-sm font-semibold text-slate-800">Overcurrent device rating</label>
+                <select
+                  id="gw-ocpd"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  {
+                    ocpdOptions.map((rating) => (
+                      <option value={rating} selected={rating === 200}>
+                        {rating} A
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div id="gw-gec-fields" class="hidden space-y-5">
+                <div>
+                  <label for="gw-service" class="text-sm font-semibold text-slate-800">
+                    Largest ungrounded service conductor
+                  </label>
+                  <select
+                    id="gw-service"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    {
+                      serviceOptions.map((label) => (
+                        <option value={label} selected={label === "3/0"}>
+                          {sizeLabel(label)}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="gw-service-material" class="text-sm font-semibold text-slate-800">
+                    Service conductor material
+                  </label>
+                  <select
+                    id="gw-service-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum / copper-clad</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="gw-electrode" class="text-sm font-semibold text-slate-800">Electrode type</label>
+                  <select
+                    id="gw-electrode"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="concrete-encased" selected>Concrete-encased (Ufer) — 4 AWG cap</option>
+                    <option value="rod">Ground rod or pipe — 6 AWG cap</option>
+                    <option value="plate">Plate electrode — 6 AWG cap</option>
+                    <option value="ground-ring">Ground ring — no larger than the ring</option>
+                    <option value="water-pipe">Metal water pipe — no cap</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    250.66(A), (B), and (C) cap the GEC where the electrode itself is the limiting factor.
+                  </p>
+                </div>
+              </div>
+
+              <div id="gw-upsize-fields" class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <label for="gw-upsized" class="text-sm font-semibold text-slate-800">
+                  Were the ungrounded conductors upsized?
+                </label>
+                <select
+                  id="gw-upsized"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                >
+                  <option value="no" selected>No</option>
+                  <option value="yes">Yes — apply 250.122(B)</option>
+                </select>
+                <div class="mt-3 grid grid-cols-2 gap-3">
+                  <div>
+                    <label for="gw-upsized-from" class="text-xs font-medium text-slate-600">From</label>
+                    <select
+                      id="gw-upsized-from"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-2.5 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    >
+                      {
+                        upsizeOptions.map((label) => (
+                          <option value={label} selected={label === "12"}>
+                            {sizeLabel(label)}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label for="gw-upsized-to" class="text-xs font-medium text-slate-600">To</label>
+                    <select
+                      id="gw-upsized-to"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-2.5 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    >
+                      {
+                        upsizeOptions.map((label) => (
+                          <option value={label} selected={label === "8"}>
+                            {sizeLabel(label)}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="gw-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Minimum grounding conductor</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="gw-size" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-emerald-600">
+                  6 AWG copper
+                </span>
+              </div>
+              <p id="gw-note" class="mt-1 text-sm font-semibold text-slate-700">
+                A 200 A overcurrent device requires a 6 AWG copper equipment grounding conductor.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Table used</p>
+                  <p id="gw-table" class="mt-1 text-lg font-bold text-slate-900">Table 250.122</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Exception applied</p>
+                  <p id="gw-exception" class="mt-1 text-lg font-bold text-slate-900">—</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor type</span><span id="gw-bd-mode" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Sized from</span><span id="gw-bd-input" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Table says</span><span id="gw-bd-table-size" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Electrode cap</span><span id="gw-bd-exception" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>250.122(B) upsize</span><span id="gw-bd-upsize" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Final size</span><span id="gw-bd-final" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Aluminum GECs may not contact earth or masonry and must be kept 18 inches above earth outdoors
+                (250.64(A)). Parallel conductor sets and separately derived systems have additional rules.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Two lookups and one multiplication. The hard part is knowing which conductor you are sizing.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Equipment grounding conductor (Table 250.122)</div>
+            <div>EGC&nbsp;=&nbsp;lookup by <span class="text-amber-300">overcurrent device rating</span></div>
+            <div>15 A → 14 · 20 A → 12 · 60 A → 10 · 100 A → 8 · 200 A → 6 · 400 A → 3 &nbsp;<span class="text-slate-400">(copper)</span></div>
+            <div class="mt-4 text-cyan-300"># Grounding electrode conductor (Table 250.66)</div>
+            <div>GEC&nbsp;=&nbsp;lookup by <span class="text-amber-300">largest service-entrance conductor</span></div>
+            <div>2 AWG or smaller → 8 · 1–1/0 → 6 · 2/0–3/0 → 4 · to 350 kcmil → 2 &nbsp;<span class="text-slate-400">(copper)</span></div>
+            <div class="mt-4 text-cyan-300"># Then cap the GEC by the electrode (250.66(A)(B)(C))</div>
+            <div>rod, pipe, or plate → never larger than <span class="text-amber-300">6 AWG</span> copper</div>
+            <div>concrete-encased → never larger than <span class="text-amber-300">4 AWG</span> copper</div>
+            <div>ground ring → never larger than the ring conductor itself</div>
+            <div class="mt-4 text-cyan-300"># If the ungrounded conductors were upsized (250.122(B))</div>
+            <div>
+              EGC cmil&nbsp;=&nbsp;table EGC cmil × (new conductor cmil ÷ original conductor cmil)
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">EGC follows the breaker</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Its job is to carry fault current long enough to open that specific device, so the device
+                rating is the only input. Conductor size doesn't enter it — unless 250.122(B) applies.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">GEC follows the service</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It has to handle whatever the service can deliver into the earth connection, so it scales with
+                the service-entrance conductors rather than with any breaker.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The electrode is the bottleneck</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A driven rod's resistance to earth is measured in ohms. Nothing above 6 AWG improves that
+                connection, which is why 250.66(A) stops there. Concrete-encased rebar is better, so it earns
+                4 AWG.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Grounded ≠ grounding</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The neutral is a grounded conductor carrying load current. The EGC is a grounding conductor
+                carrying fault current only. They bond at exactly one point — the service disconnect — and
+                nowhere else.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A branch circuit, the 200 A service where the table and the exception disagree, and the voltage-drop
+          upsize that drags the ground up with it.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">20 A kitchen circuit — EGC</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">20 A breaker · copper EGC · conductors not upsized.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 250.122, 20 A row → <span class="font-bold text-emerald-700">12 AWG copper</span><br />
+              (aluminum column would be 10 AWG)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the 12 AWG bare or green conductor in
+              standard 12/2 NM-B cable. Which is why the cable is built the way it is.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">200 A residential service — both conductors</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              200 A main breaker · 3/0 copper service conductors · copper grounding conductors.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              EGC: Table 250.122, 200 A → <span class="font-bold text-emerald-700">6 AWG copper</span><br />
+              GEC: Table 250.66, 3/0 copper → 4 AWG copper<br />
+              &nbsp;&nbsp;· to concrete-encased rebar → <span class="font-bold text-emerald-700">4 AWG</span>
+              (250.66(B) cap is also 4)<br />
+              &nbsp;&nbsp;· to a driven rod only → <span class="font-bold text-amber-700">6 AWG</span>
+              (250.66(A) caps it)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> this is the source of the endless "is it
+              4 or 6?" argument. The table says 4 AWG; the electrode exception can pull it back to 6 AWG. Both
+              are correct — for different electrodes.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Long 20 A run upsized for voltage drop — EGC</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              20 A breaker · conductors upsized from 12 AWG to 8 AWG for a long run · copper EGC.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              base EGC from Table 250.122 = 12 AWG (6,530 cmil)<br />
+              upsize ratio = 16,510 ÷ 6,530 = 2.53<br />
+              required = 6,530 × 2.53 = 16,510 cmil<br />
+              → <span class="font-bold text-emerald-700">8 AWG copper</span> (16,510 cmil — the smallest listed
+              size that meets it)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the EGC goes from 12 AWG to 8 AWG purely
+              because the hots were upsized for voltage drop. NEC 250.122(B) is routinely missed on long runs,
+              and it is exactly the kind of thing an inspector checks.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The two grounding tables</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Table 250.122 sizes the equipment grounding conductor from the overcurrent device. Table 250.66
+            sizes the grounding electrode conductor from the service conductors — then the 250.66 exceptions
+            cap it.
+          </p>
+
+          <div class="mt-8 grid lg:grid-cols-2 gap-6">
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+                <h3 class="font-bold text-slate-900">EGC — Table 250.122</h3>
+                <p class="mt-0.5 text-xs text-slate-500">By overcurrent device rating</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Device</th>
+                    <th class="py-2.5 px-5 font-semibold">Copper</th>
+                    <th class="py-2.5 px-5 font-semibold">Aluminum</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    TABLE_250_122.map((row, index) => (
+                      <tr class={index === TABLE_250_122.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 font-semibold text-slate-900">{row.maxOcpd} A</td>
+                        <td class="py-2.5 px-5">{sizeLabel(row.copper)}</td>
+                        <td class="py-2.5 px-5">{sizeLabel(row.aluminum)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+                <h3 class="font-bold text-slate-900">GEC — Table 250.66</h3>
+                <p class="mt-0.5 text-xs text-slate-500">By largest service-entrance conductor</p>
+              </div>
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    <th class="py-2.5 px-5 font-semibold">Service conductor (Cu)</th>
+                    <th class="py-2.5 px-5 font-semibold">Copper</th>
+                    <th class="py-2.5 px-5 font-semibold">Aluminum</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  {
+                    TABLE_250_66.map((row, index) => (
+                      <tr class={index === TABLE_250_66.length - 1 ? "" : "border-b border-slate-100"}>
+                        <td class="py-2.5 px-5 text-xs">{row.copperRange}</td>
+                        <td class="py-2.5 px-5 font-semibold text-slate-900">{sizeLabel(row.copper)}</td>
+                        <td class="py-2.5 px-5">{sizeLabel(row.aluminum)}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+              <div class="border-t border-slate-200 bg-slate-50 px-5 py-3">
+                <p class="text-xs text-slate-500">
+                  Caps: rod, pipe, or plate 6 AWG Cu (250.66(A)) · concrete-encased 4 AWG Cu (250.66(B)) ·
+                  ground ring no larger than the ring (250.66(C)).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — Table 250.122 equipment grounding conductor sizing,
+            250.122(B) proportional increase, Table 250.66 grounding electrode conductor sizing, 250.66(A)(B)(C)
+            electrode caps, 250.64(A) aluminum GEC restrictions, 250.24(A)(5) and 250.142 on neutral-to-ground
+            bonding, 250.52 electrode types. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about EGC and GEC sizing, and the electrode exceptions."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalGroundWireSizeCalculator } from "@/scripts/calculators/electrical-ground-wire-size-calculator";
+    initElectricalGroundWireSizeCalculator();
+  </script>
+</Layout>

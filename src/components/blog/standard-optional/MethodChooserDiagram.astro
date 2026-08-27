@@ -1,0 +1,83 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Five methods, not two. Most of the confusion around "standard vs optional"
+ * comes from treating it as a binary choice when the situation usually picks the
+ * method for you — and when the strongest one, 220.87, is not a calculation of
+ * the load at all but a measurement of it.
+ */
+const methods = [
+  {
+    section: "220 Part III",
+    name: "Standard method",
+    when: "Any dwelling. The only method for non-dwellings.",
+    note: "Always available. More work, and usually a larger answer.",
+    accent: C.blue,
+  },
+  {
+    section: "220.82",
+    name: "Optional — new dwelling",
+    when: "A one-family dwelling or an individual unit, served at 100 A or more.",
+    note: "First 10 kVA at 100%, remainder at 40%, plus the largest HVAC term.",
+    accent: C.primary,
+  },
+  {
+    section: "220.83",
+    name: "Optional — adding load",
+    when: "Adding to an existing dwelling with existing loads in place.",
+    note: "The right method when a heat pump or EVSE is being added.",
+    accent: C.green,
+  },
+  {
+    section: "220.84",
+    name: "Optional — multifamily",
+    when: "Three or more units, each with electric cooking, meeting the conditions.",
+    note: "Demand factors by unit count. Falls very fast with size.",
+    accent: C.orange,
+  },
+  {
+    section: "220.87",
+    name: "Measured existing load",
+    when: "An existing service with 12 months of utility demand data.",
+    note: "Not a calculation — a measurement. Almost always the smallest answer.",
+    accent: C.red,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The five load calculation methods and when each applies</title>
+  <desc>
+    Article 220 offers five routes. The Part III standard method is always available and is the only method for
+    non-dwellings. 220.82 is the optional method for a new dwelling, 220.83 for adding load to an existing
+    dwelling, 220.84 for multifamily buildings, and 220.87 establishes an existing load from twelve months of
+    measured utility demand rather than by calculation.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Five methods, and the situation usually picks one
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    "Standard vs optional" is a false binary — the real question is which of these five fits the job.
+  </text>
+
+  {methods.map((m, i) => {
+    const y = 68 + i * 44;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="38" rx="7" fill={C.white} stroke={m.accent} stroke-width="1.5" />
+        <rect x="24" y={y} width="5" height="38" rx="2.5" fill={m.accent} />
+        <text x="42" y={y + 16} fill={m.accent} font-family={FONT} font-size="9.5" font-weight="800">{m.section}</text>
+        <text x="128" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{m.name}</text>
+        <text x="304" y={y + 16} fill={C.dark} font-family={FONT} font-size="9">{m.when}</text>
+        <text x="42" y={y + 31} fill={C.muted} font-family={FONT} font-size="8.5">{m.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="28" y="288" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">
+    The optional methods are permissions, not obligations — the standard method is always legal.
+  </text>
+</svg>

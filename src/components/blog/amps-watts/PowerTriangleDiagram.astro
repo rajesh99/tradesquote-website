@@ -1,0 +1,86 @@
+---
+import { ampsToVoltAmps, ampsToWatts, fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The power triangle drawn to scale for 20 A at 120 V, PF 0.8 — which happens to be
+ * an exact 3-4-5 triangle (1,920 W / 1,440 VAR / 2,400 VA), so the geometry below is
+ * the real ratio rather than an artist's impression. 8 VA per pixel.
+ */
+const AMPS = 20;
+const VOLTS = 120;
+const PF = 0.8;
+const SCALE = 9; // VA per pixel
+
+const watts = ampsToWatts(AMPS, "1ph", VOLTS, PF);
+const va = ampsToVoltAmps(AMPS, "1ph", VOLTS);
+const vars = Math.sqrt(va * va - watts * watts);
+const angleDeg = (Math.acos(PF) * 180) / Math.PI;
+
+const x0 = 64;
+const y0 = 252;
+const pLen = watts / SCALE;
+const qLen = vars / SCALE;
+
+const sweep = [1, 0.9, 0.8, 0.7].map((pf) => {
+  const w = ampsToWatts(AMPS, "1ph", VOLTS, pf);
+  return { pf, watts: w, wasted: va - w, vars: Math.sqrt(Math.max(0, va * va - w * w)) };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 312" fill="none" aria-hidden="true">
+  <title>The power triangle for 20 amps at 120 volts and 0.8 power factor</title>
+  <desc>
+    Twenty amps at 120 volts draws 2,400 volt-amperes of apparent power regardless of power factor. At a 0.8 power
+    factor only 1,920 watts of that does work; the remaining component is 1,440 volt-amperes reactive, and the
+    phase angle is 36.9 degrees. Lowering the power factor to 0.9, 0.8 and 0.7 gives 2,160, 1,920 and 1,680 watts
+    from the same 2,400 volt-amperes — the conductor still carries 20 amps in every case.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="296" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`${AMPS} A at ${VOLTS} V is ${fmtInt(va)} VA — whatever the power factor`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Drawn to scale: at PF 0.8 the triangle is an exact 3-4-5.</text>
+
+  {/* Reactive leg */}
+  <line x1={x0 + pLen} y1={y0} x2={x0 + pLen} y2={y0 - qLen} stroke={C.orange} stroke-width="3" />
+  {/* Real leg */}
+  <line x1={x0} y1={y0} x2={x0 + pLen} y2={y0} stroke={C.primary} stroke-width="3.4" />
+  {/* Apparent hypotenuse */}
+  <line x1={x0} y1={y0} x2={x0 + pLen} y2={y0 - qLen} stroke={C.blue} stroke-width="3.4" />
+  {/* Right-angle marker */}
+  <path d={`M${x0 + pLen - 12} ${y0} L ${x0 + pLen - 12} ${y0 - 12} L ${x0 + pLen} ${y0 - 12}`} stroke={C.muted} stroke-width="1.2" fill="none" />
+  {/* Phase angle arc */}
+  <path d={`M${x0 + 48} ${y0} A 48 48 0 0 0 ${x0 + 48 * PF} ${y0 - 48 * Math.sin(Math.acos(PF))}`} stroke={C.muted} stroke-width="1.2" fill="none" />
+  <text x={x0 + 56} y={y0 - 14} fill={C.muted} font-family={FONT} font-size="9.5" font-weight="700">{`φ = ${fmt(angleDeg, 1)}°`}</text>
+
+  <text x={x0 + pLen / 2} y={y0 + 22} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="12" font-weight="800">{`P = ${fmtInt(watts)} W`}</text>
+  <text x={x0 + pLen / 2} y={y0 + 36} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">real power — does work, and is metered</text>
+
+  <text x={x0 + pLen + 12} y={y0 - qLen / 2} fill={C.orange} font-family={FONT} font-size="12" font-weight="800">{`Q = ${fmtInt(vars)} VAR`}</text>
+  <text x={x0 + pLen + 12} y={y0 - qLen / 2 + 15} fill={C.muted} font-family={FONT} font-size="8.5">reactive — what capacitors cancel</text>
+
+  <text x={x0 + 4} y={y0 - qLen - 12} fill={C.blue} font-family={FONT} font-size="12" font-weight="800">{`S = ${fmtInt(va)} VA`}</text>
+  <text x={x0 + 4} y={y0 - qLen + 2} fill={C.muted} font-family={FONT} font-size="8.5">apparent — what the conductor carries</text>
+
+  {/* Power-factor sweep */}
+  <rect x="404" y="76" width="292" height="196" rx="10" fill={C.white} stroke={C.border} />
+  <text x="420" y="98" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`Same ${AMPS} A, same ${fmtInt(va)} VA`}</text>
+  <text x="420" y="114" fill={C.muted} font-family={FONT} font-size="8.5">Only the useful fraction changes.</text>
+  <text x="420" y="136" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">PF</text>
+  <text x="490" y="136" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">REAL POWER</text>
+  <text x="600" y="136" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">DOES NO WORK</text>
+
+  {sweep.map((s, i) => {
+    const y = 158 + i * 27;
+    const accent = s.pf === PF ? C.orange : C.dark;
+    return (
+      <g>
+        <text x="420" y={y} fill={accent} font-family={FONT} font-size="11" font-weight={s.pf === PF ? "800" : "700"}>{s.pf.toFixed(2)}</text>
+        <text x="490" y={y} fill={accent} font-family={FONT} font-size="11.5" font-weight="800">{`${fmtInt(s.watts)} W`}</text>
+        <text x="600" y={y} fill={C.muted} font-family={FONT} font-size="10.5">{`${fmtInt(s.wasted)} VA`}</text>
+      </g>
+    );
+  })}
+
+  <text x="420" y="264" fill={C.muted} font-family={FONT} font-size="8.5">The wire is sized for 20 A in every row.</text>
+</svg>

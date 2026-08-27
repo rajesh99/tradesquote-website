@@ -1,0 +1,60 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * 210.8(A)'s dwelling list, grouped by the reason each location is on it —
+ * because the underlying principle (water, earth contact, or both) predicts the
+ * answer in locations the list doesn't name explicitly.
+ */
+const groups = [
+  {
+    accent: C.blue,
+    reason: "Water within reach",
+    items: ["Bathrooms", "Kitchens — countertop surfaces", "Within 6 ft of any sink", "Bathtub and shower areas", "Laundry areas"],
+  },
+  {
+    accent: C.orange,
+    reason: "Earth contact",
+    items: ["Outdoors", "Garages and accessory buildings", "Unfinished basements", "Crawl spaces at or below grade", "Boathouses"],
+  },
+  {
+    accent: C.primary,
+    reason: "Both, or by equipment",
+    items: ["Indoor damp and wet locations", "Pools, spas and hot tubs (Art. 680)", "Specific appliances — 210.8(D)", "Outdoor outlets — 210.8(F)", "Servicing receptacles — 210.8(E)"],
+  },
+];
+
+const LANE_X = [24, 256, 488];
+const LANE_W = 208;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where GFCI protection is required in a dwelling</title>
+  <desc>
+    GFCI protection is required where water is within reach — bathrooms, kitchen countertop surfaces, within 6 feet of
+    any sink, bathtub and shower areas and laundry areas. It is also required where there is earth contact — outdoors,
+    garages and accessory buildings, unfinished basements, crawl spaces at or below grade and boathouses. Further
+    requirements cover indoor damp and wet locations, pools and spas under Article 680, specific appliances under
+    210.8(D), outdoor outlets under 210.8(F) and receptacles for servicing equipment under 210.8(E).
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">210.8(A), grouped by why each location is on the list</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">The principle predicts locations the list doesn't name: water within reach, or a path to earth.</text>
+
+  {groups.map((g, j) => (
+    <g>
+      <rect x={LANE_X[j]} y="64" width={LANE_W} height="156" rx="10" fill={g.accent} opacity="0.07" />
+      <rect x={LANE_X[j]} y="64" width={LANE_W} height="156" rx="10" fill="none" stroke={g.accent} stroke-width="1.6" />
+      <text x={LANE_X[j] + 16} y="85" fill={g.accent} font-family={FONT} font-size="11.5" font-weight="800">{g.reason}</text>
+      {g.items.map((item, k) => (
+        <g>
+          <circle cx={LANE_X[j] + 20} cy={107 + k * 22} r="2.4" fill={g.accent} />
+          <text x={LANE_X[j] + 30} y={110 + k * 22} fill={C.dark} font-family={FONT} font-size="8.5">{item}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">The 6 ft to a sink is measured along the path a cord would follow — not through a wall, floor or ceiling.</text>
+</svg>

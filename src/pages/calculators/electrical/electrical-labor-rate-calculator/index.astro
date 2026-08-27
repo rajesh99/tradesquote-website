@@ -1,0 +1,618 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { fmt } from "@/lib/nec";
+
+const title = "Electrician Labor Rate Calculator — Loaded Cost & Bill Rate | TradesQuote";
+const description =
+  "Free electrician labor rate calculator. Work out your true loaded cost per billable hour from wage, burden, overhead, and unbillable time — then the rate you must bill to hit your target margin.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-labor-rate-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Labor Rate Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Labor Rate Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online electrician labor rate calculator computing loaded cost per billable hour from wage, payroll burden, annual overhead, and billable utilisation, then the bill rate at a target gross margin.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What should an electrician charge per hour?",
+    answer:
+      "US electricians bill roughly <strong>$50 to $130 per hour</strong> in 2026, commonly with a <strong>$100 to $200</strong> service-call fee covering the first hour. But the right number for <em>your</em> shop is not a market average — it is your loaded cost per billable hour divided by one minus your target margin. Two shops with identical wages can need rates $30 apart because their burden and utilisation differ.",
+  },
+  {
+    question: "Why isn't my rate just wage plus a markup?",
+    answer:
+      "Because you pay for hours you cannot invoice. A tech paid 2,080 hours a year who bills 1,560 has <strong>520 unbillable hours</strong> — travel, shop time, training, warranty callbacks, waiting for inspectors — and every one of those must be recovered from the hours you do bill. Add payroll taxes, workers' comp, liability insurance, the van, fuel, tools, and a phone, and the loaded cost typically lands at <strong>2.5 to 3 times</strong> base wage.",
+  },
+  {
+    question: "What counts as burden?",
+    answer:
+      "Everything you pay because someone is employed, beyond their wage: payroll taxes (FICA, FUTA, SUTA), <strong>workers' compensation</strong> — which is expensive for electrical classifications — health insurance, paid time off, retirement contributions, and any training or licensing you fund. For electrical trades this commonly runs <strong>30% to 45%</strong> of base wage. Get the real figure from your payroll reports rather than guessing.",
+  },
+  {
+    question: "What billable percentage is realistic?",
+    answer:
+      "For residential service work, <strong>65% to 80%</strong> is typical — call it 75% as a planning figure. New-construction and commercial crews on long jobs can reach 85% or better because travel and setup amortise across days rather than hours. Anything above 90% almost certainly means you are not counting warranty work, drive time, or shop time honestly. Track it for a month; the real number is usually lower than the assumed one.",
+  },
+  {
+    question: "Is the overhead figure here my whole business overhead?",
+    answer:
+      "No — the annual overhead field is the <strong>per-technician</strong> cost of keeping that person productive: van, fuel, tools, phone, and their share of insurance. Company-wide overhead like rent, office staff, software, marketing, and owner salary sits in the <strong>margin</strong>, which is why the target margin needs to be 35–50% on service work rather than 15%. Double-counting the same costs in both places will price you out of the market.",
+  },
+  {
+    question: "Should the helper's rate be lower?",
+    answer:
+      "Their <em>cost</em> is lower, so run this calculator separately for each labor class — apprentice, journeyman, master — and use the matching loaded cost when estimating. Whether you <em>bill</em> at different rates is a sales decision. Many shops quote a single blended rate for simplicity, which works as long as the blend reflects your actual crew mix. If you routinely send a two-person crew, estimate at the combined loaded cost of both.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Rate set? Put it straight into an estimate.";
+const ctaDescription =
+  "A defensible hourly rate is only useful when it reaches the customer. Describe the job or upload photos and TradesQuote's AI builds the full line-item estimate — labor at your rate, material, and totals — validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Electrical Estimate Calculator",
+    description: "Feed this rate into a priced job.",
+  },
+  {
+    href: "/calculators/electrical/electrical-panel-upgrade-cost-calculator",
+    title: "Panel Upgrade Cost Calculator",
+    description: "Price a service upgrade at your rate.",
+  },
+  {
+    href: "/calculators/electrical/electrical-rewiring-cost-calculator",
+    title: "Rewiring Cost Calculator",
+    description: "Whole-house rewiring by square foot.",
+  },
+  {
+    href: "/blog/hvac-labor-rate",
+    title: "HVAC Labor Rate Guide",
+    description: "The same loaded-rate math, written up for HVAC.",
+  },
+];
+
+/** How the bill rate moves with utilisation, at the default wage and burden. */
+const utilisationRows = [60, 65, 70, 75, 80, 85].map((pct) => {
+  const annualWage = 32 * 2080;
+  const total = annualWage * 1.35 + 9000;
+  const billableHours = 2080 * (pct / 100);
+  const loaded = total / billableHours;
+  return { pct, loaded, at40: loaded / 0.6, at30: loaded / 0.7 };
+});
+
+const styles = electricalAccentStyles.rose;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Electrician Labor Rate Calculator — Loaded Cost & Bill Rate" />
+    <meta
+      property="og:description"
+      content="Your true cost per billable hour from wage, burden, overhead, and unbillable time — then the rate to bill at your target margin."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Electrician Labor Rate Calculator — Loaded Cost & Bill Rate" />
+    <meta name="twitter:description" content="What you must charge, not what the market averages. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Labor Rate Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · For Contractors · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Labor Rate Calculator <span class="text-rose-600">— Loaded Cost & Bill Rate</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Your hourly rate is not a market average and it is not your wage plus a bit. It is the total cost
+              of employing someone — wage, burden, van, tools — divided by the hours you can actually
+              <strong>invoice</strong>, then grossed up for margin. The step most shops skip is the denominator:
+              you pay for 2,080 hours and bill maybe 1,560, and those 520 unbillable hours have to come from
+              somewhere.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Calculate your rate
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="lr-wage" class="text-sm font-semibold text-slate-800">Base hourly wage</label>
+                  <div class="flex items-center gap-1">
+                    <span class="text-sm text-slate-500">$</span>
+                    <input
+                      id="lr-wage"
+                      type="number"
+                      min="10"
+                      max="200"
+                      step="0.5"
+                      value="32"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                </div>
+                <input
+                  id="lr-wage-range"
+                  type="range"
+                  min="15"
+                  max="100"
+                  step="0.5"
+                  value="32"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>$15</span><span>$100/hr</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Run this separately for each labor class — apprentice, journeyman, master.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="lr-paid-hours" class="text-sm font-semibold text-slate-800">Paid hours per year</label>
+                  <input
+                    id="lr-paid-hours"
+                    type="number"
+                    min="500"
+                    max="3000"
+                    value="2080"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">2,080 = 40 h × 52 weeks</p>
+                </div>
+
+                <div>
+                  <label for="lr-burden" class="text-sm font-semibold text-slate-800">Payroll burden %</label>
+                  <input
+                    id="lr-burden"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value="35"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Taxes, comp, insurance, PTO — 30–45% typical</p>
+                </div>
+
+                <div>
+                  <label for="lr-billable" class="text-sm font-semibold text-slate-800">Billable hours %</label>
+                  <input
+                    id="lr-billable"
+                    type="number"
+                    min="20"
+                    max="100"
+                    value="75"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Track it — 65–80% is realistic for service work</p>
+                </div>
+
+                <div>
+                  <label for="lr-overhead" class="text-sm font-semibold text-slate-800">
+                    Per-tech overhead / year
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="lr-overhead"
+                      type="number"
+                      min="0"
+                      max="100000"
+                      value="9000"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <p class="mt-1 text-xs text-slate-500">Van, fuel, tools, phone — not company overhead</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="lr-margin" class="text-sm font-semibold text-slate-800">Target gross margin %</label>
+                  <input
+                    id="lr-margin"
+                    type="number"
+                    min="0"
+                    max="80"
+                    value="40"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    This covers company overhead — rent, office staff, software, marketing, owner profit. 35–50%
+                    on service work.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="lr-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-rose-100 bg-rose-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Bill rate required</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="lr-bill-rate" class="text-5xl font-extrabold tracking-tight text-rose-600">$105.62</span>
+                <span class="text-lg font-semibold text-slate-600">/hr</span>
+              </div>
+              <p id="lr-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Inside the $50–$130/hr band reported for US electricians in 2026.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Loaded cost / billable hour</p>
+                  <p id="lr-loaded-cost" class="mt-1 text-2xl font-bold text-slate-900">$63.37</p>
+                </div>
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Multiple of wage</p>
+                  <p id="lr-multiplier" class="mt-1 text-2xl font-bold text-slate-900">3.30×</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-rose-100 bg-white" open>
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Annual wage</span><span id="lr-bd-wage" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Burden</span><span id="lr-bd-burden" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Employment cost</span><span id="lr-bd-employment" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Per-tech overhead</span><span id="lr-bd-overhead" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Total annual cost</span><span id="lr-bd-total-cost" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Billable hours</span><span id="lr-bd-billable" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Loaded cost</span><span id="lr-bd-loaded" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Bill rate</span><span id="lr-bd-rate" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Keep per-tech overhead and company overhead separate — counting rent, office staff, and marketing
+                in both the overhead field and the margin will price you out of the market.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — What the person costs you a year</div>
+            <div>annual wage&nbsp;=&nbsp;hourly wage × paid hours</div>
+            <div>employment cost&nbsp;=&nbsp;annual wage × (1 + burden%)</div>
+            <div>total cost&nbsp;=&nbsp;employment cost + per-tech overhead</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Hours you can actually invoice</div>
+            <div>billable hours&nbsp;=&nbsp;paid hours × billable%</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Loaded cost per billable hour</div>
+            <div>loaded cost&nbsp;=&nbsp;total cost ÷ billable hours</div>
+            <div class="mt-4 text-cyan-300"># Step 4 — Gross up for margin</div>
+            <div>bill rate&nbsp;=&nbsp;loaded cost ÷ (<span class="text-amber-300">1 − margin%</span>)</div>
+            <div class="mt-4 text-rose-300"># The trap</div>
+            <div>dividing by <span class="text-amber-300">paid</span> hours instead of <span class="text-amber-300">billable</span> hours understates cost by 25%+</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The denominator is the whole game</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At 75% utilisation, every billable hour has to carry 1.33 hours of cost. Drop to 60% and it
+                carries 1.67 hours. Utilisation moves your required rate more than wage does.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Margin ≠ markup</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Divide by one minus the margin; do not multiply by one plus it. A 40% margin needs a 67% markup.
+                Getting this backwards silently underprices every hour you sell.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Two kinds of overhead</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Van, tools, and phone are per-technician and belong in the cost. Rent, office staff, software,
+                and marketing are company-wide and belong in the margin. Never both.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Workers' comp is the surprise</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Electrical classifications carry high comp rates, which is why burden for the trade sits at
+                30–45% rather than the 20% a general office would see. Use your actual payroll figure.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A journeyman, the same journeyman with poor utilisation, and the mistake of billing off wage.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Journeyman at $32/hr, 75% billable</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              2,080 paid hours · 35% burden · $9,000 per-tech overhead · 40% target margin. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              wage: 32 × 2,080 = $66,560 · burden 35% = $23,296 → $89,856<br />
+              + overhead $9,000 = $98,856 total annual cost<br />
+              billable: 2,080 × 75% = 1,560 h → loaded cost $63.37/h<br />
+              bill rate = 63.37 ÷ 0.60 = <span class="font-bold text-rose-700">$105.62/hr</span> = 3.30× wage
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a $32/hr tech has to bill at $105.62 to
+              return 40%. The 3.3× multiple surprises people, but it is what the arithmetic requires once
+              unbillable hours are counted honestly.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Same tech, utilisation drops to 60%</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A slow season, more drive time, more warranty callbacks.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              billable: 2,080 × 60% = 1,248 h<br />
+              loaded cost = 98,856 ÷ 1,248 = $79.21/h<br />
+              bill rate = 79.21 ÷ 0.60 = <span class="font-bold text-rose-700">$132.02/hr</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 15-point drop in utilisation adds
+              <strong>$26/hr</strong> to the rate you must charge — more than a $5/hr raise would. Improving
+              scheduling and cutting drive time is usually a bigger lever on profitability than raising prices.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">The "double the wage" mistake</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A common rule of thumb, tested against the real numbers.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              "2× wage" gives 32 × 2 = $64/hr<br />
+              actual loaded cost = <span class="font-bold text-rose-700">$63.37/hr</span><br />
+              → margin ≈ <span class="font-bold text-rose-700">1%</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> billing at double the wage almost exactly
+              covers cost and returns nothing. Shops that use this rule stay busy and never accumulate cash —
+              and it is why "we're profitable, we just have no money" is such a common complaint in the trade.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How utilisation moves your rate
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            At $32/hr wage, 35% burden, and $9,000 per-tech overhead — the only variable changing is the
+            percentage of paid hours you can actually invoice.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Billable %</th>
+                  <th class="py-3 px-5 font-semibold">Billable hours</th>
+                  <th class="py-3 px-5 font-semibold">Loaded cost</th>
+                  <th class="py-3 px-5 font-semibold">Bill at 30% margin</th>
+                  <th class="py-3 px-5 font-semibold">Bill at 40% margin</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  utilisationRows.map((row, index) => (
+                    <tr
+                      class={`${index === utilisationRows.length - 1 ? "" : "border-b border-slate-100"} ${row.pct === 75 ? "bg-rose-50" : ""}`}
+                    >
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.pct}%</td>
+                      <td class="py-3 px-5">{Math.round(2080 * (row.pct / 100)).toLocaleString("en-US")} h</td>
+                      <td class="py-3 px-5">${fmt(row.loaded, 2)}</td>
+                      <td class="py-3 px-5">${fmt(row.at30, 2)}</td>
+                      <td class="py-3 px-5 font-semibold text-slate-900">${fmt(row.at40, 2)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: 2026 US electrician rate data from
+            <a
+              href="https://homeguide.com/costs/electrician-cost-per-hour"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">HomeGuide</a
+            >,
+            <a
+              href="https://www.angi.com/articles/how-much-does-it-cost-hire-electrician.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600">Angi</a
+            >, and
+            <a
+              href="https://www.housecallpro.com/resources/how-to-price-electrical-work/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold text-rose-700 underline decoration-rose-300 hover:decoration-rose-600"
+              >Housecall Pro</a
+            >; wage data from the U.S. Bureau of Labor Statistics; labor units from the NECA Manual of Labor
+            Units. Ranges are market observations, not quotes. Use your own payroll and utilisation figures —
+            the market average is not your number.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about electrician labor rates, burden, and utilisation."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalLaborRateCalculator } from "@/scripts/calculators/electrical-labor-rate-calculator";
+    initElectricalLaborRateCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The four constraints that actually bind, ranked by how few fixtures each
+ * permits. Circuit ampacity comes last by an order of magnitude, which is the
+ * point — every practical limit on an LED lighting circuit is something other
+ * than the breaker.
+ */
+const DIMMER_LED_WATTS = 150;
+const TRIM_WATTS = 9;
+const CIRCUIT_AMPS = 15;
+const VOLTS = 120;
+
+const limits = [
+  {
+    name: "The dimmer's LED rating",
+    count: Math.floor(DIMMER_LED_WATTS / TRIM_WATTS),
+    detail: `A 600 W dimmer is often rated only ${DIMMER_LED_WATTS} W for LED loads. Read the small print, not the big number.`,
+    accent: C.red,
+  },
+  {
+    name: "Driver inrush",
+    count: 40,
+    detail: "LED drivers charge capacitors on energisation. Manufacturers publish a maximum per breaker — typically 30–50.",
+    accent: C.orange,
+  },
+  {
+    name: "Serviceability",
+    count: 12,
+    detail: "One tripped breaker should not black out a whole floor. This is judgement, not code.",
+    accent: C.blue,
+  },
+  {
+    name: "Circuit ampacity",
+    count: Math.floor((CIRCUIT_AMPS * VOLTS * 0.8) / TRIM_WATTS),
+    detail: "The number everyone asks about, and the one that never binds on an LED installation.",
+    accent: C.muted,
+  },
+];
+
+const peak = Math.max(...limits.map((l) => l.count));
+const BAR_X = 214;
+const BAR_MAX = 300;
+const bars = limits.map((l) => ({ ...l, width: Math.max(26, Math.round((l.count / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>What really limits the number of lights on a circuit</title>
+  <desc>
+    Four constraints on a 15 amp circuit of nine-watt LED trims. The dimmer's LED rating permits about 16 trims,
+    driver inrush typically 30 to 50, serviceability judgement about 12, and circuit ampacity 160. The electrical
+    capacity of the circuit is an order of magnitude larger than every other limit, so it is never the binding one.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four real limits, and the breaker is the loosest</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`A ${CIRCUIT_AMPS} A circuit of ${TRIM_WATTS} W LED trims. Bars are how many fixtures each constraint permits.`}</text>
+
+  {bars.map((l, i) => {
+    const y = 74 + i * 47;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{l.name}</text>
+        <rect x={BAR_X} y={y + 2} width={l.width} height="20" rx="5" fill={l.accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={l.width} height="20" rx="5" fill="none" stroke={l.accent} stroke-width="1.6" />
+        <text x={BAR_X + 9} y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">
+          {l.name === "Driver inrush" ? "30–50" : l.count}
+        </text>
+        <text x={BAR_X + l.width + 9} y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">fixtures</text>
+        <text x="28" y={y + 34} fill={C.muted} font-family={FONT} font-size="8.5">{l.detail}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">Design to the tightest bar. On almost every LED job that is the dimmer, and it is a $20 part.</text>
+</svg>

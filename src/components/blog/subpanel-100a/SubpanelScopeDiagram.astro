@@ -1,0 +1,72 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("sps");
+
+/**
+ * The question that decides which table you size from. 310.12(B) applies only to a
+ * feeder carrying the ENTIRE load of a one-family dwelling; an ordinary subpanel
+ * carrying part of the load sizes from 310.16 and needs a larger conductor.
+ */
+const branches = [
+  {
+    verdict: "YES — whole-dwelling feeder",
+    accent: C.blue,
+    bg: C.blueLight,
+    table: "Table 310.12 · 83%",
+    sizes: "4 AWG Cu · 2 AWG Al",
+    examples: ["Meter-main outside feeding the", "one and only panel inside", "— that panel carries everything"],
+    y: 92,
+  },
+  {
+    verdict: "NO — ordinary subpanel",
+    accent: C.primary,
+    bg: C.primaryLight,
+    table: "Table 310.16 · 75 °C",
+    sizes: "3 AWG Cu · 1 AWG Al",
+    examples: ["Garage, shop, addition, or any", "panel fed from a main panel", "that keeps its own loads"],
+    y: 196,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Which table sizes a 100 amp feeder</title>
+  <desc>
+    One question decides the answer: does this feeder carry the entire load of the dwelling? If yes, it is
+    a whole-dwelling feeder and Table 310.12 permits sizing at 83 percent, giving 4 AWG copper or 2 AWG
+    aluminum. If no, it is an ordinary subpanel and Table 310.16 at 75 degrees Celsius applies, requiring 3
+    AWG copper or 1 AWG aluminum. Most garage, shop, and addition subpanels fall into the second case.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One question decides the wire size</text>
+
+  <!-- The question -->
+  <rect x="24" y="120" width="150" height="80" rx="10" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="99" y="146" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">Does this feeder</text>
+  <text x="99" y="162" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">carry the ENTIRE</text>
+  <text x="99" y="178" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">dwelling load?</text>
+
+  <path d="M180 148 L 216 124" stroke={C.blue} stroke-width="1.5" marker-end="url(#sps-arrow-blue)" />
+  <path d="M180 172 L 216 226" stroke={C.primary} stroke-width="1.5" marker-end="url(#sps-arrow-primary)" />
+
+  {branches.map((b) => (
+    <g>
+      <rect x="224" y={b.y} width="472" height="94" rx="10" fill={b.bg} stroke={b.accent} stroke-width="1.5" />
+      <text x="242" y={b.y + 26} fill={b.accent} font-family={FONT} font-size="12.5" font-weight="800">{b.verdict}</text>
+      <rect x="242" y={b.y + 36} width="150" height="22" rx="5" fill={C.white} stroke={b.accent} stroke-width="1" />
+      <text x="317" y={b.y + 51} text-anchor="middle" fill={b.accent} font-family={FONT} font-size="10" font-weight="700">{b.table}</text>
+      <text x="242" y={b.y + 80} fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{b.sizes}</text>
+      <text x="420" y={b.y + 40} fill={C.muted} font-family={FONT} font-size="9.5">
+        {b.examples.map((line, li) => (
+          <tspan x="420" dy={li === 0 ? "0" : "13"}>{line}</tspan>
+        ))}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="304" fill={C.muted} font-family={FONT} font-size="10">Getting this backwards is the most common 100 A feeder error — the 83% allowance is far narrower than most charts imply.</text>
+</svg>

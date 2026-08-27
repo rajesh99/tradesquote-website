@@ -1,0 +1,84 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The transfer switch decision is the cheapest real lever on a standby job,
+ * because it usually decides the generator size too. NEC 702.4(B)(2) is the
+ * option most quotes never mention.
+ */
+const options = [
+  {
+    name: "Essential circuits, 100 A",
+    cost: 700,
+    covers: "8–10 selected circuits",
+    note: "Fridge, furnace, sump, a few lights and outlets.",
+    accent: C.green,
+  },
+  {
+    name: "Essential circuits, 150 A",
+    cost: 900,
+    covers: "more circuits, still selected",
+    note: "Adds a well pump or a single AC zone.",
+    accent: C.primary,
+  },
+  {
+    name: "Whole house, 200 A",
+    cost: 1600,
+    covers: "everything, service-rated",
+    note: "Doubles as the service disconnect. The default quote.",
+    accent: C.blue,
+  },
+  {
+    name: "Whole house, 400 A",
+    cost: 3200,
+    covers: "everything, large service",
+    note: "Usually paired with a liquid-cooled set.",
+    accent: C.orange,
+  },
+];
+
+const peak = Math.max(...options.map((o) => o.cost));
+const BAR_X = 214;
+const BAR_MAX = 210;
+const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Transfer switch options and the load management alternative</title>
+  <desc>
+    Transfer switch costs range from $700 for a 100 amp essential-circuits panel to $3,200 for a 400 amp
+    service-rated switch. NEC 702.4(B)(2) permits a generator that cannot carry the entire load where automatic
+    load management sheds the rest, which frequently allows a smaller machine and a cheaper switch.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    The switch decision usually sets the generator size
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Make this choice before picking a machine — it is the cheapest lever on the whole job.
+  </text>
+
+  {options.map((o, i) => {
+    const y = 70 + i * 42;
+    const width = Math.max(24, Math.round((o.cost / peak) * BAR_MAX));
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{o.name}</text>
+        <text x="28" y={y + 27} fill={C.muted} font-family={FONT} font-size="8.5">{o.covers}</text>
+        <rect x={BAR_X} y={y + 2} width={width} height="19" rx="4" fill={o.accent} opacity="0.18" />
+        <rect x={BAR_X} y={y + 2} width={width} height="19" rx="4" fill="none" stroke={o.accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{usd(o.cost)}</text>
+        <text x={BAR_X + BAR_MAX + 20} y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">{o.note}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="240" width="672" height="42" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="40" y="258" fill={C.primary} font-family={FONT} font-size="10" font-weight="800">
+    NEC 702.4(B)(2) — the option most quotes never mention
+  </text>
+  <text x="40" y="274" fill={C.dark} font-family={FONT} font-size="9.5">
+    A generator too small for the full load is permitted where automatic load management sheds the rest.
+  </text>
+</svg>

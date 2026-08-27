@@ -1,0 +1,69 @@
+---
+import { ampacityOf, ambientFactor, bundlingFactor, BUNDLING_ADJUSTMENT, CONDUCTOR_SIZES, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * How far a 20 A circuit survives as conductors are added to one raceway.
+ * Each row is Table 310.15(C)(1)'s adjustment factor applied to the 90 °C base,
+ * with the 40 °C ambient correction already in — so the failure point is real
+ * rather than the textbook 30 °C case where nine conductors still just pass.
+ */
+const SIZE = CONDUCTOR_SIZES.find((s) => s.label === "12")!;
+const AMBIENT_C = 40;
+const BREAKER = 20;
+
+const base90 = ampacityOf(SIZE, "copper", 90)!;
+const correction = ambientFactor(AMBIENT_C, 90);
+
+const rows = [3, 6, 9, 12, 24, 40].map((count) => {
+  const adjust = bundlingFactor(count);
+  const amps = base90 * correction * adjust;
+  const band = BUNDLING_ADJUSTMENT.find((b) => b.max === null || count <= b.max)!;
+  return { count, adjust, amps, passes: amps >= BREAKER, band: band.label };
+});
+
+const peak = Math.max(...rows.map((r) => r.amps));
+const BAR_X = 300;
+const BAR_MAX = 300;
+const bars = rows.map((r) => ({ ...r, width: Math.max(30, Math.round((r.amps / peak) * BAR_MAX)) }));
+const thresholdX = BAR_X + Math.round((BREAKER / peak) * BAR_MAX);
+const lastPassing = rows.filter((r) => r.passes).slice(-1)[0];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>How many conductors a 20 amp circuit survives</title>
+  <desc>
+    12 AWG copper THHN in a 40 degree Celsius ambient, derated from its 90 degree base of 30 amps. Three conductors
+    give 27.30 amps, six give 21.84 amps, and both hold a 20 amp breaker. Nine conductors give 19.11 amps, twelve
+    give 13.65 amps, twenty-four give 12.29 amps and forty give 10.92 amps — all short of 20 amps. Six current-carrying
+    conductors is the practical maximum, which is three 20 amp circuits with individual neutrals.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where a 20 A circuit stops surviving the bundle</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`12 AWG copper THHN, ${AMBIENT_C} °C ambient (× ${correction}), derated from its ${base90} A base at 90 °C.`}</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CURRENT-CARRYING</text>
+  <text x="150" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TABLE 310.15(C)(1)</text>
+  <text x={BAR_X} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ADJUSTED AMPACITY</text>
+
+  <line x1={thresholdX} y1="84" x2={thresholdX} y2="268" stroke={C.dark} stroke-width="1.2" stroke-dasharray="4 3" />
+  <text x={thresholdX + 5} y="94" fill={C.dark} font-family={FONT} font-size="8" font-weight="700">{`${BREAKER} A`}</text>
+
+  {bars.map((r, i) => {
+    const y = 100 + i * 28;
+    const accent = r.passes ? C.green : C.red;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.count} conductors`}</text>
+        <text x="150" y={y + 14} fill={C.muted} font-family={FONT} font-size="9.5">{`× ${r.adjust}`}</text>
+        <rect x={BAR_X} y={y + 2} width={r.width} height="19" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={r.width} height="19" rx="5" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(r.amps, 2)} A`}</text>
+        <text x={BAR_X + r.width + 8} y={y + 16} fill={accent} font-family={FONT} font-size="9" font-weight="700">{r.passes ? "holds 20 A" : "fails"}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="10">{`${lastPassing?.count} current-carrying conductors is the ceiling here — three 20 A circuits with their own neutrals, not six.`}</text>
+</svg>

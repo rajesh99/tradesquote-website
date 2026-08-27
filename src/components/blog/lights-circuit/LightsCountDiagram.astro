@@ -1,0 +1,73 @@
+---
+import { fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The count by lamp technology, which is the entire reason the old "8 to 10 per
+ * circuit" convention is obsolete. Nine-watt LED trims put the circuit-capacity
+ * answer into the hundreds, far past any number anyone would actually install.
+ */
+const VOLTS = 120;
+
+const lamps = [
+  { name: "9 W LED trim", watts: 9, accent: C.primary },
+  { name: "15 W LED panel", watts: 15, accent: C.blue },
+  { name: "60 W incandescent", watts: 60, accent: C.orange },
+];
+
+const circuits = [15, 20];
+
+const rows = lamps.map((l) => ({
+  ...l,
+  counts: circuits.map((a) => ({
+    amps: a,
+    full: Math.floor((a * VOLTS) / l.watts),
+    continuous: Math.floor((a * VOLTS * 0.8) / l.watts),
+  })),
+}));
+
+const COL_X = [300, 500];
+const COL_W = 190;
+const led = rows[0].counts[0];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>How many luminaires a circuit can carry by lamp type</title>
+  <desc>
+    On a 15 amp 120 volt circuit, 200 nine-watt LED trims fit at full capacity and 160 within the 80 percent
+    continuous limit; on a 20 amp circuit, 266 and 213. Fifteen-watt LED panels give 120 and 96 on a 15 amp circuit.
+    Sixty-watt incandescent lamps give only 30 and 24. The LED numbers are far larger than anyone would install, which
+    is why circuit capacity is no longer the constraint.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What the circuit could actually carry</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`At ${VOLTS} V. Large figure is full capacity; small figure is the 80% continuous limit.`}</text>
+
+  {circuits.map((a, j) => (
+    <text x={COL_X[j] + COL_W / 2} y="78" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">
+      {`${a} A CIRCUIT`}
+    </text>
+  ))}
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LAMP</text>
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 50;
+    return (
+      <g>
+        <text x="28" y={y + 24} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.name}</text>
+        <text x="28" y={y + 38} fill={C.muted} font-family={FONT} font-size="8">{`${r.watts} W each`}</text>
+        {r.counts.map((c, j) => (
+          <g>
+            <rect x={COL_X[j]} y={y + 4} width={COL_W} height="38" rx="8" fill={r.accent} opacity="0.09" />
+            <rect x={COL_X[j]} y={y + 4} width={COL_W} height="38" rx="8" fill="none" stroke={r.accent} stroke-width="1.5" />
+            <text x={COL_X[j] + 20} y={y + 30} fill={r.accent} font-family={FONT} font-size="17" font-weight="800">{fmtInt(c.full)}</text>
+            <text x={COL_X[j] + COL_W - 18} y={y + 29} text-anchor="end" fill={C.muted} font-family={FONT} font-size="10">{`${fmtInt(c.continuous)} continuous`}</text>
+          </g>
+        ))}
+      </g>
+    );
+  })}
+
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">{`${led.full} LED trims on a 15 A circuit is not a real design. The old "8 to 10" convention came from the bottom row.`}</text>
+</svg>

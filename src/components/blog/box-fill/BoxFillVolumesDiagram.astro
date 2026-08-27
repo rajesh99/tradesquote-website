@@ -1,0 +1,43 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/** NEC Table 314.16(B) free space per conductor — mirrors BOX_FILL_VOLUME in nec.ts. */
+const volumes = [
+  { awg: "18", vol: 1.5 },
+  { awg: "16", vol: 1.75 },
+  { awg: "14", vol: 2.0 },
+  { awg: "12", vol: 2.25 },
+  { awg: "10", vol: 2.5 },
+  { awg: "8", vol: 3.0 },
+  { awg: "6", vol: 5.0 },
+];
+
+const BAR_MAX = 420;
+const peak = Math.max(...volumes.map((v) => v.vol));
+const bars = volumes.map((v) => ({ ...v, width: Math.round((v.vol / peak) * BAR_MAX) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>NEC Table 314.16(B) volume allowance per conductor</title>
+  <desc>
+    Free space required per conductor: 18 AWG needs 1.5 cubic inches, 16 AWG 1.75, 14 AWG 2.0, 12 AWG 2.25, 10
+    AWG 2.5, 8 AWG 3.0, and 6 AWG 5.0 cubic inches. Note the jump from 3.0 to 5.0 between 8 and 6 AWG.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Volume allowance per conductor — Table 314.16(B)</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Every allowance in a box fill calculation is a multiple of one of these</text>
+
+  {bars.map((v, i) => {
+    const y = 76 + i * 33;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{`${v.awg} AWG`}</text>
+        <rect x="106" y={y + 3} width={v.width} height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x={106 + v.width - 12} y={y + 20} text-anchor="end" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{`${v.vol.toFixed(2)} in³`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="300" fill={C.muted} font-family={FONT} font-size="10">Where conductors of different sizes share a box, clamp, device and ground allowances all use the LARGEST conductor present.</text>
+</svg>

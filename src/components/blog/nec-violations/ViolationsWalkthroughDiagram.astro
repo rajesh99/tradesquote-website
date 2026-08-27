@@ -1,0 +1,66 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A pre-inspection walkthrough ordered by where you physically stand, not by
+ * code article — because that's how it actually gets done, and ordering by
+ * article is why checklists don't get used.
+ */
+const stops = [
+  {
+    where: "At the panel",
+    checks: ["Neutral isolated in every subpanel", "Backfed breaker clip fitted", "Every circuit labelled legibly", "Breaker matches conductor size", "110.26 working space clear"],
+    accent: C.red,
+  },
+  {
+    where: "At each box",
+    checks: ["Box fill under Table 314.16", "Neutral present at switch boxes", "Cable clamped and secured", "Grounds made up and pigtailed", "Correct box for the device count"],
+    accent: C.orange,
+  },
+  {
+    where: "Along the runs",
+    checks: ["Staples within 12 in of boxes", "Then every 4.5 ft", "Protection where exposed", "Derating checked in bundles", "Right cable type for the location"],
+    accent: C.blue,
+  },
+  {
+    where: "At the devices",
+    checks: ["AFCI and GFCI where required", "Tamper-resistant where required", "Covers and plates fitted", "Terminations torqued to spec", "Detached buildings have a disconnect"],
+    accent: C.primary,
+  },
+];
+
+const LANE_X = [24, 194, 364, 534];
+const LANE_W = 162;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>A pre-inspection walkthrough ordered by where you stand</title>
+  <desc>
+    At the panel: confirm the neutral is isolated in every subpanel, the backfed breaker clip is fitted, every circuit is
+    labelled, breakers match conductor sizes and working space is clear. At each box: box fill within Table 314.16, a
+    neutral at switch boxes, cable clamped, grounds made up, and the right box for the device count. Along the runs:
+    staples within 12 inches of boxes then every 4.5 feet, protection where exposed, derating checked in bundles, and the
+    right cable type. At the devices: AFCI and GFCI where required, tamper-resistant devices, covers fitted,
+    terminations torqued, and a disconnect at detached buildings.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Fifteen minutes, ordered by where you stand</text>
+
+  {stops.map((s, j) => (
+    <g>
+      <rect x={LANE_X[j]} y="46" width={LANE_W} height="156" rx="10" fill={s.accent} opacity="0.07" />
+      <rect x={LANE_X[j]} y="46" width={LANE_W} height="156" rx="10" fill="none" stroke={s.accent} stroke-width="1.6" />
+      <rect x={LANE_X[j]} y="46" width={LANE_W} height="22" rx="10" fill={s.accent} opacity="0.16" />
+      <text x={LANE_X[j] + LANE_W / 2} y="61" text-anchor="middle" fill={s.accent} font-family={FONT} font-size="10" font-weight="800">{s.where}</text>
+      {s.checks.map((c, k) => (
+        <g>
+          <circle cx={LANE_X[j] + 16} cy={86 + k * 24} r="2.2" fill={s.accent} />
+          <text x={LANE_X[j] + 25} y={89 + k * 24} fill={C.dark} font-family={FONT} font-size="7.5">{c}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">Ordered by location rather than by code article — which is the difference between a checklist used and one filed.</text>
+</svg>

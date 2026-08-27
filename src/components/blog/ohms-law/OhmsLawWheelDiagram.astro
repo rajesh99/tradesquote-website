@@ -1,0 +1,88 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The power wheel, but computed on one worked example so every form returns the
+ * same answer. That's the actual insight: there aren't twelve formulas, there are
+ * two, and the other ten are substitutions.
+ */
+const V = 120;
+const R = 10;
+const I = V / R;
+const P = V * I;
+
+const groups = [
+  {
+    solve: "Volts",
+    accent: C.blue,
+    forms: [
+      { f: "V = I × R", calc: `${I} × ${R} = ${V} V` },
+      { f: "V = P ÷ I", calc: `${P} ÷ ${I} = ${P / I} V` },
+      { f: "V = √(P × R)", calc: `√(${P} × ${R}) = ${Math.sqrt(P * R)} V` },
+    ],
+  },
+  {
+    solve: "Amps",
+    accent: C.primary,
+    forms: [
+      { f: "I = V ÷ R", calc: `${V} ÷ ${R} = ${I} A` },
+      { f: "I = P ÷ V", calc: `${P} ÷ ${V} = ${P / V} A` },
+      { f: "I = √(P ÷ R)", calc: `√(${P} ÷ ${R}) = ${Math.sqrt(P / R)} A` },
+    ],
+  },
+  {
+    solve: "Ohms",
+    accent: C.orange,
+    forms: [
+      { f: "R = V ÷ I", calc: `${V} ÷ ${I} = ${V / I} Ω` },
+      { f: "R = V² ÷ P", calc: `${V * V} ÷ ${P} = ${(V * V) / P} Ω` },
+      { f: "R = P ÷ I²", calc: `${P} ÷ ${I * I} = ${P / (I * I)} Ω` },
+    ],
+  },
+  {
+    solve: "Watts",
+    accent: C.red,
+    forms: [
+      { f: "P = V × I", calc: `${V} × ${I} = ${P} W` },
+      { f: "P = I² × R", calc: `${I}² × ${R} = ${I * I * R} W` },
+      { f: "P = V² ÷ R", calc: `${V * V} ÷ ${R} = ${(V * V) / R} W` },
+    ],
+  },
+];
+
+const COL_X = [24, 194, 364, 534];
+const COL_W = 158;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The twelve forms of Ohm's law worked on one example</title>
+  <desc>
+    On a 120 volt circuit with 10 ohms of resistance drawing 12 amps and dissipating 1,440 watts, all twelve
+    rearrangements return the same values. Volts comes from I times R, P divided by I, or the square root of P times
+    R. Amps from V over R, P over V, or the square root of P over R. Ohms from V over I, V squared over P, or P over I
+    squared. Watts from V times I, I squared times R, or V squared over R.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Twelve formulas, two equations, one answer</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Worked on ${V} V across ${R} Ω. Every form below returns the same numbers.`}</text>
+
+  {groups.map((g, j) => (
+    <g>
+      <rect x={COL_X[j]} y="66" width={COL_W} height="152" rx="9" fill={g.accent} opacity="0.06" />
+      <rect x={COL_X[j]} y="66" width={COL_W} height="152" rx="9" fill="none" stroke={g.accent} stroke-width="1.5" />
+      <rect x={COL_X[j]} y="66" width={COL_W} height="24" rx="9" fill={g.accent} opacity="0.14" />
+      <text x={COL_X[j] + COL_W / 2} y="83" text-anchor="middle" fill={g.accent} font-family={FONT} font-size="10.5" font-weight="800">
+        {`SOLVE FOR ${g.solve.toUpperCase()}`}
+      </text>
+      {g.forms.map((f, k) => (
+        <g>
+          <text x={COL_X[j] + 14} y={110 + k * 36} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{f.f}</text>
+          <text x={COL_X[j] + 14} y={124 + k * 36} fill={C.muted} font-family={FONT} font-size="8.5">{f.calc}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">{`Learn V = IR and P = VI. The other ten are substitutions — and P = I²R is the one that matters most in the field.`}</text>
+</svg>

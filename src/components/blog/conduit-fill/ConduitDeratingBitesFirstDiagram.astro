@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Fill and derating are separate limits, and derating usually binds first. 12 AWG
+ * THHN starts at its 90 °C base of 30 A; the 310.15(C)(1) factors are applied to
+ * that, then the result is compared with the 20 A breaker the conductor normally
+ * serves. Computed here rather than hardcoded.
+ */
+const BASE_90C = 30;
+const TARGET = 20;
+const tiers = [
+  { label: "1–3 conductors", factor: 1.0 },
+  { label: "4–6 conductors", factor: 0.8 },
+  { label: "7–9 conductors", factor: 0.7 },
+  { label: "10–20 conductors", factor: 0.5 },
+];
+
+const rows = tiers.map((t) => {
+  const derated = BASE_90C * t.factor;
+  return { ...t, derated, ok: derated >= TARGET };
+});
+
+const BAR_MAX = 300;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Bundling derating limits conductor count before conduit fill does</title>
+  <desc>
+    Three-quarter inch EMT accepts 16 twelve AWG conductors on fill, but bundling derating binds first. Twelve
+    AWG THHN starts at its 90 degree base of 30 amps. With one to three current-carrying conductors the factor
+    is 1.0 giving 30 amps; with four to six it is 0.8 giving 24 amps; with seven to nine it is 0.7 giving 21
+    amps — all still adequate for a 20 amp circuit. With ten to twenty conductors the factor is 0.5, giving
+    only 15 amps, which fails a 20 amp circuit. So nine current-carrying conductors is the practical maximum,
+    or four circuits with individual neutrals.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Fill says 16. Derating says 9.</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">12 AWG THHN in 3/4" EMT, feeding 20 A circuits — 310.15(C)(1) applied to the 90 °C base of 30 A</text>
+
+  {rows.map((r, i) => {
+    const y = 76 + i * 44;
+    const width = Math.round((r.derated / BASE_90C) * BAR_MAX);
+    const accent = r.ok ? C.primary : C.red;
+    const bg = r.ok ? C.primaryLight : C.redLight;
+    return (
+      <g>
+        <text x="28" y={y + 24} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.label}</text>
+        <text x="28" y={y + 37} fill={C.muted} font-family={FONT} font-size="9">{`× ${r.factor.toFixed(2)}`}</text>
+        <rect x="164" y={y + 6} width={width} height="30" rx="7" fill={bg} stroke={accent} stroke-width="1.5" />
+        <text x="176" y={y + 26} fill={accent} font-family={FONT} font-size="14" font-weight="800">{`${r.derated.toFixed(1)} A`}</text>
+        <text x={164 + width + 12} y={y + 26} fill={accent} font-family={FONT} font-size="10.5" font-weight="700">
+          {r.ok ? "covers a 20 A circuit" : "fails — under 20 A"}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="164" y1="70" x2="164" y2="256" stroke={C.border} stroke-dasharray="3 3" />
+
+  <rect x="24" y="264" width="672" height="42" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="44" y="282" fill={C.orange} font-family={FONT} font-size="11.5" font-weight="800">Practical maximum: 9 current-carrying conductors — four 20 A circuits with individual neutrals</text>
+  <text x="44" y="298" fill={C.muted} font-family={FONT} font-size="9.5">Neutrals count as current-carrying; equipment grounding conductors never do. Fill would have let you pull 16.</text>
+</svg>

@@ -1,0 +1,69 @@
+---
+import { usd } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The three paths and their prices, taken from the EV charger install cost and
+ * panel upgrade calculators so the figures agree with the tools. Load management
+ * sits between the two extremes and is the option nobody quotes.
+ */
+const paths = [
+  {
+    name: "Circuit only",
+    detail: "48 A charger, 40 ft, surface run, new breaker, 6 h labour",
+    cost: 1300,
+    accent: C.green,
+    when: "The service has headroom — verify with 220.87",
+  },
+  {
+    name: "Load management",
+    detail: "Circuit plus an energy management system under 625.42 / Art. 750",
+    cost: 1300 + 700,
+    accent: C.blue,
+    when: "The service is close, and the charger can shed",
+  },
+  {
+    name: "Service upgrade",
+    detail: "Circuit plus a 200 A panel upgrade at $3,060 including permit",
+    cost: 4240,
+    accent: C.red,
+    when: "The service genuinely can't carry it, or is obsolete anyway",
+  },
+];
+
+const peak = Math.max(...paths.map((p) => p.cost));
+const BAR_X = 218;
+const BAR_MAX = 330;
+const bars = paths.map((p) => ({ ...p, width: Math.round((p.cost / peak) * BAR_MAX) }));
+const multiple = paths[2].cost / paths[0].cost;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 244" fill="none" aria-hidden="true">
+  <title>Three ways to get an EV charger installed, and their costs</title>
+  <desc>
+    Installing the circuit alone for a 48 amp charger over a 40 foot surface run with a new breaker and 6 hours of
+    labour costs about 1,300 dollars. Adding a load-management system under 625.42 or Article 750 costs roughly 2,000
+    dollars. Doing it with a full 200 amp service upgrade costs about 4,240 dollars — 3.3 times the circuit-only
+    figure — because the panel upgrade alone is 3,060 dollars including permit.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="228" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three paths, and the middle one rarely gets quoted</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Figures from the EV charger install cost and panel upgrade calculators. Regional multipliers apply.</text>
+
+  {bars.map((p, i) => {
+    const y = 68 + i * 52;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={p.accent} font-family={FONT} font-size="11" font-weight="800">{p.name}</text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="7.5">{p.when}</text>
+        <rect x={BAR_X} y={y + 2} width={p.width} height="24" rx="6" fill={p.accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={p.width} height="24" rx="6" fill="none" stroke={p.accent} stroke-width="1.7" />
+        <text x={BAR_X + 10} y={y + 19} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{usd(p.cost)}</text>
+        <text x={BAR_X} y={y + 40} fill={C.muted} font-family={FONT} font-size="8">{p.detail}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">{`The upgrade path is ${multiple.toFixed(1)}× the circuit-only cost. Worth ruling out before it's quoted, not after.`}</text>
+</svg>

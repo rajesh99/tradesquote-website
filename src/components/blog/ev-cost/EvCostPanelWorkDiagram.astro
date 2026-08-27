@@ -1,0 +1,54 @@
+---
+import { usd } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Panel work is the whole ballgame. Every other input moves the total by hundreds;
+ * this one moves it by thousands. Figures are the calculator's own branches, with
+ * the service-upgrade cost deliberately matching the panel-upgrade calculator.
+ */
+const BASE = 1300 - 120; // default total, less the default "new breaker" line
+
+const options = [
+  { label: "Spare space already free", cost: 0, note: "the ideal case — nothing to add", accent: C.green },
+  { label: "New breaker fitted", cost: 120, note: "the default assumption", accent: C.primary },
+  { label: "Subpanel added", cost: 900, note: "panel full, but the service is fine", accent: C.orange },
+  { label: "Service upgrade to 200 A", cost: 3060, note: "matches the panel-upgrade calculator", accent: C.red },
+].map((o) => ({ ...o, total: BASE + o.cost }));
+
+const peak = Math.max(...options.map((o) => o.total));
+const BAR_X = 250;
+const BAR_MAX = 340;
+const bars = options.map((o) => ({ ...o, width: Math.round((o.total / peak) * BAR_MAX) }));
+const spread = options[3].total - options[0].total;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>How panel work changes the installation total</title>
+  <desc>
+    With everything else held at the default, an installation using existing spare panel space totals 1,180
+    dollars. Fitting a new breaker brings it to 1,300 dollars. Adding a subpanel brings it to 2,080 dollars. A
+    service upgrade to 200 amps brings it to 4,240 dollars — a spread of 3,060 dollars, far larger than any other
+    input in the job.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The panel decides the price. Everything else is rounding.</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Same 48 A charger, same 40 ft surface run, same permit and labour. Only the panel work changes.</text>
+
+  {bars.map((o, i) => {
+    const y = 74 + i * 38;
+    return (
+      <g>
+        <text x="28" y={y + 18} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{o.label}</text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="8">{o.note}</text>
+        <text x="240" y={y + 20} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9.5">{o.cost > 0 ? `+${usd(o.cost)}` : "—"}</text>
+        <rect x={BAR_X} y={y + 3} width={o.width} height="26" rx="7" fill={o.accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 3} width={o.width} height="26" rx="7" fill="none" stroke={o.accent} stroke-width="1.6" />
+        <text x={BAR_X + o.width - 12} y={y + 21} text-anchor="end" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{usd(o.total)}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="234" fill={C.muted} font-family={FONT} font-size="10">{`A ${usd(spread)} spread on identical work. Which is why NEC 220.87 — the utility's recorded demand, not a worst-case calculation — is the first thing to check.`}</text>
+</svg>

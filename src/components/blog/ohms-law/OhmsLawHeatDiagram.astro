@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * P = I²R across a grid of currents and termination resistances. The point is
+ * the squared term: doubling the current quadruples the heat, and a joint that
+ * has gone from 0.01 Ω to 0.5 Ω is dissipating fifty times as much in the same
+ * physical space.
+ */
+const CURRENTS = [5, 10, 15, 20];
+const JOINTS = [
+  { ohms: 0.01, label: "Tight", accent: C.green },
+  { ohms: 0.1, label: "Slack", accent: C.blue },
+  { ohms: 0.5, label: "Loose", accent: C.orange },
+  { ohms: 1.0, label: "Failing", accent: C.red },
+];
+
+const cells = JOINTS.map((j) => ({
+  ...j,
+  watts: CURRENTS.map((a) => a * a * j.ohms),
+}));
+
+const COL_X = [214, 336, 458, 580];
+const COL_W = 110;
+const worst = 20 * 20 * 1.0;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Heat dissipated in a termination by current and resistance</title>
+  <desc>
+    Power dissipated in a single termination, computed as current squared times resistance. A tight 0.01 ohm joint
+    dissipates 0.3 watts at 5 amps and 4 watts at 20 amps. A slack 0.1 ohm joint reaches 40 watts at 20 amps. A loose
+    0.5 ohm joint reaches 200 watts, and a failing 1 ohm joint 400 watts — all inside the volume of a wire nut.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">P = I²R, in the space of a wire nut</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Watts dissipated in one termination. The current is squared, so the growth is not gentle.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">JOINT RESISTANCE</text>
+  {CURRENTS.map((a, j) => (
+    <text x={COL_X[j] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{`${a} A`}</text>
+  ))}
+
+  {cells.map((row, i) => {
+    const y = 86 + i * 34;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={row.accent} font-family={FONT} font-size="10.5" font-weight="800">{row.label}</text>
+        <text x="80" y={y + 16} fill={C.muted} font-family={FONT} font-size="9">{`${row.ohms} Ω`}</text>
+        {row.watts.map((w, j) => {
+          const hot = w >= 100;
+          return (
+            <g>
+              <rect x={COL_X[j]} y={y} width={COL_W} height="26" rx="6" fill={row.accent} opacity={hot ? 0.2 : 0.08} />
+              <rect x={COL_X[j]} y={y} width={COL_W} height="26" rx="6" fill="none" stroke={row.accent} stroke-width={hot ? 2 : 1.1} />
+              <text x={COL_X[j] + COL_W / 2} y={y + 17} text-anchor="middle" fill={hot ? row.accent : C.dark} font-family={FONT} font-size="10.5" font-weight={hot ? 800 : 600}>
+                {`${w < 10 ? w.toFixed(1) : w.toFixed(0)} W`}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  })}
+
+  <text x="24" y="234" fill={C.muted} font-family={FONT} font-size="10">{`${worst} W concentrated at one screw. This is what an AFCI is detecting, and why 110.14(D) requires a torque spec.`}</text>
+</svg>

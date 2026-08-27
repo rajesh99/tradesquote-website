@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Same house, both methods. The point is that the optional method comes out ~21 A
+ * lower here, yet both round up to the same 125 A standard service — so the choice
+ * of method only changes the answer when you are near a rating boundary.
+ */
+const STANDARD_VA = 29325;
+const OPTIONAL_VA = 24280;
+const standardAmps = STANDARD_VA / 240;
+const optionalAmps = OPTIONAL_VA / 240;
+const difference = standardAmps - optionalAmps;
+
+const BAR_MAX = 400;
+const peak = Math.max(standardAmps, optionalAmps);
+const bars = [
+  {
+    name: "Standard method",
+    article: "Part III",
+    amps: standardAmps,
+    va: STANDARD_VA,
+    accent: C.blue,
+    bg: C.blueLight,
+  },
+  {
+    name: "Optional method",
+    article: "220.82",
+    amps: optionalAmps,
+    va: OPTIONAL_VA,
+    accent: C.primary,
+    bg: C.primaryLight,
+  },
+].map((b) => ({ ...b, width: Math.round((b.amps / peak) * BAR_MAX) }));
+
+const fmt = (n: number) => n.toLocaleString("en-US");
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Standard versus optional method on the same house</title>
+  <desc>
+    On an identical 2,000 square foot house, the standard method calculates 29,325 volt-amperes or 122.2 amps,
+    while the optional method calculates 24,280 volt-amperes or 101.2 amps — a difference of 21 amps. Both
+    round up to the same 125 amp standard service, so on this house the choice of method does not change the
+    service size. It only matters when the result sits near a rating boundary.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Same house, two methods</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">2,000 ft² · electric range, dryer, water heater, dishwasher · 5 kVA A/C</text>
+
+  {bars.map((b, i) => {
+    const y = 80 + i * 74;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{b.name}</text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="9.5">{`${b.article} · ${fmt(b.va)} VA`}</text>
+        <rect x="200" y={y} width={b.width} height="42" rx="8" fill={b.bg} stroke={b.accent} stroke-width="1.6" />
+        <text x={200 + b.width - 14} y={y + 27} text-anchor="end" fill={b.accent} font-family={FONT} font-size="20" font-weight="800">{`${b.amps.toFixed(1)} A`}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="222" width="330" height="40" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="40" y="240" fill={C.orange} font-family={FONT} font-size="11" font-weight="800">{`${difference.toFixed(1)} A apart — about 21%`}</text>
+  <text x="40" y="255" fill={C.muted} font-family={FONT} font-size="9">The optional method is the kinder one here</text>
+
+  <rect x="366" y="222" width="330" height="40" rx="9" fill={C.greenLight} stroke={C.green} stroke-width="1.5" />
+  <text x="382" y="240" fill={C.green} font-family={FONT} font-size="11" font-weight="800">Both still round to a 125 A service</text>
+  <text x="382" y="255" fill={C.muted} font-family={FONT} font-size="9">Method only changes the outcome near a boundary</text>
+</svg>

@@ -1,0 +1,65 @@
+---
+import { tanPhi, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The power triangle at PF 0.8, which happens to be a 3-4-5 right triangle
+ * scaled by 20 — the reason 0.8 is the textbook example. Drawn to scale so the
+ * geometry is the argument rather than an illustration of it.
+ */
+const KVA = 100;
+const PF = 0.8;
+const kw = KVA * PF;
+const kvar = KVA * Math.sin(Math.acos(PF));
+const angleDeg = (Math.acos(PF) * 180) / Math.PI;
+
+const SCALE = 3.4;
+const X0 = 96;
+const Y0 = 214;
+const kwPx = kw * SCALE;
+const kvarPx = kvar * SCALE;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The power triangle at 0.8 power factor</title>
+  <desc>
+    At 100 kVA and 0.8 power factor, real power is 80 kilowatts along the horizontal, reactive power is 60 kilovolt-
+    amperes reactive vertically, and apparent power is the 100 kVA hypotenuse. The phase angle is 36.9 degrees. The
+    three sides form a 3-4-5 right triangle scaled by 20, and the tangent of the angle is exactly 0.75.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`${KVA} kVA at PF ${PF} — a 3-4-5 triangle`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Real power along the bottom, reactive up the side, apparent power the hypotenuse. Drawn to scale.</text>
+
+  {/* triangle */}
+  <line x1={X0} y1={Y0} x2={X0 + kwPx} y2={Y0} stroke={C.green} stroke-width="5" />
+  <line x1={X0 + kwPx} y1={Y0} x2={X0 + kwPx} y2={Y0 - kvarPx} stroke={C.orange} stroke-width="5" />
+  <line x1={X0} y1={Y0} x2={X0 + kwPx} y2={Y0 - kvarPx} stroke={C.blue} stroke-width="5" />
+  <rect x={X0 + kwPx - 14} y={Y0 - 14} width="14" height="14" fill="none" stroke={C.muted} stroke-width="1.3" />
+
+  {/* angle arc */}
+  <path d={`M ${X0 + 44} ${Y0} A 44 44 0 0 0 ${X0 + 44 * PF} ${Y0 - 44 * Math.sin(Math.acos(PF))}`} fill="none" stroke={C.muted} stroke-width="1.3" />
+  <text x={X0 + 52} y={Y0 - 14} fill={C.muted} font-family={FONT} font-size="9" font-weight="700">{`θ = ${fmt(angleDeg, 1)}°`}</text>
+
+  {/* labels */}
+  <text x={X0 + kwPx / 2} y={Y0 + 22} text-anchor="middle" fill={C.green} font-family={FONT} font-size="12.5" font-weight="800">{`${fmt(kw, 0)} kW`}</text>
+  <text x={X0 + kwPx / 2} y={Y0 + 35} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">real power — what does work</text>
+
+  <text x={X0 + kwPx + 14} y={Y0 - kvarPx / 2} fill={C.orange} font-family={FONT} font-size="12.5" font-weight="800">{`${fmt(kvar, 0)} kVAR`}</text>
+  <text x={X0 + kwPx + 14} y={Y0 - kvarPx / 2 + 13} fill={C.muted} font-family={FONT} font-size="8.5">reactive — sloshes back and forth</text>
+
+  <text x={X0 + kwPx / 2 - 60} y={Y0 - kvarPx / 2 - 6} fill={C.blue} font-family={FONT} font-size="12.5" font-weight="800">{`${KVA} kVA`}</text>
+  <text x={X0 + kwPx / 2 - 60} y={Y0 - kvarPx / 2 + 7} fill={C.muted} font-family={FONT} font-size="8.5">apparent — what the wire carries</text>
+
+  {/* the identities */}
+  <rect x="470" y="70" width="226" height="128" rx="9" fill={C.white} stroke={C.border} />
+  <text x="486" y="90" fill={C.dark} font-family={FONT} font-size="10" font-weight="800">THE IDENTITIES</text>
+  <text x="486" y="110" fill={C.dark} font-family={FONT} font-size="9.5">{`PF = kW ÷ kVA = ${fmt(kw, 0)} ÷ ${KVA} = ${PF}`}</text>
+  <text x="486" y="128" fill={C.dark} font-family={FONT} font-size="9.5">{`kW = kVA × PF = ${fmt(kw, 0)}`}</text>
+  <text x="486" y="146" fill={C.dark} font-family={FONT} font-size="9.5">{`kVAR = kW × tan θ = ${fmt(kw * tanPhi(PF), 0)}`}</text>
+  <text x="486" y="164" fill={C.dark} font-family={FONT} font-size="9.5">{`kVA = √(kW² + kVAR²) = ${fmt(Math.sqrt(kw * kw + kvar * kvar), 0)}`}</text>
+  <text x="486" y="186" fill={C.muted} font-family={FONT} font-size="8.5">{`tan θ at PF ${PF} is exactly ${fmt(tanPhi(PF), 2)}`}</text>
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">The conductor, the breaker and the transformer are all sized for the hypotenuse. Only the base does work.</text>
+</svg>

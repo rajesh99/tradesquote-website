@@ -1,0 +1,66 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * How much charger a service will take, across the range of measured peaks. The
+ * useful reading is the diagonal: on a 100 A service a 32 A charger survives a
+ * measured peak up to 48 A, which covers a large share of real houses.
+ */
+const SERVICES = [100, 125, 200];
+const PEAKS = [30, 40, 48, 60];
+const CHARGERS = [48, 40, 32, 24, 16];
+
+function largestCharger(service: number, peak: number) {
+  const existing = peak * 1.25;
+  return CHARGERS.find((c) => existing + c * 1.25 <= service) ?? null;
+}
+
+const COL_X = [204, 368, 532];
+const COL_W = 150;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Largest EV charger each service and peak demand supports</title>
+  <desc>
+    On a 100 amp service, a measured peak of 30 amps supports a 48 amp charger, 40 amps supports a 32 amp charger, 48
+    amps supports a 32 amp charger, and 60 amps supports only a 16 amp charger. A 125 amp service supports a 48 amp
+    charger up to a 40 amp peak. A 200 amp service supports a 48 amp charger at every peak shown. Existing load is the
+    peak times 125 percent and the charger is added at 125 percent as a continuous load.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">How much charger the service will actually take</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Existing load = peak × 1.25 (NEC 220.87); charger added at 125% as a continuous load (625.41).</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MEASURED 12-MONTH PEAK</text>
+  {SERVICES.map((s, j) => (
+    <text x={COL_X[j] + COL_W / 2} y="78" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{`${s} A SERVICE`}</text>
+  ))}
+
+  {PEAKS.map((peak, i) => {
+    const y = 88 + i * 34;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${peak} A`}</text>
+        <text x="70" y={y + 20} fill={C.muted} font-family={FONT} font-size="8.5">{`→ ${fmt(peak * 1.25, 1)} A existing`}</text>
+        {SERVICES.map((service, j) => {
+          const c = largestCharger(service, peak);
+          const good = c !== null && c >= 32;
+          const accent = c === null ? C.red : good ? C.green : C.orange;
+          return (
+            <g>
+              <rect x={COL_X[j]} y={y} width={COL_W} height="28" rx="7" fill={accent} opacity="0.1" />
+              <rect x={COL_X[j]} y={y} width={COL_W} height="28" rx="7" fill="none" stroke={accent} stroke-width={good ? 1.8 : 1.3} />
+              <text x={COL_X[j] + COL_W / 2} y={y + 19} text-anchor="middle" fill={accent} font-family={FONT} font-size="11.5" font-weight="800">
+                {c === null ? "none" : `${c} A`}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  })}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">A 100 A service takes a 32 A charger up to a 48 A measured peak — which covers a great many real houses.</text>
+</svg>

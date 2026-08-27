@@ -3,19 +3,36 @@ import Base from "../../../layouts/Base.astro";
 import { getTaxonomy } from "../../../lib/taxonomyParser.astro";
 import { humanize } from "../../../lib/utils/textConverter";
 
+export const prerender = true;
+
 const categories = await getTaxonomy("posts", "categories");
 
 import { BiCategoryAlt } from "react-icons/bi";
+
+const intro = [
+  "TradesQuote blog categories group contractor guides by trade focus. Use categories when you want a broader hub than a single keyword tag — for example all HVAC sizing and diagnostics content, or electrical code and estimating articles in one place.",
+  "Each category page includes an overview of what the collection covers, featured article summaries, related tools, and the full list of posts. That makes categories useful both as a reading index and as a clearer signal of topical depth for search engines.",
+  "From here, open HVAC for load calculation, tonnage, ductwork, efficiency, and refrigerant topics, or electrical for NEC concepts, conductor sizing, panels, and estimating. You can always narrow further with tags once you know the exact subject.",
+];
 ---
 
-<Base title={"Categories"}>
+<Base
+  title="Categories"
+  meta_title="Blog Categories | TradesQuote"
+  description="Browse TradesQuote blog categories for HVAC and electrical contractors — sizing, code, cost, diagnostics, duct design, wire sizing, and estimating guides in one place."
+>
   <section class="section">
-    <div class="container text-center">
-      <h1 class="h2 page-heading">Categories</h1>
-      <ul class="space-x-4">
+    <div class="container">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <h1 class="h2 page-heading">Categories</h1>
+        <div class="mt-6 space-y-4 text-left text-base leading-relaxed text-text">
+          {intro.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+      <ul class="space-x-4 text-center">
         {
           categories.map((category) => (
-            <li class="inline-block">
+            <li class="inline-block mb-3">
               <a
                 href={`/blog/categories/${category}`}
                 class="rounded-lg bg-light px-4 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
@@ -27,7 +44,46 @@ import { BiCategoryAlt } from "react-icons/bi";
           ))
         }
       </ul>
+      <div class="mx-auto mt-12 max-w-3xl text-left text-base leading-relaxed text-text space-y-4">
+        <h2 class="text-xl font-semibold text-dark">HVAC vs electrical categories</h2>
+        <p>
+          The HVAC category covers cooling and heating capacity, airflow, duct
+          design, efficiency ratings, ventilation, humidity, and replacement cost
+          conversations contractors have every week. Pair those articles with the
+          free HVAC calculator hub when you need interactive tonnage, CFM, SEER,
+          or Manual J estimates.
+        </p>
+        <p>
+          The electrical category focuses on NEC-aware planning, ampacity, wire
+          size, voltage drop, panels, branch circuits, and how those calculations
+          feed into professional estimates. Use the electrical calculator hub for
+          wire sizing, load calculations, and related field tools.
+        </p>
+        <p>
+          Prefer keyword browsing? Visit the <a class="text-primary underline" href="/blog/tags/">tags index</a> for topics like Manual J, SEER2, AFUE, ampacity, and replacement cost. For product questions, visit <a class="text-primary underline" href="/contact">contact</a> or the <a class="text-primary underline" href="/hvac-ai-estimator">HVAC AI estimator</a> overview.
+        </p>
+        <h2 class="pt-4 text-xl font-semibold text-dark">What you get on a category page</h2>
+        <p>
+          Opening a category shows a short topic overview, featured article
+          summaries pulled from the latest matching posts, related calculator or
+          product links, and the full post grid. FAQs on each category page answer
+          common questions about scope and how the guides relate to code or
+          engineered design.
+        </p>
+        <p>
+          Categories are intentionally broad so you can scan an entire trade
+          practice area. When you need a narrower cut — for example only refrigerant
+          charge, only SEER2, or only voltage drop — switch to tags. Both systems
+          stay in sync with post frontmatter, so new articles appear automatically
+          after publish.
+        </p>
+        <p>
+          If you are evaluating TradesQuote itself, the blog is complementary to
+          the product: guides and calculators help you think through the job, while
+          the AI estimator helps turn that scope into a clean line-item quote your
+          customer can read without a spreadsheet.
+        </p>
+      </div>
     </div>
   </section>
 </Base>
-

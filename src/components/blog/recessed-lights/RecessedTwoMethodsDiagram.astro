@@ -1,0 +1,66 @@
+---
+import { fmt, fmtInt } from "@/lib/nec";
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("rtm");
+
+/**
+ * The two independent methods, computed exactly as the recessed lighting calculator
+ * computes them. On the default 16 × 12 kitchen they land on the same number, which
+ * is a good sign the conventions are consistent rather than a coincidence.
+ */
+const LEN = 16;
+const WID = 12;
+const CEILING = 8;
+const LUMENS = 650;
+const FOOTCANDLES = 40;
+
+const area = LEN * WID;
+const spacing = CEILING / 2;
+const rows = Math.max(1, Math.round(LEN / spacing));
+const cols = Math.max(1, Math.round(WID / spacing));
+const spacingCount = rows * cols;
+
+const lumensNeeded = area * FOOTCANDLES;
+const lumenCount = Math.max(1, Math.ceil(lumensNeeded / LUMENS));
+
+const recommended = Math.max(spacingCount, lumenCount);
+const delivered = recommended * LUMENS;
+const achievedFc = delivered / area;
+const agree = spacingCount === lumenCount;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 274" fill="none" aria-hidden="true">
+  <title>Two ways to count recessed lights, and they agree</title>
+  <desc>
+    The spacing method takes the 8 foot ceiling height divided by two for a 4 foot spacing, giving a 4 by 3 grid of
+    12 fixtures in a 16 by 12 foot room. The light-level method takes 192 square feet times 40 footcandles for 7,680
+    lumens, divided by 650 lumens per trim, giving 12 fixtures. Both methods return 12, delivering 7,800 lumens or
+    about 41 footcandles.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="258" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Two independent methods, one answer: ${recommended} fixtures`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`A ${LEN} × ${WID} ft kitchen, ${CEILING} ft ceiling, ${LUMENS} lm trims, ${FOOTCANDLES} footcandle target.`}</text>
+
+  <rect x="24" y="74" width="320" height="120" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1.5" />
+  <text x="42" y="96" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="800">METHOD 1 · SPACING</text>
+  <text x="42" y="118" fill={C.dark} font-family={FONT} font-size="11">{`Ceiling ${CEILING} ft ÷ 2 = ${fmt(spacing, 1)} ft spacing`}</text>
+  <text x="42" y="138" fill={C.dark} font-family={FONT} font-size="11">{`${LEN} ÷ ${fmt(spacing, 1)} = ${rows} rows · ${WID} ÷ ${fmt(spacing, 1)} = ${cols} columns`}</text>
+  <text x="42" y="172" fill={C.blue} font-family={FONT} font-size="22" font-weight="800">{`${rows} × ${cols} = ${spacingCount}`}</text>
+
+  <rect x="376" y="74" width="320" height="120" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="1.5" />
+  <text x="394" y="96" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">METHOD 2 · LIGHT LEVEL</text>
+  <text x="394" y="118" fill={C.dark} font-family={FONT} font-size="11">{`${fmtInt(area)} ft² × ${FOOTCANDLES} fc = ${fmtInt(lumensNeeded)} lm needed`}</text>
+  <text x="394" y="138" fill={C.dark} font-family={FONT} font-size="11">{`${fmtInt(lumensNeeded)} ÷ ${LUMENS} lm per trim`}</text>
+  <text x="394" y="172" fill={C.orange} font-family={FONT} font-size="22" font-weight="800">{`= ${lumenCount} fixtures`}</text>
+
+  <path d="M184 198 L 184 210" stroke={C.border} stroke-width="1.6" marker-end="url(#rtm-arrow-muted)" />
+  <path d="M536 198 L 536 210" stroke={C.border} stroke-width="1.6" marker-end="url(#rtm-arrow-muted)" />
+
+  <rect x="24" y="212" width="672" height="46" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="232" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{`Take the larger: ${recommended} fixtures${agree ? " — both methods agree here" : ""}`}</text>
+  <text x="44" y="250" fill={C.muted} font-family={FONT} font-size="9.5">{`${recommended} × ${LUMENS} lm = ${fmtInt(delivered)} lm delivered, about ${fmt(achievedFc, 0)} footcandles. Put them on a dimmer and the exact figure stops mattering.`}</text>
+</svg>

@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The answer splits on occupancy. Dwellings: 220.14(J) folds general-use receptacles
+ * into the 3 VA/ft² general lighting load, so there is no count limit. Non-dwellings:
+ * 220.14(I) assigns 180 VA per strap, which does produce a hard number.
+ */
+const cases = [
+  {
+    label: "Dwelling unit",
+    headline: "No NEC limit",
+    accent: C.primary,
+    bg: C.primaryLight,
+    rule: "220.14(J)",
+    detail: [
+      "General-use receptacles are already",
+      "counted inside the 3 VA/ft² general",
+      "lighting load, so they carry no",
+      "individual VA figure and there is no",
+      "maximum count. Spacing is regulated;",
+      "quantity is not.",
+    ],
+  },
+  {
+    label: "Non-dwelling (commercial)",
+    headline: "13 outlets",
+    accent: C.blue,
+    bg: C.blueLight,
+    rule: "220.14(I)",
+    detail: [
+      "Each receptacle on one strap counts",
+      "as 180 VA. A 20 A, 120 V circuit is",
+      "2,400 VA, so 2,400 ÷ 180 = 13.3,",
+      "meaning 13 outlets. Treat the circuit",
+      "as continuous and it drops to 10.",
+      "",
+    ],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Receptacle limits differ between dwellings and commercial occupancies</title>
+  <desc>
+    In a dwelling unit the NEC sets no maximum number of general-use receptacles on a branch circuit,
+    because 220.14(J) already counts them within the 3 volt-amperes per square foot general lighting load.
+    In a non-dwelling occupancy, 220.14(I) assigns 180 volt-amperes to each receptacle on one strap, so a 20
+    amp 120 volt circuit at 2,400 volt-amperes divided by 180 permits 13 outlets, dropping to 10 if the
+    circuit is treated as a continuous load.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The answer depends on the occupancy</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">This is why you'll find both "no limit" and "13" quoted as the correct answer — both are, in context</text>
+
+  {cases.map((c, i) => {
+    const x = 24 + i * 340;
+    return (
+      <g>
+        <rect x={x} y="72" width="324" height="168" rx="10" fill={c.bg} stroke={c.accent} stroke-width="1.5" />
+        <text x={x + 18} y="98" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{c.label}</text>
+        <text x={x + 18} y="132" fill={c.accent} font-family={FONT} font-size="26" font-weight="800">{c.headline}</text>
+        <rect x={x + 214} y="82" width="92" height="22" rx="5" fill={C.white} stroke={c.accent} stroke-width="1" />
+        <text x={x + 260} y="97" text-anchor="middle" fill={c.accent} font-family={FONT} font-size="10" font-weight="700">{c.rule}</text>
+        <text x={x + 18} y="156" fill={C.muted} font-family={FONT} font-size="9.5">
+          {c.detail.map((line, li) => (
+            <tspan x={x + 18} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

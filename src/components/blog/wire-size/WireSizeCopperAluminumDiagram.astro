@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Copper vs aluminum for the same load — NEC Table 310.16, 75 °C column, with the
+ * 240.4(D) small-conductor caps applied (which is why 20 A aluminum lands on 10 AWG
+ * rather than 12). Aluminum runs one to two trade sizes larger for the same amps.
+ */
+const rows = [
+  { amps: "20 A", copper: "12 AWG", aluminum: "10 AWG", note: "1 size up" },
+  { amps: "30 A", copper: "10 AWG", aluminum: "8 AWG", note: "1 size up" },
+  { amps: "50 A", copper: "8 AWG", aluminum: "6 AWG", note: "1 size up" },
+  { amps: "100 A", copper: "3 AWG", aluminum: "1 AWG", note: "2 sizes up" },
+  { amps: "200 A", copper: "3/0 AWG", aluminum: "250 kcmil", note: "2 sizes up" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Copper versus aluminum conductor size for the same load</title>
+  <desc>
+    Aluminum carries less current per unit of area, so it needs a larger conductor for the same load. At
+    20 amps copper takes 12 AWG and aluminum 10 AWG; at 30 amps, 10 AWG versus 8 AWG; at 50 amps, 8 AWG
+    versus 6 AWG; at 100 amps, 3 AWG versus 1 AWG; and at 200 amps, 3/0 copper versus 250 kcmil
+    aluminum. The gap widens from one trade size to two as the load grows.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Same load, two materials</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Table 310.16 at 75 °C, with the 240.4(D) small-conductor caps applied</text>
+
+  <!-- Column headers -->
+  <text x="40" y="90" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">LOAD</text>
+  <text x="190" y="90" fill={C.primary} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">COPPER</text>
+  <text x="380" y="90" fill={C.blue} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">ALUMINUM</text>
+  <text x="580" y="90" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">DIFFERENCE</text>
+  <line x1="24" y1="98" x2="696" y2="98" stroke={C.border} />
+
+  {rows.map((r, i) => {
+    const y = 108 + i * 36;
+    return (
+      <g>
+        <text x="40" y={y + 20} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{r.amps}</text>
+        <rect x="180" y={y + 2} width="130" height="26" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+        <text x="245" y={y + 20} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r.copper}</text>
+        <text x="330" y={y + 20} fill={C.muted} font-family={FONT} font-size="13">→</text>
+        <rect x="370" y={y + 2} width="130" height="26" rx="6" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+        <text x="435" y={y + 20} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r.aluminum}</text>
+        <text x="580" y={y + 20} fill={C.muted} font-family={FONT} font-size="11">{r.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="282" fill={C.muted} font-family={FONT} font-size="10">Aluminum also drops more voltage per foot — K is 21.2 against copper's 12.9 — so long aluminum runs go up again.</text>
+</svg>

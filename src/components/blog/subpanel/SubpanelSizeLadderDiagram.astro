@@ -1,0 +1,94 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { TABLE_310_12, findSizeByAmpacity, egcSize } from "@/lib/nec";
+
+/**
+ * The two tables side by side. Read straight out of nec.ts rather than
+ * transcribed, so the page cannot drift from the calculators.
+ */
+const rows = [60, 100, 125, 150, 175, 200].map((amps) => {
+  const t312 = TABLE_310_12.find((r) => r.rating === amps);
+  return {
+    amps,
+    ordinaryCu: findSizeByAmpacity(amps, "copper", 75)?.label ?? "—",
+    ordinaryAl: findSizeByAmpacity(amps, "aluminum", 75)?.label ?? "—",
+    dwellingCu: t312?.copper ?? "n/a",
+    dwellingAl: t312?.aluminum ?? "n/a",
+    egcCu: egcSize(amps, "copper"),
+    egcAl: egcSize(amps, "aluminum"),
+  };
+});
+
+const COLS = [
+  { x: 40, label: "Feeder" },
+  { x: 138, label: "Cu (310.16)" },
+  { x: 236, label: "Al (310.16)" },
+  { x: 344, label: "Cu (310.12)" },
+  { x: 444, label: "Al (310.12)" },
+  { x: 556, label: "EGC Cu" },
+  { x: 640, label: "EGC Al" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 282" fill="none" aria-hidden="true">
+  <title>Subpanel feeder conductor sizes by table</title>
+  <desc>
+    An ordinary 100 amp subpanel needs 3 AWG copper or 1 AWG aluminium from Table 310.16, while a feeder carrying
+    an entire dwelling load may use 4 AWG copper or 2 AWG aluminium under Table 310.12. At 200 amps the difference
+    is 3/0 copper against 2/0. Table 310.12 has no 60 amp row because 100 amps is the minimum dwelling service.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="266" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    One rating, two answers — pick the right table
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Ordinary subpanel from 310.16 at 75°C. Whole-dwelling feeder from 310.12. EGC from Table 250.122.
+  </text>
+
+  <rect x="24" y="64" width="290" height="20" rx="4" fill={C.redLight} stroke={C.red} stroke-width="1.2" />
+  <text x="169" y="78" text-anchor="middle" fill={C.red} font-family={FONT} font-size="9" font-weight="800">
+    ORDINARY SUBPANEL — Table 310.16
+  </text>
+  <rect x="322" y="64" width="200" height="20" rx="4" fill={C.greenLight} stroke={C.green} stroke-width="1.2" />
+  <text x="422" y="78" text-anchor="middle" fill={C.green} font-family={FONT} font-size="9" font-weight="800">
+    WHOLE DWELLING — 310.12
+  </text>
+  <rect x="530" y="64" width="166" height="20" rx="4" fill={C.white} stroke={C.border} stroke-width="1.2" />
+  <text x="613" y="78" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9" font-weight="800">
+    GROUND — Table 250.122
+  </text>
+
+  {COLS.map((c) => (
+    <text x={c.x} y={100} fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">{c.label}</text>
+  ))}
+  <line x1="24" y1="106" x2="696" y2="106" stroke={C.border} />
+
+  {rows.map((r, i) => {
+    const y = 124 + i * 24;
+    const highlight = r.amps === 100;
+    return (
+      <g>
+        {highlight && <rect x="24" y={y - 15} width="672" height="22" rx="4" fill={C.primary} opacity="0.07" />}
+        <text x={COLS[0].x} y={y} fill={C.dark} font-family={FONT} font-size="10" font-weight={highlight ? "800" : "700"}>
+          {`${r.amps} A`}
+        </text>
+        <text x={COLS[1].x} y={y} fill={C.red} font-family={FONT} font-size="10" font-weight="800">{r.ordinaryCu}</text>
+        <text x={COLS[2].x} y={y} fill={C.red} font-family={FONT} font-size="10" font-weight="800">{r.ordinaryAl}</text>
+        <text x={COLS[3].x} y={y} fill={r.dwellingCu === "n/a" ? C.muted : C.green} font-family={FONT} font-size="10" font-weight="800">
+          {r.dwellingCu}
+        </text>
+        <text x={COLS[4].x} y={y} fill={r.dwellingAl === "n/a" ? C.muted : C.green} font-family={FONT} font-size="10" font-weight="800">
+          {r.dwellingAl}
+        </text>
+        <text x={COLS[5].x} y={y} fill={C.muted} font-family={FONT} font-size="10" font-weight="700">{r.egcCu}</text>
+        <text x={COLS[6].x} y={y} fill={C.muted} font-family={FONT} font-size="10" font-weight="700">{r.egcAl}</text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="256" x2="696" y2="256" stroke={C.border} />
+  <text x="28" y="270" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">
+    310.12 has no 60 A row — 230.79(C) sets 100 A as the minimum one-family dwelling service.
+  </text>
+</svg>

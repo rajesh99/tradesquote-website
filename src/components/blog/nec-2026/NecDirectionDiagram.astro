@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The direction of travel across cycles, which is more durable guidance than any
+ * single change list — because knowing which way the code moves tells you what to
+ * expect before you read the new edition.
+ */
+const themes = [
+  {
+    theme: "GFCI and AFCI scope",
+    direction: "Widening, cycle after cycle",
+    detail: "More locations, then appliances, then outdoor outlets. Also the most amended area.",
+    accent: C.orange,
+  },
+  {
+    theme: "Electrification capacity",
+    direction: "Load management formalised",
+    detail: "625.42 for EVSE and Article 750 give code standing to controlled loads instead of bigger services.",
+    accent: C.primary,
+  },
+  {
+    theme: "Energy storage and PV",
+    direction: "Growing and restructuring",
+    detail: "Articles 690, 705 and 706 have all moved substantially across recent cycles.",
+    accent: C.blue,
+  },
+  {
+    theme: "Serviceability and safety at the panel",
+    direction: "More required hardware",
+    detail: "Emergency disconnects, surge protection, labelling and working-space enforcement.",
+    accent: C.blue,
+  },
+  {
+    theme: "Reorganisation",
+    direction: "Renumbering without new rules",
+    detail: "Article 235 and the Chapter 8 restructure moved text without changing requirements.",
+    accent: C.muted,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>The direction the code has been moving</title>
+  <desc>
+    Five durable themes across recent code cycles. GFCI and AFCI scope keeps widening, into more locations then
+    appliances then outdoor outlets, and is also the most amended area. Electrification capacity is being addressed
+    through formal load management under 625.42 and Article 750 rather than larger services. Energy storage and
+    photovoltaic articles 690, 705 and 706 keep growing and restructuring. Panel serviceability and safety requirements
+    keep adding hardware such as emergency disconnects and surge protection. And some changes are pure reorganisation
+    that renumbers text without altering requirements.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Knowing the direction beats memorising the list</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">These themes have held across several cycles, which makes them better predictors than any one change.</text>
+
+  {themes.map((t, i) => {
+    const y = 64 + i * 34;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="30" rx="7" fill={C.white} stroke={C.border} />
+        <rect x="24" y={y} width="4" height="30" rx="2" fill={t.accent} />
+        <text x="38" y={y + 13} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{t.theme}</text>
+        <text x="38" y={y + 25} fill={C.muted} font-family={FONT} font-size="7.5">{t.detail}</text>
+        <rect x="452" y={y + 6} width="230" height="18" rx="5" fill={t.accent} opacity="0.16" />
+        <text x="567" y={y + 19} text-anchor="middle" fill={t.accent} font-family={FONT} font-size="8.5" font-weight="800">{t.direction}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="236" fill={C.muted} font-family={FONT} font-size="10">Reorganisation is worth spotting: a renumbered section reads like a new rule and isn't one.</text>
+</svg>

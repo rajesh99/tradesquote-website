@@ -1,0 +1,53 @@
+---
+import { ampacityOf, CONDUCTOR_SIZES } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The only thing that separates these three methods numerically is which column
+ * of Table 310.16 you may read — and, crucially, all three still derate from the
+ * 90 °C column. NM's penalty is the ceiling, not the arithmetic.
+ */
+const SIZE = CONDUCTOR_SIZES.find((s) => s.label === "6")!;
+
+const methods = [
+  { name: "NM-B cable (Romex)", rule: "334.80", column: 60 as const, accent: C.red, note: "interior dry locations only" },
+  { name: "MC cable", rule: "330.80 + 110.14(C)", column: 75 as const, accent: C.blue, note: "90 °C conductors, 75 °C terminations" },
+  { name: "THHN/THWN-2 in conduit", rule: "110.14(C)", column: 75 as const, accent: C.blue, note: "wet-rated as THWN-2" },
+].map((m) => ({ ...m, amps: ampacityOf(SIZE, "copper", m.column)! }));
+
+const derateBase = ampacityOf(SIZE, "copper", 90)!;
+const spread = methods[1].amps - methods[0].amps;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>Which ampacity column each wiring method may use</title>
+  <desc>
+    For 6 AWG copper, NM-B cable is limited to the 60 degree column at 55 amps by section 334.80, while MC cable and
+    THHN in conduit both reach the 75 degree column at 65 amps. All three may still use the 90 degree column value of
+    75 amps as the base for correction and adjustment factors, so the derating arithmetic is identical across the
+    three methods. The 10 amp spread in usable ampacity is what changes conductor sizes.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The wiring method picks the column, not the wire</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">6 AWG copper in every row. Only the permitted column changes.</text>
+
+  {methods.map((m, i) => {
+    const y = 76 + i * 52;
+    return (
+      <g>
+        <rect x="24" y={y} width="456" height="44" rx="9" fill={m.accent} opacity="0.08" />
+        <rect x="24" y={y} width="456" height="44" rx="9" fill="none" stroke={m.accent} stroke-width="1.6" />
+        <text x="42" y={y + 20} fill={m.accent} font-family={FONT} font-size="11.5" font-weight="800">{m.name}</text>
+        <text x="42" y={y + 35} fill={C.muted} font-family={FONT} font-size="8.5">{`${m.rule} — ${m.note}`}</text>
+        <rect x="496" y={y} width="200" height="44" rx="9" fill={C.white} stroke={m.accent} stroke-width="1.8" />
+        <text x="560" y={y + 28} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10" font-weight="700">{`${m.column} °C`}</text>
+        <text x="650" y={y + 29} text-anchor="middle" fill={m.accent} font-family={FONT} font-size="17" font-weight="800">{`${m.amps} A`}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="232" width="672" height="42" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="42" y="250" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`All three derate from the 90 °C column — ${derateBase} A here`}</text>
+  <text x="42" y="266" fill={C.muted} font-family={FONT} font-size="9">{`So the derating maths is identical. The ${spread} A gap in usable ampacity is the whole difference.`}</text>
+</svg>

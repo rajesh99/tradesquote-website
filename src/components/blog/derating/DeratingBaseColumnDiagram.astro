@@ -1,0 +1,59 @@
+---
+import { ampacityOf, ambientFactor, bundlingFactor, CONDUCTOR_SIZES, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The single most consequential decision in a derating calculation is which
+ * temperature column you start from. 110.14(C) caps the *result* at the
+ * termination rating, but 310.15 derates from the conductor's own insulation
+ * rating — so a 90 °C conductor derates from the 90 °C column even when it
+ * terminates on 75 °C lugs. Starting at 75 °C fails a circuit that is legal.
+ */
+const SIZE = CONDUCTOR_SIZES.find((s) => s.label === "12")!;
+const AMBIENT_C = 40;
+const COUNT = 6;
+const BREAKER = 20;
+
+const base90 = ampacityOf(SIZE, "copper", 90)!;
+const base75 = ampacityOf(SIZE, "copper", 75)!;
+const bundle = bundlingFactor(COUNT);
+
+const right = base90 * ambientFactor(AMBIENT_C, 90) * bundle;
+const wrong = base75 * ambientFactor(AMBIENT_C, 75) * bundle;
+
+const rightPasses = right >= BREAKER;
+const wrongPasses = wrong >= BREAKER;
+const penalty = right - wrong;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>Which temperature column you derate from decides the answer</title>
+  <desc>
+    Six 12 AWG copper THHN conductors in a 40 degree Celsius ambient. Derating correctly from the 90 degree column,
+    30 amps times 0.91 times 0.80 gives 21.84 amps, which holds a 20 amp breaker. Derating incorrectly from the 75
+    degree column, 25 amps times 0.88 times 0.80 gives 17.60 amps, which does not, and would send you to a larger
+    conductor you never needed. The gap is 4.24 amps.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Derate from the conductor's column, not the terminal's</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`${COUNT} current-carrying 12 AWG copper THHN in one raceway, ${AMBIENT_C} °C ambient, on a ${BREAKER} A breaker.`}</text>
+
+  <rect x="24" y="76" width="456" height="58" rx="9" fill={C.greenLight} stroke={C.green} stroke-width="1.4" />
+  <text x="42" y="98" fill={C.green} font-family={FONT} font-size="9.5" font-weight="800">CORRECT · DERATE FROM THE 90 °C COLUMN</text>
+  <text x="42" y="120" fill={C.dark} font-family={FONT} font-size="12">{`${base90} A × ${ambientFactor(AMBIENT_C, 90)} ambient × ${bundle} bundling`}</text>
+  <rect x="496" y="76" width="200" height="58" rx="9" fill={C.white} stroke={C.green} stroke-width="2.4" />
+  <text x="596" y="106" text-anchor="middle" fill={C.green} font-family={FONT} font-size="19" font-weight="800">{`${fmt(right, 2)} A`}</text>
+  <text x="596" y="124" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{rightPasses ? `holds ${BREAKER} A` : `short of ${BREAKER} A`}</text>
+
+  <rect x="24" y="146" width="456" height="58" rx="9" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="42" y="168" fill={C.red} font-family={FONT} font-size="9.5" font-weight="800">WRONG · DERATING FROM THE 75 °C COLUMN</text>
+  <text x="42" y="190" fill={C.dark} font-family={FONT} font-size="12">{`${base75} A × ${ambientFactor(AMBIENT_C, 75)} ambient × ${bundle} bundling`}</text>
+  <rect x="496" y="146" width="200" height="58" rx="9" fill={C.white} stroke={C.red} stroke-width="1.4" />
+  <text x="596" y="176" text-anchor="middle" fill={C.red} font-family={FONT} font-size="19" font-weight="800">{`${fmt(wrong, 2)} A`}</text>
+  <text x="596" y="194" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">{wrongPasses ? `holds ${BREAKER} A` : `${fmt(BREAKER - wrong, 2)} A short — upsize for nothing`}</text>
+
+  <rect x="24" y="216" width="672" height="58" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="44" y="240" fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{`Same circuit, ${fmt(penalty, 2)} A apart — and only one of the two answers is code`}</text>
+  <text x="44" y="260" fill={C.muted} font-family={FONT} font-size="9.5">110.14(C) caps the finished number at the 75 °C column (25 A here). It does not change where you start.</text>
+</svg>

@@ -1,0 +1,63 @@
+---
+import { nextStandardOcpd, STANDARD_OCPD, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The full ladder both ways. The right-hand column is the useful one and the
+ * one nobody tabulates: a load equal to the breaker's own rating needs the
+ * NEXT device up, and at 50 A the 62.5 A result isn't a standard rating at all,
+ * so it jumps two steps to 70 A.
+ */
+const rows = [15, 20, 30, 40, 50, 60, 100, 200].map((ocpd) => {
+  const allowed = ocpd * 0.8;
+  const needed = ocpd * 1.25;
+  const device = nextStandardOcpd(needed);
+  const isStandard = STANDARD_OCPD.includes(needed);
+  return { ocpd, allowed, needed, device, isStandard, jump: device - ocpd };
+});
+
+const BAR_X = 300;
+const BAR_MAX = 250;
+const peak = Math.max(...rows.map((r) => r.ocpd));
+const bars = rows.map((r) => ({
+  ...r,
+  full: Math.max(24, Math.round((r.ocpd / peak) * BAR_MAX)),
+  cont: Math.max(19, Math.round((r.allowed / peak) * BAR_MAX)),
+}));
+const oddball = rows.find((r) => !r.isStandard && r.device - r.needed > 5);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 328" fill="none" aria-hidden="true">
+  <title>Continuous load limits by breaker rating</title>
+  <desc>
+    A 15 amp breaker allows 12 amps of continuous load, 20 amps allows 16, 30 allows 24, 40 allows 32, 50 allows 40,
+    60 allows 48, 100 allows 80 and 200 allows 160. Working the other way, a continuous load equal to a breaker's own
+    rating always needs the next device up: a 50 amp continuous load computes to 62.5 amps, which is not a standard
+    rating, so it takes a 70 amp device.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="312" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What each breaker allows, and what each load demands</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Faint bar is the device rating; solid bar is the continuous load it permits.</text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DEVICE</text>
+  <text x="94" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CONTINUOUS ALLOWED</text>
+  <text x={BAR_X} y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HEADROOM</text>
+  <text x="580" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">THAT LOAD NEEDS</text>
+
+  {bars.map((r, i) => {
+    const y = 90 + i * 27;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.ocpd} A`}</text>
+        <text x="94" y={y + 15} fill={C.green} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(r.allowed, 0)} A`}</text>
+        <rect x={BAR_X} y={y + 2} width={r.full} height="18" rx="4" fill={C.border} opacity="0.5" />
+        <rect x={BAR_X} y={y + 2} width={r.cont} height="18" rx="4" fill={C.green} opacity="0.2" />
+        <rect x={BAR_X} y={y + 2} width={r.cont} height="18" rx="4" fill="none" stroke={C.green} stroke-width="1.4" />
+        <text x="580" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5">{`${fmt(r.needed, 1)} A → ${r.device} A`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="306" fill={C.muted} font-family={FONT} font-size="10">{`${oddball?.ocpd} A is the awkward one: ${fmt(oddball!.needed, 1)} A is not a 240.6(A) rating, so it jumps to ${oddball?.device} A.`}</text>
+</svg>

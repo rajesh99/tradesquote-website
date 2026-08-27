@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Diagnosis keyed on WHEN it trips, because the timing narrows the cause faster
+ * than any other single observation — and it's free. Most published advice jumps
+ * straight to swapping parts.
+ */
+const branches = [
+  {
+    when: "On energisation only",
+    then: "Inrush",
+    detail: "LED driver capacitors or a motor starting. Count the fixtures against the manufacturer's per-circuit maximum, or split the circuit.",
+    accent: C.orange,
+  },
+  {
+    when: "Immediately, with nothing plugged in",
+    then: "Wiring",
+    detail: "A shared neutral, or a neutral touching ground. Disconnect the neutral at the panel and check continuity to ground.",
+    accent: C.red,
+  },
+  {
+    when: "Under load, repeatably",
+    then: "One load or one termination",
+    detail: "Add loads back one at a time. If it survives all of them, it's a termination — check every screw on the circuit.",
+    accent: C.blue,
+  },
+  {
+    when: "Randomly, over weeks",
+    then: "Intermittent connection",
+    detail: "The hardest case and the most likely to be a real hazard. Insulation resistance test, then open every box.",
+    accent: C.primary,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Diagnosing a trip by when it happens</title>
+  <desc>
+    Tripping on energisation only points to inrush from LED drivers or a motor starting. Tripping immediately with
+    nothing plugged in points to a wiring fault such as a shared neutral or a neutral touching ground. Tripping under
+    load repeatably points to one specific load or one termination, found by adding loads back one at a time.
+    Tripping randomly over weeks points to an intermittent connection, which is the hardest case and the most likely
+    to be a genuine hazard.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Start with when it trips — it costs nothing and narrows it fast</text>
+
+  {branches.map((b, i) => {
+    const y = 50 + i * 50;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="42" rx="9" fill={b.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="42" rx="9" fill="none" stroke={b.accent} stroke-width="1.5" />
+        <text x="40" y={y + 18} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{b.when}</text>
+        <text x="40" y={y + 33} fill={C.muted} font-family={FONT} font-size="8.5">{b.detail}</text>
+        <path d={`M 262 ${y + 15} L 280 ${y + 15}`} stroke={b.accent} stroke-width="1.6" />
+        <path d={`M 276 ${y + 11} L 281 ${y + 15} L 276 ${y + 19}`} stroke={b.accent} stroke-width="1.6" fill="none" />
+        <rect x="288" y={y + 6} width="118" height="19" rx="5" fill={b.accent} opacity="0.18" />
+        <text x="347" y={y + 19} text-anchor="middle" fill={b.accent} font-family={FONT} font-size="9" font-weight="800">{b.then}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="246" fill={C.muted} font-family={FONT} font-size="10">Modern AFCI breakers blink a trip code that names the cause. Read it before opening anything.</text>
+</svg>

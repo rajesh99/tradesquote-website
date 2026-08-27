@@ -1,0 +1,60 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Capacity in kVA is simply rating × 240 V. The "suits" rows are practical guidance,
+ * not code — the load calculation is what actually decides.
+ */
+const columns = [
+  {
+    rating: "100 A",
+    capacity: "24 kVA",
+    accent: C.blue,
+    bg: C.blueLight,
+    fits: ["Gas heat, gas range,", "gas water heater", "Modest square footage", "No EV, no heat pump"],
+    verdict: "Still legal, rarely chosen new",
+  },
+  {
+    rating: "200 A",
+    capacity: "48 kVA",
+    accent: C.primary,
+    bg: C.primaryLight,
+    fits: ["Electric range, dryer,", "water heater", "Heat pump or central A/C", "EV charging headroom"],
+    verdict: "The modern default",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>100 amp versus 200 amp residential service</title>
+  <desc>
+    A 100 amp service provides about 24 kilovolt-amperes at 240 volts and suits a house with gas heat, a gas
+    range and gas water heating, modest square footage, and no electric vehicle or heat pump — still legal but
+    rarely chosen for new work. A 200 amp service provides about 48 kilovolt-amperes and covers an electric
+    range, dryer and water heater, a heat pump or central air conditioning, and leaves headroom for electric
+    vehicle charging. It is the modern default.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What each service actually gives you</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Capacity is just rating × 240 V. Which one you need comes from a load calculation, not a rule of thumb.</text>
+
+  {columns.map((col, i) => {
+    const x = 24 + i * 340;
+    return (
+      <g>
+        <rect x={x} y="72" width="324" height="196" rx="10" fill={col.bg} stroke={col.accent} stroke-width="1.6" />
+        <text x={x + 20} y="112" fill={col.accent} font-family={FONT} font-size="30" font-weight="800">{col.rating}</text>
+        <text x={x + 130} y="112" fill={C.dark} font-family={FONT} font-size="17" font-weight="700">{col.capacity}</text>
+        <line x1={x + 20} y1="126" x2={x + 304} y2="126" stroke={col.accent} stroke-opacity="0.35" />
+        <text x={x + 20} y="150" fill={C.muted} font-family={FONT} font-size="10">
+          {col.fits.map((line, li) => (
+            <tspan x={x + 20} dy={li === 0 ? "0" : "15"}>{line}</tspan>
+          ))}
+        </text>
+        <rect x={x + 20} y="222" width="284" height="28" rx="7" fill={C.white} stroke={col.accent} stroke-width="1.3" />
+        <text x={x + 162} y="241" text-anchor="middle" fill={col.accent} font-family={FONT} font-size="11.5" font-weight="800">{col.verdict}</text>
+      </g>
+    );
+  })}
+</svg>

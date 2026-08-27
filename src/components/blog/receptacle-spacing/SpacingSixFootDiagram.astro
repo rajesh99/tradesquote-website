@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * A wall elevation drawn to scale, because the 6-foot rule only makes sense
+ * visually: the requirement is a 6 ft radius from every point on the floor line,
+ * and the familiar 12 ft spacing is what falls out of overlapping those radii.
+ * The end-of-wall case is where people under-install.
+ */
+const WALL_FT = 20;
+const SCALE = 32; // px per foot
+const X0 = 40;
+const FLOOR_Y = 168;
+
+/** Receptacles at 6, 18 ft — the maximum legal spacing on a 20 ft wall. */
+const OUTLETS = [6, 18];
+const wallEnd = X0 + WALL_FT * SCALE;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>The six-foot rule drawn along a wall</title>
+  <desc>
+    A 20 foot wall with receptacles at 6 feet and 18 feet from the left corner. Each receptacle covers 6 feet in
+    either direction, so the first covers from the corner to 12 feet and the second from 12 feet to the far corner.
+    Every point along the floor line is within 6 feet of an outlet, and the two receptacles are 12 feet apart — the
+    spacing is a consequence of the reach requirement, not the requirement itself.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A 20 ft wall, and the maximum legal spacing on it</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Each receptacle reaches 6 ft either way. Overlap them and nothing is further than 6 ft from an outlet.</text>
+
+  {/* coverage bands */}
+  {OUTLETS.map((ft, i) => {
+    const cx = X0 + ft * SCALE;
+    const left = Math.max(X0, cx - 6 * SCALE);
+    const right = Math.min(wallEnd, cx + 6 * SCALE);
+    return (
+      <g>
+        <rect x={left} y={FLOOR_Y - 46} width={right - left} height="46" rx="4" fill={i === 0 ? C.primary : C.blue} opacity="0.13" />
+        <line x1={left} y1={FLOOR_Y - 54} x2={right} y2={FLOOR_Y - 54} stroke={i === 0 ? C.primary : C.blue} stroke-width="1.4" />
+        <text x={(left + right) / 2} y={FLOOR_Y - 60} text-anchor="middle" fill={i === 0 ? C.primary : C.blue} font-family={FONT} font-size="8.5" font-weight="700">
+          {`covers ${Math.round((left - X0) / SCALE)}–${Math.round((right - X0) / SCALE)} ft`}
+        </text>
+      </g>
+    );
+  })}
+
+  {/* wall + floor */}
+  <line x1={X0} y1={FLOOR_Y} x2={wallEnd} y2={FLOOR_Y} stroke={C.dark} stroke-width="2.4" />
+  <line x1={X0} y1={FLOOR_Y - 76} x2={X0} y2={FLOOR_Y} stroke={C.dark} stroke-width="2.4" />
+  <line x1={wallEnd} y1={FLOOR_Y - 76} x2={wallEnd} y2={FLOOR_Y} stroke={C.dark} stroke-width="2.4" />
+
+  {/* receptacles */}
+  {OUTLETS.map((ft, i) => {
+    const cx = X0 + ft * SCALE;
+    return (
+      <g>
+        <rect x={cx - 9} y={FLOOR_Y - 34} width="18" height="26" rx="3" fill={C.white} stroke={i === 0 ? C.primary : C.blue} stroke-width="2" />
+        <circle cx={cx} cy={FLOOR_Y - 26} r="2" fill={i === 0 ? C.primary : C.blue} />
+        <circle cx={cx} cy={FLOOR_Y - 18} r="2" fill={i === 0 ? C.primary : C.blue} />
+        <text x={cx} y={FLOOR_Y + 15} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="700">{`${ft} ft`}</text>
+      </g>
+    );
+  })}
+
+  {/* the 12 ft dimension between them */}
+  <line x1={X0 + OUTLETS[0] * SCALE} y1={FLOOR_Y + 32} x2={X0 + OUTLETS[1] * SCALE} y2={FLOOR_Y + 32} stroke={C.orange} stroke-width="1.6" />
+  <line x1={X0 + OUTLETS[0] * SCALE} y1={FLOOR_Y + 27} x2={X0 + OUTLETS[0] * SCALE} y2={FLOOR_Y + 37} stroke={C.orange} stroke-width="1.6" />
+  <line x1={X0 + OUTLETS[1] * SCALE} y1={FLOOR_Y + 27} x2={X0 + OUTLETS[1] * SCALE} y2={FLOOR_Y + 37} stroke={C.orange} stroke-width="1.6" />
+  <text x={X0 + 12 * SCALE} y={FLOOR_Y + 28} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="9.5" font-weight="800">12 ft apart</text>
+
+  {/* the 6 ft from corner */}
+  <text x={X0 + 3 * SCALE} y={FLOOR_Y + 15} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">6 ft max from a corner</text>
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">The end-of-wall case is where people under-install: an outlet may be no more than 6 ft from the corner.</text>
+</svg>

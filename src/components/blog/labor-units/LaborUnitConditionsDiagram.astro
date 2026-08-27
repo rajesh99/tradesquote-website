@@ -1,0 +1,60 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The conditions factor, applied to the same 0.80 h assembly. This is where
+ * published units go wrong in service work: "normal conditions" means new
+ * construction with clear access, which describes almost no retrofit job.
+ */
+const BASE = 0.8;
+
+const conditions = [
+  { name: "New construction, open frame", factor: 1.0, note: "what the published units assume", accent: C.green },
+  { name: "New construction, tight schedule", factor: 1.15, note: "trade stacking, congestion", accent: C.blue },
+  { name: "Occupied retrofit", factor: 1.5, note: "protect finishes, work around people", accent: C.orange },
+  { name: "High ceilings, over 12 ft", factor: 1.3, note: "lifts and ladder time", accent: C.orange },
+  { name: "Hazardous or classified area", factor: 1.5, note: "sealing fittings, permits, procedure", accent: C.red },
+  { name: "Occupied retrofit, high ceiling", factor: 1.5 * 1.3, note: "factors multiply — they don't add", accent: C.red },
+].map((c) => ({ ...c, hours: BASE * c.factor }));
+
+const peak = Math.max(...conditions.map((c) => c.hours));
+const BAR_X = 260;
+const BAR_MAX = 280;
+const bars = conditions.map((c) => ({ ...c, width: Math.round((c.hours / peak) * BAR_MAX) }));
+const worst = conditions[conditions.length - 1];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Conditions factors applied to a labour unit</title>
+  <desc>
+    The same 0.80 hour receptacle assembly takes 0.80 hours in open new construction, 0.92 hours on a congested new
+    build, 1.20 hours in an occupied retrofit, 1.04 hours where ceilings exceed 12 feet, and 1.20 hours in a classified
+    area. An occupied retrofit with high ceilings combines to 1.56 hours, because conditions factors multiply rather
+    than add — nearly double the published figure for identical scope.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`The same ${fmt(BASE, 2)} h assembly under six conditions`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Published units assume the first row. Most service work is the third or worse.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CONDITIONS</text>
+  <text x="204" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">FACTOR</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOURS PER DEVICE</text>
+
+  {bars.map((c, i) => {
+    const y = 86 + i * 28;
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{c.name}</text>
+        <text x="28" y={y + 22} fill={C.muted} font-family={FONT} font-size="7.5">{c.note}</text>
+        <text x="204" y={y + 17} fill={c.accent} font-family={FONT} font-size="10" font-weight="800">{`×${fmt(c.factor, 2)}`}</text>
+        <rect x={BAR_X} y={y + 1} width={c.width} height="18" rx="5" fill={c.accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={c.width} height="18" rx="5" fill="none" stroke={c.accent} stroke-width="1.4" />
+        <text x={BAR_X + 8} y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{`${fmt(c.hours, 2)} h`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="254" fill={C.muted} font-family={FONT} font-size="10">{`Worst case is ${fmt(worst.hours / BASE, 2)}× the book figure. Getting the factor wrong swamps every other estimating error.`}</text>
+</svg>

@@ -1,0 +1,101 @@
+---
+import { fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The 16 × 12 layout drawn to scale at 20 px per foot. The half-spacing wall offset is
+ * what makes the arithmetic close exactly: 2 + 4 + 4 + 4 + 2 = 16 along the length and
+ * 2 + 4 + 4 + 2 = 12 across the width.
+ */
+const LEN = 16;
+const WID = 12;
+const CEILING = 8;
+const LUMENS = 650;
+const PX_PER_FT = 20;
+
+const spacing = CEILING / 2;
+const rows = Math.round(LEN / spacing);
+const cols = Math.round(WID / spacing);
+const offset = spacing / 2;
+const count = rows * cols;
+const area = LEN * WID;
+
+const ORIGIN_X = 196;
+const ORIGIN_Y = 84;
+const roomW = LEN * PX_PER_FT;
+const roomH = WID * PX_PER_FT;
+
+const xs = Array.from({ length: rows }, (_, i) => offset + i * spacing);
+const ys = Array.from({ length: cols }, (_, i) => offset + i * spacing);
+const fixtures = xs.flatMap((fx) => ys.map((fy) => ({ fx, fy })));
+
+const facts = [
+  { label: "Spacing", value: `${fmt(spacing, 1)} ft` },
+  { label: "Wall offset", value: `${fmt(offset, 1)} ft` },
+  { label: "Grid", value: `${rows} × ${cols}` },
+  { label: "Fixtures", value: `${count}` },
+  { label: "Delivered", value: `${fmtInt(count * LUMENS)} lm` },
+  { label: "Light level", value: `${fmt((count * LUMENS) / area, 0)} fc` },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 372" fill="none" aria-hidden="true">
+  <title>Plan layout of a 4 by 3 recessed grid in a 16 by 12 foot room</title>
+  <desc>
+    Twelve fixtures in four rows of three, spaced 4 feet apart, each outer row set 2 feet from the wall. Along the
+    16 foot length that is 2 plus 4 plus 4 plus 4 plus 2. Across the 12 foot width it is 2 plus 4 plus 4 plus 2. The
+    half-spacing wall offset is what makes the grid close exactly on both dimensions.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="356" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`The wall offset is half the spacing — ${fmt(offset, 1)} ft, not ${fmt(spacing, 1)}`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`Which is why the grid closes exactly: ${fmt(offset, 1)} + ${rows - 1} × ${fmt(spacing, 1)} + ${fmt(offset, 1)} = ${LEN} ft.`}</text>
+
+  {/* Room */}
+  <rect x={ORIGIN_X} y={ORIGIN_Y} width={roomW} height={roomH} rx="4" fill={C.white} stroke={C.dark} stroke-width="2" />
+
+  {/* Grid guides */}
+  {xs.map((fx) => (
+    <line x1={ORIGIN_X + fx * PX_PER_FT} y1={ORIGIN_Y} x2={ORIGIN_X + fx * PX_PER_FT} y2={ORIGIN_Y + roomH} stroke={C.border} stroke-width="0.8" stroke-dasharray="3 4" />
+  ))}
+  {ys.map((fy) => (
+    <line x1={ORIGIN_X} y1={ORIGIN_Y + fy * PX_PER_FT} x2={ORIGIN_X + roomW} y2={ORIGIN_Y + fy * PX_PER_FT} stroke={C.border} stroke-width="0.8" stroke-dasharray="3 4" />
+  ))}
+
+  {/* Fixtures */}
+  {fixtures.map((f) => (
+    <g>
+      <circle cx={ORIGIN_X + f.fx * PX_PER_FT} cy={ORIGIN_Y + f.fy * PX_PER_FT} r="11" fill={C.primary} opacity="0.16" />
+      <circle cx={ORIGIN_X + f.fx * PX_PER_FT} cy={ORIGIN_Y + f.fy * PX_PER_FT} r="11" fill="none" stroke={C.primary} stroke-width="1.8" />
+      <circle cx={ORIGIN_X + f.fx * PX_PER_FT} cy={ORIGIN_Y + f.fy * PX_PER_FT} r="3.5" fill={C.primary} />
+    </g>
+  ))}
+
+  {/* Top dimensions */}
+  <line x1={ORIGIN_X} y1="74" x2={ORIGIN_X + offset * PX_PER_FT} y2="74" stroke={C.blue} stroke-width="1.4" />
+  <text x={ORIGIN_X + (offset * PX_PER_FT) / 2} y="70" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">{`${fmt(offset, 0)}'`}</text>
+  <line x1={ORIGIN_X + offset * PX_PER_FT} y1="74" x2={ORIGIN_X + (offset + spacing) * PX_PER_FT} y2="74" stroke={C.orange} stroke-width="1.4" />
+  <text x={ORIGIN_X + (offset + spacing / 2) * PX_PER_FT} y="70" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="8.5" font-weight="700">{`${fmt(spacing, 0)}'`}</text>
+
+  {/* Left dimensions */}
+  <line x1="186" y1={ORIGIN_Y} x2="186" y2={ORIGIN_Y + offset * PX_PER_FT} stroke={C.blue} stroke-width="1.4" />
+  <text x="178" y={ORIGIN_Y + (offset * PX_PER_FT) / 2 + 3} text-anchor="end" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">{`${fmt(offset, 0)}'`}</text>
+  <line x1="186" y1={ORIGIN_Y + offset * PX_PER_FT} x2="186" y2={ORIGIN_Y + (offset + spacing) * PX_PER_FT} stroke={C.orange} stroke-width="1.4" />
+  <text x="178" y={ORIGIN_Y + (offset + spacing / 2) * PX_PER_FT + 3} text-anchor="end" fill={C.orange} font-family={FONT} font-size="8.5" font-weight="700">{`${fmt(spacing, 0)}'`}</text>
+
+  <text x={ORIGIN_X + roomW / 2} y={ORIGIN_Y + roomH + 22} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">{`${LEN} ft × ${WID} ft = ${fmtInt(area)} ft²`}</text>
+
+  {/* Facts panel */}
+  <rect x="556" y="84" width="140" height="240" rx="10" fill={C.white} stroke={C.border} />
+  {facts.map((f, i) => {
+    const y = 112 + i * 38;
+    return (
+      <g>
+        <text x="572" y={y} fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{f.label.toUpperCase()}</text>
+        <text x="572" y={y + 16} fill={C.dark} font-family={FONT} font-size="14" font-weight="800">{f.value}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="352" fill={C.muted} font-family={FONT} font-size="10">In a kitchen, shift the row nearest the counter so the beam lands on the worktop edge, not the room centre. The grid is a starting point.</text>
+</svg>

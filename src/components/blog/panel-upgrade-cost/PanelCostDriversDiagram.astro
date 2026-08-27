@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * What actually moves the number, using the calculator's own figures. Each row shows
+ * the delta against the baseline 200 A / overhead / 30 ft / meter-replaced case.
+ */
+const drivers = [
+  {
+    driver: "Service rating",
+    detail: "100 A panel $400 · 200 A $900 · 400 A $2,200",
+    swing: "up to +$1,300",
+    accent: C.primary,
+  },
+  {
+    driver: "Conductor run length",
+    detail: "$12/ft at 200 A — a 60 ft run adds $360 over a 30 ft one",
+    swing: "+$12 per foot",
+    accent: C.blue,
+  },
+  {
+    driver: "Overhead vs underground",
+    detail: "An overhead service needs a mast or riser; a lateral doesn't",
+    swing: "+$350",
+    accent: C.orange,
+  },
+  {
+    driver: "Meter socket",
+    detail: "Replaced with the upgrade, or reused where the utility allows",
+    swing: "+$250",
+    accent: C.green,
+  },
+  {
+    driver: "Region",
+    detail: "Low-cost 0.85× · average 1.0× · high metro 1.25× · very high 1.5×",
+    swing: "±50%",
+    accent: C.red,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>What drives panel upgrade cost up or down</title>
+  <desc>
+    Five variables move the price. Service rating: a 100 amp panel is about 400 dollars of material against 900
+    for 200 amps and 2,200 for 400 amps, a swing of up to 1,300. Conductor run length costs about 12 dollars a
+    foot at 200 amps, so a 60 foot run adds 360 over a 30 foot one. An overhead service needs a mast or riser at
+    about 350 where an underground lateral does not. A meter socket adds about 250 when replaced. Region applies
+    a multiplier from 0.85 in low-cost areas to 1.5 in very high cost areas.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The five things that move the price</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Against the baseline 200 A, overhead, 30 ft run, meter replaced</text>
+
+  {drivers.map((d, i) => {
+    const y = 74 + i * 42;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="36" rx="8" fill={C.white} stroke={d.accent} stroke-width="1.3" />
+        <rect x="24" y={y} width="5" height="36" rx="2.5" fill={d.accent} />
+        <text x="44" y={y + 16} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{d.driver}</text>
+        <text x="44" y={y + 29} fill={C.muted} font-family={FONT} font-size="9">{d.detail}</text>
+        <text x="676" y={y + 23} text-anchor="end" fill={d.accent} font-family={FONT} font-size="12" font-weight="800">{d.swing}</text>
+      </g>
+    );
+  })}
+</svg>

@@ -1,0 +1,79 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The decision is not "which metal is better" but "which scale are you at".
+ * Aluminum's savings scale with conductor mass, so it earns its place on
+ * services and feeders and almost never on branch circuits — and the 1960s–70s
+ * branch-circuit aluminum is a different alloy and a different problem entirely.
+ */
+const lanes = [
+  {
+    accent: C.primary,
+    heading: "Copper",
+    sub: "branch circuits, 20 A to 60 A",
+    points: [
+      "Terminates on any listed device",
+      "No antioxidant, no special lugs",
+      "Savings from aluminum are trivial here",
+      "The only choice for 14 and 12 AWG",
+    ],
+  },
+  {
+    accent: C.orange,
+    heading: "Aluminum",
+    sub: "services and feeders, 100 A and up",
+    points: [
+      "AA-8000 alloy required by 310.106(B)",
+      "AL/CU or dual-rated lugs, torqued to spec",
+      "Material savings become real at 4/0",
+      "The default for utility service laterals",
+    ],
+  },
+  {
+    accent: C.red,
+    heading: "Old branch aluminum",
+    sub: "1965–1973, a different alloy",
+    points: [
+      "Pre-AA-8000, fails at terminations",
+      "COPALUM crimps or listed connectors",
+      "A panel upgrade does not fix it",
+      "Whole-house remediation, not rewiring",
+    ],
+  },
+];
+
+const LANE_X = [24, 256, 488];
+const LANE_W = 208;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where copper belongs, where aluminum belongs, and the legacy problem</title>
+  <desc>
+    Copper is the choice for branch circuits from 20 to 60 amps, terminating on any listed device with no special
+    hardware. Aluminum belongs on services and feeders of 100 amps and above, must be AA-8000 alloy under
+    310.106(B), and needs dual-rated lugs torqued to specification. Aluminum branch-circuit wiring installed between
+    1965 and 1973 is a pre-AA-8000 alloy that fails at terminations and needs remediation with COPALUM crimps or
+    listed connectors — a panel upgrade does not address it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The question is scale, not which metal is better</text>
+
+  {lanes.map((lane, j) => (
+    <g>
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="172" rx="10" fill={lane.accent} opacity="0.07" />
+      <rect x={LANE_X[j]} y="48" width={LANE_W} height="172" rx="10" fill="none" stroke={lane.accent} stroke-width="1.6" />
+      <text x={LANE_X[j] + 16} y="72" fill={lane.accent} font-family={FONT} font-size="13" font-weight="800">{lane.heading}</text>
+      <text x={LANE_X[j] + 16} y="88" fill={C.muted} font-family={FONT} font-size="8.5">{lane.sub}</text>
+      {lane.points.map((p, k) => (
+        <g>
+          <circle cx={LANE_X[j] + 20} cy={110 + k * 27} r="2.6" fill={lane.accent} />
+          <text x={LANE_X[j] + 30} y={113 + k * 27} fill={C.dark} font-family={FONT} font-size="9">{p}</text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">Modern AA-8000 feeder aluminum and 1960s branch aluminum share a name and nothing else. Don't conflate them.</text>
+</svg>

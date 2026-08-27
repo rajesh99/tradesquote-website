@@ -1,0 +1,57 @@
+---
+import type { ResolvedTaxonomySeo } from "@/lib/blogTaxonomySeo";
+
+interface Props {
+  seo: ResolvedTaxonomySeo;
+  kind: "tag" | "category";
+}
+
+const { seo, kind } = Astro.props;
+const kindLabel = kind === "tag" ? "tag" : "category";
+---
+
+<div class="mx-auto mb-12 max-w-3xl text-left">
+  <div class="space-y-4 text-base leading-relaxed text-text">
+    {seo.intro.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+
+  {
+    seo.featuredPosts.length > 0 && (
+      <div class="mt-8">
+        <h2 class="mb-4 text-xl font-semibold text-dark">
+          Guides in this {kindLabel}
+        </h2>
+        <ul class="space-y-4">
+          {seo.featuredPosts.map((post) => (
+            <li class="rounded-lg border border-border bg-light/40 p-4">
+              <a href={post.href} class="font-semibold text-primary hover:underline">
+                {post.title}
+              </a>
+              <p class="mt-2 text-sm leading-relaxed text-text">{post.description}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  {
+    seo.relatedLinks.length > 0 && (
+      <div class="mt-8">
+        <h2 class="mb-3 text-xl font-semibold text-dark">Related resources</h2>
+        <ul class="flex flex-wrap gap-3">
+          {seo.relatedLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="inline-flex rounded-lg bg-light px-4 py-2 text-sm font-medium text-dark transition hover:bg-primary hover:text-white"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</div>

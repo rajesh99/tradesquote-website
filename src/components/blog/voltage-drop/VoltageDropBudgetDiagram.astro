@@ -1,0 +1,57 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The 3% / 5% split from the informational notes to 210.19(A) and 215.2(A). These
+ * are recommendations, not enforceable code text — the diagram labels them as such.
+ */
+const segments = [
+  { label: "Feeder", pct: 2, width: 200, fill: C.blueLight, stroke: C.blue, note: "Service or panel to subpanel" },
+  { label: "Branch circuit", pct: 3, width: 300, fill: C.primaryLight, stroke: C.primary, note: "Last panel to the outlet" },
+];
+
+const START_X = 120;
+// Precompute cumulative offsets in frontmatter rather than inline, so the template stays flat.
+let cursor = START_X;
+const placed = segments.map((s) => {
+  const seg = { ...s, x: cursor };
+  cursor += s.width;
+  return seg;
+});
+const totalEnd = cursor;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>The 3 percent and 5 percent voltage drop budget</title>
+  <desc>
+    The informational notes to 210.19(A) and 215.2(A) recommend no more than 3 percent drop on the branch
+    circuit and no more than 5 percent combined across feeder plus branch circuit. A common split is 2
+    percent on the feeder from service to subpanel and 3 percent on the branch circuit from the last
+    panel to the outlet. These figures are recommendations in informational notes, not enforceable code
+    requirements, though many jurisdictions adopt them as local amendments.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The 5% total budget, and how it splits</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Recommended in informational notes to 210.19(A) and 215.2(A) — guidance, not enforceable text</text>
+
+  <!-- Source -->
+  <rect x="24" y="92" width="88" height="56" rx="8" fill={C.white} stroke={C.border} stroke-width="1.4" />
+  <text x="68" y="116" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">Service</text>
+  <text x="68" y="132" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">100% volts</text>
+
+  {placed.map((s) => (
+    <g>
+      <rect x={s.x} y="92" width={s.width} height="56" rx="8" fill={s.fill} stroke={s.stroke} stroke-width="1.5" />
+      <text x={s.x + s.width / 2} y="116" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{s.label}</text>
+      <text x={s.x + s.width / 2} y="134" text-anchor="middle" fill={s.stroke} font-family={FONT} font-size="13" font-weight="800">{`${s.pct}% max`}</text>
+      <text x={s.x + s.width / 2} y="170" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">{s.note}</text>
+    </g>
+  ))}
+
+  <!-- Total bracket -->
+  <path d={`M${START_X} 196 L ${START_X} 204 L ${totalEnd} 204 L ${totalEnd} 196`} stroke={C.dark} stroke-width="1.4" fill="none" />
+  <text x={(START_X + totalEnd) / 2} y="224" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">5% combined, service to outlet</text>
+
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">A 2/3 split is convention, not law. Spend it wherever the run is longest — 1% feeder and 4% branch is equally valid.</text>
+</svg>

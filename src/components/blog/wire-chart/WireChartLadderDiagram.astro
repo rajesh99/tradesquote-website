@@ -1,0 +1,70 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Copper vs aluminum ampacity at the 75 °C column, straight from Table 310.16.
+ * Bars are scaled against the largest value shown so the copper-over-aluminum gap
+ * reads at a glance.
+ */
+const rows = [
+  { size: "14", cu: 20, al: null },
+  { size: "12", cu: 25, al: 20 },
+  { size: "10", cu: 35, al: 30 },
+  { size: "8", cu: 50, al: 40 },
+  { size: "6", cu: 65, al: 50 },
+  { size: "4", cu: 85, al: 65 },
+  { size: "2", cu: 115, al: 90 },
+  { size: "1/0", cu: 150, al: 120 },
+  { size: "2/0", cu: 175, al: 135 },
+  { size: "4/0", cu: 230, al: 180 },
+];
+
+const BAR_MAX = 340;
+const peak = Math.max(...rows.map((r) => r.cu));
+const bars = rows.map((r) => ({
+  ...r,
+  cuW: Math.round((r.cu / peak) * BAR_MAX),
+  alW: r.al === null ? 0 : Math.round((r.al / peak) * BAR_MAX),
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" fill="none" aria-hidden="true">
+  <title>Ampacity by conductor size, copper versus aluminum at 75 degrees Celsius</title>
+  <desc>
+    Allowable ampacity at the 75 degree Celsius column of Table 310.16. Copper then aluminum: 14 AWG
+    carries 20 amps with no aluminum listing; 12 AWG 25 versus 20; 10 AWG 35 versus 30; 8 AWG 50 versus
+    40; 6 AWG 65 versus 50; 4 AWG 85 versus 65; 2 AWG 115 versus 90; 1/0 150 versus 120; 2/0 175 versus
+    135; and 4/0 230 versus 180 amps.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="444" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Ampacity at 75 °C — Table 310.16</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">The column that governs most work. Aluminum trails copper by roughly 20% at every size.</text>
+
+  <!-- Legend -->
+  <rect x="500" y="28" width="12" height="12" rx="3" fill={C.primaryLight} stroke={C.primary} stroke-width="1.2" />
+  <text x="518" y="38" fill={C.muted} font-family={FONT} font-size="10">Copper</text>
+  <rect x="580" y="28" width="12" height="12" rx="3" fill={C.blueLight} stroke={C.blue} stroke-width="1.2" />
+  <text x="598" y="38" fill={C.muted} font-family={FONT} font-size="10">Aluminum</text>
+
+  {bars.map((r, i) => {
+    const y = 74 + i * 37;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="12" font-weight="700">{r.size}</text>
+        <rect x="80" y={y + 2} width={r.cuW} height="14" rx="4" fill={C.primaryLight} stroke={C.primary} stroke-width="1.1" />
+        <text x={80 + r.cuW + 8} y={y + 13} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${r.cu} A`}</text>
+        {r.al === null ? (
+          <text x="84" y={y + 32} fill={C.muted} font-family={FONT} font-size="10">not listed in aluminum</text>
+        ) : (
+          <g>
+            <rect x="80" y={y + 18} width={r.alW} height="14" rx="4" fill={C.blueLight} stroke={C.blue} stroke-width="1.1" />
+            <text x={80 + r.alW + 8} y={y + 29} fill={C.muted} font-family={FONT} font-size="11" font-weight="700">{`${r.al} A`}</text>
+          </g>
+        )}
+      </g>
+    );
+  })}
+
+  <text x="24" y="440" fill={C.muted} font-family={FONT} font-size="10">These are table values before derating, and before the 240.4(D) breaker caps on 14, 12, and 10 AWG.</text>
+</svg>

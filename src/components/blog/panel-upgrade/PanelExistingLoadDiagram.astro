@@ -1,0 +1,69 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("pel");
+
+/**
+ * NEC 220.87 worked: measured 12-month peak × 125%, plus the new load at 125% for a
+ * continuous EVSE. Every figure computed here so the diagram and prose cannot drift.
+ */
+const SERVICE = 100;
+const measuredPeak = 44;
+const existingAdjusted = measuredPeak * 1.25;
+
+const evseSmall = 32;
+const evseSmallAdjusted = evseSmall * 1.25;
+const totalSmall = existingAdjusted + evseSmallAdjusted;
+
+const evseLarge = 48;
+const evseLargeAdjusted = evseLarge * 1.25;
+const totalLarge = existingAdjusted + evseLargeAdjusted;
+
+const steps = [
+  { label: "Utility 12-month peak", value: `${measuredPeak} A`, note: "from interval data", accent: C.blue, bg: C.blueLight },
+  { label: "× 125% — 220.87", value: `${existingAdjusted} A`, note: "existing load, established", accent: C.blue, bg: C.blueLight },
+  { label: "+ 32 A EVSE × 125%", value: `${totalSmall} A`, note: `fits ${SERVICE} A — ${SERVICE - totalSmall} A spare`, accent: C.green, bg: C.greenLight },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>NEC 220.87 worked example on a 100 amp service</title>
+  <desc>
+    A 100 amp service where the utility's highest recorded demand over twelve months is 44 amps. Under 220.87
+    that becomes the established existing load at 125 percent, or 55 amps. Adding a 32 amp electric vehicle
+    charger, itself continuous and so taken at 125 percent or 40 amps, gives 95 amps — inside the 100 amp
+    service with 5 amps to spare. A 48 amp charger would instead add 60 amps for a total of 115 amps and would
+    not fit, which is why choosing the smaller charger often avoids an upgrade entirely.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">220.87 — proving a 100 A service can take an EV charger</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Measured demand instead of a paper calculation. This is the argument that saves the upgrade.</text>
+
+  {steps.map((s, i) => {
+    const x = 24 + i * 232;
+    return (
+      <g>
+        <rect x={x} y="78" width="212" height="96" rx="10" fill={s.bg} stroke={s.accent} stroke-width="1.6" />
+        <text x={x + 106} y="102" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{s.label}</text>
+        <text x={x + 106} y="138" text-anchor="middle" fill={s.accent} font-family={FONT} font-size="26" font-weight="800">{s.value}</text>
+        <text x={x + 106} y="160" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9">{s.note}</text>
+      </g>
+    );
+  })}
+
+  <path d="M240 126 L 254 126" stroke={C.border} stroke-width="1.6" marker-end="url(#pel-arrow-muted)" />
+  <path d="M472 126 L 486 126" stroke={C.border} stroke-width="1.6" marker-end="url(#pel-arrow-muted)" />
+
+  <!-- The contrast case -->
+  <rect x="24" y="196" width="672" height="80" rx="10" fill={C.white} stroke={C.border} stroke-width="1" />
+  <text x="44" y="220" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">Same house, bigger charger</text>
+
+  <rect x="44" y="230" width="300" height="32" rx="7" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="60" y="251" fill={C.red} font-family={FONT} font-size="11" font-weight="800">{`48 A EVSE → ${evseLargeAdjusted} A → ${totalLarge} A total`}</text>
+
+  <text x="364" y="243" fill={C.muted} font-family={FONT} font-size="9.5">{`Over the ${SERVICE} A service by ${totalLarge - SERVICE} A. Specifying a 32 A charger instead of a 48 A one`}</text>
+  <text x="364" y="257" fill={C.muted} font-family={FONT} font-size="9.5">is frequently the whole difference between a $300 circuit and a $4,000 upgrade.</text>
+</svg>

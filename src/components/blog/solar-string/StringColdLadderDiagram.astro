@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { stringSizing } from "@/lib/nec";
+
+/**
+ * What the design temperature costs, and what using Table 690.7(A) instead of the
+ * module's own coefficient costs on top of it. The table is a conservative
+ * fallback, and at some temperatures it throws away a module per string for no
+ * safety benefit.
+ */
+const MODULE = { vocStc: 49.5, vmpStc: 41.5, tempCoeffVoc: -0.27, tempCoeffVmp: -0.35 };
+const rows = [10, 0, -10, -20, -30, -40].map((t) => {
+  const r = stringSizing({ ...MODULE, lowAmbientC: t, hotCellC: 65, inverterMaxVolts: 600, mpptMinVolts: 80 });
+  return {
+    t,
+    vocCold: r.vocCold,
+    max: r.maxModules,
+    factor: r.tableFactor,
+    tableMax: r.tableMaxModules,
+    costsOne: r.tableMaxModules < r.maxModules,
+  };
+});
+
+const BAR_X = 150;
+const PER_MODULE = 34;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 286" fill="none" aria-hidden="true">
+  <title>Maximum string length by design temperature</title>
+  <desc>
+    A 49.5 volt module at minus 0.27 percent per degree Celsius on a 600 volt inverter. At 10 degrees the maximum
+    is 11 modules, at minus 10 it is still 11, at minus 20 it falls to 10, and at minus 40 it is 10. Using Table
+    690.7(A) instead of the module coefficient gives one module fewer at minus 10 and at minus 40.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="270" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    What the cold costs — and what the fallback table costs
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Solid blocks use the module's own coefficient. A hollow block is one the Table 690.7(A) method gives away.
+  </text>
+
+  {rows.map((r, i) => {
+    const y = 70 + i * 32;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+          {`${r.t}°C`}
+        </text>
+        <text x="70" y={y + 16} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${r.vocCold.toFixed(2)} V`}
+        </text>
+        {Array.from({ length: r.max }, (_, k) => k).map((k) => {
+          const lost = k >= r.tableMax;
+          return (
+            <rect
+              x={BAR_X + k * PER_MODULE}
+              y={y + 3}
+              width={PER_MODULE - 6}
+              height="20"
+              rx="3"
+              fill={lost ? "none" : C.blue}
+              opacity={lost ? 1 : 0.2}
+              stroke={lost ? C.red : C.blue}
+              stroke-width="1.5"
+              stroke-dasharray={lost ? "3 2" : undefined}
+            />
+          );
+        })}
+        <text x={BAR_X + r.max * PER_MODULE + 8} y={y + 18} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="800">
+          {r.max}
+        </text>
+        <text x={BAR_X + r.max * PER_MODULE + 26} y={y + 18} fill={r.costsOne ? C.red : C.muted} font-family={FONT} font-size="8.5">
+          {r.costsOne ? `table ×${r.factor} → ${r.tableMax}` : `table ×${r.factor} agrees`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="256" x2="696" y2="256" stroke={C.border} />
+  <text x="28" y="272" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    Twenty degrees colder costs one module. So does using the table when a datasheet coefficient exists.
+  </text>
+</svg>

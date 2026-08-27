@@ -1,0 +1,64 @@
+---
+import { usd, fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The same ten fixtures at four duty cycles. Payback is inversely proportional to
+ * operating hours and nothing else changes, which is the single most useful fact
+ * for choosing which rooms to retrofit first.
+ */
+const RATE = 0.17;
+const COUNT = 10;
+const OLD_W = 100;
+const NEW_W = 15;
+const COST = COUNT * 18 + 2 * 95;
+
+const rows = [3, 6, 12, 24].map((hrs) => {
+  const annualHours = hrs * 365;
+  const kwh = (COUNT * (OLD_W - NEW_W) * annualHours) / 1000;
+  const saving = kwh * RATE;
+  return { hrs, annualHours, kwh, saving, years: COST / saving };
+});
+
+const peak = Math.max(...rows.map((r) => r.years));
+const BAR_X = 200;
+const BAR_MAX = 300;
+const bars = rows.map((r) => ({ ...r, width: Math.max(20, Math.round((r.years / peak) * BAR_MAX)) }));
+const ratio = rows[0].years / rows[rows.length - 1].years;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 244" fill="none" aria-hidden="true">
+  <title>The same retrofit at four duty cycles</title>
+  <desc>
+    Ten fixtures going from 100 watts to 15 watts, costing 370 dollars to convert. At 3 hours a day the saving is 158
+    dollars a year and payback takes 2.34 years. At 6 hours a day it halves to 1.17 years, at 12 hours to 0.58 years
+    and at 24 hours a day to 0.29 years. The hardware and the cost are identical in every row — only the operating
+    hours change — and the continuous case pays back 8 times faster.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="228" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Same ${COUNT} fixtures, same ${usd(COST)}, four duty cycles`}</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`${OLD_W} W → ${NEW_W} W each. Nothing changes between rows except hours per day.`}</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOURS/DAY</text>
+  <text x="102" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SAVING/YR</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PAYBACK</text>
+
+  {bars.map((r, i) => {
+    const y = 86 + i * 32;
+    const accent = r.years < 0.5 ? C.green : r.years < 1.5 ? C.blue : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${r.hrs} h`}</text>
+        <text x="102" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{usd(r.saving)}</text>
+        <rect x={BAR_X} y={y + 1} width={r.width} height="19" rx="5" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={r.width} height="19" rx="5" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 8} y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(r.years, 2)} yr`}</text>
+        <text x={BAR_X + r.width + 8} y={y + 15} fill={C.muted} font-family={FONT} font-size="8">{`${fmtInt(Math.round(r.kwh))} kWh saved`}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="204" width="672" height="26" rx="7" fill={C.primaryLight} stroke={C.primary} stroke-width="1.5" />
+  <text x="40" y="221" fill={C.dark} font-family={FONT} font-size="10">{`${fmt(ratio, 1)}× faster at 24 h than at 3 h. Retrofit by operating hours, not by wattage or by room size.`}</text>
+</svg>

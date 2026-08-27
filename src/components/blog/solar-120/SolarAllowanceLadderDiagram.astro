@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { busbarAllowance } from "@/lib/nec";
+
+/**
+ * The maximum inverter each common panel size will accept, assuming the main
+ * breaker equals the busbar rating — which is the ordinary case. Computed from
+ * the same helper the calculator uses so the two can never disagree.
+ */
+const rows = [100, 125, 150, 200, 225, 400].map((rating) => {
+  const r = busbarAllowance({ busbarRating: rating, mainBreaker: rating, inverterAmps: 0 });
+  return {
+    rating,
+    allowance: r.allowance,
+    pvBreaker: r.maxPvBreaker,
+    inverter: r.maxInverterAmps,
+    kw: (r.maxInverterAmps * 240) / 1000,
+  };
+});
+
+const peak = Math.max(...rows.map((r) => r.kw));
+const BAR_X = 150;
+const BAR_MAX = 300;
+const bars = rows.map((r) => ({ ...r, width: Math.max(14, Math.round((r.kw / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Maximum solar inverter by panel size</title>
+  <desc>
+    With the main breaker equal to the busbar rating, a 100 amp panel accepts a 20 amp PV breaker and a 16 amp
+    inverter, a 150 amp panel a 30 amp breaker and 24 amp inverter, a 200 amp panel a 40 amp breaker and 32 amp
+    inverter of about 7.7 kilowatts, and a 400 amp panel an 80 amp breaker and 64 amp inverter.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    The largest inverter each panel will take
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Main breaker equal to the busbar rating, which is the usual case. Bars are inverter kW at 240 V.
+  </text>
+
+  {bars.map((r, i) => {
+    const y = 68 + i * 27;
+    const highlight = r.rating === 200;
+    const accent = highlight ? C.orange : C.muted;
+    return (
+      <g>
+        <text
+          x="28"
+          y={y + 14}
+          fill={highlight ? C.dark : C.muted}
+          font-family={FONT}
+          font-size="10"
+          font-weight={highlight ? "800" : "600"}
+        >
+          {`${r.rating} A panel`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={r.width} height="17" rx="4" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={r.width} height="17" rx="4" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 7} y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">
+          {`${r.kw.toFixed(2)} kW`}
+        </text>
+        <text x={BAR_X + r.width + 9} y={y + 15} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${r.allowance} A allowance − ${r.rating} A main → ${r.pvBreaker} A breaker → ${r.inverter.toFixed(0)} A`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="234" x2="696" y2="234" stroke={C.border} />
+  <text x="28" y="252" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    Every row is 20% of the busbar ÷ 1.25 — so the usable inverter is always 16% of the panel rating.
+  </text>
+</svg>

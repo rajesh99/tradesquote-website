@@ -1,0 +1,84 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Lose the service neutral and the two 120 V legs become a series divider
+ * across the full 240 V. The lightly loaded leg takes almost all of it, which
+ * is why an open neutral destroys electronics rather than simply killing power.
+ */
+const SUPPLY = 240;
+const NOMINAL = 120;
+
+const CASES = [
+  { ra: 24, rb: 24 },
+  { ra: 60, rb: 30 },
+  { ra: 240, rb: 24 },
+  { ra: 240, rb: 12 },
+];
+
+const rows = CASES.map((c) => {
+  const i = SUPPLY / (c.ra + c.rb);
+  return {
+    ...c,
+    wa: (NOMINAL * NOMINAL) / c.ra,
+    wb: (NOMINAL * NOMINAL) / c.rb,
+    va: i * c.ra,
+    vb: i * c.rb,
+  };
+});
+
+const COL_X = [214, 330, 460, 576];
+const COL_W = 108;
+const HEADERS = ["LOAD ON L1", "LOAD ON L2", "L1 NOW SEES", "L2 NOW SEES"];
+const wattText = (w: number) => `${Math.round(w).toLocaleString("en-US")} W`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Voltages on each leg when the service neutral opens</title>
+  <desc>
+    With the neutral intact both legs sit at 120 volts regardless of load. With the neutral open the two legs form a
+    series divider across 240 volts. Equal loads still give 120 volts each, but a 60 watt load opposite a 1,200 watt load
+    leaves the lightly loaded leg at 228.6 volts and the heavy leg at 11.4 volts.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Lose the neutral and the legs divide 240 V between them</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`With the neutral intact every leg sits at ${NOMINAL} V no matter what. With it open, load decides.`}
+  </text>
+
+  {HEADERS.map((h, j) => (
+    <text x={COL_X[j] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{h}</text>
+  ))}
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    const bad = row.va > NOMINAL * 1.1 || row.vb > NOMINAL * 1.1;
+    const values = [wattText(row.wa), wattText(row.wb), `${row.va.toFixed(1)} V`, `${row.vb.toFixed(1)} V`];
+    return (
+      <g>
+        {values.map((v, j) => {
+          const isVolts = j >= 2;
+          const over = isVolts && (j === 2 ? row.va : row.vb) > NOMINAL * 1.1;
+          const accent = !isVolts ? C.muted : over ? C.red : bad ? C.orange : C.green;
+          return (
+            <g>
+              <rect x={COL_X[j]} y={y} width={COL_W} height="24" rx="6" fill={isVolts ? accent : C.white} opacity={isVolts ? (over ? 0.2 : 0.08) : 1} />
+              <rect x={COL_X[j]} y={y} width={COL_W} height="24" rx="6" fill="none" stroke={isVolts ? accent : C.border} stroke-width={over ? 2 : 1.1} />
+              <text x={COL_X[j] + COL_W / 2} y={y + 16} text-anchor="middle" fill={isVolts ? accent : C.dark} font-family={FONT} font-size="10.5" font-weight={over ? 800 : 600}>
+                {v}
+              </text>
+            </g>
+          );
+        })}
+        <text x="28" y={y + 16} fill={bad ? C.red : C.green} font-family={FONT} font-size="9.5" font-weight="700">
+          {bad ? "damaging" : "survivable"}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">
+    {`The two legs always sum to ${SUPPLY} V. The lightly loaded side takes the larger share — and its electronics die first.`}
+  </text>
+</svg>

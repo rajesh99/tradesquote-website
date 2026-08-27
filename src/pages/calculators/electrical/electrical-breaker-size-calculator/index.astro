@@ -1,0 +1,617 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { STANDARD_OCPD, findSizeByAmpacity, sizeLabel, smallConductorCap } from "@/lib/nec";
+
+const title = "Breaker Size Calculator — NEC 210.20(A) & 240.6 Standard Ratings | TradesQuote";
+const description =
+  "Free breaker size calculator. Enter continuous and non-continuous load to get the required overcurrent device — continuous loads at 125%, rounded up to the next standard NEC 240.6(A) rating, with the minimum copper or aluminum conductor that must go with it.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-breaker-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Breaker Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Breaker Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC breaker size calculator that applies the 125% continuous-load factor, rounds to the next standard 240.6(A) overcurrent rating, and returns the minimum conductor that must be protected by it.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is a continuous load?",
+    answer:
+      "<strong>NEC Article 100</strong> defines it as a load where the maximum current is expected to continue for <strong>three hours or more</strong>. Commercial lighting, EV charging, electric water heating on a long recovery, and most commercial refrigeration qualify. Household receptacle circuits, ranges, and dryers generally do not — they cycle. When in doubt, treating a load as continuous is the conservative choice.",
+  },
+  {
+    question: "Why 125% for continuous loads?",
+    answer:
+      "Because a breaker carrying its full rating continuously runs hot, and heat is cumulative. <strong>NEC 210.20(A)</strong> requires the overcurrent device to be rated at not less than 100% of the non-continuous load plus <strong>125% of the continuous load</strong>. The inverse of 1.25 is 0.80 — which is where the informal \"80% rule\" comes from. They are the same requirement stated from opposite ends.",
+  },
+  {
+    question: "Can I use a 40 amp breaker on 10 AWG wire?",
+    answer:
+      "No. <strong>NEC 240.4(D)</strong> caps 10 AWG copper at a 30 A overcurrent device regardless of what Table 310.16 says its ampacity is, and caps 12 AWG copper at 20 A and 14 AWG copper at 15 A. For aluminum the caps are 25 A on 10 AWG and 15 A on 12 AWG. The narrow exceptions are motor and air-conditioning circuits, where Articles 430 and 440 permit the device to exceed conductor ampacity because it is protecting against short circuits rather than overload.",
+  },
+  {
+    question: "What are the standard breaker sizes?",
+    answer:
+      "<strong>NEC 240.6(A)</strong> lists them: 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, and 600 amps, continuing upward from there. Anything not on that list is a non-standard rating — available as a special order but not something to design around.",
+  },
+  {
+    question: "What if my calculated amps fall between two standard sizes?",
+    answer:
+      "You round <strong>up</strong> to the next standard rating. A 51 A calculated requirement goes to a 60 A device, not 50 A. This surprises people because it feels like over-protection, but the breaker is sized to carry the load without nuisance tripping — the conductor then has to be large enough for that breaker, which is why rounding up can push the wire up a size too.",
+  },
+  {
+    question: "Does the breaker protect the wire or the equipment?",
+    answer:
+      "Primarily the <strong>wire</strong>. That is the core logic of NEC 240.4: overcurrent devices protect conductors from carrying more current than their ampacity allows. Equipment protection is a separate matter handled by the appliance's own internal protection, or by the nameplate's maximum overcurrent protection rating for HVAC equipment. This is why the breaker can never simply be sized to \"whatever the appliance wants.\"",
+  },
+  {
+    question: "When is a breaker allowed to be larger than the conductor ampacity?",
+    answer:
+      'Several specific cases. <strong>240.4(G)</strong> lists them, and motor circuits (Article 430) are the big one — the branch-circuit device there provides short-circuit and ground-fault protection while a separate overload relay handles sustained overcurrent, so a 60 A breaker on conductors rated 40 A is normal. Air-conditioning equipment (Article 440) works the same way, which is why nameplates give a minimum circuit ampacity and a separate maximum overcurrent protection value. For HVAC, the <a href="/calculators/hvac/hvac-amp-draw-calculator" class="font-semibold text-red-700 underline decoration-red-300 hover:decoration-red-600">HVAC Amp Draw Calculator</a> works out MCA and MOCP from BTU capacity.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Breaker sized? Quote the circuit in seconds.";
+const ctaDescription =
+  "The device is one line; the circuit is a dozen. Describe the job or upload photos and TradesQuote's AI builds a detailed line-item estimate — breaker, conductor, raceway, devices, and labor — with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size the conductor by ampacity and voltage drop.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ampacity-calculator",
+    title: "Ampacity & Derating Calculator",
+    description: "See what the conductor can carry after derating.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ev-charger-calculator",
+    title: "EV Charger Circuit Calculator",
+    description: "The whole EVSE chain, continuous load included.",
+  },
+  {
+    href: "/calculators/hvac/hvac-amp-draw-calculator",
+    title: "HVAC Amp Draw Calculator",
+    description: "MCA and MOCP for AC and heat pump equipment.",
+  },
+];
+
+/**
+ * Standard OCPD ratings mapped to the minimum general-purpose conductor at the
+ * 75 °C column, computed with the same helper the calculator uses so the table
+ * can never drift from the tool. Dwelling services and main feeders are smaller —
+ * those use Table 310.12, not this table.
+ */
+const ocpdTable = STANDARD_OCPD.filter((r) => r <= 200).map((rating) => {
+  const cu = findSizeByAmpacity(rating, "copper", 75);
+  const al = findSizeByAmpacity(rating, "aluminum", 75);
+  return {
+    rating,
+    cu: cu ? sizeLabel(cu.label) : "—",
+    al: al ? sizeLabel(al.label) : "—",
+    cap: cu ? smallConductorCap(cu.label, "copper") : null,
+  };
+});
+
+const styles = electricalAccentStyles.red;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Breaker Size Calculator — NEC 210.20(A) & 240.6" />
+    <meta
+      property="og:description"
+      content="Get the overcurrent device your load requires — continuous at 125%, rounded to the next standard NEC rating, with the conductor that must match."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Breaker Size Calculator — NEC 210.20(A) & 240.6" />
+    <meta
+      name="twitter:description"
+      content="Continuous loads at 125%, next standard 240.6(A) rating, matching conductor. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Breaker Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Breaker Size Calculator <span class="text-red-600">— The 125% Rule</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Sizing an overcurrent device is three steps: take non-continuous load at 100% and continuous load
+              at <strong>125%</strong>, round up to the next standard rating in NEC 240.6(A), then make sure the
+              conductor is large enough to be protected by that device. This calculator does all three and shows
+              you the 240.4(D) small-conductor cap when it applies.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+              ></path>
+            </svg>
+            Size the overcurrent device
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="br-cont" class="text-sm font-semibold text-slate-800">Continuous load</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="br-cont"
+                      type="number"
+                      min="0"
+                      max="600"
+                      value="40"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">amps</span>
+                  </div>
+                </div>
+                <input
+                  id="br-cont-range"
+                  type="range"
+                  min="0"
+                  max="400"
+                  step="1"
+                  value="40"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-red-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0</span><span>400 A</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Runs three hours or more at maximum current — counted at 125%.
+                </p>
+              </div>
+
+              <div>
+                <label for="br-noncont" class="text-sm font-semibold text-slate-800">Non-continuous load</label>
+                <div class="mt-2 flex items-center gap-2">
+                  <input
+                    id="br-noncont"
+                    type="number"
+                    min="0"
+                    max="600"
+                    value="0"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  />
+                  <span class="text-sm text-slate-500 shrink-0">amps</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">Cycling or intermittent load — counted at 100%.</p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="br-material" class="text-sm font-semibold text-slate-800">Conductor material</label>
+                  <select
+                    id="br-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum / copper-clad</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="br-temp" class="text-sm font-semibold text-slate-800">Termination rating</label>
+                  <select
+                    id="br-temp"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  >
+                    <option value="60">60 °C</option>
+                    <option value="75" selected>75 °C (most equipment)</option>
+                    <option value="90">90 °C (rare)</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="br-voltage" class="text-sm font-semibold text-slate-800">System voltage</label>
+                  <select
+                    id="br-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                  >
+                    <option value="120">120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240" selected>240 V</option>
+                    <option value="277">277 V</option>
+                    <option value="480">480 V</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Used only to show the load in VA — it does not affect the breaker size.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="br-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-red-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-red-100 bg-red-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Required breaker</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="br-size" class="text-5xl font-extrabold tracking-tight text-red-600">50 A</span>
+              </div>
+              <p id="br-note" class="mt-1 text-sm font-semibold text-slate-700">
+                50 A is already a standard 240.6(A) rating — no rounding needed.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Required amps</p>
+                  <p id="br-required" class="mt-1 text-2xl font-bold text-slate-900">50.0 A</p>
+                </div>
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Minimum conductor</p>
+                  <p id="br-conductor" class="mt-1 text-2xl font-bold text-slate-900">8 AWG copper</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-red-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Non-continuous at 100%</span><span id="br-bd-noncont" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Continuous at 125%</span><span id="br-bd-cont" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Total required</span><span id="br-bd-total" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Next standard rating</span><span id="br-bd-standard" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor to match</span><span id="br-bd-conductor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Its ampacity</span><span id="br-bd-ampacity" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Connected load</span><span id="br-bd-va" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Conductor shown is the general-purpose minimum before derating. Motor and air-conditioning
+                circuits follow Articles 430 and 440, where the device may exceed conductor ampacity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three steps, in a fixed order. Skipping the third is how undersized conductors end up behind
+            correctly sized breakers.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Weight the loads (NEC 210.20(A))</div>
+            <div>
+              required&nbsp;=&nbsp;non-continuous × <span class="text-amber-300">1.00</span> + continuous ×
+              <span class="text-amber-300">1.25</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Round up to a real device (NEC 240.6(A))</div>
+            <div>
+              OCPD&nbsp;=&nbsp;smallest of 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150,
+              175, 200… ≥ required
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 3 — The conductor must survive that device (NEC 240.4)</div>
+            <div>conductor&nbsp;=&nbsp;smallest AWG whose ampacity ≥ OCPD, subject to 240.4(D)</div>
+            <div class="mt-4 text-cyan-300"># The 80% rule, restated</div>
+            <div>
+              1 ÷ <span class="text-amber-300">1.25</span> = <span class="text-amber-300">0.80</span
+              >&nbsp;&nbsp;→&nbsp;&nbsp;a continuous load may not exceed 80% of the breaker rating
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">125% and 80% are the same rule</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Sizing the breaker at 125% of a continuous load is arithmetically identical to loading a breaker
+                to no more than 80% of its rating. The Code writes it the first way; the trade says it the
+                second way.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Round up, never down</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                51 A of required capacity means a 60 A device, because a 50 A breaker would nuisance-trip.
+                That jump can also push the conductor from 6 AWG to 4 AWG.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The breaker guards the wire</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                NEC 240.4 exists to keep conductors from carrying more than their ampacity. Equipment looks
+                after itself through internal protection or a nameplate MOCP value.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Motors break the pattern</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Article 430 splits the job: the breaker handles short circuits and ground faults, a separate
+                overload device handles sustained overcurrent. That is why motor breakers legitimately exceed
+                conductor ampacity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A clean landing, the rounding surprise, and the case that explains why a 16 A continuous load cannot
+          sit on a 15 A circuit.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">40 A continuous — EV charger or commercial lighting</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              40 A continuous · 0 A non-continuous · copper · 75 °C terminations. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 0 × 1.00 + 40 × 1.25 = 50.0 A<br />
+              50 A is already a standard 240.6(A) rating<br />
+              conductor: 8 AWG Cu = 50 A at 75 °C ✓<br />
+              → <span class="font-bold text-red-700">50 A breaker · 8 AWG copper</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the arithmetic lands exactly on a
+              standard rating, and the conductor's ampacity matches the device exactly. This is as tidy as
+              circuit sizing gets.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Mixed load — 36 A non-continuous + 12 A continuous</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Copper · 75 °C terminations.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 36 × 1.00 + 12 × 1.25 = 36 + 15 = 51.0 A<br />
+              51 A is not standard → round up to <span class="font-bold text-amber-700">60 A</span><br />
+              conductor: 8 AWG (50 A) is too small → 6 AWG Cu = 65 A ✓<br />
+              → <span class="font-bold text-red-700">60 A breaker · 6 AWG copper</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> one amp over 50 costs a whole conductor
+              size. A 48 A total load would have stayed on a 50 A breaker with 8 AWG — worth knowing before
+              adding that last fixture to a circuit.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">16 A continuous — the 15 amp circuit that can't</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Copper · 75 °C terminations.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 16 × 1.25 = 20.0 A<br />
+              → 20 A breaker · 12 AWG Cu (capped at 20 A by 240.4(D))<br />
+              on a 15 A circuit: 15 × 0.80 = <span class="font-bold text-rose-700">12 A maximum continuous</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 15 A circuit can only carry 12 A
+              continuously, so a 16 A continuous load needs a 20 A circuit on 12 AWG. This is the calculation
+              behind most commercial lighting-circuit layouts.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Standard breaker sizes and matching conductors
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Every standard rating from NEC 240.6(A) up to 200 A, with the smallest general-purpose conductor at
+            the 75 °C column that the device may protect. Rows marked with a cap are limited by the 240.4(D)
+            small-conductor rule. <strong>Dwelling services and main feeders are smaller</strong> — those use
+            Table 310.12 and the 83% allowance instead.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Breaker</th>
+                  <th class="py-3 px-5 font-semibold">Max continuous load (80%)</th>
+                  <th class="py-3 px-5 font-semibold">Copper (75 °C)</th>
+                  <th class="py-3 px-5 font-semibold">Aluminum (75 °C)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ocpdTable.map((row, index) => (
+                    <tr class={index === ocpdTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.rating} A</td>
+                      <td class="py-3 px-5">{(row.rating * 0.8).toFixed(0)} A</td>
+                      <td class="py-3 px-5">
+                        {row.cu}
+                        {row.cap !== null && (
+                          <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            240.4(D)
+                          </span>
+                        )}
+                      </td>
+                      <td class="py-3 px-5">{row.al}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — 210.20(A) overcurrent device rating, Article 100
+            definition of continuous load, 240.6(A) standard ampere ratings, 240.4 conductor protection,
+            240.4(B) next-higher-rating allowance, 240.4(D) small-conductor limits, 240.4(G) and Articles 430
+            and 440 for motor and air-conditioning circuits, Table 310.16 ampacities. Local amendments override
+            the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="red"
+        subtitle="Common questions about breaker sizing, continuous loads, and the 80% rule."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalBreakerSizeCalculator } from "@/scripts/calculators/electrical-breaker-size-calculator";
+    initElectricalBreakerSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #dc2626;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #dc2626;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

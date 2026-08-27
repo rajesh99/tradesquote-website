@@ -1,0 +1,67 @@
+---
+import { fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Five coverage levels, from a fridge-and-lights install to a whole all-electric
+ * house. Each row runs both tests and selects a standard size, exactly as the
+ * calculator does — which is why the ladder is not a straight line.
+ */
+const STANDARD_KW = [7.5, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 36, 48, 60];
+const MARGIN = 0.25;
+const SURGE = 3;
+
+const scenarios = [
+  { label: "Fridge, lights, sump", detail: "no A/C, no well pump", running: 2700, largest: 800 },
+  { label: "Essentials + well pump", detail: "still no air conditioning", running: 4200, largest: 1500 },
+  { label: "Essentials + 3-ton A/C", detail: "the usual “backup the important stuff” spec", running: 9200, largest: 5000 },
+  { label: "Whole house, gas heat", detail: "+ range, water heater, dryer", running: 27200, largest: 5000 },
+  { label: "Whole house, all-electric", detail: "+ 10 kW of heat strips", running: 37200, largest: 5000 },
+].map((s) => {
+  const starting = s.running - s.largest + s.largest * SURGE;
+  const required = Math.max(s.running * (1 + MARGIN), starting);
+  const selected = STANDARD_KW.find((k) => k >= required / 1000) ?? 60;
+  return { ...s, starting, required, selected };
+});
+
+const peak = Math.max(...scenarios.map((s) => s.selected));
+const BAR_X = 306;
+const BAR_MAX = 268;
+const bars = scenarios.map((s) => ({ ...s, width: Math.max(34, Math.round((s.selected / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Generator size by how much of the house you back up</title>
+  <desc>
+    Backing up a fridge, lights and a sump pump needs 4,300 watts of starting capacity and a 7.5 kilowatt set. Add
+    a well pump and it is 7,200 watts, still a 7.5 kilowatt set. Add a 3-ton air conditioner and it jumps to 19,200
+    watts and a 20 kilowatt set. A whole house with gas heat needs 37,200 watts and a 48 kilowatt set, and an
+    all-electric house with heat strips needs 47,200 watts, also a 48 kilowatt set.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The air conditioner is the step change</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">25% running margin and a 3× surge on the largest motor throughout. Sizes are standard air-cooled and liquid-cooled ratings.</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT YOU BACK UP</text>
+  <text x="212" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RUN / START</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">GENERATOR</text>
+
+  {bars.map((s, i) => {
+    const y = 88 + i * 32;
+    const accent = i < 2 ? C.green : i === 2 ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{s.label}</text>
+        <text x="28" y={y + 25} fill={C.muted} font-family={FONT} font-size="7.5">{s.detail}</text>
+        <text x="212" y={y + 14} fill={C.muted} font-family={FONT} font-size="9.5">{`${fmt(s.running / 1000, 1)}k / ${fmt(s.starting / 1000, 1)}k W`}</text>
+        <text x="212" y={y + 25} fill={C.muted} font-family={FONT} font-size="7.5">{`needs ${fmt(s.required / 1000, 1)} kW`}</text>
+        <rect x={BAR_X} y={y + 1} width={s.width} height="22" rx="6" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 1} width={s.width} height="22" rx="6" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + s.width - 10} y={y + 17} text-anchor="end" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{`${fmt(s.selected, s.selected % 1 === 0 ? 0 : 1)} kW`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">The "20 kW whole-house generator" marketing default is really the essentials-plus-air-conditioning tier. A house without central air needs a third of it.</text>
+</svg>

@@ -1,0 +1,84 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+
+const defs = markerDefs("ccs");
+
+/**
+ * The four-step Chapter 9 method. Table 5 gives conductor areas, Table 4 gives
+ * raceway areas, Table 1 gives the allowable percentage — and the count-dependent
+ * percentage is why step 4 is a comparison rather than a division.
+ */
+const steps = [
+  {
+    n: "1",
+    title: "Add up conductor area",
+    table: "Table 5",
+    body: ["Look up each conductor's area", "including insulation and total", "them. Mixed sizes are fine —", "just add them all."],
+    accent: C.blue,
+    bg: C.blueLight,
+  },
+  {
+    n: "2",
+    title: "Find the raceway area",
+    table: "Table 4",
+    body: ["100% internal area for that", "type and trade size. EMT, PVC", "40, PVC 80, RMC and IMC all", "differ."],
+    accent: C.primary,
+    bg: C.primaryLight,
+  },
+  {
+    n: "3",
+    title: "Pick the fill limit",
+    table: "Table 1",
+    body: ["53% for one conductor, 31%", "for two, 40% for three or", "more. 60% for a nipple of", "24 in or less."],
+    accent: C.orange,
+    bg: C.orangeLight,
+  },
+  {
+    n: "4",
+    title: "Compare",
+    table: "Step 1 ÷ Step 2",
+    body: ["Conductor area must be at or", "below raceway area × the", "limit. Express as a percentage", "to show your work."],
+    accent: C.green,
+    bg: C.greenLight,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" fill="none" aria-hidden="true">
+  <title>Four step conduit fill calculation method</title>
+  <desc>
+    Step one: add up the cross-sectional area of every conductor including insulation, from Chapter 9 Table 5;
+    mixed sizes simply add together. Step two: find the raceway's 100 percent internal area from Table 4 for
+    that type and trade size. Step three: pick the fill limit from Table 1 — 53 percent for one conductor, 31
+    percent for two, 40 percent for three or more, and 60 percent for a nipple of 24 inches or less. Step four:
+    compare, since the total conductor area must not exceed the raceway area multiplied by that limit.
+  </desc>
+
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="244" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four steps, three tables</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">This method works for any mix of conductor sizes — which is where the pre-computed charts give up</text>
+
+  {steps.map((s, i) => {
+    const x = 24 + i * 172;
+    return (
+      <g>
+        <rect x={x} y="74" width="152" height="164" rx="10" fill={s.bg} stroke={s.accent} stroke-width="1.5" />
+        <circle cx={x + 22} cy="98" r="12" fill={C.white} stroke={s.accent} stroke-width="1.4" />
+        <text x={x + 22} y="103" text-anchor="middle" fill={s.accent} font-family={FONT} font-size="12" font-weight="800">{s.n}</text>
+        <text x={x + 42} y="102" fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{s.title}</text>
+        <rect x={x + 12} y="116" width="88" height="18" rx="5" fill={C.white} stroke={s.accent} stroke-width="1" />
+        <text x={x + 56} y="128" text-anchor="middle" fill={s.accent} font-family={FONT} font-size="8.5" font-weight="700">{s.table}</text>
+        <text x={x + 12} y="152" fill={C.muted} font-family={FONT} font-size="9">
+          {s.body.map((line, li) => (
+            <tspan x={x + 12} dy={li === 0 ? "0" : "12"}>{line}</tspan>
+          ))}
+        </text>
+        {i !== steps.length - 1 && (
+          <path d={`M${x + 156} 156 L ${x + 168} 156`} stroke={C.border} stroke-width="1.6" marker-end="url(#ccs-arrow-muted)" />
+        )}
+      </g>
+    );
+  })}
+</svg>

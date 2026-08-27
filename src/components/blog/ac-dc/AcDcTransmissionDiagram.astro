@@ -1,0 +1,79 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Why the grid is AC: transformers only work on changing flux, and stepping the
+ * voltage up collapses the I²R loss. Loss = P²R/V², so it falls with the
+ * SQUARE of voltage — doubling the voltage quarters the loss.
+ */
+const POWER_W = 100_000;
+const LINE_OHMS = 1;
+
+const LEVELS = [
+  { volts: 240, label: "240 V", note: "dwelling service" },
+  { volts: 480, label: "480 V", note: "plant distribution" },
+  { volts: 4160, label: "4.16 kV", note: "campus / industrial" },
+  { volts: 13800, label: "13.8 kV", note: "utility primary" },
+  { volts: 69000, label: "69 kV", note: "sub-transmission" },
+];
+
+const rows = LEVELS.map((l) => {
+  const amps = POWER_W / l.volts;
+  const lossW = amps * amps * LINE_OHMS;
+  return { ...l, amps, lossW, lossPct: (lossW / POWER_W) * 100 };
+});
+
+const MAX_PCT = Math.max(...rows.map((r) => r.lossPct));
+const BAR_X = 400;
+const BAR_MAX = 196;
+
+const pctText = (p: number) => (p >= 10 ? `${p.toFixed(0)}%` : p >= 1 ? `${p.toFixed(1)}%` : `${p.toFixed(4)}%`);
+const ampText = (a: number) => (a >= 100 ? a.toFixed(0) : a.toFixed(2));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 272" fill="none" aria-hidden="true">
+  <title>Transmission loss against voltage for the same delivered power</title>
+  <desc>
+    Delivering 100 kilowatts through one ohm of line. At 240 volts the current is 417 amps and the line loss is 174
+    percent of the power — physically impossible. At 480 volts the loss is 43 percent. At 4.16 kilovolts it falls to 0.6
+    percent, at 13.8 kilovolts to 0.05 percent, and at 69 kilovolts to 0.002 percent. Loss falls with the square of
+    voltage.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="256" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why the grid is AC: transformers, and the square law</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Delivering ${(POWER_W / 1000).toFixed(0)} kW through ${LINE_OHMS} Ω of line. Loss = P²R ÷ V², so it falls with the square of voltage.`}
+  </text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LINE VOLTAGE</text>
+  <text x="196" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CURRENT</text>
+  <text x="290" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">I²R LOSS</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LOSS AS A SHARE OF THE POWER DELIVERED</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    const impossible = row.lossPct > 100;
+    const accent = impossible ? C.red : row.lossPct > 5 ? C.orange : C.green;
+    const w = Math.max(2, (row.lossPct / MAX_PCT) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={accent} font-family={FONT} font-size="11" font-weight="800">{row.label}</text>
+        <text x="92" y={y + 16} fill={C.muted} font-family={FONT} font-size="9">{row.note}</text>
+        <text x="196" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">{`${ampText(row.amps)} A`}</text>
+        <text x="290" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">
+          {row.lossW >= 1000 ? `${(row.lossW / 1000).toFixed(1)} kW` : `${row.lossW.toFixed(1)} W`}
+        </text>
+
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="4" fill={accent} opacity={impossible ? 0.85 : 0.7} />
+        <text x={BAR_X + w + 8} y={y + 16} fill={accent} font-family={FONT} font-size="10" font-weight="700">
+          {impossible ? `${pctText(row.lossPct)} — impossible` : pctText(row.lossPct)}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">
+    Only AC could be transformed up and back down cheaply in 1890 — that, not safety, is why the grid alternates.
+  </text>
+</svg>

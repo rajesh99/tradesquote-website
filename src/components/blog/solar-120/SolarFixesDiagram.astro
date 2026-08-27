@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { busbarAllowance } from "@/lib/nec";
+
+/**
+ * What to do when the 120% check fails, ranked by cost. The main derate is the
+ * one people forget, and on a 200 A busbar it is the difference between a 7.7 kW
+ * and an 11.5 kW system for the price of one breaker.
+ */
+const BUSBAR = 200;
+const derates = [200, 175, 150, 125, 100].map((main) => {
+  const r = busbarAllowance({ busbarRating: BUSBAR, mainBreaker: main, inverterAmps: 0 });
+  return { main, pvBreaker: r.maxPvBreaker, inverter: r.maxInverterAmps, kw: (r.maxInverterAmps * 240) / 1000 };
+});
+
+const peak = Math.max(...derates.map((d) => d.kw));
+const BAR_X = 168;
+const BAR_MAX = 250;
+const bars = derates.map((d) => ({ ...d, width: Math.max(14, Math.round((d.kw / peak) * BAR_MAX)) }));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>Derating the main breaker to make room for solar</title>
+  <desc>
+    On a 200 amp busbar, a 200 amp main leaves room for a 40 amp PV breaker and a 32 amp inverter of about 7.7
+    kilowatts. Derating the main to 175 amps allows a 60 amp breaker and 48 amps of inverter, about 11.5
+    kilowatts. At 150 amps the panel accepts a 90 amp breaker and 72 amps of inverter, and at 100 amps a 125 amp
+    breaker and 100 amps of inverter.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    A main breaker derate is the cheap fix
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Same ${BUSBAR} A busbar throughout — only the main breaker changes. Bars are inverter kW at 240 V.`}
+  </text>
+
+  {bars.map((d, i) => {
+    const y = 68 + i * 30;
+    const base = d.main === 200;
+    const accent = base ? C.muted : C.primary;
+    return (
+      <g>
+        <text
+          x="28"
+          y={y + 15}
+          fill={base ? C.muted : C.dark}
+          font-family={FONT}
+          font-size="10"
+          font-weight={base ? "600" : "800"}
+        >
+          {base ? `${d.main} A main (as built)` : `${d.main} A main`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={d.width} height="18" rx="4" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 3} width={d.width} height="18" rx="4" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 7} y={y + 17} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">
+          {`${d.kw.toFixed(2)} kW`}
+        </text>
+        <text x={BAR_X + d.width + 9} y={y + 17} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${d.pvBreaker} A PV breaker · ${d.inverter.toFixed(0)} A inverter`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="228" x2="696" y2="228" stroke={C.border} />
+  <text x="28" y="248" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    Dropping the main from 200 A to 175 A adds 50% more solar, for the price of one breaker.
+  </text>
+  <text x="28" y="266" fill={C.muted} font-family={FONT} font-size="9.5">
+    Prove the house stays under the new main first — twelve months of utility peak at 125%, per NEC 220.87.
+  </text>
+  <text x="28" y="280" fill={C.muted} font-family={FONT} font-size="9.5">
+    If no derate works, a supply-side tap under 705.11 bypasses the busbar rule entirely.
+  </text>
+</svg>

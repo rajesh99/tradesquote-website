@@ -1,0 +1,475 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { BTU_PER_WATT, WATTS_PER_HP, fmt, fmtInt } from "@/lib/nec";
+
+const title = "Electrical Unit Converter — Watts, kW, hp, BTU, kVA & Amps | TradesQuote";
+const description =
+  "Free electrical unit converter. Convert between watts, kilowatts, horsepower, BTU per hour, tons of refrigeration, volt-amperes, and amps — the units nameplates use and that never match each other.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-unit-converter";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Electrical Unit Converter", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Electrical Unit Converter",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online electrical unit converter for watts, kilowatts, horsepower, BTU per hour, tons of refrigeration, volt-amperes, and line current.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many watts is 1 horsepower?",
+    answer:
+      "<strong>745.7 watts</strong> for electrical horsepower — the value used throughout NEC motor calculations. You will also see 746 W used as a round figure, and metric horsepower (PS) at 735.5 W, but 745.7 is the one to work from on US electrical jobs. Note this is <em>output</em> power: a motor rated 1 hp draws more than 745.7 W of input because of its efficiency.",
+  },
+  {
+    question: "How do I convert watts to BTU per hour?",
+    answer:
+      "Multiply by <strong>3.412142</strong>. So 1,000 W = 3,412 BTU/h, and 1 hp = 2,544 BTU/h. Going the other way, divide BTU/h by 3.412142. This conversion is how you cross between the electrical and HVAC sides of a job — a 5,000 W electric heater and a 17,061 BTU/h heater are the same appliance.",
+  },
+  {
+    question: "How many watts is a ton of cooling?",
+    answer:
+      "One ton of refrigeration is <strong>12,000 BTU/h</strong>, which is <strong>3,517 W</strong> of heat removed. That is <em>not</em> the electrical input — a modern 1-ton air conditioner might draw only 900 to 1,200 W to move 3,517 W of heat, because it pumps heat rather than generating it. Never size a circuit from cooling tonnage; use the equipment nameplate.",
+  },
+  {
+    question: "Why don't watts and volt-amperes match?",
+    answer:
+      'They match only at unity power factor. <strong>Volt-amperes</strong> is voltage times current — the load the conductor carries. <strong>Watts</strong> is the portion doing real work. A 1,000 VA load at 0.8 power factor delivers 800 W. Conductors, breakers, transformers, and generators are all rated in VA. The <a href="/calculators/electrical/electrical-kva-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">kVA Calculator</a> covers the relationship properly.',
+  },
+  {
+    question: "Can I size a motor circuit from its horsepower?",
+    answer:
+      "Not directly from a horsepower-to-watts conversion. <strong>NEC 430.6(A)(1)</strong> requires motor branch-circuit conductors to be sized from the full-load current tables — <strong>430.248</strong> for single-phase and <strong>430.250</strong> for three-phase — rather than from the nameplate or from a calculation. Those table values are deliberately higher than the arithmetic suggests. Use this converter for estimating and cross-checking, not for the final circuit design.",
+  },
+  {
+    question: "What's the difference between kW and kVA on a generator?",
+    answer:
+      "The kW rating is what the engine can deliver as real power; the kVA rating is what the alternator can carry as apparent power. Standby generators are commonly published at <strong>0.8 power factor</strong>, so a 100 kVA unit is an 80 kW unit. When you compare a calculated load against a generator, compare <strong>kVA to kVA</strong> — comparing your kW to its kVA will oversell the machine by 25%.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Units sorted? Quote the job in seconds.";
+const ctaDescription =
+  "Nameplate decoded, load known — now price it. Describe the job or upload photos and TradesQuote's AI builds a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-watts-to-amps-calculator",
+    title: "Watts to Amps Calculator",
+    description: "Convert power into the current a circuit carries.",
+  },
+  {
+    href: "/calculators/electrical/electrical-kva-calculator",
+    title: "kVA Calculator",
+    description: "Apparent, real, and reactive power.",
+  },
+  {
+    href: "/calculators/hvac/hvac-unit-converter",
+    title: "HVAC Unit Converter",
+    description: "Tons, BTU/h, and °F on the HVAC side.",
+  },
+  {
+    href: "/calculators/electrical/electrical-kwh-cost-calculator",
+    title: "kWh Cost Calculator",
+    description: "Turn power into a running cost.",
+  },
+];
+
+/** Reference conversions, computed from the same constants the script uses. */
+const constantRows = [
+  { from: "1 horsepower", to: `${WATTS_PER_HP} W`, note: "Electrical hp, used in NEC motor tables" },
+  { from: "1 kilowatt", to: `${fmt(1000 / WATTS_PER_HP, 3)} hp`, note: "Roughly 1⅓ hp" },
+  { from: "1 watt", to: `${BTU_PER_WATT} BTU/h`, note: "The electrical-to-thermal bridge" },
+  { from: "1 kilowatt", to: `${fmtInt(1000 * BTU_PER_WATT)} BTU/h`, note: "" },
+  { from: "1 horsepower", to: `${fmtInt(WATTS_PER_HP * BTU_PER_WATT)} BTU/h`, note: "" },
+  { from: "1 ton of refrigeration", to: "12,000 BTU/h", note: `${fmtInt(12000 / BTU_PER_WATT)} W of heat moved` },
+  { from: "1 kVA at PF 1.0", to: "1,000 W", note: "Apparent equals real only at unity" },
+  { from: "1 kVA at PF 0.8", to: "800 W", note: "Typical generator rating basis" },
+];
+
+const styles = electricalAccentStyles.sky;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Electrical Unit Converter — W, kW, hp, BTU, kVA & Amps" />
+    <meta
+      property="og:description"
+      content="Convert between watts, kilowatts, horsepower, BTU per hour, tons, volt-amperes, and amps — the units nameplates use and that never match."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Electrical Unit Converter — W, kW, hp, BTU, kVA & Amps" />
+    <meta
+      name="twitter:description"
+      content="Every electrical power unit, converted. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Electrical Unit Converter"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Electrical Unit Converter <span class="text-sky-600">— W, kW, hp, BTU, kVA & A</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every nameplate on a job site uses a different unit. Motors give horsepower, heaters give watts,
+              HVAC equipment gives BTU per hour or tons, transformers and generators give kVA, and the code
+              tables want amps. This converter moves between all of them — including the current conversions
+              that need voltage and power factor to be meaningful.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+            Convert electrical units
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div>
+                <label for="uc-mode" class="text-sm font-semibold text-slate-800">What are you converting?</label>
+                <select
+                  id="uc-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                >
+                  <option value="power" selected>Power units — W, kW, hp, BTU/h</option>
+                  <option value="power-to-amps">Power → amps</option>
+                  <option value="amps-to-power">Amps → power</option>
+                </select>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="uc-value" class="text-sm font-semibold text-slate-800">Value</label>
+                  <input
+                    id="uc-value"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value="1"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label for="uc-unit" class="text-sm font-semibold text-slate-800">Unit</label>
+                  <select
+                    id="uc-unit"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="W">watts</option>
+                    <option value="kW">kilowatts</option>
+                    <option value="hp" selected>horsepower</option>
+                    <option value="BTU/h">BTU per hour</option>
+                  </select>
+                  <p class="mt-1 text-xs text-slate-500">Used in power-unit mode only.</p>
+                </div>
+              </div>
+
+              <div id="uc-ac-fields" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold text-slate-800">Supply details</p>
+                <p class="mt-1 text-xs text-slate-500">Required to convert between power and current.</p>
+                <div class="mt-3 grid sm:grid-cols-3 gap-3">
+                  <div>
+                    <label for="uc-phase" class="text-xs font-medium text-slate-600">Supply</label>
+                    <select
+                      id="uc-phase"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-2.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    >
+                      <option value="1ph" selected>1φ AC</option>
+                      <option value="3ph">3φ AC</option>
+                      <option value="dc">DC</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="uc-volts" class="text-xs font-medium text-slate-600">Volts</label>
+                    <select
+                      id="uc-volts"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-2.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    >
+                      <option value="120">120</option>
+                      <option value="208">208</option>
+                      <option value="240" selected>240</option>
+                      <option value="277">277</option>
+                      <option value="480">480</option>
+                      <option value="600">600</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="uc-pf" class="text-xs font-medium text-slate-600">Power factor</label>
+                    <input
+                      id="uc-pf"
+                      type="number"
+                      min="0.1"
+                      max="1"
+                      step="0.01"
+                      value="1"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-2.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="uc-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-sky-100 bg-sky-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Converted to <span id="uc-primary-label">watts</span></p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="uc-primary" class="text-5xl font-extrabold tracking-tight text-sky-600">746 W</span>
+              </div>
+              <p id="uc-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Using 1 hp = 745.7 W and 1 W = 3.412142 BTU/h.
+              </p>
+
+              <div class="mt-6 rounded-xl border border-sky-100 bg-white px-4 py-2">
+                <div id="uc-rows" class="text-sm"></div>
+              </div>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Motor branch circuits must be sized from the NEC Table 430.248 and 430.250 full-load currents,
+                not from a horsepower conversion. Cooling tonnage is heat moved, not electrical input.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The conversions, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Power units</div>
+            <div>
+              W&nbsp;=&nbsp;hp × <span class="text-amber-300">745.7</span>&nbsp;&nbsp;·&nbsp;&nbsp;W&nbsp;=&nbsp;kW ×
+              1,000&nbsp;&nbsp;·&nbsp;&nbsp;W&nbsp;=&nbsp;BTU/h ÷ <span class="text-amber-300">3.412142</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Thermal equivalence</div>
+            <div>
+              BTU/h&nbsp;=&nbsp;W × <span class="text-amber-300">3.412142</span
+              >&nbsp;&nbsp;·&nbsp;&nbsp;tons&nbsp;=&nbsp;BTU/h ÷ <span class="text-amber-300">12,000</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Power ↔ current (needs voltage)</div>
+            <div>1φ: A&nbsp;=&nbsp;W ÷ (V × PF)&nbsp;&nbsp;·&nbsp;&nbsp;3φ: A&nbsp;=&nbsp;W ÷ (<span class="text-amber-300">1.732</span> × V × PF)</div>
+            <div class="mt-4 text-cyan-300"># Apparent power</div>
+            <div>VA&nbsp;=&nbsp;W ÷ PF&nbsp;&nbsp;·&nbsp;&nbsp;equal to watts only when PF = 1.0</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Horsepower is output, not input</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A 1 hp motor delivers 745.7 W at the shaft but draws more than that from the supply, because
+                efficiency is never 100%. Divide by efficiency to get input power.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Cooling tons aren't watts</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A ton is 12,000 BTU/h of heat <em>moved</em>. A heat pump moving 3,517 W of heat might draw only
+                1,000 W to do it — which is the whole point of a heat pump.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">A motor nameplate, an HVAC crossover, and a generator comparison.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">1 horsepower motor</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              1 hp = <span class="font-bold text-sky-700">745.7 W</span> = 0.746 kW<br />
+              = 745.7 × 3.412142 = 2,544 BTU/h<br />
+              = 0.212 tons of refrigeration equivalent
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 745.7 W is <em>shaft output</em>. At 85%
+              efficiency the motor draws about 877 W from the supply, and its branch circuit would still be
+              sized from NEC Table 430.248 rather than either figure.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">5 kW electric heater in BTU</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Crossing from the electrical to the HVAC side of a job.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              5,000 W × 3.412142 = <span class="font-bold text-sky-700">17,061 BTU/h</span><br />
+              at 240 V single-phase, PF 1.0: 5,000 ÷ 240 = 20.83 A → 30 A circuit
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> electric resistance heat converts
+              one-for-one, so 5 kW is exactly 17,061 BTU/h. This is how you compare a strip-heat kit against a
+              gas furnace rating — and note the 20.83 A it draws, which is what pushes electrification onto
+              larger services.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">A "100 kVA" generator</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Published at the industry-standard 0.8 power factor.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              100 kVA × 0.8 = <span class="font-bold text-sky-700">80 kW</span> of real power<br />
+              at 480 V three-phase: 100,000 ÷ (1.732 × 480) = 120.3 A
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> comparing an 85 kW calculated load
+              against a "100 kVA" generator looks fine but is actually over capacity — the machine only makes
+              80 kW. Always compare kVA to kVA.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Conversion constants</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The figures behind every conversion on this page, rendered from the same constants the calculator
+            uses.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">From</th>
+                  <th class="py-3 px-5 font-semibold">Equals</th>
+                  <th class="py-3 px-5 font-semibold">Note</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  constantRows.map((row, index) => (
+                    <tr class={index === constantRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.from}</td>
+                      <td class="py-3 px-5 font-mono">{row.to}</td>
+                      <td class="py-3 px-5 text-slate-500">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: electrical horsepower = {WATTS_PER_HP} W; 1 W = {BTU_PER_WATT} BTU/h;
+            1 ton of refrigeration = 12,000 BTU/h. NEC (NFPA 70) 2023 — 430.6(A)(1) and Tables 430.248 and
+            430.250 require motor conductors to be sized from tabulated full-load currents rather than from
+            nameplate horsepower. Generator kVA ratings are conventionally published at 0.8 power factor.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about electrical power units and what they actually mean."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalUnitConverter } from "@/scripts/calculators/electrical-unit-converter";
+    initElectricalUnitConverter();
+  </script>
+</Layout>

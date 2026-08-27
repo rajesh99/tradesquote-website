@@ -1,0 +1,655 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+
+const title = "Wire Size Calculator — NEC Ampacity & Voltage Drop | TradesQuote";
+const description =
+  "Free NEC wire size calculator. Enter amps, distance, and material to get the AWG your circuit needs — sized by Table 310.16 ampacity and by voltage drop, whichever governs. Copper and aluminum, 60/75/90 °C terminations, instant results, no sign-up.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-wire-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Wire Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Wire Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC wire size calculator that determines the required conductor gauge from load current, run length, conductor material, system voltage, and termination temperature rating — checking both Table 310.16 ampacity and voltage drop.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size wire do I need for a 50 amp circuit?",
+    answer:
+      "On ampacity alone, <strong>8 AWG copper</strong> carries 50 A at the 75 °C column of NEC Table 310.16. But over a 100-foot run at 240 V, 8 AWG drops 3.26% — past the 3% recommendation — so most installers pull <strong>6 AWG</strong>. Short runs stay at 8 AWG; long runs go to 6 AWG or larger. The calculator above shows you which of the two rules is governing.",
+  },
+  {
+    question: "Does voltage drop override the ampacity table?",
+    answer:
+      "Neither overrides the other — you satisfy both, so the <strong>larger conductor wins</strong>. Ampacity is a mandatory NEC requirement that keeps the conductor from overheating. Voltage drop is an engineering recommendation that keeps equipment working properly at the far end of a long run. On short circuits ampacity almost always governs; past roughly 75–100 feet, voltage drop usually takes over.",
+  },
+  {
+    question: "Is the 3% voltage drop limit actually a code requirement?",
+    answer:
+      'No. The 3% branch-circuit and 5% total figures live in <strong>Informational Notes</strong> to NEC 210.19(A) and 215.2(A), and Informational Notes are explanatory rather than enforceable. They are widely treated as good practice, and many project specifications and local amendments adopt them as mandatory — so the calculator checks against them and tells you when drop is the reason a conductor got upsized. See the <a href="/calculators/electrical/electrical-voltage-drop-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">Voltage Drop Calculator</a> for the full picture.',
+  },
+  {
+    question: "Can I use aluminum instead of copper?",
+    answer:
+      "Yes, where the equipment terminations are listed for aluminum (look for an AL/CU or AL9CU marking). Aluminum carries roughly <strong>two sizes less current</strong> than the same copper gauge, and its higher resistivity (K = 21.2 vs 12.9) means more voltage drop over the same run. Aluminum is standard for services and large feeders because of cost; copper dominates branch circuits.",
+  },
+  {
+    question: "Why is 12 AWG limited to 20 amps when the table says 25?",
+    answer:
+      "Because of the small-conductor rule in <strong>NEC 240.4(D)</strong>. Regardless of what Table 310.16 allows, overcurrent protection is capped at 15 A for 14 AWG copper, 20 A for 12 AWG copper, and 30 A for 10 AWG copper (15 A and 25 A for 12 and 10 AWG aluminum). The calculator applies these caps automatically.",
+  },
+  {
+    question: "Do I use the 60, 75, or 90 °C column?",
+    answer:
+      'Use the column matching the <strong>lowest-rated termination</strong> in the circuit, per <strong>NEC 110.14(C)</strong> — not the insulation rating printed on the wire. Most breakers, panels, and equipment are listed for 75 °C, which is why 75 °C is the default here. THHN is a 90 °C insulation, but you may only use its 90 °C ampacity for derating math, never as the final usable ampacity. The <a href="/calculators/electrical/electrical-ampacity-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">Ampacity &amp; Derating Calculator</a> walks through that distinction.',
+  },
+  {
+    question: "Does the neutral count as a current-carrying conductor?",
+    answer:
+      "For a normal single-phase two-wire or three-wire circuit, yes for the two-wire case and no for a balanced multiwire branch circuit — NEC 310.15(E) exempts the neutral of a balanced 3-wire circuit from the conductor count. It does count where the load is largely nonlinear or on a 4-wire three-phase system with significant harmonic content. This matters for derating, not for the base ampacity lookup this calculator starts from.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Circuit sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "The conductor is one line item. TradesQuote turns the whole job into a detailed, line-item estimate — wire, conduit, devices, panel work, and labor — with quantities, unit prices, and totals, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-voltage-drop-calculator",
+    title: "Voltage Drop Calculator",
+    description: "Check drop percent and the longest compliant run.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ampacity-calculator",
+    title: "Ampacity & Derating Calculator",
+    description: "Correct for ambient heat and conductor bundling.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "Match the overcurrent device to the load.",
+  },
+  {
+    href: "/calculators/electrical/electrical-conduit-fill-calculator",
+    title: "Conduit Fill Calculator",
+    description: "See how many conductors fit the raceway.",
+  },
+];
+
+/** Amps → minimum conductor, plus the size a 100 ft run at 240 V needs for 3% drop. */
+const sizingTable = [
+  { amps: 15, cu: "14 AWG", al: "12 AWG", long: "12 AWG" },
+  { amps: 20, cu: "12 AWG", al: "10 AWG", long: "10 AWG" },
+  { amps: 30, cu: "10 AWG", al: "8 AWG", long: "8 AWG" },
+  { amps: 40, cu: "8 AWG", al: "8 AWG", long: "8 AWG" },
+  { amps: 50, cu: "8 AWG", al: "6 AWG", long: "6 AWG" },
+  { amps: 60, cu: "6 AWG", al: "4 AWG", long: "6 AWG" },
+  { amps: 70, cu: "4 AWG", al: "3 AWG", long: "4 AWG" },
+  { amps: 100, cu: "3 AWG", al: "1 AWG", long: "3 AWG" },
+  { amps: 125, cu: "1 AWG", al: "2/0 AWG", long: "1 AWG" },
+  { amps: 150, cu: "1/0 AWG", al: "3/0 AWG", long: "1/0 AWG" },
+  { amps: 200, cu: "3/0 AWG", al: "250 kcmil", long: "3/0 AWG" },
+];
+
+const styles = electricalAccentStyles.blue;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Wire Size Calculator — NEC Ampacity & Voltage Drop" />
+    <meta
+      property="og:description"
+      content="Get the AWG your circuit needs from amps, distance, and material — checked against both NEC Table 310.16 ampacity and voltage drop. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Wire Size Calculator — NEC Ampacity & Voltage Drop" />
+    <meta
+      name="twitter:description"
+      content="The AWG your circuit needs, sized by NEC ampacity and voltage drop. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Wire Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Wire Size Calculator <span class="text-blue-600">— NEC Ampacity & Voltage Drop</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Sizing a conductor means satisfying two separate rules, and the larger answer wins. First,
+              <strong>ampacity</strong>: NEC Table 310.16 sets how much current a conductor can carry without
+              overheating. Second, <strong>voltage drop</strong>: over a long run, a conductor that is thermally
+              fine can still starve the load. This calculator runs both, tells you which one governed, and
+              applies the 240.4(D) small-conductor caps and the 110.14(C) termination limit along the way.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+            Size your conductor
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ws-amps" class="text-sm font-semibold text-slate-800">Load current</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ws-amps"
+                      type="number"
+                      min="0"
+                      max="600"
+                      value="50"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">amps</span>
+                  </div>
+                </div>
+                <input
+                  id="ws-amps-range"
+                  type="range"
+                  min="5"
+                  max="400"
+                  step="5"
+                  value="50"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-blue-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5</span><span>400 A</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="ws-continuous" class="text-sm font-semibold text-slate-800">Continuous load?</label>
+                  <select
+                    id="ws-continuous"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="no" selected>No — normal load</option>
+                    <option value="yes">Yes — 3 hours or more (×1.25)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ws-material" class="text-sm font-semibold text-slate-800">Conductor material</label>
+                  <select
+                    id="ws-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper</option>
+                    <option value="aluminum">Aluminum / copper-clad</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ws-length" class="text-sm font-semibold text-slate-800">One-way run length</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ws-length"
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value="100"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="ws-voltage" class="text-sm font-semibold text-slate-800">System voltage</label>
+                  <select
+                    id="ws-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="120">120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240" selected>240 V</option>
+                    <option value="277">277 V</option>
+                    <option value="480">480 V</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ws-phase" class="text-sm font-semibold text-slate-800">Phase</label>
+                  <select
+                    id="ws-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="1" selected>Single-phase</option>
+                    <option value="3">Three-phase</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ws-vd-limit" class="text-sm font-semibold text-slate-800">Voltage-drop limit</label>
+                  <select
+                    id="ws-vd-limit"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="3" selected>3% (branch circuit)</option>
+                    <option value="5">5% (feeder + branch)</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="ws-temp" class="text-sm font-semibold text-slate-800">
+                    Termination temperature rating
+                  </label>
+                  <select
+                    id="ws-temp"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="60">60 °C</option>
+                    <option value="75" selected>75 °C (most equipment)</option>
+                    <option value="90">90 °C (rare — check the listing)</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    NEC 110.14(C) — use the lowest-rated termination in the circuit, not the wire's insulation
+                    rating.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="ws-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Required conductor</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ws-gauge" class="text-5xl font-extrabold tracking-tight text-blue-600">6 AWG</span>
+              </div>
+              <p id="ws-governed-by" class="mt-1 text-sm font-semibold text-slate-700">
+                Voltage drop governs — ampacity alone would allow 8 AWG.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Ampacity</p>
+                  <p id="ws-ampacity" class="mt-1 text-2xl font-bold text-slate-900">65 A</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Voltage drop</p>
+                  <p id="ws-vd-percent" class="mt-1 text-2xl font-bold text-slate-900">2.05%</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Required ampacity</span><span id="ws-bd-required" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Ampacity says</span><span id="ws-bd-amp-gauge" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Voltage drop says</span><span id="ws-bd-vd-gauge" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Governing rule</span><span id="ws-bd-governing" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Volts at the load</span><span id="ws-bd-volts" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>240.4(D) OCPD cap</span><span id="ws-bd-ocpd-cap" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Derating for ambient heat or more than three current-carrying conductors is
+                not applied here — run the Ampacity &amp; Derating Calculator for that. A licensed electrician
+                and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Conductor sizing is two independent checks run against the same circuit. Here is exactly what this
+            calculator does, in order.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Required ampacity (NEC 210.20(A))</div>
+            <div>
+              required&nbsp;=&nbsp;non-continuous × <span class="text-amber-300">1.00</span> + continuous ×
+              <span class="text-amber-300">1.25</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Ampacity lookup (Table 310.16 + 110.14(C) + 240.4(D))</div>
+            <div>gauge₁&nbsp;=&nbsp;smallest AWG whose ampacity at the termination column ≥ required</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Voltage drop check</div>
+            <div>
+              1φ: VD&nbsp;=&nbsp;<span class="text-amber-300">2</span> × K × I × L ÷ CM&nbsp;&nbsp;·&nbsp;&nbsp;3φ:
+              VD&nbsp;=&nbsp;<span class="text-amber-300">1.732</span> × K × I × L ÷ CM
+            </div>
+            <div>
+              K&nbsp;=&nbsp;<span class="text-amber-300">12.9</span> copper&nbsp;·&nbsp;<span class="text-amber-300"
+                >21.2</span
+              > aluminum&nbsp;&nbsp;·&nbsp;&nbsp;VD%&nbsp;=&nbsp;VD ÷ V × 100
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 4 — The larger conductor wins</div>
+            <div>gauge₂&nbsp;=&nbsp;smallest AWG where VD% ≤ limit&nbsp;&nbsp;→&nbsp;&nbsp;answer = max(gauge₁, gauge₂)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why two rules?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Ampacity is a heat problem — too much current in too small a conductor melts insulation.
+                Voltage drop is a performance problem — resistance over distance robs the load of voltage.
+                A conductor can pass one and fail the other.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What K actually is</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                K is resistivity in ohm-circular-mils per foot at roughly 75 °C. Copper's 12.9 versus
+                aluminum's 21.2 is why an aluminum run of the same gauge drops about 64% more voltage.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The 2 and the 1.732</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Single-phase current travels out and back, so you count the run length twice. Three-phase
+                uses √3 ≈ 1.732 because the phase currents are 120° apart and partially cancel in the return path.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The 240.4(D) trap</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Table 310.16 says 12 AWG copper carries 25 A at 75 °C, but 240.4(D) caps its breaker at 20 A.
+                The table value is real; the usable value is what the small-conductor rule allows.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          Three circuits showing ampacity governing, voltage drop governing, and the long-run trap that catches
+          people out.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Kitchen receptacle circuit — 20 A, 40 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              20 A non-continuous · copper · 40 ft one-way · 120 V single-phase · 75 °C terminations · 3% limit.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 20 A × 1.00 = 20 A<br />
+              ampacity: 12 AWG Cu = 25 A at 75 °C, capped at 20 A by 240.4(D) → 12 AWG<br />
+              drop = 2 × 12.9 × 20 × 40 ÷ 6,530 = 3.16 V = 2.63%<br />
+              → <span class="font-bold text-blue-700">12 AWG copper — ampacity governs</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> standard 12 AWG on a 20 A breaker.
+              Both checks pass comfortably, which is why short branch circuits rarely need any thought.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Detached garage feeder — 50 A, 100 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              50 A non-continuous · copper · 100 ft one-way · 240 V single-phase · 75 °C terminations · 3% limit.
+              These are the calculator's defaults.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              required = 50 A<br />
+              ampacity: 8 AWG Cu = 50 A at 75 °C → 8 AWG would do<br />
+              8 AWG drop = 2 × 12.9 × 50 × 100 ÷ 16,510 = 7.81 V = 3.26% ✗<br />
+              6 AWG drop = 2 × 12.9 × 50 × 100 ÷ 26,240 = 4.92 V = 2.05% ✓<br />
+              → <span class="font-bold text-blue-700">6 AWG copper — voltage drop governs</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 6 AWG, one size up from what the
+              ampacity table alone allows, and 235.1 V arrives at the subpanel instead of 232.2 V.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Long 120 V run to a shed — 20 A, 150 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              20 A non-continuous · copper · 150 ft one-way · 120 V single-phase · 3% limit.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              ampacity: 12 AWG is fine — 20 A<br />
+              12 AWG drop = 2 × 12.9 × 20 × 150 ÷ 6,530 = 11.85 V = <span class="font-bold text-rose-700">9.88% ✗</span><br
+              />
+              10 AWG = 7.46 V = 6.21% ✗ · 8 AWG = 4.69 V = 3.91% ✗ · 6 AWG = 2.95 V = 2.46% ✓<br />
+              → <span class="font-bold text-blue-700">6 AWG copper — three sizes up</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same 20 A load needs 6 AWG instead
+              of 12 AWG purely because of distance and low voltage. Doubling the voltage to 240 V would cut the
+              drop percentage in half and bring 10 AWG back into play — which is why long outbuilding runs are
+              almost always fed at 240 V.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Wire size chart by amps</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Minimum conductor at the 75 °C column of NEC Table 310.16, with the 240.4(D) small-conductor caps
+            applied. The last column shows what a <strong>100-foot run at 240 V</strong> needs to stay inside 3%
+            voltage drop — at 120 V the drop percentage doubles, so those runs need more copper.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Load</th>
+                  <th class="py-3 px-5 font-semibold">Copper (75 °C)</th>
+                  <th class="py-3 px-5 font-semibold">Aluminum (75 °C)</th>
+                  <th class="py-3 px-5 font-semibold">Copper at 100 ft, 240 V</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  sizingTable.map((row, index) => (
+                    <tr class={index === sizingTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.amps} A</td>
+                      <td class="py-3 px-5">{row.cu}</td>
+                      <td class="py-3 px-5">{row.al}</td>
+                      <td class="py-3 px-5">
+                        {row.long}
+                        {row.long !== row.cu && (
+                          <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            upsized
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — Table 310.16 conductor ampacities, 110.14(C)
+            termination temperature limitations, 240.4(D) small-conductor protection, 210.19(A) and 215.2(A)
+            Informational Notes on voltage drop, Chapter 9 Table 8 conductor properties. Local amendments
+            override the model code; confirm the edition your jurisdiction enforces.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about NEC wire sizing, ampacity, and voltage drop."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalWireSizeCalculator } from "@/scripts/calculators/electrical-wire-size-calculator";
+    initElectricalWireSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

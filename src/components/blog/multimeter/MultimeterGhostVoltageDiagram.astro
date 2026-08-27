@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Ghost voltage is a voltage divider, nothing more. Capacitive coupling from a
+ * live conductor forms the upper leg; the meter's input impedance forms the
+ * lower one. A 10 MΩ meter sees a large fraction of it; a low-impedance meter
+ * loads it to nothing.
+ */
+const SOURCE_V = 120;
+const HIGH_Z_MOHM = 10;
+const LOW_Z_MOHM = 0.003;
+const COUPLINGS = [1, 10, 50, 100];
+
+const rows = COUPLINGS.map((zc) => ({
+  zc,
+  high: (SOURCE_V * HIGH_Z_MOHM) / (zc + HIGH_Z_MOHM),
+  low: (SOURCE_V * LOW_Z_MOHM) / (zc + LOW_Z_MOHM),
+}));
+
+const COL_X = [232, 400];
+const COL_W = 150;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Ghost voltage readings on a high-impedance meter versus a low-impedance meter</title>
+  <desc>
+    A disconnected conductor picking up voltage by capacitive coupling forms a divider with the meter. Through 10 megohms
+    of coupling, a 10 megohm meter reads 60 volts on a dead wire while a 3 kilohm low-impedance meter reads 0.04 volts.
+    The conductor is equally dead in both cases.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Ghost voltage is just a voltage divider</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A dead conductor coupled to a live one beside it, read on ${SOURCE_V} V. The meter is the lower leg of the divider.`}
+  </text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">COUPLING IMPEDANCE</text>
+  <text x={COL_X[0] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">{`${HIGH_Z_MOHM} MΩ METER READS`}</text>
+  <text x={COL_X[1] + COL_W / 2} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">3 kΩ LOW-Z METER READS</text>
+  <text x="576" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">THE CONDUCTOR IS</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    const alarming = row.high >= 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{`${row.zc} MΩ`}</text>
+
+        <rect x={COL_X[0]} y={y} width={COL_W} height="24" rx="6" fill={alarming ? C.red : C.orange} opacity={alarming ? 0.18 : 0.08} />
+        <rect x={COL_X[0]} y={y} width={COL_W} height="24" rx="6" fill="none" stroke={alarming ? C.red : C.orange} stroke-width={alarming ? 2 : 1.1} />
+        <text x={COL_X[0] + COL_W / 2} y={y + 16} text-anchor="middle" fill={alarming ? C.red : C.orange} font-family={FONT} font-size="10.5" font-weight={alarming ? 800 : 600}>
+          {`${row.high.toFixed(1)} V`}
+        </text>
+
+        <rect x={COL_X[1]} y={y} width={COL_W} height="24" rx="6" fill={C.green} opacity="0.1" />
+        <rect x={COL_X[1]} y={y} width={COL_W} height="24" rx="6" fill="none" stroke={C.green} stroke-width="1.4" />
+        <text x={COL_X[1] + COL_W / 2} y={y + 16} text-anchor="middle" fill={C.green} font-family={FONT} font-size="10.5" font-weight="700">
+          {`${row.low.toFixed(2)} V`}
+        </text>
+
+        <text x="576" y={y + 16} fill={C.green} font-family={FONT} font-size="9.5" font-weight="700">dead either way</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">
+    Same conductor, same leads — only the meter's input impedance changed. Prove dead with a low-Z meter or a tester.
+  </text>
+</svg>

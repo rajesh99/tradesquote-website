@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Which constraint actually decides the fixture count. Across eight real rooms
+ * the spacing grid governs almost every time — the light-level calculation only
+ * takes over where the target is high, which in a house means the workshop.
+ */
+const CEILING = 8;
+const FIXTURE_LM = 650;
+const spacing = CEILING / 2;
+
+const rooms = [
+  { name: "Hallway", l: 20, w: 4, fc: 10 },
+  { name: "Bathroom", l: 8, w: 5, fc: 30 },
+  { name: "Bedroom", l: 12, w: 12, fc: 20 },
+  { name: "Office", l: 12, w: 10, fc: 40 },
+  { name: "Dining", l: 14, w: 12, fc: 25 },
+  { name: "Kitchen", l: 16, w: 12, fc: 40 },
+  { name: "Living", l: 16, w: 14, fc: 20 },
+  { name: "Workshop", l: 20, w: 20, fc: 50 },
+].map((r) => {
+  const rows = Math.max(1, Math.round(r.l / spacing));
+  const cols = Math.max(1, Math.round(r.w / spacing));
+  const bySpacing = rows * cols;
+  const byLight = Math.max(1, Math.ceil((r.l * r.w * r.fc) / FIXTURE_LM));
+  return {
+    ...r,
+    bySpacing,
+    byLight,
+    count: Math.max(bySpacing, byLight),
+    governs: byLight > bySpacing ? "light" : byLight === bySpacing ? "both" : "spacing",
+  };
+});
+
+const peak = Math.max(...rooms.map((r) => r.count));
+const BAR_X = 176;
+const BAR_MAX = 300;
+const w = (v: number) => Math.max(6, Math.round((v / peak) * BAR_MAX));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 314" fill="none" aria-hidden="true">
+  <title>Which constraint decides the fixture count</title>
+  <desc>
+    Across eight rooms on an 8 foot ceiling, the spacing grid governs the fixture count in six of them, both
+    methods agree in the bathroom and kitchen, and only the workshop at 50 footcandles is governed by light level,
+    where 31 fixtures are needed against the 25 the spacing grid gives.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="298" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    In most rooms, spacing governs — not light level
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${CEILING} ft ceiling, so a ${spacing} ft grid, with ${FIXTURE_LM} lm trims. Take whichever method asks for more.`}
+  </text>
+
+  {rooms.map((r, i) => {
+    const y = 68 + i * 27;
+    const lightGoverns = r.governs === "light";
+    const accent = lightGoverns ? C.orange : r.governs === "both" ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{r.name}</text>
+        <text x="86" y={y + 14} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${r.l}×${r.w} · ${r.fc} fc`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={w(r.count)} height="17" rx="4" fill={accent} opacity="0.18" />
+        <rect x={BAR_X} y={y + 2} width={w(r.count)} height="17" rx="4" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + 7} y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{r.count}</text>
+        <text x={BAR_X + w(r.count) + 9} y={y + 15} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`grid ${r.bySpacing} · light ${r.byLight}`}
+        </text>
+        <text x={BAR_X + w(r.count) + 104} y={y + 15} fill={accent} font-family={FONT} font-size="8.5" font-weight="700">
+          {r.governs === "both" ? "both agree" : `${r.governs} governs`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="290" x2="696" y2="290" stroke={C.border} />
+  <text x="28" y="306" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    Only the workshop is light-level driven. Everywhere else, even coverage asks for more than the target does.
+  </text>
+</svg>

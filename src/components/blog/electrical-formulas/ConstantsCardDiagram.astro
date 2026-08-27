@@ -1,0 +1,59 @@
+---
+import { BTU_PER_WATT, BOX_FILL_VOLUME, K_ALUMINUM, K_COPPER, SQRT3, WATTS_PER_HP, cmilOf, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The dozen constants worth committing to memory. Those that exist in the NEC data
+ * module are read from it rather than typed, so they cannot drift from the calculators.
+ */
+const chips = [
+  { value: `${K_COPPER} / ${K_ALUMINUM}`, label: "K, ohm-cmil per foot", sub: "copper / aluminum, voltage drop", accent: C.blue },
+  { value: fmt(SQRT3, 3), label: "√3", sub: "the three-phase line factor", accent: C.blue },
+  { value: "1.25", label: "continuous-load adder", sub: "210.20(A) — the 80% rule inverted", accent: C.orange },
+  { value: "0.83", label: "dwelling service allowance", sub: "Table 310.12, service or whole-load feeder", accent: C.orange },
+  { value: "3 VA/ft²", label: "general lighting load", sub: "220.12 — finished area only", accent: C.primary },
+  { value: "1,500 VA", label: "each small-appliance circuit", sub: "220.52 — and the laundry circuit", accent: C.primary },
+  { value: "10,000 VA", label: "220.82 first tier at 100%", sub: "everything above it at 40%", accent: C.primary },
+  { value: `${WATTS_PER_HP} W`, label: "one horsepower", sub: "output, not input — divide by efficiency", accent: C.red },
+  { value: `${fmt(BTU_PER_WATT, 3)} BTU/h`, label: "one watt", sub: "the electric-to-heat bridge", accent: C.red },
+  { value: `${fmt(BOX_FILL_VOLUME["12"], 2)} in³`, label: "12 AWG box-fill allowance", sub: "Table 314.16(B); 14 AWG is 2.00", accent: C.blue },
+  { value: "180 VA", label: "per receptacle strap", sub: "220.14(I) — non-dwelling only", accent: C.orange },
+  { value: "4–6 mA", label: "GFCI Class A trip band", sub: "UL 943 — 30 mA GFPE protects equipment", accent: C.primary },
+];
+
+const twelveGaugeCmil = cmilOf("12");
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>The constants worth memorising</title>
+  <desc>
+    Twelve constants: K is 12.9 for copper and 21.2 for aluminum; the square root of three is 1.732; the continuous
+    load adder is 1.25; the dwelling service allowance is 0.83; general lighting is 3 volt-amperes per square foot;
+    each small-appliance and laundry circuit is 1,500 volt-amperes; the optional-method first tier is 10,000
+    volt-amperes at 100 percent with the remainder at 40 percent; one horsepower is 745.7 watts; one watt is 3.412
+    BTU per hour; a 12 AWG conductor gets 2.25 cubic inches of box fill; a non-dwelling receptacle strap is 180
+    volt-amperes; and a Class A GFCI trips between 4 and 6 milliamperes.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The constants worth memorising</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Learn these twelve and most of the arithmetic on a job site becomes mental.</text>
+
+  {chips.map((chip, i) => {
+    const col = i % 4;
+    const row = Math.floor(i / 4);
+    const x = 24 + col * 168;
+    const y = 72 + row * 78;
+    return (
+      <g>
+        <rect x={x} y={y} width="156" height="68" rx="9" fill={C.white} stroke={chip.accent} stroke-width="1.3" />
+        <rect x={x} y={y} width="4" height="68" rx="2" fill={chip.accent} />
+        <text x={x + 14} y={y + 24} fill={chip.accent} font-family={FONT} font-size="14" font-weight="800">{chip.value}</text>
+        <text x={x + 14} y={y + 42} fill={C.dark} font-family={FONT} font-size="8.5" font-weight="700">{chip.label}</text>
+        <text x={x + 14} y={y + 56} fill={C.muted} font-family={FONT} font-size="7.5">{chip.sub}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="314" fill={C.muted} font-family={FONT} font-size="10">{`Two more if you size wire often: 12 AWG is ${twelveGaugeCmil.toLocaleString("en-US")} circular mils, and conduit fill is 53% for one conductor, 31% for two, 40% for three or more.`}</text>
+</svg>

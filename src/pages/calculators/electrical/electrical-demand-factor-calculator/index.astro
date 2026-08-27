@@ -1,0 +1,532 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { rangeColumnC, dryerDemand, fmt, fmtInt } from "@/lib/nec";
+
+const title = "Range & Dryer Demand Factor Calculator — NEC 220.55 | TradesQuote";
+const description =
+  "Free NEC Table 220.55 and 220.54 calculator. Why a 12 kW range counts as 8 kW, why every dryer has a 5,000 VA floor, and how hard both demand factors scale in multifamily buildings.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-demand-factor-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Range & Dryer Demand Factor Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Range & Dryer Demand Factor Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC Table 220.55 and Table 220.54 demand factor calculator for household electric ranges and clothes dryers, including Note 1 for ranges over 12 kW and the Column A and B alternatives.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does a 12 kW range count as in a load calculation?",
+    answer:
+      "<strong>8 kW.</strong> Table 220.55 Column C gives a maximum demand of 8 kW for one household range rated over 1¾ kW through 12 kW — and that is a <em>demand in kilowatts, not a percentage</em>. This is the single most misread table in Article 220. A 9 kW range and a 12 kW range both count as 8 kW, so the nameplate barely matters at this size. The 8 kW figure already has diversity built into it: nobody runs every element and the oven simultaneously for long.",
+  },
+  {
+    question: "What about a range larger than 12 kW?",
+    answer:
+      "Note 1 to Table 220.55 applies: for ranges over 12 kW through 27 kW of the same rating, the Column C figure is <strong>increased by 5% for each additional kilowatt above 12</strong>. A 16 kW range is 4 kW over, so 8 kW × (1 + 20%) = <strong>9.6 kW</strong>. Note that the 5% applies to the <em>table value</em>, not to the nameplate — a mistake that inflates the answer badly. Even a 27 kW commercial-style range only reaches 14 kW of demand.",
+  },
+  {
+    question: "How much does an electric dryer count as?",
+    answer:
+      "<strong>5,000 VA or the nameplate, whichever is larger</strong>, per NEC 220.54. So a 4,800 W dryer still counts as 5,000 VA, and a 5,600 W one counts as 5,600. The demand factor is 100% for one through four dryers, and only starts reducing at five: 85% at five, 75% at six, down to 50% at ten. In a single-family house there is no reduction at all — the dryer is simply its 5,000 VA floor.",
+  },
+  {
+    question: "Why do these demand factors exist?",
+    answer:
+      "Because connected load and simultaneous load are different quantities, and services are sized for the second. Ten apartments have ten ranges totalling 120 kW installed, but the probability that all ten are roasting at full output at the same moment is effectively zero. Table 220.55 counts those ten at <strong>25 kW</strong> — an 79% reduction. Without demand factors every multifamily service in the country would be roughly four times larger than it needs to be, at enormous cost and no safety benefit.",
+  },
+  {
+    question: "What are Columns A and B for?",
+    answer:
+      "Small appliances. <strong>Column A</strong> covers cooking appliances over 1¾ kW and under 3½ kW, <strong>Column B</strong> covers 3½ kW through 8¾ kW, and both give percentages rather than kilowatts. Note 3 permits using them <em>in lieu of</em> Column C for appliances in those ranges — which matters because Column C's flat 8 kW would otherwise penalise a small unit. A single 6 kW wall oven is 4.8 kW under Column B against 8 kW under Column C.",
+  },
+  {
+    question: "Do separate cooktops and wall ovens count as one range?",
+    answer:
+      "Often yes, and it saves considerable load. Note 4 to Table 220.55 permits a counter-mounted cooking unit and up to two wall ovens <strong>supplied from a single branch circuit and located in the same room</strong> to be treated as a single range by adding their nameplate ratings together. A 7 kW cooktop plus a 5 kW oven totals 12 kW, which is then a single 8 kW range demand rather than two separate appliance loads.",
+  },
+  {
+    question: "Do these tables apply to gas ranges or commercial kitchens?",
+    answer:
+      "Neither. A gas range has no significant electrical cooking load — only its ignition, controls and clock, counted as an ordinary appliance. And Table 220.55 covers <strong>household</strong> equipment only; a commercial kitchen uses <strong>NEC 220.56</strong>, which is a completely different set of demand factors (100% for one or two units, then 90%, 80%, 70% and 65%) with a floor at the sum of the two largest pieces of equipment.",
+  },
+  {
+    question: "Does the 220.82 optional method use these tables?",
+    answer:
+      "No — and this catches people who work both methods on the same house. The <strong>220.82 optional method takes appliance nameplate ratings at full value</strong> and then applies its own single reduction: the first 10 kVA at 100% and the remainder at 40%. Tables 220.55 and 220.54 belong to the <strong>Part III standard method</strong>. Applying a range demand factor and then the 40% remainder factor double-counts the diversity and understates the load.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load calculated? Quote the work.";
+const ctaDescription =
+  "Service and feeder work is where estimating errors get expensive. TradesQuote turns the scope into a detailed line-item estimate — gear, conductors, terminations, and labour — validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "The whole-house 220.82 optional method.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Turn the calculated load into a service rating.",
+  },
+  {
+    href: "/calculators/electrical/electrical-commercial-load-calculator",
+    title: "Commercial Load Calculator",
+    description: "The Part III method for non-dwellings.",
+  },
+  {
+    href: "/calculators/electrical/electrical-breaker-size-calculator",
+    title: "Breaker Size Calculator",
+    description: "Protect the range and dryer circuits.",
+  },
+];
+
+/** The multifamily ladder — both tables at once, computed not transcribed. */
+const ladderRows = [1, 2, 4, 5, 6, 10, 20, 30, 40].map((n) => {
+  const rangeKw = rangeColumnC(n);
+  const d = dryerDemand(n, 5000);
+  return {
+    n,
+    rangeConnected: n * 12,
+    rangeKw,
+    rangePercent: (rangeKw / (n * 12)) * 100,
+    dryerKw: d.demandVa / 1000,
+    dryerPercent: d.percent,
+  };
+});
+
+const styles = electricalAccentStyles.violet;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Range & Dryer Demand Factor Calculator — NEC 220.55" />
+    <meta
+      property="og:description"
+      content="Why a 12 kW range counts as 8 kW, why every dryer has a 5,000 VA floor, and how both scale in multifamily."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Range & Dryer Demand Factor Calculator" />
+    <meta name="twitter:description" content="NEC Table 220.55 and 220.54, worked properly. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Range & Dryer Demand Factors"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 10h16" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Range &amp; Dryer Demand <span class="text-violet-600">— Tables 220.55 and 220.54</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A 12 kW range counts as <strong>8 kW</strong>. Column C is a demand in <em>kilowatts</em>, not a
+              percentage — the most misread table in Article 220. And every dryer has a
+              <strong>5,000 VA floor</strong> no matter how small its nameplate.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 10h16"></path>
+            </svg>
+            Enter the appliances
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Household ranges — Table 220.55</p>
+                <div class="mt-2 grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="df-range-count" class="text-xs text-slate-500">How many</label>
+                    <input
+                      id="df-range-count"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value="1"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="df-range-kw" class="text-xs text-slate-500">Each rated (kW)</label>
+                    <input
+                      id="df-range-kw"
+                      type="number"
+                      min="0"
+                      step="0.25"
+                      value="12"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Electric clothes dryers — Table 220.54</p>
+                <div class="mt-2 grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="df-dryer-count" class="text-xs text-slate-500">How many</label>
+                    <input
+                      id="df-dryer-count"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value="1"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="df-dryer-watts" class="text-xs text-slate-500">Each nameplate (W)</label>
+                    <input
+                      id="df-dryer-watts"
+                      type="number"
+                      min="0"
+                      step="100"
+                      value="5000"
+                      class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                Both tables cover <strong>dwelling units only</strong>. A commercial kitchen uses 220.56 instead. A
+                cooktop and up to two wall ovens on one circuit in the same room may be added together and treated
+                as a single range under Note 4.
+              </p>
+
+              <button
+                id="df-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-violet-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-violet-100 bg-violet-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Combined demand load</p>
+              <div class="mt-2">
+                <span id="df-total" class="text-5xl font-extrabold tracking-tight text-violet-600">13,000 VA</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Ranges</p>
+                  <p id="df-range-demand" class="mt-1 text-2xl font-bold text-slate-900">8.00 kW</p>
+                </div>
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Dryers</p>
+                  <p id="df-dryer-demand" class="mt-1 text-2xl font-bold text-slate-900">5,000 VA</p>
+                </div>
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Connected</p>
+                  <p id="df-connected" class="mt-1 text-2xl font-bold text-slate-900">17,000 VA</p>
+                </div>
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Removed</p>
+                  <p id="df-saved" class="mt-1 text-2xl font-bold text-slate-900">24%</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-violet-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Ranges connected</span><span id="df-bd-range-connected" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Column C</span><span id="df-bd-range-column" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Note 1</span><span id="df-bd-range-note1" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Note 3 alternative</span><span id="df-bd-range-alt" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Dryer each</span><span id="df-bd-dryer-each" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Dryers connected</span><span id="df-bd-dryer-connected" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Table 220.54</span><span id="df-bd-dryer-percent" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Combined</span><span id="df-bd-total" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="df-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Column C is a demand in kilowatts, not a percentage.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">The method, explained in plain English</h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Ranges — Table 220.55</div>
+            <div>1 range, 1¾ to 12 kW&nbsp;→&nbsp;<span class="text-amber-300">8 kW</span> flat (Column C)</div>
+            <div>over 12 kW&nbsp;→&nbsp;8 kW × (1 + 5% per kW over 12) <span class="text-slate-400">Note 1</span></div>
+            <div>under 8¾ kW&nbsp;→&nbsp;Column A or B percentage instead <span class="text-slate-400">Note 3</span></div>
+            <div class="mt-4 text-cyan-300"># Dryers — Table 220.54</div>
+            <div>each&nbsp;=&nbsp;max(<span class="text-amber-300">5,000 VA</span>, nameplate)</div>
+            <div>1–4 @ 100% · 5 @ 85% · 6 @ 75% · 10 @ 50%</div>
+            <div class="mt-4 text-cyan-300"># These belong to the Part III standard method only</div>
+            <div>220.82 takes nameplates at full value instead</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Kilowatts, not percent</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Column C's numbers are demands. Reading 8 as "80%" of a 12 kW range gives 9.6 kW and is wrong —
+                the correct answer is 8 kW flat.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The dryer has a floor, not a factor</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                In a single dwelling 220.54's demand factor is 100%. What changes the number is the 5,000 VA
+                minimum, which raises small dryers rather than lowering big ones.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Note 1 multiplies the table</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The 5%-per-kilowatt increase applies to the 8 kW Column C figure, not to the appliance nameplate.
+                A 16 kW range is 9.6 kW, not 19.2.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Never stack with 220.82</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The optional method has its own diversity in the 40% remainder factor. Applying a range demand
+                factor first double-counts it and undersizes the service.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">One house, one big range, and one apartment building.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">One house — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A single 12 kW range and a single 5 kW dryer.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              range: 12 kW connected → Column C → <span class="font-bold text-violet-700">8,000 VA</span><br />
+              dryer: max(5,000, 5,000) × 100% = <span class="font-bold text-violet-700">5,000 VA</span><br />
+              combined <span class="font-bold text-slate-900">13,000 VA</span> against 17,000 connected — 24% removed
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> four kilowatts of the calculation disappear
+              on the range alone. That is roughly 17 A on a 240 V service — the difference between comfortably
+              inside a 100 A service and not.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">A 16 kW professional range — Note 1</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Same house, a much larger range.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              16 kW is 4 kW over 12 → 4 × 5% = 20%<br />
+              8 kW × 1.20 = <span class="font-bold text-violet-700">9.6 kW</span><br />
+              a third more range, <span class="font-bold text-slate-900">1.6 kW more calculated load</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> upgrading from a 12 kW to a 16 kW range adds
+              under 7 A to the service calculation. Homeowners routinely assume a bigger range forces a service
+              upgrade; the table says otherwise.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Ten apartments — where the tables really earn their keep</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Ten 12 kW ranges and ten 5 kW dryers on one service.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              ranges: 120 kW connected → Column C row 10 → <span class="font-bold text-violet-700">25 kW</span><br />
+              dryers: 50 kW connected × 50% → <span class="font-bold text-violet-700">25 kW</span><br />
+              combined <span class="font-bold text-slate-900">50,000 VA</span> against 170,000 connected — 71% removed
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> both tables land on exactly 25 kW at ten
+              units, by coincidence rather than design. Without them this building's service would be sized for
+              170 kVA of cooking and laundry that will never happen at once.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">How both tables scale with unit count</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Ranges at 12 kW each, dryers at 5 kW each. Notice the ranges fall away far faster at low counts, while
+            the dryers hold at 100% until the fifth unit.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Units</th>
+                  <th class="py-3 px-4 font-semibold">Ranges connected</th>
+                  <th class="py-3 px-4 font-semibold">Range demand</th>
+                  <th class="py-3 px-4 font-semibold">Of connected</th>
+                  <th class="py-3 px-4 font-semibold">Dryer demand</th>
+                  <th class="py-3 px-4 font-semibold">Factor</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ladderRows.map((row, index) => (
+                    <tr class={index === ladderRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.n}</td>
+                      <td class="py-3 px-4">{fmtInt(row.rangeConnected)} kW</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{fmt(row.rangeKw, 2)} kW</td>
+                      <td class="py-3 px-4">{fmt(row.rangePercent, 0)}%</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{fmt(row.dryerKw, 1)} kW</td>
+                      <td class="py-3 px-4">{row.dryerPercent}%</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 <strong>Table 220.55</strong> for household electric ranges,
+            wall-mounted ovens and counter-mounted cooking units over 1¾ kW, with <strong>Note 1</strong> (the 5%
+            per kilowatt increase above 12 kW), <strong>Note 3</strong> (Columns A and B in lieu of Column C at
+            8¾ kW and below) and <strong>Note 4</strong> (a cooktop plus up to two ovens on one circuit in the same
+            room treated as a single range); <strong>Table 220.54</strong> for electric clothes dryers, with the
+            5,000 VA minimum in <strong>220.54</strong> itself. Both apply to <strong>dwelling units only</strong> —
+            commercial kitchen equipment uses <strong>220.56</strong>. These tables belong to the
+            <strong>Part III standard method</strong> and must not be combined with the
+            <strong>220.82 optional method</strong>, which applies its own diversity. Local amendments and the AHJ
+            have final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="violet"
+        subtitle="Common questions about range and dryer demand factors."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalDemandFactorCalculator } from "@/scripts/calculators/electrical-demand-factor-calculator";
+    initElectricalDemandFactorCalculator();
+  </script>
+</Layout>

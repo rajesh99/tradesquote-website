@@ -1,0 +1,69 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Which of the three Table 310.16 columns actually applies. The 90 °C column is
+ * never the final usable figure under 110.14(C) — it only serves as the base that
+ * derating factors are applied to.
+ */
+const columns = [
+  {
+    temp: "60 °C",
+    accent: C.blue,
+    bg: C.blueLight,
+    when: "NM-B cable (Romex)",
+    detail: ["334.80 requires the 60 °C", "column for NM-B, whatever the", "conductor insulation is rated"],
+    verdict: "Use it for Romex",
+  },
+  {
+    temp: "75 °C",
+    accent: C.primary,
+    bg: C.primaryLight,
+    when: "Almost everything else",
+    detail: ["THHN/THWN-2 in raceway,", "landing on standard 75 °C", "breakers and lugs"],
+    verdict: "The usual answer",
+  },
+  {
+    temp: "90 °C",
+    accent: C.orange,
+    bg: C.orangeLight,
+    when: "Derating base only",
+    detail: ["110.14(C) blocks it as a final", "number — but derating starts", "here, which is why it matters"],
+    verdict: "Never the end result",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Which temperature column of Table 310.16 applies</title>
+  <desc>
+    Table 310.16 lists three ampacities per conductor size. The 60 degree Celsius column applies to NM-B
+    cable because 334.80 requires it. The 75 degree column applies to almost everything else, including
+    THHN in raceway landing on standard 75 degree breakers and lugs, and is the usual answer. The 90
+    degree column can never be the final usable ampacity under 110.14(C); it serves only as the base
+    that ambient and bundling derating factors are applied to.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three columns per size — which one is yours?</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Reading the wrong column is the most common way a correct chart gives a wrong answer</text>
+
+  {columns.map((col, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="184" rx="10" fill={col.bg} stroke={col.accent} stroke-width="1.5" />
+        <text x={x + 16} y="104" fill={col.accent} font-family={FONT} font-size="20" font-weight="800">{col.temp}</text>
+        <line x1={x + 16} y1="116" x2={x + 192} y2="116" stroke={col.accent} stroke-opacity="0.35" />
+        <text x={x + 16} y="138" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{col.when}</text>
+        <text x={x + 16} y="160" fill={C.muted} font-family={FONT} font-size="10">
+          {col.detail.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "14"}>{line}</tspan>
+          ))}
+        </text>
+        <rect x={x + 16} y="216" width="176" height="26" rx="6" fill={C.white} stroke={col.accent} stroke-width="1.2" />
+        <text x={x + 104} y="233" text-anchor="middle" fill={col.accent} font-family={FONT} font-size="11" font-weight="800">{col.verdict}</text>
+      </g>
+    );
+  })}
+</svg>

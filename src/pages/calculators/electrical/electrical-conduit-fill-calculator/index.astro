@@ -1,0 +1,570 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { CONDUIT_AREA, THHN_AREA, maxConductorCount } from "@/lib/nec";
+
+const title = "Conduit Fill Calculator — NEC Chapter 9 for EMT, PVC, RMC | TradesQuote";
+const description =
+  "Free NEC conduit fill calculator for EMT, PVC Schedule 40 and 80, RMC, and IMC. Enter your conductor mix to get fill percentage, allowable area, how many more conductors fit, and the next trade size up. Chapter 9 Tables 1, 4, and 5.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-conduit-fill-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Conduit Fill Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Conduit Fill Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC conduit fill calculator for EMT, PVC, RMC, and IMC raceways. Computes fill percentage from Chapter 9 Table 5 conductor areas and Table 4 raceway areas against the Table 1 fill limits.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is the 40% conduit fill rule?",
+    answer:
+      "<strong>NEC Chapter 9, Table 1</strong> sets the maximum percentage of a raceway's internal cross-section that conductors may occupy. For <strong>three or more</strong> conductors that limit is <strong>40%</strong>. The empty 60% is not waste — it is the room heat needs to escape and the clearance a pull needs to be physically possible.",
+  },
+  {
+    question: "Why is two conductors 31% but three is 40%?",
+    answer:
+      "Geometry. Two round conductors in a round pipe leave awkward crescent-shaped voids and jam against each other during a pull, so Table 1 allows only <strong>31%</strong>. Three or more pack more efficiently and get <strong>40%</strong>. A single conductor gets the most generous allowance at <strong>53%</strong> because there is nothing for it to bind against. This is why a two-conductor pull sometimes needs a larger pipe than three of the same conductor.",
+  },
+  {
+    question: "Does the ground wire count in conduit fill?",
+    answer:
+      "<strong>Yes.</strong> Every conductor in the raceway counts toward fill, including equipment grounding conductors and neutrals — fill is about physical space, so anything occupying space counts. This differs from <em>ampacity derating</em>, where NEC 310.15(E)(3) excludes grounding conductors from the conductor count. Same raceway, two different counts, and mixing them up is a common error.",
+  },
+  {
+    question: "How many #12 THHN fit in 3/4 inch EMT?",
+    answer:
+      "By the Chapter 9 area method, <strong>16</strong>. The 40% allowable area for 3/4-inch EMT is 0.213 in², and 12 AWG THHN is 0.0133 in² each — so 16 conductors use 0.213 in² and land right at the limit. In practice most electricians stop around 9 or 10 in a 3/4-inch run, because 16 conductors also triggers a 0.50 bundling derate and makes the pull very hard.",
+  },
+  {
+    question: "Do I use Table 4 or Annex C?",
+    answer:
+      "Either, and they occasionally disagree by one conductor. <strong>Annex C</strong> gives pre-computed maximum counts for a raceway full of one identical conductor type — fast, but only valid for a uniform fill. <strong>Chapter 9 Tables 1, 4, and 5</strong> are the general method and the only option for a mixed fill. This calculator uses the Chapter 9 area method, so a result may differ from Annex C by one conductor at the exact boundary because of rounding in the published areas.",
+  },
+  {
+    question: "Does a short nipple get 60% fill?",
+    answer:
+      "Yes. <strong>Chapter 9, Note 4</strong> permits <strong>60% fill</strong> in a nipple — a raceway not more than 24 inches long between boxes, cabinets, or similar enclosures. Note 4 also exempts nipples from ampacity adjustment. This calculator uses the standard Table 1 limits; for a nipple you can compare the computed area against 60% of the Table 4 total shown in the breakdown.",
+  },
+  {
+    question: "Does derating apply once I pass three current-carrying conductors?",
+    answer:
+      'Yes, and it is easy to forget. Fill and derating are separate rules that trigger at different counts. Once more than three <em>current-carrying</em> conductors share a raceway for over 24 inches, NEC 310.15(C)(1) reduces ampacity — 0.80 for 4–6 conductors, 0.70 for 7–9, 0.50 for 10–20. A raceway can be legally filled and still contain conductors that are now too small for their breakers. Check with the <a href="/calculators/electrical/electrical-ampacity-calculator" class="font-semibold text-teal-700 underline decoration-teal-300 hover:decoration-teal-600">Ampacity &amp; Derating Calculator</a>.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Conduit sized? Quote the rough-in in seconds.";
+const ctaDescription =
+  "Raceway, fittings, straps, and the labor to bend and pull it — TradesQuote turns the whole rough-in into a detailed line-item estimate. Describe the job or upload photos and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-box-fill-calculator",
+    title: "Box Fill Calculator",
+    description: "Cubic inches required per NEC 314.16.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ampacity-calculator",
+    title: "Ampacity & Derating Calculator",
+    description: "The bundling derate a full raceway triggers.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size the conductors before you size the pipe.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+    title: "Ground Wire Size Calculator",
+    description: "The EGC that also takes up fill space.",
+  },
+];
+
+const gaugeOptions = Object.keys(THHN_AREA);
+
+/**
+ * Maximum THHN count by gauge and EMT trade size, computed with the same
+ * tier-aware helper the calculator script uses so the table cannot drift.
+ */
+const fillSizes = ['1/2"', '3/4"', '1"', '1-1/4"', '1-1/2"', '2"'];
+const fillGauges = ["14", "12", "10", "8", "6", "4", "2"];
+const fillTable = fillGauges.map((gauge) => ({
+  gauge,
+  area: THHN_AREA[gauge],
+  counts: fillSizes.map((size) => maxConductorCount(CONDUIT_AREA.EMT[size], THHN_AREA[gauge])),
+}));
+
+const styles = electricalAccentStyles.teal;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Conduit Fill Calculator — NEC Chapter 9" />
+    <meta
+      property="og:description"
+      content="Fill percentage for EMT, PVC, RMC, and IMC from your actual conductor mix — plus how many more fit and the next trade size up."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Conduit Fill Calculator — NEC Chapter 9" />
+    <meta
+      name="twitter:description"
+      content="EMT, PVC, RMC, and IMC fill percentage per NEC Chapter 9 Tables 1, 4, and 5. Free and instant."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Conduit Fill Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Conduit Fill Calculator <span class="text-teal-600">— EMT, PVC, RMC & IMC</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Conduit fill is an area problem. Add up the cross-sectional area of every conductor going in
+              (Chapter 9, Table 5), compare it to the raceway's internal area (Table 4), and check the result
+              against the limit in Table 1 — <strong>53%</strong> for one conductor, <strong>31%</strong> for
+              two, <strong>40%</strong> for three or more. Enter up to four different conductor sizes below for
+              a mixed fill.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Fill your raceway
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div class="grid sm:grid-cols-3 gap-5">
+                <div>
+                  <label for="cf-type" class="text-sm font-semibold text-slate-800">Raceway type</label>
+                  <select
+                    id="cf-type"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    <option value="EMT" selected>EMT</option>
+                    <option value="PVC Sch 40">PVC Sch 40</option>
+                    <option value="PVC Sch 80">PVC Sch 80</option>
+                    <option value="RMC">RMC</option>
+                    <option value="IMC">IMC</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="cf-size" class="text-sm font-semibold text-slate-800">Trade size</label>
+                  <select
+                    id="cf-size"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    <option value='1/2"' selected>1/2"</option>
+                    <option value='3/4"'>3/4"</option>
+                    <option value='1"'>1"</option>
+                    <option value='1-1/4"'>1-1/4"</option>
+                    <option value='1-1/2"'>1-1/2"</option>
+                    <option value='2"'>2"</option>
+                    <option value='2-1/2"'>2-1/2"</option>
+                    <option value='3"'>3"</option>
+                    <option value='4"'>4"</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="cf-insulation" class="text-sm font-semibold text-slate-800">Insulation</label>
+                  <select
+                    id="cf-insulation"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    <option value="THHN" selected>THHN / THWN-2</option>
+                    <option value="XHHW-2">XHHW-2</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Conductors going in</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Count every conductor including neutrals and grounds — fill is about space, not current.
+                </p>
+                <div class="mt-3 space-y-2.5">
+                  {
+                    [1, 2, 3, 4].map((row) => (
+                      <div class="flex items-center gap-3">
+                        <select
+                          id={`cf-gauge-${row}`}
+                          aria-label={`Conductor size, row ${row}`}
+                          class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                        >
+                          {gaugeOptions.map((label) => (
+                            <option value={label} selected={label === "12"}>
+                              {label.includes("kcmil") ? label : `${label} AWG`}
+                            </option>
+                          ))}
+                        </select>
+                        <span class="text-sm text-slate-400">×</span>
+                        <input
+                          id={`cf-count-${row}`}
+                          type="number"
+                          min="0"
+                          max="200"
+                          value={row === 1 ? "4" : "0"}
+                          aria-label={`Conductor count, row ${row}`}
+                          class="w-20 rounded-lg border border-slate-300 px-3 py-2 text-right text-sm font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                        />
+                        <span id={`cf-area-${row}`} class="w-24 text-right text-xs text-slate-500">—</span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <button
+                id="cf-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Raceway fill</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="cf-percent" class="text-5xl font-extrabold tracking-tight text-teal-600">17.5%</span>
+              </div>
+              <p id="cf-verdict" class="mt-1 text-sm font-semibold text-emerald-700">
+                Within the 40% limit for 4 conductors.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Area used</p>
+                  <p id="cf-used" class="mt-1 text-2xl font-bold text-slate-900">0.0532 in²</p>
+                </div>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Area allowed</p>
+                  <p id="cf-allowable" class="mt-1 text-2xl font-bold text-slate-900">0.1216 in²</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Total conductors</span><span id="cf-bd-conductors" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Fill limit applied</span><span id="cf-bd-limit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Conductor area total</span><span id="cf-bd-total-area" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Raceway internal area</span><span id="cf-bd-conduit-area" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Room for</span><span id="cf-bd-more-fit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Next trade size</span><span id="cf-bd-next-size" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Experienced installers target 30–35% for a pullable raceway. A 24-inch nipple may go to 60%
+                (Chapter 9, Note 4). More than three current-carrying conductors also triggers ampacity
+                derating.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three tables, one comparison. Every conductor's area against the pipe's area, judged by a
+            percentage that depends on how many conductors there are.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Total conductor area (Chapter 9, Table 5)</div>
+            <div>total area&nbsp;=&nbsp;Σ (count × area per conductor for that insulation type)</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Pick the fill limit (Chapter 9, Table 1)</div>
+            <div>
+              1 conductor → <span class="text-amber-300">53%</span>&nbsp;·&nbsp;2 conductors →
+              <span class="text-amber-300">31%</span>&nbsp;·&nbsp;3 or more → <span class="text-amber-300">40%</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Allowable area (Chapter 9, Table 4)</div>
+            <div>allowable&nbsp;=&nbsp;raceway internal area × fill limit</div>
+            <div class="mt-4 text-cyan-300"># Step 4 — Compare</div>
+            <div>fill%&nbsp;=&nbsp;total area ÷ raceway internal area × 100&nbsp;&nbsp;·&nbsp;&nbsp;pass if total ≤ allowable</div>
+            <div class="mt-4 text-cyan-300"># THHN areas (in²)</div>
+            <div>
+              14 <span class="text-amber-300">0.0097</span>&nbsp;·&nbsp;12 <span class="text-amber-300">0.0133</span
+              >&nbsp;·&nbsp;10 <span class="text-amber-300">0.0211</span>&nbsp;·&nbsp;8
+              <span class="text-amber-300">0.0366</span>&nbsp;·&nbsp;6 <span class="text-amber-300">0.0507</span
+              >&nbsp;·&nbsp;4 <span class="text-amber-300">0.0824</span>&nbsp;·&nbsp;2
+              <span class="text-amber-300">0.1158</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Everything counts</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Hots, neutrals, and grounds all occupy space, so all of them count toward fill. Only ampacity
+                derating gets to ignore the grounding conductor.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Two is the awkward number</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At 31%, two conductors sometimes need a bigger pipe than three of the same conductor would at
+                40%. If you're at two and failing, check whether the run actually needs a third.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Legal is not pullable</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                40% passes inspection. It also fights you the whole way through the pipe, especially with
+                bends. Most installers design to 30–35% and thank themselves later.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">PVC Schedule 80 is smaller</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Its thicker wall means less internal area than Schedule 40 at the same trade size — 0.217 in²
+                versus 0.285 in² at 1/2 inch. Switching to Sch 80 for physical protection can cost you a
+                conductor.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A comfortable branch circuit, a legal-but-miserable pull, and the two-conductor trap.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">One 20 A circuit — 4 × #12 THHN in 1/2" EMT</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Two hots, a neutral, and a ground. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              area = 4 × 0.0133 = 0.0532 in²<br />
+              1/2" EMT internal area = 0.304 in² · limit for 3+ = 40% → 0.1216 in²<br />
+              fill = 0.0532 ÷ 0.304 = 17.5%<br />
+              → <span class="font-bold text-emerald-700">PASS</span> · room for 5 more #12 (9 total)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> comfortable at 17.5%, and an easy pull.
+              This is why 1/2-inch EMT handles a single branch circuit without a second thought.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Maxed out — 9 × #12 THHN in 1/2" EMT</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Four 20 A circuits — 4 hots, 4 neutrals, and one shared equipment ground.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              area = 9 × 0.0133 = 0.1197 in²<br />
+              allowable at 40% = 0.1216 in² → 0.1197 ≤ 0.1216 ✓<br />
+              fill = 0.1197 ÷ 0.304 = 39.4%<br />
+              → <span class="font-bold text-amber-700">PASS, barely</span> — and 8 current-carrying conductors
+              triggers a 0.70 ampacity derate
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> legal on fill, but those #12 THHN
+              conductors are derated from 30 A to 21 A (30 × 1.00 × 0.70), so the 20 A breakers still just
+              work. Add one more circuit and both rules fail at once — fill goes to 48.1% and the bundling
+              factor drops to 0.50, leaving 15 A on a 20 A breaker.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">The 31% trap — 2 × 4/0 THHN in 1-1/2" EMT</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A two-wire 240 V feeder, no neutral in this raceway.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              area = 2 × 0.3237 = 0.6474 in²<br />
+              1-1/2" EMT internal = 2.036 in² · limit for <span class="font-bold">2 conductors = 31%</span> →
+              0.6312 in²<br />
+              0.6474 &gt; 0.6312 → <span class="font-bold text-rose-700">FAIL</span> at 31.8%<br />
+              at 40% (3+ conductors) it would pass easily
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a raceway only 31.8% full fails,
+              because two conductors get the stricter limit. Go to 2-inch EMT, or note that adding a third
+              conductor moves you to the 40% tier and makes the 1-1/2 inch legal.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Conduit fill chart — THHN in EMT
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Maximum number of identical THHN/THWN-2 conductors by trade size, computed by the Chapter 9 area
+            method with the correct fill tier applied at each count. Where the maximum is one or two
+            conductors, the stricter 53% and 31% limits are what govern.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Conductor</th>
+                  <th class="py-3 px-5 font-semibold">Area</th>
+                  {fillSizes.map((size) => <th class="py-3 px-4 font-semibold">{size}</th>)}
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  fillTable.map((row, index) => (
+                    <tr class={index === fillTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.gauge} AWG</td>
+                      <td class="py-3 px-5 text-xs text-slate-500">{row.area.toFixed(4)} in²</td>
+                      {row.counts.map((count) => (
+                        <td class="py-3 px-4">{count}</td>
+                      ))}
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — Chapter 9 Table 1 percent-fill limits, Table 4
+            raceway dimensions and percent areas, Table 5 conductor dimensions, Chapter 9 Note 4 for nipples,
+            Annex C pre-computed conductor counts, 310.15(C)(1) bundling adjustment. Values computed by the
+            Chapter 9 area method may differ from Annex C by one conductor at the exact boundary. Local
+            amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about conduit fill, the 40% rule, and what counts."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalConduitFillCalculator } from "@/scripts/calculators/electrical-conduit-fill-calculator";
+    initElectricalConduitFillCalculator();
+  </script>
+</Layout>

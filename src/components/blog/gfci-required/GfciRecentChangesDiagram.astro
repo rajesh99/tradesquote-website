@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The three recent expansions, presented with their adoption status rather than
+ * as settled requirements — because these are the provisions most often amended
+ * out or delayed at state level, and stating them flatly would mislead.
+ */
+const changes = [
+  {
+    section: "210.8(D)",
+    what: "Specific appliances",
+    cycle: "2020, expanded 2023",
+    status: "Contested",
+    detail: "Began with dishwashers; later cycles reach further into cooking and other appliances. Amended out or delayed in several states.",
+    accent: C.red,
+  },
+  {
+    section: "210.8(F)",
+    what: "All outdoor dwelling outlets",
+    cycle: "2020",
+    status: "Contested",
+    detail: "Caught air-conditioning condensers, which produced real nuisance-trip problems and a wave of local amendments.",
+    accent: C.red,
+  },
+  {
+    section: "210.8(A)",
+    what: "Laundry areas, sink proximity",
+    cycle: "long-standing",
+    status: "Settled",
+    detail: "The core dwelling list has been stable for cycles. Safe to design to without checking.",
+    accent: C.green,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>Which GFCI requirements are settled and which are contested</title>
+  <desc>
+    The core dwelling list in 210.8(A) has been stable for several code cycles and is safe to design to. The
+    requirement in 210.8(D) for specific appliances, introduced for dishwashers in 2020 and expanded in 2023, and the
+    requirement in 210.8(F) for all outdoor dwelling outlets, introduced in 2020, have both been amended out or
+    delayed in several jurisdictions — 210.8(F) in particular because it caught air-conditioning condensers.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Not every GFCI rule is settled where you work</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Two recent expansions are among the most amended provisions in the code. Confirm with the AHJ.</text>
+
+  {changes.map((c, i) => {
+    const y = 64 + i * 58;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="50" rx="9" fill={c.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="50" rx="9" fill="none" stroke={c.accent} stroke-width="1.5" />
+        <text x="40" y={y + 20} fill={c.accent} font-family={FONT} font-size="10.5" font-weight="800">{c.section}</text>
+        <text x="112" y={y + 20} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{c.what}</text>
+        <text x="112" y={y + 38} fill={C.muted} font-family={FONT} font-size="8.5">{c.detail}</text>
+        <text x="40" y={y + 38} fill={C.muted} font-family={FONT} font-size="7.5">{c.cycle}</text>
+        <rect x="592" y={y + 8} width="90" height="19" rx="5" fill={c.accent} />
+        <text x="637" y={y + 21} text-anchor="middle" fill={C.white} font-family={FONT} font-size="8.5" font-weight="800">{c.status}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="236" fill={C.muted} font-family={FONT} font-size="10">Adoption lags publication by years, and states amend. The model code is not automatically the local code.</text>
+</svg>

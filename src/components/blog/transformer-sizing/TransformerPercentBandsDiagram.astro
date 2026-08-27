@@ -1,0 +1,70 @@
+---
+import { transformerFla, transformerPrimaryMaxPercent, prevStandardOcpd, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The primary percentage bands, which run the opposite way to intuition: the
+ * SMALLER the transformer the LARGER the permitted multiple, because inrush is a
+ * bigger multiple of full-load current on small transformers.
+ */
+const cases = [
+  { kva: 3, volts: 480, label: "3 kVA control transformer" },
+  { kva: 15, volts: 480, label: "15 kVA" },
+  { kva: 75, volts: 480, label: "75 kVA" },
+  { kva: 300, volts: 480, label: "300 kVA" },
+].map((c) => {
+  const fla = transformerFla(c.kva, c.volts, "3ph");
+  const pctNo = transformerPrimaryMaxPercent(fla, false);
+  const pctYes = transformerPrimaryMaxPercent(fla, true);
+  return {
+    ...c,
+    fla,
+    pctNo,
+    pctYes,
+    maxNo: (fla * pctNo) / 100,
+    maxYes: (fla * pctYes) / 100,
+    pickYes: prevStandardOcpd((fla * pctYes) / 100),
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Transformer primary overcurrent percentage bands</title>
+  <desc>
+    The permitted primary overcurrent percentage rises as the transformer gets smaller, because magnetising inrush is a
+    larger multiple of full-load current on a small transformer. A 3 kVA transformer at 480 volts three-phase has a
+    3.61 amp full-load current and a 167 percent band without secondary protection. A 75 kVA transformer at 90.21 amps
+    is limited to 125 percent without secondary protection and 250 percent with it. The 250 percent allowance always
+    requires secondary protection.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The smaller the transformer, the larger the permitted multiple</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Table 450.3(B) percentages of primary full-load current, 480 V three-phase throughout.</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TRANSFORMER</text>
+  <text x="196" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PRIMARY FLA</text>
+  <text x="308" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NO SECONDARY PROTECTION</text>
+  <text x="520" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WITH SECONDARY PROTECTION</text>
+
+  {cases.map((c, i) => {
+    const y = 88 + i * 34;
+    const small = c.pctNo > 125;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="30" rx="6" fill={small ? C.orangeLight : C.white} stroke={small ? C.orange : C.border} stroke-width={small ? 1.5 : 1} />
+        <text x="38" y={y + 19} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{c.label}</text>
+        <text x="196" y={y + 19} fill={C.dark} font-family={FONT} font-size="10">{`${fmt(c.fla, 2)} A`}</text>
+        <rect x="308" y={y + 6} width="42" height="18" rx="5" fill={small ? C.orange : C.muted} opacity="0.18" />
+        <text x="329" y={y + 19} text-anchor="middle" fill={small ? C.orange : C.dark} font-family={FONT} font-size="9" font-weight="800">{`${c.pctNo}%`}</text>
+        <text x="360" y={y + 19} fill={C.muted} font-family={FONT} font-size="9">{`= ${fmt(c.maxNo, 2)} A`}</text>
+        <rect x="520" y={y + 6} width="42" height="18" rx="5" fill={C.green} opacity="0.18" />
+        <text x="541" y={y + 19} text-anchor="middle" fill={C.green} font-family={FONT} font-size="9" font-weight="800">{`${c.pctYes}%`}</text>
+        <text x="572" y={y + 19} fill={C.muted} font-family={FONT} font-size="9">{`= ${fmt(c.maxYes, 1)} A → ${c.pickYes} A`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="240" fill={C.muted} font-family={FONT} font-size="10">Below 9 A the band rises to 167%, and below 2 A to 300% — inrush is a bigger multiple on a small transformer.</text>
+  <text x="24" y="254" fill={C.muted} font-family={FONT} font-size="10">The 250% column is only available where the secondary is separately protected. Otherwise you're capped at 125%.</text>
+</svg>

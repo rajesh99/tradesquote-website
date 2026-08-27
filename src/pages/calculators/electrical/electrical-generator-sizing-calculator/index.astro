@@ -1,0 +1,603 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { fmtInt } from "@/lib/nec";
+
+const title = "Generator Sizing Calculator — What Size Standby Generator | TradesQuote";
+const description =
+  "Free standby generator sizing calculator. Enter the loads you need to keep running and get the kW size, checked against both running capacity and the motor-starting surge that usually governs it.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-generator-sizing-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Generator Sizing Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Generator Sizing Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online standby generator sizing calculator. Returns the required kW from selected running loads plus a margin, checked against the motor-starting surge requirement, and selects the next standard generator size.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size generator do I need for my house?",
+    answer:
+      "It depends entirely on which loads you intend to run, not on the square footage. A typical essential-circuits set — furnace or air handler, well pump, refrigerator, lighting and outlets, sump pump — runs around <strong>9,000 to 10,000 W</strong>, which usually lands on a <strong>20 kW</strong> generator once the motor-starting surge is accounted for. Whole-house coverage with central air and electric cooking often needs 24 kW or more.",
+  },
+  {
+    question: "Why is the generator bigger than the sum of my loads?",
+    answer:
+      "Because starting a motor draws several times its running current for a second or two. If your loads total 9,200 W but the air conditioner alone needs 15,000 W to start, the generator has to supply the other 4,200 W <em>and</em> that 15,000 W inrush at the same moment — 19,200 W. On any house with an air conditioner, heat pump, or well pump, the starting requirement usually governs rather than the running total.",
+  },
+  {
+    question: "What is the difference between running watts and starting watts?",
+    answer:
+      "<strong>Running watts</strong> is the steady draw once a load is up to speed. <strong>Starting watts</strong> (or surge) is the brief inrush a motor demands to overcome inertia — commonly <strong>2 to 3 times</strong> running watts for a typical induction motor, and higher for a hard-starting compressor. Resistive loads like heaters, lights, and ovens have no surge at all: running and starting watts are the same.",
+  },
+  {
+    question: "Can a soft starter let me use a smaller generator?",
+    answer:
+      "Often, yes — and it is frequently cheaper than the next generator size up. A soft starter or an inverter-driven compressor reduces inrush dramatically, which can move the governing requirement from the starting path back to the running path. If this calculator tells you motor starting is what set your size, a soft starter on the largest motor is the first thing to price.",
+  },
+  {
+    question: "Do I need a transfer switch?",
+    answer:
+      "Yes. A permanently installed standby generator requires a transfer switch so utility and generator power can never be connected simultaneously — that is a life-safety requirement for line workers as much as for the equipment. An <strong>automatic transfer switch</strong> starts the set and switches over on its own; a manual switch is cheaper but needs someone present. Backfeeding a panel through a receptacle is extremely dangerous and never permitted.",
+  },
+  {
+    question: "Should I size for the whole house or just essential circuits?",
+    answer:
+      "Essential circuits is usually the better value — a smaller set, a smaller gas supply, and a lower install cost. Whole-house makes sense where central air conditioning matters in summer, where the house is all-electric, or where an occupant depends on medical equipment. A middle route is whole-house coverage with a <strong>load-shedding module</strong> that drops the air conditioner when the range is in use, letting a smaller generator serve everything.",
+  },
+  {
+    question: "Does the generator's kW rating mean the same as my load in watts?",
+    answer:
+      "For sizing purposes, treat 1 kW as 1,000 W of load. Two caveats: generator ratings are usually given for <em>standby</em> duty rather than continuous prime duty, so a set rated 20 kW standby should not be run flat out indefinitely — which is exactly what the margin in this calculator protects. And a set's rating derates with altitude and high ambient temperature, typically a few percent per 1,000 feet.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Generator sized? Quote the install in seconds.";
+const ctaDescription =
+  "Generator work is a high-ticket sale with a lot of line items — set, transfer switch, pad, gas, conductor, and labor. TradesQuote turns it into a detailed line-item estimate with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-existing-load-calculator",
+    title: "Existing Load Calculator",
+    description: "What the house actually draws, from metered demand.",
+  },
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "The NEC 220.82 whole-house calculated load.",
+  },
+  {
+    href: "/calculators/electrical/electrical-watts-to-amps-calculator",
+    title: "Watts to Amps Calculator",
+    description: "Convert generator kW into circuit amps.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Estimate Calculator",
+    description: "Price the generator install with overhead and margin.",
+  },
+];
+
+/** Typical running and starting watts. Surge multiples are computed, not hardcoded. */
+const loadRows = [
+  { name: "Furnace / air handler (1/2 hp)", running: 800, surge: 3 },
+  { name: "Central A/C, 3 ton", running: 5000, surge: 3 },
+  { name: "Well pump (1 hp)", running: 1500, surge: 3 },
+  { name: "Sump pump (1/3 hp)", running: 800, surge: 3 },
+  { name: "Refrigerator", running: 700, surge: 3 },
+  { name: "Lighting & outlets", running: 1200, surge: 1 },
+  { name: "Electric water heater", running: 4500, surge: 1 },
+  { name: "Electric range (one element)", running: 2500, surge: 1 },
+].map((r) => ({ ...r, starting: r.running * r.surge }));
+
+const styles = electricalAccentStyles.orange;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Generator Sizing Calculator — What Size Standby Generator" />
+    <meta
+      property="og:description"
+      content="Standby generator kW from your actual loads, checked against the motor-starting surge that usually governs the size."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Generator Sizing Calculator" />
+    <meta name="twitter:description" content="What size standby generator your loads actually need. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Generator Sizing Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Generator Sizing Calculator <span class="text-orange-600">— Standby kW</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Adding up running watts gets you half an answer. A generator also has to absorb the
+              <strong>inrush</strong> when the biggest motor starts while everything else is already running —
+              and on most houses that starting surge, not the running total, is what sets the size. This tool
+              checks both and tells you which one governed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              ></path>
+            </svg>
+            Size the generator
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <p class="text-sm font-semibold text-slate-800">Running watts by load</p>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="gs-hvac" class="text-sm font-medium text-slate-700">A/C or heat pump</label>
+                  <input
+                    id="gs-hvac"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value="5000"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gs-well" class="text-sm font-medium text-slate-700">Well pump</label>
+                  <input
+                    id="gs-well"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value="1500"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gs-fridge" class="text-sm font-medium text-slate-700">Refrigerator / freezer</label>
+                  <input
+                    id="gs-fridge"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value="700"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gs-lights" class="text-sm font-medium text-slate-700">Lighting &amp; outlets</label>
+                  <input
+                    id="gs-lights"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value="1200"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gs-sump" class="text-sm font-medium text-slate-700">Sump pump</label>
+                  <input
+                    id="gs-sump"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value="800"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gs-other" class="text-sm font-medium text-slate-700">Other loads</label>
+                  <input
+                    id="gs-other"
+                    type="number"
+                    min="0"
+                    max="60000"
+                    value="0"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4 border-t border-slate-200 pt-5">
+                <div>
+                  <label for="gs-largest" class="text-sm font-semibold text-slate-800">Largest motor, running W</label>
+                  <input
+                    id="gs-largest"
+                    type="number"
+                    min="0"
+                    max="30000"
+                    value="5000"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="gs-multiplier" class="text-sm font-semibold text-slate-800">Starting surge</label>
+                  <select
+                    id="gs-multiplier"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                  >
+                    <option value="1">1× — soft start / inverter</option>
+                    <option value="2">2× — easy starting</option>
+                    <option value="3" selected>3× — typical motor</option>
+                    <option value="4">4× — hard-starting compressor</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="gs-margin" class="text-sm font-semibold text-slate-800">Running margin</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="gs-margin"
+                      type="number"
+                      min="0"
+                      max="60"
+                      value="25"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">%</span>
+                  </div>
+                </div>
+                <input
+                  id="gs-margin-range"
+                  type="range"
+                  min="0"
+                  max="60"
+                  step="5"
+                  value="25"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-orange-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0%</span><span>60%</span>
+                </div>
+              </div>
+
+              <button
+                id="gs-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Generator size</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="gs-size" class="text-5xl font-extrabold tracking-tight text-orange-600">20 kW</span>
+              </div>
+              <p id="gs-governing" class="mt-1 text-sm font-semibold text-slate-700">
+                Motor starting governs the size
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Running total</p>
+                  <p id="gs-running" class="mt-1 text-2xl font-bold text-slate-900">9,200 W</p>
+                </div>
+                <div class="rounded-xl border border-orange-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Starting need</p>
+                  <p id="gs-starting" class="mt-1 text-2xl font-bold text-slate-900">19,200 W</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-orange-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Running total</span><span id="gs-bd-running" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>With margin</span><span id="gs-bd-margin" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Largest motor surge</span><span id="gs-bd-surge" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Starting requirement</span><span id="gs-bd-starting" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Governing requirement</span><span id="gs-bd-required" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Selected</span><span id="gs-bd-selected" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="gs-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The generator has to absorb 15,000 W of inrush while 4,200 W is already running.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Requirement 1 — running capacity</div>
+            <div>running&nbsp;=&nbsp;sum of running watts × (1 + margin)</div>
+            <div class="mt-4 text-cyan-300"># Requirement 2 — starting capacity</div>
+            <div>starting&nbsp;=&nbsp;running total − largest motor running + largest motor <span class="text-orange-300">starting</span></div>
+            <div class="mt-4 text-cyan-300"># The size</div>
+            <div>required&nbsp;=&nbsp;<span class="text-orange-300">max</span>(running, starting)&nbsp;&nbsp;→&nbsp;&nbsp;round up to a standard kW</div>
+            <div class="mt-4 text-cyan-300"># Why requirement 2 usually wins</div>
+            <div>motor inrush is 2–4× running watts for a second or two</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Only one motor starts at a time</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                You size for the largest motor's inrush, not every motor's. Two compressors starting on the same
+                cycle is rare enough that the code and the industry both size for one.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Resistive loads have no surge</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Heaters, ovens, water heaters, and lighting draw the same starting as running. Only motors —
+                compressors, pumps, fans — carry inrush.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A soft starter can save a size</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                If starting governs your result, reducing inrush on the largest motor is often cheaper than the
+                next generator up. Inverter-driven equipment does this natively.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Ratings derate with conditions</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Standby ratings assume sea level and moderate ambient. Expect a few percent loss per 1,000 ft of
+                altitude, and more in sustained heat.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same load list, three different starting characteristics — and three different generators.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Essential circuits, typical 3× motor</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above — 9,200 W of running load.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              running: 9,200 × 1.25 = 11,500 W<br />
+              starting: 9,200 − 5,000 + (5,000 × 3 = 15,000) = 19,200 W<br />
+              governing = 19,200 W → <span class="font-bold text-orange-700">20 kW</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the A/C compressor's inrush sets the size.
+              The running load alone would have fitted a 12 kW set.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Same loads, soft starter on the A/C</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Set the starting surge to 1× — an inverter or soft-started compressor.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              running: 9,200 × 1.25 = 11,500 W<br />
+              starting: 9,200 − 5,000 + 5,000 = 9,200 W<br />
+              governing = 11,500 W → <span class="font-bold text-orange-700">12 kW</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> two sizes smaller, from one accessory.
+              This is the single highest-leverage change available on a generator quote.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Hard-starting compressor, 4×</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">An older single-stage compressor with no start assist.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              starting: 9,200 − 5,000 + (5,000 × 4 = 20,000) = 24,200 W<br />
+              governing = 24,200 W → <span class="font-bold text-orange-700">26 kW</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same house needs a set twice the size
+              of the soft-start case. Always check the compressor's locked-rotor amps on its nameplate.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Typical running and starting watts</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Planning figures. Always prefer the nameplate — and for motors, the locked-rotor amps if it gives
+            them. Resistive loads carry no surge, so their starting figure equals running.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Load</th>
+                  <th class="py-3 px-4 font-semibold">Running W</th>
+                  <th class="py-3 px-4 font-semibold">Surge</th>
+                  <th class="py-3 px-4 font-semibold">Starting W</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  loadRows.map((row, index) => (
+                    <tr class={index === loadRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.name}</td>
+                      <td class="py-3 px-4">{fmtInt(row.running)}</td>
+                      <td class="py-3 px-4">{row.surge === 1 ? "none" : `${row.surge}×`}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{fmtInt(row.starting)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: running and starting figures are planning estimates from typical residential
+            equipment nameplates; surge multiples reflect common induction-motor inrush and vary with the specific
+            machine. Generator installations are governed by NEC (NFPA 70) 2023 <strong>Article 445</strong>
+            (generators), <strong>Article 702</strong> (optional standby systems), and <strong>702.5</strong> for
+            transfer equipment capacity; <strong>Article 700</strong> applies to legally required emergency
+            systems. Local amendments override the model code, and the AHJ has final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="orange"
+        subtitle="Common questions about sizing a standby generator."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalGeneratorSizingCalculator } from "@/scripts/calculators/electrical-generator-sizing-calculator";
+    initElectricalGeneratorSizingCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #ea580c;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

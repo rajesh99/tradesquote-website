@@ -1,0 +1,57 @@
+---
+import { ampsToWatts, fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * What a breaker rating is worth in watts — and the 80% of it that a continuous
+ * load may actually use (210.20(A)). Each bar is that circuit's own 100%, because a
+ * linear scale across 1,800 W to 48,000 W would make the first row invisible.
+ */
+const rows = [
+  { amps: 15, volts: 120, serves: "general lighting" },
+  { amps: 20, volts: 120, serves: "kitchen counter circuits" },
+  { amps: 30, volts: 240, serves: "dryer, water heater" },
+  { amps: 50, volts: 240, serves: "range, welder" },
+  { amps: 100, volts: 240, serves: "small service or subpanel" },
+  { amps: 200, volts: 240, serves: "typical modern service" },
+].map((r) => {
+  const nameplate = ampsToWatts(r.amps, "1ph", r.volts, 1);
+  return { ...r, nameplate, continuous: nameplate * 0.8 };
+});
+
+const BAR_X = 150;
+const BAR_W = 320;
+const FILL_W = BAR_W * 0.8;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 306" fill="none" aria-hidden="true">
+  <title>What each breaker rating is worth in watts</title>
+  <desc>
+    A 15 amp 120 volt circuit is 1,800 watts on paper and 1,440 watts of continuous load. A 20 amp circuit is 2,400
+    and 1,920 watts. At 240 volts, a 30 amp circuit is 7,200 and 5,760 watts; a 50 amp circuit 12,000 and 9,600; a
+    100 amp service 24,000 and 19,200; a 200 amp service 48,000 and 38,400 watts. The shaded part of each bar is
+    the 80 percent a continuous load may use.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="290" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A breaker rating is not a wattage budget</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Each bar is that circuit's own 100%. The filled part is the 80% a continuous load may use.</text>
+
+  {rows.map((r, i) => {
+    const y = 74 + i * 34;
+    const accent = r.volts === 120 ? C.blue : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 19} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${r.amps} A @ ${r.volts} V`}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_W} height="24" rx="6" fill="none" stroke={C.border} stroke-width="1.2" stroke-dasharray="3 3" />
+        <rect x={BAR_X} y={y + 2} width={FILL_W} height="24" rx="6" fill={accent} opacity="0.16" />
+        <rect x={BAR_X} y={y + 2} width={FILL_W} height="24" rx="6" fill="none" stroke={accent} stroke-width="1.5" />
+        <text x={BAR_X + FILL_W - 10} y={y + 19} text-anchor="end" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{`${fmtInt(r.continuous)} W`}</text>
+        <text x={BAR_X + BAR_W + 10} y={y + 19} fill={C.muted} font-family={FONT} font-size="10">{`of ${fmtInt(r.nameplate)} W`}</text>
+        <text x={BAR_X + BAR_W + 96} y={y + 19} fill={C.muted} font-family={FONT} font-size="8.5">{r.serves}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">{`The gap is real: a 20 A circuit loses ${fmtInt(2400 - 1920)} W to the continuous-load rule, and a 200 A service ${fmtInt(48000 - 38400)} W — before any demand factor is applied.`}</text>
+</svg>

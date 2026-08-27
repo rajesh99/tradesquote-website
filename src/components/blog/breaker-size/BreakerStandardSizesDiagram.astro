@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * NEC 240.6(A) standard ampere ratings. Rendered as a ladder so the gaps are
+ * obvious — the point being that a calculated 33 A goes to 35 A, not to "33 A".
+ */
+const ratings = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600];
+
+const PER_ROW = 13;
+const rows = [ratings.slice(0, PER_ROW), ratings.slice(PER_ROW)];
+const residential = new Set([15, 20, 30, 40, 50, 60, 100, 125, 150, 200]);
+const cells = rows.map((row) =>
+  row.map((r) => ({ value: r, common: residential.has(r) })),
+);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+  <title>NEC 240.6(A) standard breaker and fuse ratings</title>
+  <desc>
+    The standard ampere ratings for fuses and inverse time circuit breakers are 15, 20, 25, 30, 35, 40, 45,
+    50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500 and 600 amps. A
+    calculated value that falls between two of these rounds up to the next one — there is no 33 amp
+    breaker. The ratings shaded darker are the ones common in residential work.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="224" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The only ratings that exist — 240.6(A)</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">A calculated 33 A becomes a 35 A breaker. Round up, never down.</text>
+
+  {cells.map((row, ri) => (
+    <g>
+      {row.map((cell, ci) => {
+        const x = 26 + ci * 52;
+        const y = 76 + ri * 50;
+        return (
+          <g>
+            <rect
+              x={x}
+              y={y}
+              width="46"
+              height="38"
+              rx="7"
+              fill={cell.common ? C.primaryLight : C.white}
+              stroke={cell.common ? C.primary : C.border}
+              stroke-width={cell.common ? "1.6" : "1"}
+            />
+            <text
+              x={x + 23}
+              y={y + 24}
+              text-anchor="middle"
+              fill={C.dark}
+              font-family={FONT}
+              font-size="12"
+              font-weight={cell.common ? "800" : "600"}
+            >
+              {cell.value}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  ))}
+
+  <rect x="26" y="188" width="12" height="12" rx="3" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="44" y="198" fill={C.muted} font-family={FONT} font-size="10">Common in residential work</text>
+  <text x="26" y="222" fill={C.muted} font-family={FONT} font-size="10">240.6(A) also lists additional standard fuse ratings of 1, 3, 6, 10 and 601 A and above — rarely seen on branch circuits.</text>
+</svg>

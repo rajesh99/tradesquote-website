@@ -1,0 +1,72 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * One 60 Hz sine against the DC level that would deliver the same heat. The
+ * whole point of RMS: 120 V AC and 120 V DC warm a resistor identically, but
+ * the AC waveform actually reaches 169.7 V twice per cycle.
+ */
+const RMS = 120;
+const PEAK = RMS * Math.SQRT2;
+const FREQ = 60;
+const PERIOD_MS = 1000 / FREQ;
+
+const X0 = 70;
+const W = 600;
+const MID = 148;
+const AMP = 58;
+const CYCLES = 2;
+const STEPS = 160;
+
+const points = Array.from({ length: STEPS + 1 }, (_, i) => {
+  const x = X0 + (i / STEPS) * W;
+  const y = MID - AMP * Math.sin((2 * Math.PI * CYCLES * i) / STEPS);
+  return `${x.toFixed(2)},${y.toFixed(2)}`;
+});
+const wavePath = `M${points.join(" L")}`;
+
+const rmsY = MID - AMP / Math.SQRT2;
+const cycleW = W / CYCLES;
+const cycleEnd = X0 + cycleW;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 286" fill="none" aria-hidden="true">
+  <title>A 60 hertz sine wave against the equivalent DC level</title>
+  <desc>
+    A 120 volt RMS alternating waveform reaches 169.7 volts positive and 169.7 volts negative twice in each cycle, and
+    crosses zero 120 times a second. The dashed line marks 120 volts, the steady DC value that would heat a resistor by
+    the same amount. One complete cycle at 60 hertz takes 16.67 milliseconds.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="270" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">"120 volts" is an average that never actually appears</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`A ${FREQ} Hz sine at ${RMS} V RMS, against the steady DC that would deliver the same heat.`}</text>
+
+  <line x1={X0} y1={MID} x2={X0 + W} y2={MID} stroke={C.border} stroke-width="1.2" />
+  <text x="34" y={MID + 4} fill={C.muted} font-family={FONT} font-size="9" font-weight="700">0 V</text>
+
+  <line x1={X0} y1={MID - AMP} x2={X0 + W} y2={MID - AMP} stroke={C.border} stroke-width="0.9" stroke-dasharray="2 4" />
+  <line x1={X0} y1={MID + AMP} x2={X0 + W} y2={MID + AMP} stroke={C.border} stroke-width="0.9" stroke-dasharray="2 4" />
+
+  <line x1={X0} y1={rmsY} x2={X0 + W} y2={rmsY} stroke={C.blue} stroke-width="2" stroke-dasharray="7 5" />
+
+  <path d={wavePath} stroke={C.orange} stroke-width="2.4" fill="none" stroke-linejoin="round" />
+
+  <text x={X0 + 8} y={MID - AMP - 8} fill={C.orange} font-family={FONT} font-size="10" font-weight="700">{`+${PEAK.toFixed(1)} V peak`}</text>
+  <text x={X0 + 8} y={MID + AMP + 16} fill={C.orange} font-family={FONT} font-size="10" font-weight="700">{`−${PEAK.toFixed(1)} V peak`}</text>
+  <text x={X0 + W - 6} y={rmsY - 7} text-anchor="end" fill={C.blue} font-family={FONT} font-size="10" font-weight="700">{`${RMS} V RMS — the DC equivalent`}</text>
+
+  <line x1={X0} y1="232" x2={cycleEnd} y2="232" stroke={C.dark} stroke-width="1.4" />
+  <line x1={X0} y1="226" x2={X0} y2="238" stroke={C.dark} stroke-width="1.4" />
+  <line x1={cycleEnd} y1="226" x2={cycleEnd} y2="238" stroke={C.dark} stroke-width="1.4" />
+  <text x={X0 + cycleW / 2} y="250" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {`one cycle = ${PERIOD_MS.toFixed(2)} ms`}
+  </text>
+  <text x={cycleEnd + 16} y="236" fill={C.muted} font-family={FONT} font-size="10">
+    {`${FREQ} cycles a second · polarity reverses ${FREQ * 2} times a second`}
+  </text>
+
+  <text x="24" y="270" fill={C.muted} font-family={FONT} font-size="10">
+    {`RMS is defined as the DC value that heats identically — which is why ${RMS} V AC insulation must survive ${PEAK.toFixed(0)} V.`}
+  </text>
+</svg>

@@ -811,7 +811,7 @@ export const hvacFaqs = [
   {
     question: "Are these HVAC calculators really free?",
     answer:
-      "Yes. All thirty-two are completely free, run instantly in your browser, and require no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
+      "Yes. Every one of them is completely free, runs instantly in your browser, and requires no account or sign-up. They're planning and field-check tools built by TradesQuote, the AI estimating platform for trades businesses.",
   },
   {
     question: "Which HVAC calculator should I use first?",
@@ -836,6 +836,6 @@ export const hvacFaqs = [
   {
     question: "Will calculators for other trades be added?",
     answer:
-      "Yes. HVAC is the first set — calculators for carpentry, painting, cleaning, electrical, and plumbing are planned next, matching the trades TradesQuote supports for AI-powered estimating.",
+      "Yes. HVAC was the first set and there are now twelve free NEC-based electrical calculators too — wire size, voltage drop, ampacity derating, breaker sizing, grounding, conduit and box fill, load calculations, EV charger circuits, and job pricing. Calculators for plumbing, carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.",
   },
 ];

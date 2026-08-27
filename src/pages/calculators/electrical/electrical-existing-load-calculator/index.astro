@@ -1,0 +1,572 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { fmt } from "@/lib/nec";
+
+const title = "Existing Load Calculator — NEC 220.87 Measured Demand | TradesQuote";
+const description =
+  "Free NEC 220.87 calculator. Turn twelve months of utility peak demand into an established existing load, add a new load, and see whether the existing service covers it — often proving no upgrade is needed.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-existing-load-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Existing Load Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Existing Load Calculator (NEC 220.87)",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC 220.87 existing load calculator. Establishes an existing load from measured utility peak demand at 125%, adds a new load at 125% where continuous, and compares the total against the service rating.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is NEC 220.87?",
+    answer:
+      "It is the method for determining an <em>existing</em> load from measured data rather than a paper calculation. The existing load may be taken as the <strong>maximum demand recorded over the previous 12 months × 125%</strong>. Where a full year of data is not available, 30 days of recorded demand data may be used instead. Because real buildings draw far less than a load calculation predicts, it frequently shows an existing service has capacity the calculation says it does not.",
+  },
+  {
+    question: "How do I get my peak demand from the utility?",
+    answer:
+      "Ask for interval or peak-demand data for the last 12 months — most utilities provide it free, often through the online account portal, and many will email a CSV. If the meter is not a demand meter, some jurisdictions accept a recording ammeter or a data logger left on the service for 30 days, which is what the 30-day provision is for. Confirm what your AHJ will accept before relying on it.",
+  },
+  {
+    question: "Can I add an EV charger to a 100 amp service?",
+    answer:
+      "Very often yes, and this is the calculation that proves it. A house with a 44 A recorded peak establishes a 55 A existing load; a 32 A charger — continuous under <strong>625.41</strong>, so 40 A — brings the total to 95 A, inside a 100 A service. A 48 A charger would add 60 A instead for 115 A and would not fit, which is why specifying the smaller charger is often the whole difference between a $300 circuit and a $4,000 upgrade.",
+  },
+  {
+    question: "Why is the new load multiplied by 125% but the existing load also 125%?",
+    answer:
+      "They are two different rules that happen to share a number. The 125% on the existing load is the safety factor <strong>220.87</strong> itself applies to measured demand. The 125% on the new load is <strong>210.20(A)</strong>, which requires the overcurrent device and conductors to be sized at 125% of a <em>continuous</em> load — one operating for three hours or more. A non-continuous new load such as a range or dryer is added at 100%.",
+  },
+  {
+    question: "Does 220.87 replace a load calculation?",
+    answer:
+      "For establishing the <em>existing</em> load, yes — that is exactly its purpose. It does not size the new circuit, which still follows the normal rules, and it does not apply to a building with no operating history. For a new dwelling or an addition with no metered data, use the <strong>220.82</strong> optional method instead.",
+  },
+  {
+    question: "What if the load exceeds the service?",
+    answer:
+      "Three routes before an upgrade. Specify a smaller version of the new load — a 32 A charger instead of 48 A is usually ample overnight. Add a <strong>load-management system</strong> under Article 750, which lets a large load back off when the house is busy and is a fraction of an upgrade's cost. Or, if neither works, upgrade the service — the calculator names the next standard rating that would cover the total.",
+  },
+  {
+    question: "Is a full panel the same as a full service?",
+    answer:
+      "No, and conflating them is the most common reason people are sold an upgrade they do not need. Running out of <em>breaker spaces</em> is a physical problem solved by tandem breakers or a subpanel. Running out of <em>capacity</em> is what this calculator tests. A panel with no free slots may still have plenty of unused capacity.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load proven? Quote the work in seconds.";
+const ctaDescription =
+  "Whether the answer is a single circuit or a full service upgrade, TradesQuote turns it into a detailed line-item estimate — conductor, devices, panel work, and labor — with quantities and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "The 220.82 paper calculation, for comparison.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-size-calculator",
+    title: "Service Size Calculator",
+    description: "Turn a calculated load into a service rating.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ev-charger-calculator",
+    title: "EV Charger Calculator",
+    description: "Size the circuit the charger actually needs.",
+  },
+  {
+    href: "/calculators/electrical/electrical-panel-upgrade-cost-calculator",
+    title: "Panel Upgrade Cost",
+    description: "Price the upgrade if it turns out you need one.",
+  },
+];
+
+/**
+ * Worked comparison rows — the same 100 A service and 44 A recorded peak against a
+ * range of new loads. Computed inline so the table always matches the script.
+ */
+const SERVICE = 100;
+const PEAK = 44;
+const existingLoad = PEAK * 1.25;
+const scenarioRows = [
+  { name: "Nothing added", amps: 0, continuous: false },
+  { name: "Electric dryer", amps: 30, continuous: false },
+  { name: "EV charger, 32 A", amps: 32, continuous: true },
+  { name: "EV charger, 40 A", amps: 40, continuous: true },
+  { name: "EV charger, 48 A", amps: 48, continuous: true },
+  { name: "Heat pump, 30 A", amps: 30, continuous: true },
+].map((r) => {
+  const applied = r.continuous ? r.amps * 1.25 : r.amps;
+  const total = existingLoad + applied;
+  return { ...r, applied, total, fits: total <= SERVICE };
+});
+
+const styles = electricalAccentStyles.violet;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Existing Load Calculator — NEC 220.87 Measured Demand" />
+    <meta
+      property="og:description"
+      content="Turn twelve months of utility peak demand into an established existing load and see whether your service covers a new load."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Existing Load Calculator — NEC 220.87" />
+    <meta name="twitter:description" content="Prove an existing service has capacity, using measured demand. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Existing Load Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Existing Load Calculator <span class="text-violet-600">— NEC 220.87</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A paper load calculation assumes a house might run everything at once. Real houses never do.
+              <strong>NEC 220.87</strong> lets you establish the existing load from what the building actually
+              drew — the utility's highest recorded demand over twelve months, times 125% — then add your new
+              load on top. It is the single strongest argument against an unnecessary service upgrade.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16 8v8m-4-5v5m-4-2v2m-2 4h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              ></path>
+            </svg>
+            Test the existing service
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="el-peak" class="text-sm font-semibold text-slate-800">
+                    Highest recorded demand, 12 months
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="el-peak"
+                      type="number"
+                      min="0"
+                      max="400"
+                      value="44"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">amps</span>
+                  </div>
+                </div>
+                <input
+                  id="el-peak-range"
+                  type="range"
+                  min="0"
+                  max="300"
+                  step="1"
+                  value="44"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-violet-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>0</span><span>300 A</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="el-service" class="text-sm font-semibold text-slate-800">Existing service</label>
+                  <select
+                    id="el-service"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                  >
+                    <option value="60">60 A</option>
+                    <option value="100" selected>100 A</option>
+                    <option value="125">125 A</option>
+                    <option value="150">150 A</option>
+                    <option value="200">200 A</option>
+                    <option value="400">400 A</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="el-new" class="text-sm font-semibold text-slate-800">New load</label>
+                  <input
+                    id="el-new"
+                    type="number"
+                    min="0"
+                    max="400"
+                    value="32"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="el-continuous" class="text-sm font-semibold text-slate-800">Continuous?</label>
+                  <select
+                    id="el-continuous"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                  >
+                    <option value="yes" selected>Yes — ×1.25</option>
+                    <option value="no">No — ×1.00</option>
+                  </select>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                EV supply equipment is continuous by rule (625.41). Ranges, dryers, and ovens are not. Ask the
+                utility for twelve months of interval or peak-demand data — most provide it free through the
+                account portal.
+              </p>
+
+              <button
+                id="el-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-violet-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-violet-100 bg-violet-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Total calculated load</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="el-total" class="text-5xl font-extrabold tracking-tight text-violet-600">95.0 A</span>
+              </div>
+              <p id="el-verdict" class="mt-1 text-sm font-semibold text-emerald-700">Fits the existing service</p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Existing load</p>
+                  <p id="el-existing" class="mt-1 text-2xl font-bold text-slate-900">55.0 A</p>
+                </div>
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Headroom</p>
+                  <p id="el-headroom" class="mt-1 text-2xl font-bold text-slate-900">5.0 A</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-violet-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Recorded peak</span><span id="el-bd-peak" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Existing load, 220.87</span><span id="el-bd-existing" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>New load applied</span><span id="el-bd-new" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Total</span><span id="el-bd-total" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Service rating</span><span id="el-bd-service" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Result</span><span id="el-bd-headroom" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="el-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The 100 A service covers this with 5.0 A to spare, so no upgrade is required on the basis of load.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — Establish the existing load (220.87)</div>
+            <div>existing&nbsp;=&nbsp;highest 12-month demand × <span class="text-violet-300">1.25</span></div>
+            <div class="mt-4 text-cyan-300"># Step 2 — Add the new load (210.20(A))</div>
+            <div>new&nbsp;=&nbsp;amps × <span class="text-violet-300">1.25</span> if continuous, else × 1.00</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — Compare</div>
+            <div>total&nbsp;=&nbsp;existing + new&nbsp;&nbsp;→&nbsp;&nbsp;must be ≤ service rating</div>
+            <div class="mt-4 text-cyan-300"># Where a year of data is unavailable</div>
+            <div>30 days of recorded demand data may be used instead</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Measured beats calculated</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A load calculation is deliberately conservative. Metered demand is what the building really did,
+                which on an older house is routinely half what the paper number says.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Two different 125% rules</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                One is 220.87's safety factor on measured demand. The other is 210.20(A) on a continuous new
+                load. They share a number and nothing else.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Spaces aren't capacity</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A full panel is a physical problem — tandems or a subpanel fix it. This calculation tests
+                capacity, which is a different question entirely.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Ask before you rely on it</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                220.87 is model-code text, but what data your AHJ accepts — and whether a 30-day logger will do
+                — is a local question. Confirm before quoting.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same house — 100 A service, 44 A recorded peak — with three different additions.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">32 A EV charger — fits</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above. A 7.7 kW charger, ample overnight.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              44 A × 1.25 = 55.0 A existing<br />
+              32 A × 1.25 = 40.0 A new (continuous, 625.41)<br />
+              total = <span class="font-bold text-violet-700">95.0 A</span> on a 100 A service → 5.0 A spare
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> no upgrade needed. A 32 A charger delivers
+              roughly 25–30 miles of range per hour, so a car parked overnight is comfortably covered.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">48 A EV charger — does not fit</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The same house, a bigger charger.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              55.0 A existing + (48 × 1.25 = 60.0 A) = <span class="font-bold text-red-700">115.0 A</span><br />
+              over a 100 A service by 15.0 A
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the charger, not the house, is the problem.
+              Dropping to 32 A or adding load management under Article 750 both solve it for a fraction of an
+              upgrade.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">30 A electric dryer — non-continuous</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A dryer cycles, so no 125% adder applies to it.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              55.0 A existing + 30.0 A new (×1.00) = <span class="font-bold text-violet-700">85.0 A</span><br />
+              15.0 A remaining on the 100 A service
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> comfortably inside. Note how much the
+              continuous flag matters — the same 30 A treated as continuous would add 37.5 A instead.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">What fits a 100 A service</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            All rows assume a {PEAK} A recorded 12-month peak, giving a {fmt(existingLoad, 1)} A established
+            existing load under 220.87. Change the inputs above for your own figures.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">New load</th>
+                  <th class="py-3 px-4 font-semibold">Nameplate</th>
+                  <th class="py-3 px-4 font-semibold">Applied</th>
+                  <th class="py-3 px-4 font-semibold">Total</th>
+                  <th class="py-3 px-4 font-semibold">On {SERVICE} A</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  scenarioRows.map((row, index) => (
+                    <tr class={index === scenarioRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.name}</td>
+                      <td class="py-3 px-4">{row.amps === 0 ? "—" : `${row.amps} A`}</td>
+                      <td class="py-3 px-4">
+                        {row.amps === 0 ? "—" : `${fmt(row.applied, 1)} A`}
+                        {row.continuous && <span class="text-xs text-slate-400"> ×1.25</span>}
+                      </td>
+                      <td class="py-3 px-4">{fmt(row.total, 1)} A</td>
+                      <td class="py-3 px-4">
+                        {
+                          row.fits ? (
+                            <span class="font-semibold text-emerald-700">Fits</span>
+                          ) : (
+                            <span class="font-semibold text-red-700">Over</span>
+                          )
+                        }
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — <strong>220.87</strong> determining existing loads from
+            measured demand, <strong>220.82</strong> optional dwelling calculation, <strong>220.83</strong>
+            additional loads in an existing dwelling, <strong>210.20(A)</strong> continuous load, <strong
+              >625.41</strong
+            > EV supply equipment as a continuous load, <strong>230.79(C)</strong> minimum service rating, Article
+            750 energy management systems. What demand data an AHJ will accept varies locally; local amendments
+            override the model code and the AHJ has final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="violet"
+        subtitle="Common questions about NEC 220.87 and measured existing load."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalExistingLoadCalculator } from "@/scripts/calculators/electrical-existing-load-calculator";
+    initElectricalExistingLoadCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #7c3aed;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #7c3aed;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

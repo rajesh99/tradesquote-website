@@ -1,0 +1,87 @@
+---
+import { fmt, fmtInt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Room-by-room counts, computed with the calculator's own method and its own
+ * footcandle options. The "governs" column is the useful part: in most rooms the
+ * spacing grid asks for more fixtures than the light level needs.
+ */
+const CEILING = 8;
+const LUMENS = 650;
+
+const rooms = [
+  { name: "Hallway", len: 20, wid: 4, fc: 10 },
+  { name: "Bathroom", len: 8, wid: 5, fc: 30 },
+  { name: "Bedroom", len: 12, wid: 12, fc: 20 },
+  { name: "Dining", len: 14, wid: 12, fc: 25 },
+  { name: "Living room", len: 16, wid: 14, fc: 20 },
+  { name: "Kitchen", len: 16, wid: 12, fc: 40 },
+  { name: "Home office", len: 12, wid: 10, fc: 40 },
+  { name: "Workshop", len: 20, wid: 20, fc: 50 },
+].map((r) => {
+  const area = r.len * r.wid;
+  const spacing = CEILING / 2;
+  const rows = Math.max(1, Math.round(r.len / spacing));
+  const cols = Math.max(1, Math.round(r.wid / spacing));
+  const spacingCount = rows * cols;
+  const lumenCount = Math.max(1, Math.ceil((area * r.fc) / LUMENS));
+  const recommended = Math.max(spacingCount, lumenCount);
+  return {
+    ...r,
+    area,
+    rows,
+    cols,
+    spacingCount,
+    lumenCount,
+    recommended,
+    achievedFc: (recommended * LUMENS) / area,
+    governs: spacingCount === lumenCount ? "both agree" : lumenCount > spacingCount ? "light level" : "spacing",
+  };
+});
+
+const cols = { name: 34, size: 132, fc: 214, grid: 280, level: 372, rec: 462, gov: 546 };
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 306" fill="none" aria-hidden="true">
+  <title>Recessed light count room by room</title>
+  <desc>
+    With an 8 foot ceiling and 650 lumen trims: a 20 by 4 hallway at 10 footcandles takes 5 fixtures, a 8 by 5
+    bathroom at 30 footcandles takes 2, a 12 by 12 bedroom at 20 footcandles takes 9, a 14 by 12 dining room at 25
+    footcandles takes 12, a 16 by 14 living room at 20 footcandles takes 16, a 16 by 12 kitchen at 40 footcandles
+    takes 12, a 12 by 10 office at 40 footcandles takes 9, and a 20 by 20 workshop at 50 footcandles takes 31. In
+    most rooms the spacing grid governs rather than the light level.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="290" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">{`Room by room, ${CEILING} ft ceiling, ${LUMENS} lm trims`}</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Footcandle targets are the calculator's own options. Take the larger of the two counts.</text>
+
+  <text x={cols.name} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ROOM</text>
+  <text x={cols.size} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SIZE</text>
+  <text x={cols.fc} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TARGET</text>
+  <text x={cols.grid} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SPACING GRID</text>
+  <text x={cols.level} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LIGHT LEVEL</text>
+  <text x={cols.rec} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">USE</text>
+  <text x={cols.gov} y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT GOVERNS</text>
+
+  {rooms.map((r, i) => {
+    const y = 100 + i * 24;
+    const accent = r.governs === "light level" ? C.orange : r.governs === "both agree" ? C.primary : C.blue;
+    return (
+      <g>
+        {i % 2 === 0 && <rect x="24" y={y - 13} width="672" height="22" rx="4" fill={C.white} />}
+        <text x={cols.name} y={y + 2} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.name}</text>
+        <text x={cols.size} y={y + 2} fill={C.muted} font-family={FONT} font-size="9.5">{`${r.len} × ${r.wid} ft`}</text>
+        <text x={cols.fc} y={y + 2} fill={C.muted} font-family={FONT} font-size="9.5">{`${r.fc} fc`}</text>
+        <text x={cols.grid} y={y + 2} fill={C.muted} font-family={FONT} font-size="9.5">{`${r.rows} × ${r.cols} = ${r.spacingCount}`}</text>
+        <text x={cols.level} y={y + 2} fill={C.muted} font-family={FONT} font-size="9.5">{`${r.lumenCount} fixtures`}</text>
+        <text x={cols.rec} y={y + 2} fill={accent} font-family={FONT} font-size="11.5" font-weight="800">{`${r.recommended}`}</text>
+        <text x={cols.rec + 24} y={y + 2} fill={C.muted} font-family={FONT} font-size="8">{`${fmt(r.achievedFc, 0)} fc`}</text>
+        <text x={cols.gov} y={y + 2} fill={accent} font-family={FONT} font-size="9.5" font-weight="700">{r.governs}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="290" fill={C.muted} font-family={FONT} font-size="10">{`Note the hallway: the grid wants 5 fixtures where the light level needs 2, so it lands at ${fmt(rooms[0].achievedFc, 0)} fc. Even coverage beats hitting the target — dim it.`}</text>
+</svg>

@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * GEC for a 200 A service (2/0 Cu or 4/0 Al service conductors). Table 250.66 gives
+ * 4 AWG copper, but 250.66(A) and (B) cap the run depending on the electrode — which
+ * is why a ground rod only ever needs 6 AWG copper.
+ */
+const electrodes = [
+  {
+    name: "Ground rod",
+    size: "6 AWG Cu",
+    accent: C.primary,
+    bg: C.primaryLight,
+    rule: "250.66(A) cap",
+    detail: ["Table says 4 AWG, but a GEC to a", "rod, pipe, or plate never needs to", "exceed 6 AWG copper."],
+  },
+  {
+    name: "Concrete-encased (Ufer)",
+    size: "4 AWG Cu",
+    accent: C.blue,
+    bg: C.blueLight,
+    rule: "250.66(B) cap",
+    detail: ["Capped at 4 AWG copper — which", "matches the table value here, so", "4 AWG it is."],
+  },
+  {
+    name: "Metal water pipe",
+    size: "4 AWG Cu",
+    accent: C.orange,
+    bg: C.orangeLight,
+    rule: "No cap — full table size",
+    detail: ["Water pipe gets no reduction, so", "the full Table 250.66 size applies.", "Bonding jumper rules also apply."],
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Grounding electrode conductor size for a 200 amp service</title>
+  <desc>
+    For a 200 amp service with 2/0 copper or 4/0 aluminum service conductors, Table 250.66 gives a 4 AWG
+    copper grounding electrode conductor. The caps then apply by electrode type: to a ground rod, pipe, or
+    plate the conductor need not exceed 6 AWG copper under 250.66(A); to a concrete-encased electrode it is
+    capped at 4 AWG under 250.66(B), which matches the table value; and to a metal water pipe there is no
+    cap, so the full 4 AWG applies.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">GEC for a 200 A service — the electrode decides</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Table 250.66 says 4 AWG copper, then 250.66(A)–(C) cap it by what you're connecting to</text>
+
+  {electrodes.map((e, i) => {
+    const x = 24 + i * 224;
+    return (
+      <g>
+        <rect x={x} y="72" width="208" height="184" rx="10" fill={e.bg} stroke={e.accent} stroke-width="1.5" />
+        <text x={x + 16} y="96" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{e.name}</text>
+        <text x={x + 16} y="132" fill={e.accent} font-family={FONT} font-size="22" font-weight="800">{e.size}</text>
+        <rect x={x + 16} y="144" width="150" height="20" rx="5" fill={C.white} stroke={e.accent} stroke-width="1" />
+        <text x={x + 91} y="158" text-anchor="middle" fill={e.accent} font-family={FONT} font-size="9.5" font-weight="700">{e.rule}</text>
+        <text x={x + 16} y="186" fill={C.muted} font-family={FONT} font-size="9.5">
+          {e.detail.map((line, li) => (
+            <tspan x={x + 16} dy={li === 0 ? "0" : "13"}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>

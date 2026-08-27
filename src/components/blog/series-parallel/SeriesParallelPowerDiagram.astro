@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * n identical elements draw exactly n² times as much power in parallel as in
+ * series, because series multiplies the resistance by n while parallel divides
+ * it by n. Bars are computed from P = V²/R.
+ */
+const V = 120;
+const R = 40;
+const COUNTS = [2, 3, 4, 5];
+
+const rows = COUNTS.map((n) => ({
+  n,
+  series: (V * V) / (R * n),
+  parallel: (V * V) / (R / n),
+}));
+
+const MAX = Math.max(...rows.map((r) => r.parallel));
+const BASE = 196;
+const SPAN = 108;
+const scale = (w: number) => (w / MAX) * SPAN;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Power drawn by n identical elements in series versus parallel</title>
+  <desc>
+    Two 40 ohm elements on 120 volts dissipate 180 watts in series and 720 watts in parallel, a ratio of four. Three
+    elements give 120 against 1,080 watts, a ratio of nine. Four give 90 against 1,440, a ratio of sixteen. Five give 72
+    against 1,800, a ratio of twenty-five. The ratio is always n squared.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Adding elements in parallel multiplies power by n²</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Watts drawn by n identical ${R} Ω elements on ${V} V. Series divides the current; parallel multiplies it.`}</text>
+
+  <rect x="470" y="66" width="14" height="10" rx="2" fill={C.orange} opacity="0.75" />
+  <text x="490" y="75" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">SERIES</text>
+  <rect x="556" y="66" width="14" height="10" rx="2" fill={C.green} opacity="0.85" />
+  <text x="576" y="75" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">PARALLEL</text>
+
+  <line x1="40" y1={BASE} x2="690" y2={BASE} stroke={C.border} stroke-width="1.2" />
+
+  {rows.map((row, i) => {
+    const gx = 68 + i * 158;
+    const hS = scale(row.series);
+    const hP = scale(row.parallel);
+    return (
+      <g>
+        <rect x={gx} y={BASE - hS} width="54" height={hS} rx="4" fill={C.orange} opacity="0.75" />
+        <text x={gx + 27} y={BASE - hS - 7} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+          {`${row.series.toFixed(0)} W`}
+        </text>
+
+        <rect x={gx + 64} y={BASE - hP} width="54" height={hP} rx="4" fill={C.green} opacity="0.85" />
+        <text x={gx + 91} y={BASE - hP - 7} text-anchor="middle" fill={C.green} font-family={FONT} font-size="10" font-weight="700">
+          {`${row.parallel.toLocaleString("en-US")} W`}
+        </text>
+
+        <text x={gx + 59} y={BASE + 17} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+          {`n = ${row.n}`}
+        </text>
+        <text x={gx + 59} y={BASE + 33} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">
+          {`${(row.parallel / row.series).toFixed(0)}× more`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">
+    Series multiplies resistance by n, parallel divides it by n — so the gap between them is n², not n.
+  </text>
+</svg>

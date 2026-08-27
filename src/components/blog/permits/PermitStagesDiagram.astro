@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The sequence, because the expensive mistake is closing a wall before the
+ * rough-in inspection. Everything else about permits is administrative; that one
+ * is structural.
+ */
+const stages = [
+  {
+    n: "1",
+    name: "Apply",
+    detail: "Scope, load calculation, sometimes a panel schedule and a one-line",
+    gate: "Before work starts",
+    accent: C.blue,
+  },
+  {
+    n: "2",
+    name: "Rough-in inspection",
+    detail: "Boxes, cable, supports, box fill, grounding — everything about to be hidden",
+    gate: "Before insulation and drywall",
+    accent: C.red,
+  },
+  {
+    n: "3",
+    name: "Final inspection",
+    detail: "Devices, covers, AFCI/GFCI, labelling, torque, panel dress",
+    gate: "Before occupancy or sign-off",
+    accent: C.orange,
+  },
+  {
+    n: "4",
+    name: "Close the permit",
+    detail: "Get the record. An open permit is a problem at sale time",
+    gate: "After the final passes",
+    accent: C.primary,
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 252" fill="none" aria-hidden="true">
+  <title>The four stages of a permitted electrical job</title>
+  <desc>
+    First apply, before work starts, submitting the scope and a load calculation and sometimes a panel schedule. Second
+    the rough-in inspection, before insulation and drywall, covering boxes, cable, supports, box fill and grounding —
+    everything about to be hidden. Third the final inspection, before occupancy, covering devices, covers, AFCI and
+    GFCI protection, labelling and panel dress. Fourth, close the permit and obtain the record, because an open permit
+    causes problems at sale time.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four stages, and one of them is a hard gate</text>
+
+  {stages.map((s, i) => {
+    const y = 46 + i * 46;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="40" rx="9" fill={s.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="40" rx="9" fill="none" stroke={s.accent} stroke-width={s.n === "2" ? 2.2 : 1.5} />
+        <circle cx="48" cy={y + 20} r="12" fill={s.accent} />
+        <text x="48" y={y + 24} text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="800">{s.n}</text>
+        <text x="70" y={y + 17} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{s.name}</text>
+        <text x="70" y={y + 31} fill={C.muted} font-family={FONT} font-size="8.5">{s.detail}</text>
+        <rect x="540" y={y + 11} width="142" height="18" rx="5" fill={s.accent} opacity="0.16" />
+        <text x="611" y={y + 24} text-anchor="middle" fill={s.accent} font-family={FONT} font-size="8" font-weight="800">{s.gate}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="238" fill={C.muted} font-family={FONT} font-size="10">Close a wall before the rough-in inspection and you may be opening it again. That's the only irreversible step.</text>
+</svg>

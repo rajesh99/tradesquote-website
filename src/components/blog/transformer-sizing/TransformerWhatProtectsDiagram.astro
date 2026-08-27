@@ -1,0 +1,64 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The distinction that causes the most real-world violations: 450.3 protects the
+ * transformer as a piece of equipment, and says nothing about the secondary
+ * conductors. Those are 240.21(C), which is where the 10-ft and 25-ft tap rules
+ * come from.
+ */
+const zones = [
+  {
+    accent: C.blue,
+    rule: "450.3(B)",
+    protects: "The transformer",
+    detail: "Primary and secondary device ratings as a percentage of transformer FLA. Protects the windings from overload and the core from saturation.",
+    doesNot: "Says nothing about the conductors on either side",
+  },
+  {
+    accent: C.orange,
+    rule: "240.21(C)",
+    protects: "The secondary conductors",
+    detail: "Secondary conductors are generally unprotected at their supply end, so this section sets the conditions — including the 10-ft and 25-ft tap rules.",
+    doesNot: "Is not satisfied by the 450.3 secondary device alone",
+  },
+  {
+    accent: C.primary,
+    rule: "240.4 / 310",
+    protects: "The primary conductors",
+    detail: "Sized to the primary device you actually install. Using the 250% allowance means the conductor grows to match it.",
+    doesNot: "Not satisfied by 125% of FLA if the device is at 250%",
+  },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>What each code section actually protects</title>
+  <desc>
+    Section 450.3(B) protects the transformer itself, setting primary and secondary device ratings as percentages of
+    transformer full-load current, and says nothing about the conductors. Section 240.21(C) protects the secondary
+    conductors, which are generally unprotected at their supply end, and is the source of the 10-foot and 25-foot tap
+    rules. The primary conductors follow the ordinary rules of 240.4 and Article 310 and must be sized to the primary
+    device actually installed — so using the 250 percent allowance means a larger conductor.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three sections, three different things protected</text>
+
+  {zones.map((z, i) => {
+    const y = 48 + i * 68;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="60" rx="9" fill={z.accent} opacity="0.06" />
+        <rect x="24" y={y} width="672" height="60" rx="9" fill="none" stroke={z.accent} stroke-width="1.6" />
+        <rect x="38" y={y + 12} width="88" height="19" rx="5" fill={z.accent} />
+        <text x="82" y={y + 25} text-anchor="middle" fill={C.white} font-family={FONT} font-size="9" font-weight="800">{z.rule}</text>
+        <text x="140" y={y + 26} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{z.protects}</text>
+        <text x="38" y={y + 44} fill={C.muted} font-family={FONT} font-size="8.5">{z.detail}</text>
+        <text x="38" y={y + 55} fill={z.accent} font-family={FONT} font-size="8" font-weight="700">{z.doesNot}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">Satisfying 450.3 and stopping there is the commonest transformer violation. The secondary conductors need 240.21(C).</text>
+</svg>

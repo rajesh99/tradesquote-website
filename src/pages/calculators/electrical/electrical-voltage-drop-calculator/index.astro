@@ -1,0 +1,623 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles, electricalCalculators } from "@/config/electricalCalculators";
+import { CONDUCTOR_SIZES } from "@/lib/nec";
+
+const title = "Voltage Drop Calculator — NEC 3% Rule, Copper & Aluminum | TradesQuote";
+const description =
+  "Free voltage drop calculator for single-phase and three-phase circuits. Get drop in volts and percent, voltage at the load, and the longest run that stays inside the NEC 3% recommendation. Copper and aluminum, 120 V to 480 V.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-voltage-drop-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Voltage Drop Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Voltage Drop Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online voltage drop calculator for single-phase and three-phase branch circuits and feeders. Returns volts dropped, percent drop, voltage at the load, and the maximum compliant one-way run length.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "Is 3% voltage drop a code requirement or a recommendation?",
+    answer:
+      "A <strong>recommendation</strong>. The 3% branch-circuit and 5% combined feeder-plus-branch figures appear in <strong>Informational Notes</strong> to NEC 210.19(A) and 215.2(A), and Article 90.5(C) states that Informational Notes are explanatory and not enforceable as Code requirements. That said, many project specifications, engineering standards, and local amendments adopt them as mandatory — and some specific articles (like 647.4(D) for sensitive electronic equipment, or 695.7 for fire pumps) do impose hard voltage-drop limits. Treat 3% as the professional default, not as optional.",
+  },
+  {
+    question: "Why 2× for single-phase and 1.732× for three-phase?",
+    answer:
+      "Single-phase current flows out on the hot and back on the neutral, so it travels the run length <strong>twice</strong> — hence the factor of 2. In a balanced three-phase circuit the three phase currents are 120° apart and partly cancel in the return path, which works out to a factor of <strong>√3 ≈ 1.732</strong> rather than 2. That is a big part of why three-phase distribution wins on long runs.",
+  },
+  {
+    question: "What is an acceptable voltage drop?",
+    answer:
+      "Aim for <strong>3% or less on a branch circuit</strong> and <strong>5% or less</strong> for the feeder and branch circuit combined. Motors are particularly sensitive: low voltage raises current draw, which raises heat and shortens winding life. Resistive loads like water heaters simply run slower and cost more per unit of output. LED drivers and electronics usually tolerate more drop but can flicker or reset near the limit.",
+  },
+  {
+    question: "Does voltage drop matter more on 120 V than 240 V?",
+    answer:
+      "Yes, dramatically. Drop in <em>volts</em> depends only on current, length, and conductor size — not on system voltage. But drop as a <em>percentage</em> is that figure divided by the system voltage. The same 6-volt drop is <strong>5% at 120 V and only 2.5% at 240 V</strong>. That is why long outbuilding runs are almost always fed at 240 V and why commercial work uses 480 V.",
+  },
+  {
+    question: "How far can I run 12 AWG on a 20 amp circuit?",
+    answer:
+      "At 240 V single-phase, about <strong>91 feet</strong> before 12 AWG copper passes 3%. At 120 V it is only about <strong>45 feet</strong> at the full 20 A load. If the actual load is lower than the breaker rating, the compliant run gets longer in proportion — drop scales with current, not with breaker size. Enter your real load current above rather than the breaker rating.",
+  },
+  {
+    question: "Does upsizing wire for voltage drop change my ground wire size?",
+    answer:
+      'Yes. <strong>NEC 250.122(B)</strong> requires the equipment grounding conductor to be increased proportionally when the ungrounded conductors are upsized — including when the reason is voltage drop. The ratio is by circular mils. The <a href="/calculators/electrical/electrical-ground-wire-size-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Ground Wire Size Calculator</a> has a toggle that does this proportional upsize for you.',
+  },
+  {
+    question: "Should I use the load current or the breaker rating?",
+    answer:
+      "Use the <strong>actual load current</strong>. Voltage drop is a function of the current that really flows, so sizing to a breaker rating the circuit never reaches over-builds the conductor. The exception is a circuit you expect to load to capacity — an EV charger or an electric water heater running at nameplate — where load and rating are effectively the same number.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Drop within limits? Price the run in seconds.";
+const ctaDescription =
+  "Knowing the conductor is one thing; pricing the pull, the terminations, and the labor is another. Describe the job or upload photos and TradesQuote's AI builds a detailed line-item estimate — quantities, unit prices, and totals — validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size the conductor by ampacity and drop together.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ampacity-calculator",
+    title: "Ampacity & Derating Calculator",
+    description: "Correct for ambient heat and conductor bundling.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "Dwelling service conductors and the 83% rule.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+    title: "Ground Wire Size Calculator",
+    description: "EGC and GEC, including the 250.122(B) upsize.",
+  },
+];
+
+/** Selectable conductor sizes for the dropdown. */
+const gaugeOptions = CONDUCTOR_SIZES.filter((s) => s.copper[75] !== null).map((s) => s.label);
+
+/**
+ * Max one-way run in feet at 3% drop, 240 V single-phase copper:
+ * L = 0.03 × 240 × CM ÷ (2 × 12.9 × I). Cells are blank where 240.4(D) or
+ * Table 310.16 will not let that conductor carry the current in the first place.
+ */
+const runTable: { gauge: string; cells: (number | null)[] }[] = [
+  { gauge: "14 AWG", cells: [76, null, null, null, null] },
+  { gauge: "12 AWG", cells: [121, 91, null, null, null] },
+  { gauge: "10 AWG", cells: [193, 144, 96, null, null] },
+  { gauge: "8 AWG", cells: [307, 230, 153, 92, null] },
+  { gauge: "6 AWG", cells: [488, 366, 244, 146, null] },
+  { gauge: "4 AWG", cells: [776, 582, 388, 232, null] },
+  { gauge: "3 AWG", cells: [979, 734, 489, 293, 146] },
+  { gauge: "2 AWG", cells: [1234, 925, 617, 370, 185] },
+  { gauge: "1/0 AWG", cells: [1964, 1473, 982, 589, 294] },
+  { gauge: "4/0 AWG", cells: [3936, 2952, 1968, 1181, 590] },
+];
+const runHeaders = ["15 A", "20 A", "30 A", "50 A", "100 A"];
+
+const styles = electricalAccentStyles.sky;
+const self = electricalCalculators.find((c) => c.slug === "electrical-voltage-drop-calculator")!;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Voltage Drop Calculator — NEC 3% Rule" />
+    <meta
+      property="og:description"
+      content="Voltage drop in volts and percent for any gauge, length, and load — plus the longest run that stays inside 3%. Single-phase and three-phase, copper and aluminum."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Voltage Drop Calculator — NEC 3% Rule" />
+    <meta
+      name="twitter:description"
+      content="Drop percent, voltage at the load, and max compliant run length. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Voltage Drop Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Voltage Drop Calculator <span class="text-sky-600">— The 3% Rule, Properly</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              {self.description} Every conductor has resistance, so every run gives up some voltage on the way
+              to the load. This calculator returns the drop in volts and percent, the voltage that actually
+              arrives, and the longest one-way run that keeps you inside your limit — for single-phase and
+              three-phase, copper and aluminum, 120 V through 480 V.
+            </p>
+
+            <div class="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-4">
+              <p class="text-sm text-sky-900 leading-relaxed">
+                <span class="font-semibold">Worth knowing:</span> the 3% and 5% figures are
+                <strong>Informational Notes</strong> in NEC 210.19(A) and 215.2(A) — explanatory guidance, not
+                enforceable Code. Most specifications and many local amendments adopt them anyway, and a few
+                articles (647.4(D), 695.7) do set hard limits. Treat 3% as the professional default.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+            </svg>
+            Check the drop on your run
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="vd-amps" class="text-sm font-semibold text-slate-800">Load current</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="vd-amps"
+                      type="number"
+                      min="0"
+                      max="600"
+                      value="50"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">amps</span>
+                  </div>
+                </div>
+                <input
+                  id="vd-amps-range"
+                  type="range"
+                  min="5"
+                  max="400"
+                  step="5"
+                  value="50"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-sky-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5</span><span>400 A</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="vd-gauge" class="text-sm font-semibold text-slate-800">Conductor size</label>
+                  <select
+                    id="vd-gauge"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    {
+                      gaugeOptions.map((label) => (
+                        <option value={label} selected={label === "6"}>
+                          {label.includes("kcmil") ? label : `${label} AWG`}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="vd-material" class="text-sm font-semibold text-slate-800">Conductor material</label>
+                  <select
+                    id="vd-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="copper" selected>Copper (K = 12.9)</option>
+                    <option value="aluminum">Aluminum (K = 21.2)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="vd-length" class="text-sm font-semibold text-slate-800">One-way run length</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="vd-length"
+                      type="number"
+                      min="0"
+                      max="2000"
+                      value="100"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="vd-voltage" class="text-sm font-semibold text-slate-800">System voltage</label>
+                  <select
+                    id="vd-voltage"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="120">120 V</option>
+                    <option value="208">208 V</option>
+                    <option value="240" selected>240 V</option>
+                    <option value="277">277 V</option>
+                    <option value="480">480 V</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="vd-phase" class="text-sm font-semibold text-slate-800">Phase</label>
+                  <select
+                    id="vd-phase"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="1" selected>Single-phase (×2)</option>
+                    <option value="3">Three-phase (×1.732)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="vd-limit" class="text-sm font-semibold text-slate-800">Drop limit</label>
+                  <select
+                    id="vd-limit"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="3" selected>3% (branch circuit)</option>
+                    <option value="5">5% (feeder + branch)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="vd-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-sky-100 bg-sky-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Voltage drop</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="vd-percent" class="text-5xl font-extrabold tracking-tight text-sky-600">2.05%</span>
+              </div>
+              <p id="vd-verdict" class="mt-1 text-sm font-semibold text-emerald-700">
+                Within the 3% recommendation.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-sky-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Volts dropped</p>
+                  <p id="vd-volts-dropped" class="mt-1 text-2xl font-bold text-slate-900">4.92 V</p>
+                </div>
+                <div class="rounded-xl border border-sky-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Volts at the load</p>
+                  <p id="vd-volts-at-load" class="mt-1 text-2xl font-bold text-slate-900">235.1 V</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-sky-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>K (resistivity)</span><span id="vd-bd-k" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Circular mils</span><span id="vd-bd-cmil" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Phase multiplier</span><span id="vd-bd-multiplier" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Against the limit</span><span id="vd-bd-status" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Max compliant run</span><span id="vd-bd-max-length" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Uses the circular-mils approximation, which ignores conductor reactance. For large feeders,
+                long runs in steel raceway, or power-factor-sensitive loads, use the impedance method with
+                Chapter 9 Table 9.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Voltage drop is Ohm's law applied to the wire itself. Current through the conductor's own
+            resistance produces a voltage that never reaches the load.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Single-phase</div>
+            <div>VD&nbsp;=&nbsp;<span class="text-amber-300">2</span> × K × I × L ÷ CM</div>
+            <div class="mt-4 text-cyan-300"># Three-phase (balanced)</div>
+            <div>VD&nbsp;=&nbsp;<span class="text-amber-300">1.732</span> × K × I × L ÷ CM</div>
+            <div class="mt-4 text-cyan-300"># As a percentage</div>
+            <div>VD%&nbsp;=&nbsp;VD ÷ V<sub>system</sub> × 100&nbsp;&nbsp;·&nbsp;&nbsp;V<sub>load</sub>&nbsp;=&nbsp;V<sub>system</sub> − VD</div>
+            <div class="mt-4 text-cyan-300"># Longest compliant one-way run</div>
+            <div>L<sub>max</sub>&nbsp;=&nbsp;limit% × V × CM ÷ (multiplier × K × I)</div>
+            <div class="mt-4 text-cyan-300"># Where</div>
+            <div>
+              K&nbsp;=&nbsp;<span class="text-amber-300">12.9</span> copper, <span class="text-amber-300">21.2</span>
+              aluminum&nbsp;·&nbsp;I&nbsp;=&nbsp;load amps&nbsp;·&nbsp;L&nbsp;=&nbsp;one-way feet&nbsp;·&nbsp;CM&nbsp;=&nbsp;circular
+              mils
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">One-way length, doubled</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Enter the distance from panel to load, not the total conductor length. The formula's
+                multiplier already accounts for the return path — entering round-trip footage doubles the
+                answer.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Volts are absolute, percent is relative</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The volts dropped don't change with system voltage. Only the percentage does. That single fact
+                explains why 240 V and 480 V distribution exist.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why aluminum drops more</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                K = 21.2 versus copper's 12.9 means about 64% more drop at the same gauge — which is why
+                aluminum feeders are typically run two sizes larger than their copper equivalent.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What this method ignores</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Reactance. For conductors above about 1/0 in steel raceway, or loads with poor power factor,
+                the impedance method using Chapter 9 Table 9 gives a more accurate answer.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A pass, a bad fail, and the case that shows why voltage matters more than gauge on long runs.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Garage subpanel feeder — 6 AWG, 50 A, 100 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Copper · 240 V single-phase · 3% limit. The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              VD = 2 × 12.9 × 50 × 100 ÷ 26,240 = 4.92 V<br />
+              VD% = 4.92 ÷ 240 × 100 = 2.05%<br />
+              V at load = 240 − 4.92 = 235.1 V<br />
+              → <span class="font-bold text-emerald-700">PASS</span> · max compliant run = 146 ft
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> comfortable at 2.05%, with 46 feet of
+              headroom before the run would need 4 AWG.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Shed circuit — 12 AWG, 20 A, 150 ft at 120 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Copper · 120 V single-phase · 3% limit.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              VD = 2 × 12.9 × 20 × 150 ÷ 6,530 = 11.85 V<br />
+              VD% = 11.85 ÷ 120 × 100 = <span class="font-bold text-rose-700">9.88%</span><br />
+              V at load = 108.1 V<br />
+              → <span class="font-bold text-rose-700">FAIL</span> · max compliant run = 45 ft
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 108 volts at the load will make motors
+              buzz and struggle to start. The fix is 6 AWG, or feeding the shed at 240 V with a small subpanel.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Three-phase machine feed — 4/0, 100 A, 400 ft at 480 V</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Copper · 480 V three-phase · 3% limit.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              VD = 1.732 × 12.9 × 100 × 400 ÷ 211,600 = 4.22 V<br />
+              VD% = 4.22 ÷ 480 × 100 = 0.88%<br />
+              → <span class="font-bold text-emerald-700">PASS</span> easily
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> under 1% across 400 feet. The same
+              100 A load at 120 V single-phase on the same conductor drops 4.88 V — which is
+              <strong>4.06%</strong>, more than four times the percentage on identical copper. Higher voltage
+              and three-phase working together is what makes long industrial feeders practical.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Maximum run length at 3% — 240 V copper
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Longest one-way run in feet before drop passes 3%, single-phase at 240 V. Blank cells are
+            combinations where Table 310.16 or the 240.4(D) small-conductor rule will not permit that current
+            on that conductor at all. <strong>At 120 V, halve every number.</strong>
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Conductor</th>
+                  {runHeaders.map((h) => <th class="py-3 px-5 font-semibold">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  runTable.map((row, index) => (
+                    <tr class={index === runTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.gauge}</td>
+                      {row.cells.map((cell) => (
+                        <td class="py-3 px-5">{cell === null ? <span class="text-slate-300">—</span> : `${cell} ft`}</td>
+                      ))}
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — 210.19(A) and 215.2(A) Informational Notes on
+            voltage drop, 90.5(C) on the status of Informational Notes, Chapter 9 Table 8 conductor
+            properties, Chapter 9 Table 9 for the impedance method, Table 310.16 ampacities, 240.4(D)
+            small-conductor protection. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about voltage drop, the 3% rule, and long runs."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalVoltageDropCalculator } from "@/scripts/calculators/electrical-voltage-drop-calculator";
+    initElectricalVoltageDropCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0284c7;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0284c7;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

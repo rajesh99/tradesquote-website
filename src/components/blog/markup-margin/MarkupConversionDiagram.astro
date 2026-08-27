@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The conversion in both directions. The pairs worth memorising are 25/20,
+ * 50/33 and 100/50 — and the gap widens as the numbers grow, which is why the
+ * error is worst on exactly the jobs where it costs most.
+ */
+const rows = [10, 15, 20, 25, 30, 40, 50, 75, 100].map((markup) => {
+  const margin = (markup / (100 + markup)) * 100;
+  return { markup, margin, gap: markup - margin };
+});
+
+const peak = 100;
+const BAR_X = 132;
+const BAR_MAX = 330;
+const w = (v: number) => Math.max(4, Math.round((v / peak) * BAR_MAX));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" fill="none" aria-hidden="true">
+  <title>Markup to margin conversion</title>
+  <desc>
+    A 10 percent markup is a 9.1 percent margin, 25 percent markup is 20 percent margin, 50 percent markup is 33.3
+    percent margin, and 100 percent markup is 50 percent margin. The gap between the two figures widens as the
+    numbers grow, so the error costs most on the largest jobs.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="314" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    Every markup is a smaller margin
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    margin = markup ÷ (100 + markup). Outline is the markup you applied; solid is the margin you got.
+  </text>
+
+  {rows.map((r, i) => {
+    const y = 68 + i * 26;
+    const notable = r.markup === 25 || r.markup === 50 || r.markup === 100;
+    return (
+      <g>
+        <text
+          x="28"
+          y={y + 14}
+          fill={notable ? C.dark : C.muted}
+          font-family={FONT}
+          font-size="10"
+          font-weight={notable ? "800" : "600"}
+        >
+          {`${r.markup}% markup`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={w(r.markup)} height="16" rx="3" fill="none" stroke={C.border} stroke-width="1.4" />
+        <rect x={BAR_X} y={y + 2} width={w(r.margin)} height="16" rx="3" fill={C.primary} opacity="0.2" />
+        <rect x={BAR_X} y={y + 2} width={w(r.margin)} height="16" rx="3" fill="none" stroke={C.primary} stroke-width="1.5" />
+        <text x={BAR_X + w(r.markup) + 10} y={y + 14} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="800">
+          {`${r.margin.toFixed(1)}% margin`}
+        </text>
+        <text x={BAR_X + w(r.markup) + 92} y={y + 14} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${r.gap.toFixed(1)} points short`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="304" x2="696" y2="304" stroke={C.border} />
+  <text x="28" y="320" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    Worth memorising: 25 → 20, 50 → 33, 100 → 50. To hit a margin, divide by (1 − margin) instead.
+  </text>
+</svg>

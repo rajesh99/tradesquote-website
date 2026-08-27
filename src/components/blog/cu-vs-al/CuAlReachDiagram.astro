@@ -1,0 +1,65 @@
+---
+import { maxLengthForDrop, cmilOf, kFor, voltageDrop, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The reach penalty is a single constant. K rises from 12.9 to 21.2, so at any
+ * size, any current and any voltage, aluminum reaches exactly K_al / K_cu less
+ * far. That invariance is the most useful thing to remember about the material.
+ */
+const AMPS = 100;
+const VOLTS = 240;
+const ratio = kFor("aluminum") / kFor("copper");
+
+const rows = ["3", "1", "2/0", "4/0"].map((size) => {
+  const cmil = cmilOf(size);
+  const base = { cmil, amps: AMPS, volts: VOLTS, phase: 1 as const, limitPercent: 3 };
+  return {
+    size,
+    cu: maxLengthForDrop({ ...base, material: "copper" }),
+    al: maxLengthForDrop({ ...base, material: "aluminum" }),
+    cuPct: (voltageDrop({ cmil, material: "copper", amps: AMPS, lengthFt: 150, phase: 1 }) / VOLTS) * 100,
+    alPct: (voltageDrop({ cmil, material: "aluminum", amps: AMPS, lengthFt: 150, phase: 1 }) / VOLTS) * 100,
+  };
+});
+
+const peak = Math.max(...rows.map((r) => r.cu));
+const BAR_X = 132;
+const BAR_MAX = 400;
+const bars = rows.map((r) => ({
+  ...r,
+  cuW: Math.round((r.cu / peak) * BAR_MAX),
+  alW: Math.round((r.al / peak) * BAR_MAX),
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>Aluminum's reach penalty is a single constant</title>
+  <desc>
+    Longest one-way run within 3 percent drop at 100 amps and 240 volts. 3 AWG copper reaches 147 feet against
+    aluminum's 89 feet, 1 AWG 234 against 142, 2/0 371 against 226, and 4/0 591 against 359. The ratio is 1.64 at
+    every size, because the resistivity constant K rises from 12.9 for copper to 21.2 for aluminum.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The reach penalty never changes: 1.64× at every size</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`Longest one-way run within 3% drop at ${AMPS} A, ${VOLTS} V single-phase. Teal is copper, orange aluminum.`}</text>
+
+  {bars.map((r, i) => {
+    const y = 78 + i * 46;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{r.size}</text>
+        <text x="28" y={y + 30} fill={C.muted} font-family={FONT} font-size="7.5">AWG</text>
+        <rect x={BAR_X} y={y + 2} width={r.cuW} height="16" rx="4" fill={C.primary} opacity="0.18" />
+        <rect x={BAR_X} y={y + 2} width={r.cuW} height="16" rx="4" fill="none" stroke={C.primary} stroke-width="1.4" />
+        <text x={BAR_X + r.cuW + 7} y={y + 15} fill={C.primary} font-family={FONT} font-size="10" font-weight="800">{`${Math.round(r.cu)} ft`}</text>
+        <rect x={BAR_X} y={y + 22} width={r.alW} height="16" rx="4" fill={C.orange} opacity="0.18" />
+        <rect x={BAR_X} y={y + 22} width={r.alW} height="16" rx="4" fill="none" stroke={C.orange} stroke-width="1.4" />
+        <text x={BAR_X + r.alW + 7} y={y + 35} fill={C.orange} font-family={FONT} font-size="10" font-weight="800">{`${Math.round(r.al)} ft`}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">{`K = ${kFor("copper")} copper, ${kFor("aluminum")} aluminum, so the ratio is a fixed ${ratio.toFixed(2)}× — independent of size, current and voltage.`}</text>
+</svg>

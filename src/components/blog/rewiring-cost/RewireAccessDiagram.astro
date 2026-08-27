@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * Access is the dominant variable — a 3× spread in the base rate before any other
+ * factor applies. Totals use the same 1,800 ft² midcentury one-storey case as the
+ * rest of the article, including the $3,000 panel and $500 permit.
+ */
+const SQFT = 1800;
+const AGE_MULT = 1.1;
+const PANEL = 3000;
+const PERMIT = 500;
+
+const levels = [
+  {
+    label: "Easy",
+    rate: 4,
+    accent: C.green,
+    what: ["Open walls, a full basement or", "accessible attic, single storey"],
+  },
+  {
+    label: "Average",
+    rate: 7,
+    accent: C.primary,
+    what: ["Some fishing required, partial", "attic or crawlspace access"],
+  },
+  {
+    label: "Difficult",
+    rate: 12,
+    accent: C.red,
+    what: ["Plaster and lath, no attic or", "crawlspace, balloon framing"],
+  },
+];
+
+const rows = levels.map((l) => {
+  const total = SQFT * l.rate * AGE_MULT + PANEL + PERMIT;
+  return { ...l, total: Math.round(total), perSqft: total / SQFT };
+});
+
+const peak = Math.max(...rows.map((r) => r.total));
+const BAR_MAX = 360;
+const bars = rows.map((r) => ({ ...r, width: Math.round((r.total / peak) * BAR_MAX) }));
+
+const usd = (v: number) => `$${v.toLocaleString("en-US")}`;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" fill="none" aria-hidden="true">
+  <title>How wall access drives whole-house rewiring cost</title>
+  <desc>
+    On the same 1,800 square foot midcentury house, easy access at 4 dollars per square foot comes to about
+    11,420 dollars or 6.34 per square foot; average access at 7 dollars comes to 17,360 or 9.64 per square foot;
+    and difficult access at 12 dollars comes to 27,260 or 15.14 per square foot. Access alone is a three times
+    spread in the base rate, making it the single largest variable in a rewire.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="274" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Access is the biggest variable — a 3× spread</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Same 1,800 ft² midcentury house, same panel and permit. Only the access changes.</text>
+
+  {bars.map((r, i) => {
+    const y = 76 + i * 62;
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="12.5" font-weight="800">{r.label}</text>
+        <text x="28" y={y + 34} fill={r.accent} font-family={FONT} font-size="11" font-weight="700">{`$${r.rate}/ft²`}</text>
+        <text x="28" y={y + 48} fill={C.muted} font-family={FONT} font-size="8.5">
+          {r.what.map((line, li) => (
+            <tspan x="28" dy={li === 0 ? "0" : "10"}>{line}</tspan>
+          ))}
+        </text>
+        <rect x="216" y={y + 4} width={r.width} height="34" rx="8" fill={r.accent} opacity="0.14" />
+        <rect x="216" y={y + 4} width={r.width} height="34" rx="8" fill="none" stroke={r.accent} stroke-width="1.7" />
+        <text x={216 + r.width - 14} y={y + 26} text-anchor="end" fill={C.dark} font-family={FONT} font-size="15" font-weight="800">{usd(r.total)}</text>
+        <text x="228" y={y + 26} fill={r.accent} font-family={FONT} font-size="10.5" font-weight="700">{`$${r.perSqft.toFixed(2)}/ft² all-in`}</text>
+      </g>
+    );
+  })}
+</svg>

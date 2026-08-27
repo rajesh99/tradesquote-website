@@ -1,0 +1,543 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { panelCapacity } from "@/lib/nec";
+
+const title = "Panel Spaces & Tandem Breaker Calculator — NEC 408.54 | TradesQuote";
+const description =
+  "Free panel capacity calculator. How many more poles a panel can legally take — spaces, the listed device limit under NEC 408.54, and which slots will actually accept a tandem breaker on a Class CTL panelboard.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-panel-schedule-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Panel Spaces & Tandem Breaker Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Panel Spaces & Tandem Breaker Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online panel capacity calculator returning free spaces, poles in use against the listed device limit, the maximum poles achievable with tandem breakers, and whether a proposed circuit will fit.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "My panel is full — can I just add tandem breakers?",
+    answer:
+      "Only if the panel is listed for them, and only in the specific slots that accept them. <strong>NEC 408.54</strong> forbids putting more overcurrent devices in a panelboard than the number it was designed, rated and listed for — a figure printed on the panel label, not derived from anything in the code. A \"30-space, 40-circuit\" load centre means 30 physical spaces and 40 devices maximum, so ten of those spaces will take a tandem. Once you reach 40 poles, the panel is full no matter how many spaces look empty.",
+  },
+  {
+    question: "What is a Class CTL panelboard?",
+    answer:
+      "CTL stands for <strong>circuit total limiting</strong>, and it is a UL listing requirement rather than an NEC rule. A CTL panelboard uses <strong>physical rejection features</strong> — a notch or tab arrangement on the busbar stab — so a tandem breaker will only seat in a slot rated to accept one. It exists precisely because 408.54 is unenforceable by inspection alone. If a tandem is sitting in a slot that should reject it, someone has filed the rejection tab off the breaker, which is a genuine hazard and an instant inspection failure.",
+  },
+  {
+    question: "What is the difference between spaces, circuits, and poles?",
+    answer:
+      "<strong>Spaces</strong> are physical mounting positions on the busbar. <strong>Poles</strong> — usually printed as \"circuits\" — are overcurrent devices. A single-pole breaker is one of each. A tandem is one space and two poles. A two-pole 240 V breaker is the reverse: two spaces, and it protects one circuit. This is why the two numbers on the panel label differ, and why a panel can run out of poles while spaces remain, or out of spaces while poles remain.",
+  },
+  {
+    question: "Is a tandem breaker the same as a quad breaker?",
+    answer:
+      "No. A <strong>tandem</strong> (also called twin, duplex, or slimline) puts two independent single-pole breakers in one space, each on the same bus stab. A <strong>quad</strong> occupies two spaces and provides two two-pole circuits, with the outer poles handle-tied and the inner pair handle-tied. Quads are how you fit two 240 V circuits into the footprint of one. They are different devices with different listings — a panel that accepts one does not automatically accept the other.",
+  },
+  {
+    question: "Does a full panel mean I need a service upgrade?",
+    answer:
+      "Almost never, and conflating the two is how homeowners get sold $4,000 of unnecessary work. <strong>Panel spaces and service capacity are completely separate questions.</strong> A 200 A service with a full 20-space panel has run out of room to land wires, not out of amps. The fix is a <strong>subpanel</strong> — typically $800 to $1,500 — fed from a two-pole breaker in the existing panel, which trades two spaces for however many the new panel has. Check actual capacity with a NEC 220.87 measured-demand calculation before anyone quotes a service upgrade.",
+  },
+  {
+    question: "Can I put two wires under one breaker to free up a space?",
+    answer:
+      "Not unless the breaker is <strong>listed for two conductors</strong>, and most are not. The practice is called double-tapping, it is one of the most common items written up on a home inspection, and the reason is mechanical: a single-conductor lug cannot reliably clamp two wires, so one works loose, heats, and eventually arcs. Some breakers — certain Square D models among them — <em>are</em> listed for two conductors and say so on the breaker. The correct universal fix is a pigtail: join both conductors to a single tail with an approved connector, and land the tail.",
+  },
+  {
+    question: "How do I know how many tandems my panel takes?",
+    answer:
+      "Read the label inside the door. It gives the manufacturer's catalogue number, the maximum number of overcurrent devices, and usually a diagram showing which positions are tandem-capable — frequently only the lower portion of the bus. If the label is missing or illegible, the catalogue number will resolve it from the manufacturer's literature. Do not infer it from whether a tandem physically fits; on a CTL panel that test is exactly what the rejection feature is designed to answer, and defeating it is the failure mode.",
+  },
+  {
+    question: "Are tandem breakers safe?",
+    answer:
+      "Yes, when installed where the panel is listed for them. A tandem is a normally listed overcurrent device, tested to the same standards as a full-size one, and there is nothing inferior about it. Every real problem attributed to tandems traces back to <em>exceeding the listed device count</em> or forcing one into a rejected slot — both of which overload a busbar that was never designed for that many connections. The device is not the hazard; using more than the panel is rated for is.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Need a subpanel? Quote it in minutes.";
+const ctaDescription =
+  "Subpanel jobs are small, frequent, and easy to under-price — feeder, breaker, enclosure, grounding, and the labour to fish it. TradesQuote turns the scope into a line-item estimate, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-existing-load-calculator",
+    title: "Existing Load Calculator",
+    description: "Prove the service has capacity before upgrading.",
+  },
+  {
+    href: "/calculators/electrical/electrical-service-wire-size-calculator",
+    title: "Service & Feeder Wire Size",
+    description: "Size the feeder to a new subpanel.",
+  },
+  {
+    href: "/calculators/electrical/electrical-load-calculator",
+    title: "Residential Load Calculator",
+    description: "What the house actually calculates to.",
+  },
+  {
+    href: "/calculators/electrical/electrical-panel-upgrade-cost-calculator",
+    title: "Panel Upgrade Cost Calculator",
+    description: "If an upgrade genuinely is needed.",
+  },
+];
+
+/** Common residential load centres, with the tandem gain each one implies. */
+const panelRows = [
+  { label: "12-space, 12-circuit", spaces: 12, devices: 12 },
+  { label: "20-space, 20-circuit", spaces: 20, devices: 20 },
+  { label: "20-space, 30-circuit", spaces: 20, devices: 30 },
+  { label: "30-space, 40-circuit", spaces: 30, devices: 40 },
+  { label: "40-space, 40-circuit", spaces: 40, devices: 40 },
+  { label: "42-space, 42-circuit", spaces: 42, devices: 42 },
+].map((p) => {
+  const tandemSlots = Math.max(0, p.devices - p.spaces);
+  const r = panelCapacity({
+    spaces: p.spaces,
+    tandemSlots,
+    maxDevices: p.devices,
+    fullSizeUsed: 0,
+    tandemsUsed: 0,
+  });
+  return { ...p, tandemSlots, maxPoles: r.maxPolesWithTandems };
+});
+
+const styles = electricalAccentStyles.blue;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Panel Spaces & Tandem Breaker Calculator — NEC 408.54" />
+    <meta
+      property="og:description"
+      content="How many more poles a panel can legally take — and why a full panel almost never means a service upgrade."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Panel Spaces & Tandem Breaker Calculator" />
+    <meta name="twitter:description" content="Is your panel really full? Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Panel Spaces & Tandem Breakers"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM8 8h3M8 12h3M13 8h3M13 12h3" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Panel Spaces &amp; Tandem Breakers <span class="text-blue-600">— Is It Really Full?</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              <strong>Spaces, poles, and the listed device limit are three different numbers.</strong> NEC 408.54
+              caps the third one, and it is printed on the panel label. A full panel is a wire-landing problem —
+              it says nothing at all about whether the service has amps to spare.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM8 8h3M8 12h3M13 8h3M13 12h3"></path>
+            </svg>
+            Read it off the panel label
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="ps-spaces" class="text-sm font-semibold text-slate-800">Spaces</label>
+                  <input
+                    id="ps-spaces"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value="30"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ps-max-devices" class="text-sm font-semibold text-slate-800">Max devices</label>
+                  <input
+                    id="ps-max-devices"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value="40"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ps-tandem-slots" class="text-sm font-semibold text-slate-800">Tandem slots</label>
+                  <input
+                    id="ps-tandem-slots"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="10"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="ps-full-size" class="text-sm font-semibold text-slate-800">Full-size fitted</label>
+                  <input
+                    id="ps-full-size"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="24"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ps-tandems" class="text-sm font-semibold text-slate-800">Tandems fitted</label>
+                  <input
+                    id="ps-tandems"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="3"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="ps-wanted" class="text-sm font-semibold text-slate-800">Poles wanted</label>
+                  <input
+                    id="ps-wanted"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  />
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                A "30-space, 40-circuit" panel has 30 spaces, a 40-device limit, and therefore 10 tandem-capable
+                slots. Count a two-pole 240 V breaker as <strong>two</strong> full-size devices occupying two spaces.
+                Count each tandem once in "tandems fitted" — the tool doubles it for you.
+              </p>
+
+              <button
+                id="ps-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Verdict</p>
+              <div class="mt-2">
+                <span id="ps-verdict" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-emerald-600">
+                  Room available
+                </span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Poles available</p>
+                  <p id="ps-available" class="mt-1 text-2xl font-bold text-slate-900">10</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Spaces free</p>
+                  <p id="ps-spaces-free" class="mt-1 text-2xl font-bold text-slate-900">3</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Devices in use</p>
+                  <p id="ps-devices-used" class="mt-1 text-2xl font-bold text-slate-900">30 / 40</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Ceiling</p>
+                  <p id="ps-max-poles" class="mt-1 text-2xl font-bold text-slate-900">40</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Spaces</span><span id="ps-bd-spaces" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Poles fitted</span><span id="ps-bd-devices" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Ceiling</span><span id="ps-bd-ceiling" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Available</span><span id="ps-bd-available" class="font-bold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Against what you want</span><span id="ps-bd-wanted" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p id="ps-note" class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Check the panel label for which specific slots accept a tandem.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Three numbers, kept apart</h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># What each one means</div>
+            <div>spaces&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;physical positions on the busbar</div>
+            <div>poles&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;overcurrent devices <span class="text-slate-400">(a tandem is 1 space, 2 poles)</span></div>
+            <div>max devices&nbsp;=&nbsp;the listed limit — <span class="text-amber-300">NEC 408.54</span>, off the label</div>
+            <div class="mt-4 text-cyan-300"># The ceiling is whichever binds first</div>
+            <div>ceiling&nbsp;=&nbsp;min(max devices, spaces + tandem-capable slots)</div>
+            <div>available&nbsp;=&nbsp;ceiling − poles fitted</div>
+            <div class="mt-4 text-cyan-300"># And separately, which has nothing to do with the above</div>
+            <div>service capacity&nbsp;=&nbsp;a <span class="text-amber-300">220.87</span> load question</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Full panel ≠ full service</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Running out of spaces means running out of places to land wires. A 200 A service with a full panel
+                still has 200 A. A subpanel solves it for a fraction of an upgrade.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The label is the authority</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Nothing in the NEC derives the device limit — it comes from the listing, and 408.54 simply makes
+                exceeding it a violation. Read the door.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Rejection features are the enforcement</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A CTL panel physically refuses a tandem in a slot not rated for one. Filing the tab off defeats a
+                safety device and fails inspection on sight.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Double-tapping is not the shortcut</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Two conductors under one lug is the most-written-up defect in home inspection. Pigtail them unless
+                the breaker is explicitly listed for two.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">Three panels that all look "full" and are not the same problem at all.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">30-space / 40-circuit, mostly filled — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">24 full-size breakers and 3 tandems fitted; a 240 V circuit wants 2 poles.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              spaces: 24 + 3 = 27 of 30 used, 3 free<br />
+              poles: 24 + (3 × 2) = 30 of 40 used<br />
+              ceiling: min(40, 30 + 10) = 40 → <span class="font-bold text-emerald-700">10 poles available</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> comfortable. Three empty spaces take the
+              two-pole breaker directly with no tandems needed, and there are seven poles of headroom beyond it.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">20-space / 20-circuit, every space used — genuinely full</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">An older panel with no tandem-capable slots at all.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              spaces: 20 of 20 used, 0 free<br />
+              ceiling: min(20, 20 + 0) = 20 → <span class="font-bold text-red-700">0 poles available</span><br />
+              subpanel: 2 spaces out, 12 to 24 back in
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a subpanel, not a service upgrade. Trading
+              two spaces for a 12- or 24-space subpanel costs roughly $800–$1,500 against $3,000+ — and the service
+              itself was never the constraint.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Twelve tandems in a 10-tandem panel — already a violation</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">20 full-size plus 12 tandems in the same 30-space / 40-circuit panel.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              poles: 20 + (12 × 2) = 44 against a 40 limit<br />
+              tandems: 12 fitted where 10 are permitted<br />
+              <span class="font-bold text-red-700">408.54 violation before adding anything</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> on a CTL panel those last two tandems should
+              not have seated. If they did, the rejection tabs were removed. This needs correcting on its own merits,
+              regardless of what circuit prompted the question.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Common residential load centres</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The gap between the two numbers in a panel's designation <em>is</em> the tandem allowance. A
+            "40-space, 40-circuit" panel has forty spaces and takes no tandems at all.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Designation</th>
+                  <th class="py-3 px-4 font-semibold">Spaces</th>
+                  <th class="py-3 px-4 font-semibold">Device limit</th>
+                  <th class="py-3 px-4 font-semibold">Tandem slots</th>
+                  <th class="py-3 px-4 font-semibold">Max poles</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  panelRows.map((row, index) => (
+                    <tr class={index === panelRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-4">{row.spaces}</td>
+                      <td class="py-3 px-4">{row.devices}</td>
+                      <td class="py-3 px-4">{row.tandemSlots === 0 ? "none" : row.tandemSlots}</td>
+                      <td class="py-3 px-4 font-semibold text-slate-900">{row.maxPoles}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 <strong>408.54</strong> — a panelboard shall not be supplied
+            with more overcurrent devices than the number for which it was designed, rated and listed;
+            <strong>408.4(A)</strong> requires a legible circuit directory identifying each circuit's specific
+            purpose; <strong>110.3(B)</strong> makes the manufacturer's listing and labelling instructions
+            enforceable, which is what carries the tandem restriction into the code. <strong>Class CTL</strong> is a
+            <em>UL 67 listing requirement, not an NEC term</em> — the physical rejection features that enforce
+            tandem placement come from the listing standard. The device limit and tandem-capable positions are
+            specific to the panel and are read from its label or catalogue number; the designations tabulated above
+            are the common conventions, not a code table. Local amendments and the AHJ have final say.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about panel spaces, tandem breakers, and full panels."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalPanelScheduleCalculator } from "@/scripts/calculators/electrical-panel-schedule-calculator";
+    initElectricalPanelScheduleCalculator();
+  </script>
+</Layout>

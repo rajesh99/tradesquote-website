@@ -1,0 +1,541 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { SQRT3, fmt } from "@/lib/nec";
+
+const title = "Three-Phase Power Calculator — kW, kVA, kVAR & Line Amps | TradesQuote";
+const description =
+  "Free three-phase power calculator. Get line current, kW, kVA, and kVAR for balanced three-phase systems from load, from measured amps, or from motor horsepower with efficiency — at 208 V, 240 V, 480 V, or 600 V.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-three-phase-power-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Three-Phase Power Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Three-Phase Power Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online three-phase power calculator returning line current, real power, apparent power, and reactive power for balanced three-phase systems, including motor horsepower input with efficiency.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What is the three-phase power formula?",
+    answer:
+      "<strong>P = √3 × V × I × PF</strong> for real power, and rearranged, <strong>I = P ÷ (√3 × V × PF)</strong> for line current. V is the line-to-line voltage. So a 50 kW load at 480 V with 0.85 power factor draws 50,000 ÷ (1.732 × 480 × 0.85) = <strong>70.75 amps</strong> per line.",
+  },
+  {
+    question: "Why is there a √3 in three-phase calculations?",
+    answer:
+      "Because the three phase voltages are 120° apart. The line-to-line voltage is √3 times the line-to-neutral voltage — 480 V line-to-line corresponds to 277 V to neutral, and 208 V corresponds to 120 V. When you express power in terms of line-to-line voltage and line current, that geometric relationship shows up as the <strong>√3 ≈ 1.732</strong> factor.",
+  },
+  {
+    question: "How much current does three-phase save?",
+    answer:
+      "About <strong>42%</strong> compared with single-phase at the same voltage and power. A 50 kW load at 480 V draws 70.75 A three-phase but would draw 122.5 A single-phase. Less current means smaller conductors, less voltage drop, and less I²R heat — which is why every commercial and industrial building of any size is three-phase.",
+  },
+  {
+    question: "Do I use line voltage or phase voltage?",
+    answer:
+      "<strong>Line-to-line voltage</strong> — the value the system is named for: 208 V, 240 V, 480 V, 600 V. The √3 in the formula already accounts for the relationship to phase voltage. Using 277 V (the line-to-neutral value of a 480 V system) with the √3 formula will give an answer about 42% too low.",
+  },
+  {
+    question: "How do I calculate current from motor horsepower?",
+    answer:
+      'Set the mode above to motor output and enter the horsepower plus efficiency. Horsepower is <em>shaft output</em>, so input power is higher: kW = hp × 0.7457 ÷ efficiency. But for actual circuit design, <strong>NEC 430.6(A)(1)</strong> requires you to use the full-load current from <strong>Table 430.250</strong> instead of any calculation — the table values are deliberately conservative and are what an inspector will check against.',
+  },
+  {
+    question: "Does this work for unbalanced or wild-leg systems?",
+    answer:
+      "No. These formulas assume a <strong>balanced</strong> three-phase load — equal current in all three lines. Unbalanced loads need per-phase analysis, and a 240/120 V high-leg delta (\"wild leg\") system has one phase at 208 V to neutral that cannot serve 120 V loads at all. For unbalanced panels, calculate each phase separately and size for the worst one.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Three-phase load sized? Quote the job in seconds.";
+const ctaDescription =
+  "Feeder, disconnect, starter, and labor — TradesQuote turns commercial electrical scope into a detailed line-item estimate with quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-kva-calculator",
+    title: "kVA Calculator",
+    description: "Apparent, real, and reactive power in detail.",
+  },
+  {
+    href: "/calculators/electrical/electrical-power-factor-calculator",
+    title: "Power Factor Correction",
+    description: "Size the capacitor bank to cut line current.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size three-phase conductors and check drop.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ampacity-calculator",
+    title: "Ampacity & Derating Calculator",
+    description: "Derate for the raceway those conductors share.",
+  },
+];
+
+/** Line current per kW at each common system voltage and power factor. */
+const ampsPerKw = [208, 240, 480, 600].map((volts) => ({
+  volts,
+  pf80: 1000 / (SQRT3 * volts * 0.8),
+  pf85: 1000 / (SQRT3 * volts * 0.85),
+  pf90: 1000 / (SQRT3 * volts * 0.9),
+  pf100: 1000 / (SQRT3 * volts * 1.0),
+}));
+
+const styles = electricalAccentStyles.cyan;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Three-Phase Power Calculator — kW, kVA, kVAR & Amps" />
+    <meta
+      property="og:description"
+      content="Line current, kW, kVA, and kVAR for balanced three-phase — from load, measured amps, or motor horsepower."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Three-Phase Power Calculator — kW, kVA, kVAR & Amps" />
+    <meta name="twitter:description" content="The √3 math, done for you. Free and instant." />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Three-Phase Power Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Three-Phase Power Calculator <span class="text-cyan-600">— The √3 Math</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every three-phase calculation carries a <strong>√3 ≈ 1.732</strong>, and it is there because the
+              three phases sit 120° apart. The practical consequence is that three-phase moves the same power
+              with about <strong>42% less line current</strong> than single-phase at the same voltage. Work from a
+              load in kW, from a measured line current, or from motor horsepower with efficiency.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 18c2-8 4-8 6 0s4 8 6 0 2-8 4-4"></path>
+            </svg>
+            Solve a three-phase system
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <label for="tp-mode" class="text-sm font-semibold text-slate-800">What do you know?</label>
+                <select
+                  id="tp-mode"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                >
+                  <option value="from-kw" selected>Real power (kW)</option>
+                  <option value="from-amps">Measured line current</option>
+                  <option value="from-hp">Motor output (hp)</option>
+                </select>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="tp-value" class="text-sm font-semibold text-slate-800">
+                    <span id="tp-value-label">Real power</span>
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="tp-value"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value="50"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span id="tp-value-unit" class="text-sm text-slate-500 w-8">kW</span>
+                  </div>
+                </div>
+                <input
+                  id="tp-value-range"
+                  type="range"
+                  min="1"
+                  max="500"
+                  step="1"
+                  value="50"
+                  class="elec-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>500</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="tp-volts" class="text-sm font-semibold text-slate-800">Line voltage</label>
+                  <select
+                    id="tp-volts"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="208">208 V</option>
+                    <option value="240">240 V</option>
+                    <option value="480" selected>480 V</option>
+                    <option value="600">600 V</option>
+                  </select>
+                  <p class="mt-1 text-xs text-slate-500">Line-to-line</p>
+                </div>
+                <div>
+                  <label for="tp-pf" class="text-sm font-semibold text-slate-800">Power factor</label>
+                  <input
+                    id="tp-pf"
+                    type="number"
+                    min="0.1"
+                    max="1"
+                    step="0.01"
+                    value="0.85"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                </div>
+                <div>
+                  <label for="tp-efficiency" class="text-sm font-semibold text-slate-800">Efficiency %</label>
+                  <input
+                    id="tp-efficiency"
+                    type="number"
+                    min="10"
+                    max="100"
+                    step="1"
+                    value="100"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Motor mode only</p>
+                </div>
+              </div>
+
+              <button
+                id="tp-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Line current</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="tp-amps" class="text-5xl font-extrabold tracking-tight text-cyan-600">70.75 A</span>
+              </div>
+              <p id="tp-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Single-phase at the same voltage would draw far more.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Real power</p>
+                  <p id="tp-kw" class="mt-1 text-2xl font-bold text-slate-900">50.00 kW</p>
+                </div>
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Apparent power</p>
+                  <p id="tp-kva" class="mt-1 text-2xl font-bold text-slate-900">58.82 kVA</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Formula</span><span id="tp-bd-formula" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Denominator</span><span id="tp-bd-denominator" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Line current</span><span id="tp-bd-amps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Apparent power</span><span id="tp-bd-kva" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Reactive power</span><span id="tp-bd-kvar" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Single-phase equivalent</span><span id="tp-bd-single" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Assumes a <strong>balanced</strong> load. Motor branch circuits must be sized from NEC Table
+                430.250 full-load currents, not from these figures.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Real power from current</div>
+            <div>P&nbsp;=&nbsp;<span class="text-amber-300">1.732</span> × V<sub>L-L</sub> × I × PF</div>
+            <div class="mt-4 text-cyan-300"># Line current from load</div>
+            <div>I&nbsp;=&nbsp;P ÷ (<span class="text-amber-300">1.732</span> × V<sub>L-L</sub> × PF)</div>
+            <div class="mt-4 text-cyan-300"># From motor horsepower (shaft output)</div>
+            <div>kW<sub>input</sub>&nbsp;=&nbsp;hp × <span class="text-amber-300">0.7457</span> ÷ efficiency</div>
+            <div class="mt-4 text-cyan-300"># The rest of the triangle</div>
+            <div>kVA&nbsp;=&nbsp;kW ÷ PF&nbsp;&nbsp;·&nbsp;&nbsp;kVAR&nbsp;=&nbsp;√(kVA² − kW²)</div>
+            <div class="mt-4 text-cyan-300"># Why √3</div>
+            <div>V<sub>L-L</sub>&nbsp;=&nbsp;<span class="text-amber-300">1.732</span> × V<sub>L-N</sub>&nbsp;&nbsp;·&nbsp;&nbsp;480 V ↔ 277 V&nbsp;·&nbsp;208 V ↔ 120 V</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Use line-to-line voltage</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The √3 already handles the phase relationship. Entering 277 V instead of 480 V on a 480 V system
+                will give an answer 42% too low.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Balanced loads only</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                These formulas assume equal current in all three lines. Unbalanced panels need per-phase
+                analysis, and high-leg delta systems have a 208 V leg that can't serve 120 V loads.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">A load, a measurement, and a motor.</p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">50 kW at 480 V, PF 0.85</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">The defaults above.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              I = 50,000 ÷ (1.732 × 480 × 0.85) = <span class="font-bold text-cyan-700">70.75 A</span><br />
+              kVA = 50 ÷ 0.85 = 58.82 kVA · kVAR = 30.99 kVAR<br />
+              single-phase at 480 V would be 122.5 A — <span class="font-bold">42% more</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 70.75 A lands on 4 AWG copper; the
+              single-phase equivalent would need 1/0. Across a whole building that difference is the commercial
+              case for three-phase service.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Measured 85 A at 208 V, PF 0.9</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A clamp-meter reading on a commercial panel feeder.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              P = 1.732 × 208 × 85 × 0.9 = <span class="font-bold text-cyan-700">27.56 kW</span><br />
+              kVA = 1.732 × 208 × 85 ÷ 1,000 = 30.62 kVA<br />
+              kVAR = √(30.62² − 27.56²) = 13.35 kVAR
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 30.6 kVA existing load. Compare this
+              against the panel's rating to find real spare capacity — measured demand beats an estimated
+              calculation every time.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">25 hp motor at 480 V, 92% efficient, PF 0.87</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Motor output mode.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              input kW = 25 × 0.7457 ÷ 0.92 = 20.26 kW<br />
+              I = 20,264 ÷ (1.732 × 480 × 0.87) = <span class="font-bold text-cyan-700">28.02 A</span><br />
+              NEC Table 430.250 for 25 hp at 460 V: <span class="font-bold text-amber-700">34 A</span> ← use this
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the calculation gives 28 A but the Code
+              table says 34 A, and <strong>the table governs</strong> per NEC 430.6(A)(1). This is exactly why
+              motor circuits are never sized from arithmetic — the tables carry deliberate margin, and an
+              inspector will check against them.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Line amps per kW, three-phase</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Multiply your load in kW by the figure below to get line current. A quick field shortcut that
+            replaces the √3 arithmetic.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Line voltage</th>
+                  <th class="py-3 px-4 font-semibold">PF 0.80</th>
+                  <th class="py-3 px-4 font-semibold">PF 0.85</th>
+                  <th class="py-3 px-4 font-semibold">PF 0.90</th>
+                  <th class="py-3 px-4 font-semibold">PF 1.00</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ampsPerKw.map((row, index) => (
+                    <tr class={index === ampsPerKw.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.volts} V</td>
+                      <td class="py-3 px-4">{fmt(row.pf80, 3)} A/kW</td>
+                      <td class="py-3 px-4">{fmt(row.pf85, 3)} A/kW</td>
+                      <td class="py-3 px-4">{fmt(row.pf90, 3)} A/kW</td>
+                      <td class="py-3 px-4">{fmt(row.pf100, 3)} A/kW</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: √3 = {fmt(SQRT3, 4)}; 1 hp = 745.7 W. NEC (NFPA 70) 2023 — 430.6(A)(1) and
+            Table 430.250 for three-phase motor full-load currents, Article 430 motor circuits, Table 310.16
+            conductor ampacities, 220.61 neutral load. Formulas assume a balanced three-phase load. Local
+            amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about three-phase power, √3, and motor circuits."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators calculators={relatedCalculators} styles={styles} heading="More electrical calculators" />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalThreePhasePowerCalculator } from "@/scripts/calculators/electrical-three-phase-power-calculator";
+    initElectricalThreePhasePowerCalculator();
+  </script>
+</Layout>
+
+<style>
+  .elec-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .elec-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .elec-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

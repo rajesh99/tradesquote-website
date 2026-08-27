@@ -1,0 +1,595 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { electricalAccentStyles } from "@/config/electricalCalculators";
+import { BOX_FILL_VOLUME, STANDARD_BOX_VOLUMES } from "@/lib/nec";
+
+const title = "Box Fill Calculator — NEC 314.16 Cubic Inches | TradesQuote";
+const description =
+  "Free NEC 314.16 box fill calculator. Count conductors, clamps, devices, grounds, and support fittings the way the Code counts them, and get the cubic inches required plus the smallest standard box that works.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/electrical/electrical-box-fill-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Electrical", item: "https://www.tradesquote.ai/calculators/electrical" },
+    { "@type": "ListItem", position: 4, name: "Box Fill Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Box Fill Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online NEC box fill calculator implementing 314.16(B) — conductor, clamp, support fitting, device yoke, and equipment grounding conductor allowances — returning required cubic inches and the smallest compliant box.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I count grounds in box fill?",
+    answer:
+      "All equipment grounding conductors in the box together count as <strong>one single conductor volume</strong>, based on the largest EGC present — per <strong>NEC 314.16(B)(5)</strong>. Six grounds pigtailed together still count as one. If there is a separate isolated equipment grounding conductor group, that adds one more volume. This is the single most misunderstood part of 314.16.",
+  },
+  {
+    question: "Do wire nuts, pigtails, and cable staples count?",
+    answer:
+      "<strong>No.</strong> NEC 314.16(B) has exactly five allowance categories: conductors, cable clamps, support fittings, device yokes, and equipment grounding conductors. Wire connectors, pigtails made up entirely inside the box, and external staples or straps are not on the list and get no allowance. A conductor that both originates and terminates inside the box — a pigtail — is not counted at all.",
+  },
+  {
+    question: "How many wires can go in a single-gang box?",
+    answer:
+      "It depends entirely on the box's marked volume and what else is inside. A common 18 in³ single-gang box holds 8 × 12 AWG conductors on their own. Add internal clamps and one receptacle and the same box only takes 4 current-carrying conductors plus grounds — which is exactly two 12/2 cables. That is the default shown above.",
+  },
+  {
+    question: "Does a smart switch or dimmer change the count?",
+    answer:
+      "Not for the box-fill arithmetic — <strong>NEC 314.16(B)(4)</strong> gives every device yoke two conductor volumes regardless of what the device is, unless the device is wider than a single 2-gang yoke, which gets four. Physically, though, deep smart switches and dimmers crowd a box badly. Most manufacturers recommend a 20+ in³ box even when 314.16 permits smaller, and the Code minimum is not the same as a workable install.",
+  },
+  {
+    question: "Do all the clamps count once, or each?",
+    answer:
+      "<strong>Once, in total.</strong> NEC 314.16(B)(2) allows a single conductor volume for all internal cable clamps in the box combined, based on the largest conductor present. Four clamps still cost you one volume. Note this applies only to clamps <em>inside</em> the box — external cable connectors on a metal box are not counted.",
+  },
+  {
+    question: "What about a conductor that just passes through?",
+    answer:
+      "It counts as <strong>one</strong> volume. NEC 314.16(B)(1) counts each conductor that runs through the box without splice or termination the same as one that terminates there. A conductor entering and leaving unbroken is one conductor, not two — even though it crosses the box twice.",
+  },
+  {
+    question: "Where do I find my box's cubic inches?",
+    answer:
+      "Non-metallic boxes are required to be <strong>durably and legibly marked</strong> with their volume, usually moulded into the inside back or on the mounting flange. Standard metal boxes are not always marked, so their volumes come from <strong>NEC Table 314.16(A)</strong> by trade size. Plaster rings, extension rings, and domed covers add their own marked volume to the total.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Boxes counted? Quote the rough-in in seconds.";
+const ctaDescription =
+  "Boxes, rings, clamps, devices, plates, and the labor to set them — TradesQuote turns the whole rough-in into a detailed line-item estimate. Describe the job or upload photos and our AI builds quantities, unit prices, and totals, validated by a built-in quality control agent.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/electrical/electrical-conduit-fill-calculator",
+    title: "Conduit Fill Calculator",
+    description: "The raceway side of the rough-in.",
+  },
+  {
+    href: "/calculators/electrical/electrical-wire-size-calculator",
+    title: "Wire Size Calculator",
+    description: "Size the conductors feeding the box.",
+  },
+  {
+    href: "/calculators/electrical/electrical-ground-wire-size-calculator",
+    title: "Ground Wire Size Calculator",
+    description: "The EGC that counts once, no matter how many.",
+  },
+  {
+    href: "/calculators/electrical/electrical-estimate-calculator",
+    title: "Electrical Estimate Calculator",
+    description: "Turn the device count into a quoted price.",
+  },
+];
+
+/** Common boxes with max conductor counts, computed from the same 314.16(B) volumes the script uses. */
+const boxTable = [...STANDARD_BOX_VOLUMES]
+  .sort((a, b) => a.volume - b.volume)
+  .map((box) => ({
+    ...box,
+    max14: Math.floor(box.volume / BOX_FILL_VOLUME["14"]),
+    max12: Math.floor(box.volume / BOX_FILL_VOLUME["12"]),
+    max10: Math.floor(box.volume / BOX_FILL_VOLUME["10"]),
+  }));
+
+const styles = electricalAccentStyles.teal;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Box Fill Calculator — NEC 314.16" />
+    <meta
+      property="og:description"
+      content="Cubic inches required per NEC 314.16 with conductors, clamps, devices, and grounds each counted the way the Code counts them."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Box Fill Calculator — NEC 314.16" />
+    <meta
+      name="twitter:description"
+      content="Required cubic inches and the smallest compliant box. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Electrical"
+            categoryHref="/calculators/electrical"
+            current="Box Fill Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Electrical Tools · NEC 2023 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Box Fill Calculator <span class="text-teal-600">— NEC 314.16 Cubic Inches</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Box fill is a volume calculation with five allowance categories, and the trick is that they do
+              not all count the same way. Conductors count individually. <strong>All</strong> the grounds count
+              as one. <strong>All</strong> the clamps count as one. Each device yoke counts as
+              <strong>two</strong>. Get those multipliers right and the arithmetic is easy — get them wrong and
+              you either fail inspection or buy boxes you didn't need.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            Count what's in the box
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-5">
+              <div>
+                <label for="bf-gauge" class="text-sm font-semibold text-slate-800">Largest conductor in the box</label>
+                <select
+                  id="bf-gauge"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                >
+                  <option value="14">14 AWG — 2.00 in³ each</option>
+                  <option value="12" selected>12 AWG — 2.25 in³ each</option>
+                  <option value="10">10 AWG — 2.50 in³ each</option>
+                  <option value="8">8 AWG — 3.00 in³ each</option>
+                  <option value="6">6 AWG — 5.00 in³ each</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Clamp, device, and fitting allowances are all based on this size.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="bf-hots" class="text-sm font-semibold text-slate-800">Ungrounded (hot) conductors</label>
+                  <input
+                    id="bf-hots"
+                    type="number"
+                    min="0"
+                    max="40"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label for="bf-neutrals" class="text-sm font-semibold text-slate-800">Grounded (neutral) conductors</label>
+                  <input
+                    id="bf-neutrals"
+                    type="number"
+                    min="0"
+                    max="40"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label for="bf-grounds" class="text-sm font-semibold text-slate-800">Equipment grounds</label>
+                  <input
+                    id="bf-grounds"
+                    type="number"
+                    min="0"
+                    max="40"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">All of them together count as one.</p>
+                </div>
+
+                <div>
+                  <label for="bf-devices" class="text-sm font-semibold text-slate-800">Device yokes</label>
+                  <input
+                    id="bf-devices"
+                    type="number"
+                    min="0"
+                    max="8"
+                    value="1"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Receptacles, switches, dimmers — each counts double.</p>
+                </div>
+
+                <div>
+                  <label for="bf-clamps" class="text-sm font-semibold text-slate-800">Internal cable clamps</label>
+                  <select
+                    id="bf-clamps"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    <option value="yes" selected>Yes — one or more</option>
+                    <option value="no">No internal clamps</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="bf-fittings" class="text-sm font-semibold text-slate-800">Support fittings</label>
+                  <input
+                    id="bf-fittings"
+                    type="number"
+                    min="0"
+                    max="4"
+                    value="0"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Fixture studs or hickeys — each counts double.</p>
+                </div>
+              </div>
+
+              <button
+                id="bf-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <div class="mt-6 lg:mt-0 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Volume required</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="bf-total" class="text-5xl font-extrabold tracking-tight text-teal-600">18.00 in³</span>
+              </div>
+              <p id="bf-note" class="mt-1 text-sm font-semibold text-amber-700">
+                3" × 2" × 3-1/2" device box meets the minimum with almost no margin — go one size up for a
+                workable box.
+              </p>
+
+              <div class="mt-6 grid grid-cols-1 gap-3">
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Smallest box that works</p>
+                  <p id="bf-box" class="mt-1 text-base font-bold leading-snug text-slate-900">
+                    3" × 2" × 3-1/2" device box
+                  </p>
+                </div>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Spare volume in that box</p>
+                  <p id="bf-spare" class="mt-1 text-2xl font-bold text-slate-900">0.00 in³</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Unit volume</span><span id="bf-bd-volume" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Conductors × 1</span><span id="bf-bd-conductors" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>All grounds × 1</span><span id="bf-bd-grounds" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>All clamps × 1</span><span id="bf-bd-clamps" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Devices × 2</span><span id="bf-bd-devices" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Fittings × 2</span><span id="bf-bd-fittings" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span class="font-bold">Total required</span><span id="bf-bd-total" class="font-bold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Plaster rings, extension rings, and domed covers add their own marked volume — add that to the
+                box volume before comparing. The Code minimum is not the same as a comfortable install.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One unit volume, set by the largest conductor in the box, multiplied by five different counts.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Unit volumes (NEC 314.16(B))</div>
+            <div>
+              14 AWG <span class="text-amber-300">2.00</span>&nbsp;·&nbsp;12 AWG
+              <span class="text-amber-300">2.25</span>&nbsp;·&nbsp;10 AWG <span class="text-amber-300">2.50</span
+              >&nbsp;·&nbsp;8 AWG <span class="text-amber-300">3.00</span>&nbsp;·&nbsp;6 AWG
+              <span class="text-amber-300">5.00</span> in³
+            </div>
+            <div class="mt-4 text-cyan-300"># The five allowances</div>
+            <div>
+              each conductor entering the box&nbsp;&nbsp;→&nbsp;&nbsp;× <span class="text-amber-300">1</span>
+              &nbsp;&nbsp;<span class="text-slate-400">314.16(B)(1)</span>
+            </div>
+            <div>
+              all internal clamps together&nbsp;&nbsp;→&nbsp;&nbsp;× <span class="text-amber-300">1</span>
+              &nbsp;&nbsp;<span class="text-slate-400">314.16(B)(2)</span>
+            </div>
+            <div>
+              each support fitting&nbsp;&nbsp;→&nbsp;&nbsp;× <span class="text-amber-300">2</span>
+              &nbsp;&nbsp;<span class="text-slate-400">314.16(B)(3)</span>
+            </div>
+            <div>
+              each device yoke&nbsp;&nbsp;→&nbsp;&nbsp;× <span class="text-amber-300">2</span>
+              &nbsp;&nbsp;<span class="text-slate-400">314.16(B)(4)</span>
+            </div>
+            <div>
+              all grounds together&nbsp;&nbsp;→&nbsp;&nbsp;× <span class="text-amber-300">1</span>
+              &nbsp;&nbsp;<span class="text-slate-400">314.16(B)(5)</span>
+            </div>
+            <div class="mt-4 text-cyan-300"># Not counted at all</div>
+            <div>wire connectors&nbsp;·&nbsp;pigtails made up inside the box&nbsp;·&nbsp;external cable connectors&nbsp;·&nbsp;straps</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Grounds are one, always</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Two grounds or eight, they collectively cost one conductor volume. This is the allowance people
+                most often over-count, which leads to buying boxes a size too big.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Devices are the expensive part</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At two volumes each, a single receptacle costs 4.50 in³ on a 12 AWG job — a quarter of an 18 in³
+                box before any wire goes in. Two devices in one box is where things get tight fast.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Largest conductor sets everything</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                One 10 AWG conductor in a box otherwise full of 12 AWG raises the clamp, device, and fitting
+                allowances to 2.50 in³ each. Mixed-gauge boxes cost more volume than people expect.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Through-conductors count once</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A conductor passing through unbroken counts as one, not two, even though it physically crosses
+                the box twice. Splice it and it is still one — the splice itself adds nothing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The everyday receptacle, a three-way switch that forces a 4-inch square, and the smallest legal box
+          on the market.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">1</span>
+              <h3 class="text-lg font-bold text-slate-900">Mid-run receptacle — two 12/2 cables</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              12 AWG · 2 hots · 2 neutrals · 2 grounds · internal clamps · 1 receptacle. The defaults above.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              conductors: 4 × 2.25 = 9.00 in³<br />
+              grounds (2 count as 1): 1 × 2.25 = 2.25 in³<br />
+              clamps (all count as 1): 1 × 2.25 = 2.25 in³<br />
+              device yoke: 2 × 2.25 = 4.50 in³<br />
+              → <span class="font-bold text-teal-700">18.00 in³ required</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> an 18 in³ box meets this
+              <em>exactly</em> — zero spare volume. It is legal, but a 20.3 or 22.5 in³ box costs pennies more
+              and leaves room to actually fold the wires in.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">2</span>
+              <h3 class="text-lg font-bold text-slate-900">Three-way switch — two 12/2 plus one 12/3</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              12 AWG · 4 hots (including the traveller pair) · 2 neutrals · 3 grounds · internal clamps ·
+              1 switch.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              conductors: 6 × 2.25 = 13.50 in³<br />
+              grounds (3 count as 1): 2.25 in³<br />
+              clamps: 2.25 in³<br />
+              device yoke: 4.50 in³<br />
+              → <span class="font-bold text-teal-700">22.50 in³ required</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> past every standard single-gang device
+              box except a 22.5 in³ plastic box, which it fills exactly. In metal, this is a 4-inch square box
+              with a plaster ring. Two extra conductors added 4.50 in³ and cost a box size.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">3</span>
+              <h3 class="text-lg font-bold text-slate-900">Switch loop — one 14/2 cable</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              14 AWG · 1 hot · 1 neutral · 1 ground · internal clamps · 1 switch.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              conductors: 2 × 2.00 = 4.00 in³<br />
+              grounds: 2.00 in³ · clamps: 2.00 in³ · device: 4.00 in³<br />
+              → <span class="font-bold text-teal-700">12.00 in³ required</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 12.5 in³ box works. Note that
+              <strong>two-thirds</strong> of this total comes from the clamps, the ground, and the device — not
+              from the conductors. On small boxes the fixed allowances dominate.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Common box volumes</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Standard boxes with the maximum number of conductors each holds <strong>on its own</strong> — no
+            clamps, devices, or grounds. Add those allowances and the usable conductor count drops fast, which
+            is what the calculator above accounts for.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Box</th>
+                  <th class="py-3 px-5 font-semibold">Volume</th>
+                  <th class="py-3 px-5 font-semibold">Max 14 AWG</th>
+                  <th class="py-3 px-5 font-semibold">Max 12 AWG</th>
+                  <th class="py-3 px-5 font-semibold">Max 10 AWG</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  boxTable.map((row, index) => (
+                    <tr class={index === boxTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5">{row.label}</td>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.volume.toFixed(1)} in³</td>
+                      <td class="py-3 px-5">{row.max14}</td>
+                      <td class="py-3 px-5">{row.max12}</td>
+                      <td class="py-3 px-5">{row.max10}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: NEC (NFPA 70) 2023 — 314.16(A) and Table 314.16(A) box volumes,
+            314.16(B)(1) through (B)(5) fill allowances, 314.16(B)(2) clamp allowance, 314.16(B)(4) device yoke
+            allowance, 314.16(B)(5) equipment grounding conductor allowance, 314.16(C) for conduit bodies.
+            Non-metallic boxes must be marked with their volume. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about NEC 314.16 box fill and what counts."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More electrical calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initElectricalBoxFillCalculator } from "@/scripts/calculators/electrical-box-fill-calculator";
+    initElectricalBoxFillCalculator();
+  </script>
+</Layout>

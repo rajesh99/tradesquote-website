@@ -1,0 +1,60 @@
+---
+import { nextStandardOcpd, motorFlc, smallConductorCap, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * What actually lands on 10 AWG. The EV charger is the interesting row — a 24 A
+ * charger at 125% is exactly 30.00 A, landing precisely on the 240.4(D) cap —
+ * and the air conditioner is the row that breaks the cap legally via 240.4(G).
+ */
+const CAP = smallConductorCap("10", "copper")!;
+
+const rows = [
+  { name: "Electric dryer", basis: "5,000 VA at 240 V", amps: 5000 / 240, continuous: false },
+  { name: "Water heater, 4.5 kW", basis: "continuous load, ×1.25", amps: 4500 / 240, continuous: true },
+  { name: "EV charger, 24 A", basis: "continuous load, ×1.25", amps: 24, continuous: true },
+  { name: "Baseboard heat, 3.5 kW", basis: "continuous load, ×1.25", amps: 3500 / 240, continuous: true },
+  { name: "Well pump, 2 HP", basis: "Table 430.248 FLC, ×1.25", amps: motorFlc(2, "1ph", 230)!, continuous: true },
+].map((r) => {
+  const design = r.continuous ? r.amps * 1.25 : r.amps;
+  const ocpd = Math.min(nextStandardOcpd(design), CAP);
+  return { ...r, design, ocpd, fits: design <= CAP };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Common loads that land on 10 AWG</title>
+  <desc>
+    An electric dryer draws 20.83 amps, a 4.5 kilowatt water heater 23.44 amps after the 125 percent continuous
+    factor, a 24 amp EV charger exactly 30.00 amps, 3.5 kilowatts of baseboard heat 18.23 amps and a 2 horsepower
+    well pump 15.00 amps. All five fit inside the 30 amp limit that 240.4(D) places on 10 AWG copper, and the EV
+    charger lands exactly on it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What actually runs on 10 AWG</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">{`Design current after any 125% continuous factor, against the ${CAP} A ceiling on 10 AWG copper.`}</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LOAD</text>
+  <text x="300" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DESIGN CURRENT</text>
+  <text x="450" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BREAKER</text>
+  <text x="560" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">10 AWG COPPER</text>
+
+  {rows.map((r, i) => {
+    const y = 88 + i * 32;
+    const exact = Math.abs(r.design - CAP) < 0.01;
+    const accent = exact ? C.orange : C.green;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="28" rx="7" fill={C.white} stroke={exact ? C.orange : C.border} stroke-width={exact ? 1.8 : 1} />
+        <text x="38" y={y + 18} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{r.name}</text>
+        <text x="300" y={y + 18} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">{`${fmt(r.design, 2)} A`}</text>
+        <text x="450" y={y + 18} fill={C.muted} font-family={FONT} font-size="10">{`${r.ocpd} A`}</text>
+        <text x="560" y={y + 18} fill={accent} font-family={FONT} font-size="9.5" font-weight="700">{exact ? "exactly at the cap" : "fits"}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="250" width="672" height="30" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="40" y="269" fill={C.dark} font-family={FONT} font-size="10">Air conditioners are the exception: 10 AWG on a 35 A breaker is legal via 240.4(G) and 440.22 if the MCA fits.</text>
+</svg>

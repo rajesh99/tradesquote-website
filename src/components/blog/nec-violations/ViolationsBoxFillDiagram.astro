@@ -1,0 +1,59 @@
+---
+import { BOX_FILL_VOLUME, smallestBoxFor, fmt } from "@/lib/nec";
+import { C, FONT } from "../infographicTokens";
+
+/**
+ * The number-one failure, worked. Computed from the real Table 314.16 volumes so
+ * the total is the code's, not an assertion — and it lands exactly on an 18.0 in³
+ * box, which is why this one catches people.
+ */
+const CONDUCTOR = BOX_FILL_VOLUME["12"] ?? 2.25;
+
+const items = [
+  { name: "4 × 12 AWG conductors", each: CONDUCTOR, qty: 4, rule: "one each", accent: C.blue },
+  { name: "All equipment grounds", each: CONDUCTOR, qty: 1, rule: "one total, however many", accent: C.green },
+  { name: "Internal cable clamps", each: CONDUCTOR, qty: 1, rule: "one total, however many", accent: C.green },
+  { name: "One duplex device", each: CONDUCTOR, qty: 2, rule: "TWO for the yoke", accent: C.red },
+  { name: "Pigtails inside the box", each: CONDUCTOR, qty: 0, rule: "zero — they don't count", accent: C.muted },
+];
+
+const total = items.reduce((s, it) => s + it.each * it.qty, 0);
+const box = smallestBoxFor(total);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Box fill worked for the commonest failure case</title>
+  <desc>
+    Two 12/2 NM cables into a single-gang box with internal clamps and one duplex receptacle. Four 12 AWG conductors at
+    2.25 cubic inches each give 9.00, all equipment grounds count once for 2.25, all clamps count once for 2.25, and the
+    device yoke counts twice for 4.50 — totalling 18.00 cubic inches, which lands exactly on the 18.0 cubic inch device
+    box. Pigtails wholly inside the box count nothing.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The number-one failure, worked</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">{`Two 12/2 NM cables, internal clamps, one duplex. 12 AWG counts ${CONDUCTOR} in³ per Table 314.16.`}</text>
+
+  <text x="28" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT'S IN THE BOX</text>
+  <text x="342" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOW IT COUNTS</text>
+  <text x="590" y="78" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VOLUME</text>
+
+  {items.map((it, i) => {
+    const y = 88 + i * 27;
+    const v = it.each * it.qty;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="23" rx="5" fill={it.accent} opacity="0.06" />
+        <rect x="24" y={y} width="4" height="23" rx="2" fill={it.accent} />
+        <text x="40" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{it.name}</text>
+        <text x="342" y={y + 15} fill={it.accent} font-family={FONT} font-size="8.5" font-weight="700">{it.rule}</text>
+        <text x="590" y={y + 15} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="800">{`${fmt(v, 2)} in³`}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="226" width="672" height="28" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="40" y="244" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">
+    {`Total ${fmt(total, 2)} in³ — needs the ${box ? box.label : "next larger"} box at ${box ? fmt(box.volume, 1) : "?"} in³. Exactly at the limit.`}
+  </text>
+</svg>

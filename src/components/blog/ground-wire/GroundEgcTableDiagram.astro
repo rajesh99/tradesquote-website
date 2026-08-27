@@ -1,0 +1,51 @@
+---
+import { C, FONT } from "../infographicTokens";
+
+/** NEC Table 250.122 — mirrors TABLE_250_122 in src/lib/nec.ts. */
+const rows = [
+  { ocpd: "15 A", copper: "14 AWG", aluminum: "12 AWG" },
+  { ocpd: "20 A", copper: "12 AWG", aluminum: "10 AWG", common: true },
+  { ocpd: "60 A", copper: "10 AWG", aluminum: "8 AWG" },
+  { ocpd: "100 A", copper: "8 AWG", aluminum: "6 AWG", common: true },
+  { ocpd: "200 A", copper: "6 AWG", aluminum: "4 AWG", common: true },
+  { ocpd: "300 A", copper: "4 AWG", aluminum: "2 AWG" },
+  { ocpd: "400 A", copper: "3 AWG", aluminum: "1 AWG" },
+  { ocpd: "600 A", copper: "1 AWG", aluminum: "2/0 AWG" },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" fill="none" aria-hidden="true">
+  <title>NEC Table 250.122 equipment grounding conductor sizes</title>
+  <desc>
+    Minimum equipment grounding conductor by overcurrent device rating. Up to 15 amps takes 14 AWG copper or 12
+    AWG aluminum; up to 20 amps, 12 AWG or 10 AWG; up to 60 amps, 10 AWG or 8 AWG; up to 100 amps, 8 AWG or 6
+    AWG; up to 200 amps, 6 AWG or 4 AWG; up to 300 amps, 4 AWG or 2 AWG; up to 400 amps, 3 AWG or 1 AWG; and up
+    to 600 amps, 1 AWG copper or 2/0 aluminum. Note there is no 30 amp row — a 30 amp circuit falls under the 60
+    amp row and takes 10 AWG copper.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="344" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="36" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Equipment grounding conductor — Table 250.122</text>
+  <text x="24" y="54" fill={C.muted} font-family={FONT} font-size="11">Sized by the breaker, not by the circuit conductors</text>
+
+  <text x="48" y="86" fill={C.muted} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">OCPD UP TO</text>
+  <text x="288" y="86" fill={C.primary} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">COPPER</text>
+  <text x="500" y="86" fill={C.blue} font-family={FONT} font-size="10" font-weight="700" letter-spacing="0.5">ALUMINUM</text>
+  <line x1="24" y1="94" x2="696" y2="94" stroke={C.border} />
+
+  {rows.map((r, i) => {
+    const y = 104 + i * 31;
+    const fill = r.common ? C.primaryLight : C.white;
+    const stroke = r.common ? C.primary : C.border;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="26" rx="6" fill={fill} stroke={stroke} stroke-width={r.common ? "1.5" : "0.8"} />
+        <text x="48" y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{r.ocpd}</text>
+        <text x="288" y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight={r.common ? "800" : "600"}>{r.copper}</text>
+        <text x="500" y={y + 18} fill={C.dark} font-family={FONT} font-size="11.5" font-weight={r.common ? "800" : "600"}>{r.aluminum}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="338" fill={C.muted} font-family={FONT} font-size="10">There is no 30 A row — a 30 A circuit falls in the 60 A row, so it also takes 10 AWG copper.</text>
+</svg>
