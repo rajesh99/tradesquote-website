@@ -1,0 +1,594 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import { plumbingCalculators } from "@/config/plumbingCalculators";
+
+const title = "Plumbing Formula Reference — Every Formula Explained | TradesQuote";
+const description =
+  "Complete plumbing formula reference: water supply fixture units to GPM demand, pipe velocity, Hazen-Williams friction loss, available pressure, drainage fixture units, drain slope, Manning's equation, vent and trap arm sizing, pump head, water heater recovery rate, and gas load in CFH. Each with variable definitions, typical values, and the IPC section it comes from.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/formulas";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Formula Reference", item: pageUrl },
+  ],
+};
+
+/**
+ * Explicitly typed because `calc` is genuinely optional — the gas-load formula
+ * points at the shared HVAC gas line tool rather than a plumbing one. Without the
+ * annotation TS infers a union of shapes and the `{f.calc && ...}` guard below
+ * fails to compile.
+ *
+ * `formula` strings are rendered in a `whitespace-pre` block, so column
+ * alignment is preserved verbatim. Keep every line at or under 36 characters —
+ * that is what fits the block at a 375 px viewport without horizontal scroll.
+ */
+type Formula = {
+  name: string;
+  formula: string;
+  vars: { sym: string; desc: string }[];
+  normal: string;
+  calc?: { href: string; label: string };
+};
+type Section = { title: string; color: string; formulas: Formula[] };
+
+const sections: Section[] = [
+  {
+    title: "Pipe Sizing & Water Supply",
+    color: "blue",
+    formulas: [
+      {
+        name: "Water Supply Fixture Units → Peak Demand (GPM)",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator",
+          label: "Water Supply Fixture Unit Calculator",
+        },
+        formula:
+          "total WSFU = Σ (fixture WSFU × qty)\ndemand GPM = Hunter's curve lookup\n  [IPC Tables E103.3(2), E103.3(3)]",
+        vars: [
+          { sym: "WSFU", desc: "Water supply fixture unit — a weighting per fixture type, from IPC Table E103.3(2)" },
+          { sym: "Hunter's curve", desc: "The probability curve in Table E103.3(3) that converts fixture units to a design flow" },
+          { sym: "hot / cold split", desc: "For a fixture with both supplies, each side is 3/4 of the fixture's total" },
+        ],
+        normal:
+          "A WSFU is a probability weighting, not a flow rate — 100 WSFU is nowhere near 100 GPM, because no real building runs every fixture at once. A typical single-family house lands around 20–30 WSFU and 12–18 GPM of design demand",
+      },
+      {
+        name: "Pipe Velocity",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pipe-velocity-calculator",
+          label: "Pipe Velocity Calculator",
+        },
+        formula: "V = 0.408 × Q ÷ d²",
+        vars: [
+          { sym: "V", desc: "Velocity in feet per second" },
+          { sym: "Q", desc: "Flow in gallons per minute through that section" },
+          { sym: "d", desc: "Inside diameter in inches — not nominal size; they differ by material" },
+          { sym: "0.408", desc: "Unit constant converting GPM and square inches to ft/s" },
+        ],
+        normal:
+          "The IPC sets no velocity cap. Section 604.1 asks only for \"accepted engineering practice\" and an approved sizing method. The familiar 8 ft/s cold and 5 ft/s hot limits are ASPE and copper-tube manufacturer guidance against erosion-corrosion — good practice, not IPC code. The UPC is stricter here, so check which code your jurisdiction adopted before calling a velocity a violation",
+      },
+      {
+        name: "Hazen-Williams Friction Loss",
+        calc: {
+          href: "/calculators/plumbing/plumbing-friction-loss-calculator",
+          label: "Pipe Friction Loss Calculator",
+        },
+        formula: "psi/100 ft =\n    4.52 × Q^1.852 × 100\n    ÷ (C^1.852 × d^4.8704)",
+        vars: [
+          { sym: "Q", desc: "Flow in gallons per minute" },
+          { sym: "C", desc: "Roughness coefficient: copper 130–150, PEX and CPVC ~150, galvanized steel 100–120, aged cast iron ~100" },
+          { sym: "d", desc: "Inside diameter in inches — the 4.87 exponent is why one size up cuts loss so hard" },
+        ],
+        normal:
+          "Valid for water between 40 °F and 75 °F in turbulent flow only. The d^4.87 term dominates: going from 1/2 in to 3/4 in copper at the same flow drops friction loss roughly six-fold, which is usually cheaper than upsizing the meter",
+      },
+      {
+        name: "Available Pressure for Friction",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+          label: "Water Pipe Size Calculator",
+        },
+        formula:
+          "P_avail = P_static − P_fixture_min\n          − (0.433 × height)\n          − meter loss\n          − device losses",
+        vars: [
+          { sym: "P_static", desc: "Street or well pressure at the meter, measured not assumed" },
+          { sym: "P_fixture_min", desc: "Minimum flow pressure for the governing fixture, from IPC Table 604.3" },
+          { sym: "0.433 × height", desc: "Elevation penalty in psi per foot of rise to that fixture" },
+          { sym: "device losses", desc: "Softener, filter, backflow preventer, PRV — each takes its cut" },
+        ],
+        normal:
+          "IPC Table 604.3 sets the floor: most fixtures need 8 psi flow pressure, a flush tank 20 psi, a flushometer valve 15–20 psi at 25 GPM. Whatever is left after all four deductions is the entire budget for pipe friction",
+      },
+      {
+        name: "Allowable Friction Loss per 100 ft",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+          label: "Water Pipe Size Calculator",
+        },
+        formula: "allowable psi/100 ft\n    = P_avail ÷ L_developed × 100",
+        vars: [
+          { sym: "P_avail", desc: "Pressure left over for friction, from the formula above" },
+          { sym: "L_developed", desc: "Total developed length to the governing fixture, fittings included" },
+        ],
+        normal:
+          "This is the number you carry into the sizing table — pick the smallest pipe whose loss at design flow stays under it. Residential jobs usually land between 2 and 8 psi per 100 ft",
+      },
+      {
+        name: "Developed Length & Fitting Equivalents",
+        calc: {
+          href: "/calculators/plumbing/plumbing-friction-loss-calculator",
+          label: "Pipe Friction Loss Calculator",
+        },
+        formula: "L_developed = L_measured\n    + Σ (fitting equiv lengths)",
+        vars: [
+          { sym: "L_measured", desc: "Actual pipe run to the governing fixture, following the route" },
+          { sym: "equivalent length", desc: "Each fitting expressed as the feet of straight pipe that loses the same pressure" },
+        ],
+        normal:
+          "Multiplying the measured length by 1.5 is the common residential shortcut. On a fitting-heavy run — a tight mechanical room, several changes of direction — the fittings can outweigh the pipe, so count them",
+      },
+    ],
+  },
+  {
+    title: "Drainage, Waste & Vent",
+    color: "emerald",
+    formulas: [
+      {
+        name: "Drainage Fixture Units (DFU)",
+        calc: {
+          href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+          label: "Drainage Fixture Unit Calculator",
+        },
+        formula:
+          "total DFU = Σ (fixture DFU × count)\nsize = smallest pipe whose\n       capacity ≥ total DFU\n  [Table 709.1; 710.1(1), 710.1(2)]",
+        vars: [
+          { sym: "DFU", desc: "Drainage fixture unit per fixture type, from IPC Table 709.1" },
+          { sym: "Table 710.1(1)", desc: "Maximum fixture units on horizontal branches and stacks, 2-1/2 in and smaller" },
+          { sym: "Table 710.1(2)", desc: "The same limits for 3 in through 6 in pipe" },
+        ],
+        normal:
+          "DFU and WSFU are different scales for different systems — do not mix them. The stack column and the horizontal-branch column differ for the same pipe size, because a vertical stack carries more than a horizontal run of the same diameter",
+      },
+      {
+        name: "Minimum Drain Slope",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+          label: "Drain Pipe Slope Calculator",
+        },
+        formula:
+          "2-1/2 in and under:  ≥ 1/4 in/ft\n3 in and larger:     ≥ 1/8 in/ft\n                      [IPC 704.1]",
+        vars: [
+          { sym: "1/4 in/ft", desc: "The residential default — everything 2-1/2 in and under" },
+          { sym: "1/8 in/ft", desc: "Permitted for 3 in and larger, where scouring velocity still holds" },
+          { sym: "exception", desc: "Piping upstream of a grease interceptor stays at 1/4 in per ft" },
+        ],
+        normal:
+          "IPC 2021 has only these two rows — there is no separate 1/16 in per ft allowance for 8 in and larger, which older editions did carry. The UPC generally holds 1/4 in per ft with allowances for larger pipe, so confirm which code your AHJ enforces before flattening a long run",
+      },
+      {
+        name: "Slope as Percent & Total Fall",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+          label: "Drain Pipe Slope Calculator",
+        },
+        formula: "fall (in) = slope (in/ft) × run (ft)\nslope % = slope (in/ft) ÷ 12 × 100",
+        vars: [
+          { sym: "fall", desc: "Total vertical drop across the run — what has to fit in the joist bay" },
+          { sym: "run", desc: "Horizontal distance in feet" },
+        ],
+        normal:
+          "1/4 in per ft = 2.08%, 1/8 in per ft = 1.04%. A 40 ft run at 1/4 in per ft drops 10 in — the number that decides whether the drain clears the footing, and the usual reason a long run goes to 3 in pipe at 1/8 in per ft",
+      },
+      {
+        name: "Manning's Equation — Drain Capacity",
+        calc: {
+          href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+          label: "Drain Pipe Size Calculator",
+        },
+        formula: "V = (1.486 ÷ n) × R^(2/3) × S^(1/2)\nQ = A × V",
+        vars: [
+          { sym: "V", desc: "Velocity in feet per second" },
+          { sym: "n", desc: "Roughness: 0.009–0.015 for plastic, 0.012–0.015 for cast iron" },
+          { sym: "R", desc: "Hydraulic radius — flow area divided by wetted perimeter, in feet" },
+          { sym: "S", desc: "Slope as a decimal, so 1/4 in per ft is 0.0208" },
+          { sym: "A", desc: "Cross-sectional area of the flow, in square feet" },
+        ],
+        normal:
+          "The IPC capacity tables assume drains 3 in and larger run half full. That is why oversizing can backfire: the same flow in a bigger pipe at a flatter slope spreads thinner, velocity falls below the ~2 ft/s scouring threshold, and solids drop out instead of moving",
+      },
+      {
+        name: "Vent Size",
+        calc: {
+          href: "/calculators/plumbing/plumbing-vent-size-calculator",
+          label: "Vent Pipe Size Calculator",
+        },
+        formula:
+          "vent dia ≥ 1/2 × drain dia\nmin 1-1/4 in            [IPC 916.2]\n> 40 ft developed length:\n    up one size, whole length\n                        [IPC 906.2]",
+        vars: [
+          { sym: "drain dia", desc: "The drain size the DFU table demanded — not the pipe someone installed" },
+          { sym: "min 1-1/4 in", desc: "The floor, no matter how small the drain" },
+          { sym: "40 ft rule", desc: "Applies to the whole developed length of that vent, not just the excess" },
+        ],
+        normal:
+          "4 in drain → 2 in vent. 3 in drain → 1-1/2 in vent. Anything 2 in and under lands on the 1-1/4 in minimum. Individual, branch, circuit and relief vents all follow the same half-diameter rule",
+      },
+      {
+        name: "Trap Arm Maximum Length",
+        calc: {
+          href: "/calculators/plumbing/plumbing-vent-size-calculator",
+          label: "Vent Pipe Size Calculator",
+        },
+        formula:
+          "trap arm   max len   max slope\n1-1/4 in      5 ft   1/4 in/ft\n1-1/2 in      6 ft   1/4 in/ft\n2 in          8 ft   1/4 in/ft\n3 in         12 ft   1/8 in/ft\n4 in         16 ft   1/8 in/ft\n        [IPC Table 909.1]",
+        vars: [
+          { sym: "max len", desc: "Developed length from the trap weir to the inner edge of the vent fitting" },
+          { sym: "minimum distance", desc: "Also a floor: at least 2 × the trap arm diameter from weir to vent" },
+          { sym: "max slope", desc: "Counts toward the limit — a steeper arm siphons the trap sooner" },
+        ],
+        normal:
+          "Self-siphoning fixtures — water closets above all — are not length-limited, because the fixture reseals its own trap. Everything else is, and exceeding the table is the most common reason a trap gurgles and then dries out",
+      },
+    ],
+  },
+  {
+    title: "Pressure & Pump Head",
+    color: "cyan",
+    formulas: [
+      {
+        name: "Pressure ↔ Head of Water",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+          label: "Water Pressure Calculator",
+        },
+        formula: "psi = 0.433 × ft of head\nft of head = 2.31 × psi",
+        vars: [
+          { sym: "0.433", desc: "psi gained or lost per vertical foot of water, at 60 °F" },
+          { sym: "2.31", desc: "The reciprocal — feet of head per psi" },
+        ],
+        normal:
+          "The most-reached-for conversion on this page. Both constants shift slightly with temperature, but 0.433 and 2.31 are accurate enough for any domestic system",
+      },
+      {
+        name: "Static Pressure Loss from Elevation",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+          label: "Water Pressure Calculator",
+        },
+        formula: "loss (psi) = 0.433 × height (ft)",
+        vars: [{ sym: "height", desc: "Vertical rise from the pressure source to the fixture" }],
+        normal:
+          "Roughly 4.3 psi to reach a second floor, 8.7 psi to a third — spent before a single foot of friction. On a 45 psi supply that is a fifth of your budget gone to gravity alone",
+      },
+      {
+        name: "Total Dynamic Head",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pump-head-calculator",
+          label: "Pump Head Calculator",
+        },
+        formula: "TDH = static lift + friction head\n      + pressure head\n      + velocity head",
+        vars: [
+          { sym: "static lift", desc: "Vertical distance the pump actually raises the water" },
+          { sym: "friction head", desc: "Pipe and fitting losses at design flow, converted to feet" },
+          { sym: "pressure head", desc: "Pressure needed at the outlet, converted at 2.31 ft per psi" },
+          { sym: "velocity head", desc: "V² ÷ 2g — usually small enough to ignore in domestic work" },
+        ],
+        normal:
+          "TDH and flow together pick the pump off its curve. Sizing on lift alone is the classic error: a well pump lifting 80 ft through a long, undersized run can easily see 160 ft of TDH",
+      },
+      {
+        name: "Pressure-Reducing Valve Threshold",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+          label: "Water Pressure Calculator",
+        },
+        formula: "static > 80 psi  →  PRV required\n    reduce to ≤ 80 psi   [IPC 604.8]",
+        vars: [
+          { sym: "80 psi", desc: "The static ceiling for building water distribution piping" },
+          { sym: "PRV", desc: "Approved valve conforming to ASSE 1003 or CSA B356, with strainer" },
+          { sym: "exceptions", desc: "Service lines to sill cocks and outside hydrants" },
+        ],
+        normal:
+          "Measure static pressure at night, when mains pressure peaks — a system that reads 78 psi at 4 pm can sit well over 80 psi at 4 am. High static pressure is also what drives fixture and water-heater failures long before it trips an inspection",
+      },
+      {
+        name: "Thermal Expansion Volume",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator",
+          label: "Water Heater Replacement Cost Calculator",
+        },
+        formula: "ΔV ≈ V_system × expansion factor",
+        vars: [
+          { sym: "V_system", desc: "Water heater plus piping volume, in gallons" },
+          { sym: "expansion factor", desc: "About 0.02 for a rise from 40 °F to 140 °F" },
+        ],
+        normal:
+          "IPC 607.3 requires thermal expansion control wherever a storage water heater's cold feed passes a check valve, PRV, or backflow preventer — which is to say almost every system with a PRV. Water gains roughly 2% in volume over that rise, and in a closed system with nowhere to go it shows up as pressure on the T&P valve",
+      },
+    ],
+  },
+  {
+    title: "Water Heating & Gas Piping",
+    color: "rose",
+    formulas: [
+      {
+        name: "Temperature Rise & Recovery Rate",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-heater-size-calculator",
+          label: "Water Heater Size Calculator",
+        },
+        formula:
+          "ΔT = outlet °F − inlet °F\ngas:  GPH = (BTU/hr × eff)\n                 ÷ (8.33 × ΔT)\nelec: GPH = (kW × 3412)\n                 ÷ (8.33 × ΔT)",
+        vars: [
+          { sym: "GPH", desc: "Gallons per hour the heater can raise through ΔT — its recovery rate" },
+          { sym: "8.33", desc: "Pounds per gallon of water; 1 BTU raises 1 lb by 1 °F" },
+          { sym: "eff", desc: "Thermal efficiency: ~0.80 atmospheric gas, ~0.95 condensing, ~1.0 electric" },
+          { sym: "3412", desc: "BTU per hour per kilowatt" },
+        ],
+        normal:
+          "A 40,000 BTU/hr gas heater at 80% recovers about 46 GPH through a 90 °F rise. The same duty on a 4.5 kW electric element gives about 20 GPH — the gap that decides which one keeps up with back-to-back showers",
+      },
+      {
+        name: "Tankless Flow Capacity",
+        calc: {
+          href: "/calculators/plumbing/plumbing-tankless-water-heater-calculator",
+          label: "Tankless Water Heater Calculator",
+        },
+        formula: "GPM = (BTU/hr × eff) ÷ (500 × ΔT)",
+        vars: [
+          { sym: "GPM", desc: "Continuous flow the unit can hold at that temperature rise" },
+          { sym: "500", desc: "8.33 lb per gallon × 60 minutes per hour" },
+          { sym: "ΔT", desc: "Rise from incoming ground-water temperature to delivery temperature" },
+        ],
+        normal:
+          "Size on winter inlet, not summer. A 45 °F inlet to a 105 °F shower is a 60 °F rise, and a 199,000 BTU/hr unit at 0.95 efficiency gives about 6.3 GPM there against roughly 9.5 GPM at a 40 °F rise. Undersizing on the summer number is why tankless units disappoint in January",
+      },
+      {
+        name: "First-Hour Rating",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-heater-size-calculator",
+          label: "Water Heater Size Calculator",
+        },
+        formula: "FHR ≈ (0.70 × tank gal) + GPH",
+        vars: [
+          { sym: "FHR", desc: "Gallons of hot water available in the first hour from a full, hot tank" },
+          { sym: "0.70", desc: "Usable fraction before incoming cold dilutes delivery below setpoint" },
+          { sym: "GPH", desc: "Recovery rate, from the formula above" },
+        ],
+        normal:
+          "FHR, not tank size, is what to compare. A 40 gal gas heater can out-deliver a 50 gal electric on first-hour rating because recovery dominates the second half of that hour",
+      },
+      {
+        name: "Mixing Valve / Tempered Water Ratio",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-heater-size-calculator",
+          label: "Water Heater Size Calculator",
+        },
+        formula: "hot fraction = (T_mix − T_cold)\n               ÷ (T_hot − T_cold)",
+        vars: [
+          { sym: "T_mix", desc: "Target delivered temperature" },
+          { sym: "T_hot", desc: "Stored temperature at the heater outlet" },
+          { sym: "T_cold", desc: "Incoming cold temperature" },
+        ],
+        normal:
+          "Storing at 140 °F and delivering at 120 °F with 50 °F cold means the valve blends about 78% hot. That split is the whole point: 140 °F storage suppresses Legionella, 120 °F delivery avoids scalding, and IPC 607.1.2 governs the tempered-water control that reconciles them",
+      },
+      {
+        name: "Gas Load → CFH",
+        formula:
+          "CFH = BTU/hr ÷ BTU per cubic foot\nnat gas ≈ 1,000 BTU/ft³ → CFH ≈ MBH\npropane ≈ 2,516 BTU/ft³",
+        vars: [
+          { sym: "CFH", desc: "Cubic feet per hour of gas the section must carry" },
+          { sym: "BTU/hr", desc: "Sum of the input ratings of every appliance downstream of that section" },
+          { sym: "BTU per ft³", desc: "Confirm with the local utility — natural gas runs roughly 950–1,100 BTU/ft³" },
+        ],
+        normal:
+          "Fuel gas is a separate code: sizing comes from IFGC 402.4 and NFPA 54, not the IPC. Once you have CFH, the longest-length method sets the pipe — size every section for the load it carries, read against the length of the longest run to any outlet",
+        calc: {
+          href: "/calculators/hvac/hvac-gas-line-sizing-calculator",
+          label: "Gas Line Sizing Calculator",
+        },
+      },
+    ],
+  },
+];
+
+const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "")}`;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Plumbing Formula Reference — Every Formula Explained" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Plumbing Formula Reference | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Formula Reference"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600"
+            >
+              Plumbing Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Plumbing Formula Reference
+            </h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every formula used in plumbing design and field work — water supply, drainage and venting, pressure
+              and pump head, water heating and gas load. Each entry gives the formula, what each variable means,
+              and the typical values you should expect back. IPC citations throughout so you can check any of it
+              against the book.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            {
+              sections.map((s) => (
+                <a
+                  href={`#${sectionId(s.title)}`}
+                  class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-orange-500 hover:text-orange-600 transition"
+                >
+                  {s.title}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14 space-y-20">
+        {
+          sections.map((section) => (
+            <div id={sectionId(section.title)}>
+              <div
+                class={`inline-block rounded-lg px-4 py-1.5 text-sm font-bold mb-4
+                ${section.color === "blue" ? "bg-blue-100 text-blue-700" : ""}
+                ${section.color === "emerald" ? "bg-emerald-100 text-emerald-700" : ""}
+                ${section.color === "cyan" ? "bg-cyan-100 text-cyan-700" : ""}
+                ${section.color === "rose" ? "bg-rose-100 text-rose-700" : ""}
+              `}
+              >
+                {section.title}
+              </div>
+
+              <div class="space-y-8">
+                {section.formulas.map((f) => (
+                  <div
+                    class={`rounded-2xl border-l-4 border bg-white p-6 shadow-sm
+                    ${section.color === "blue" ? "border-l-blue-500 border-blue-100" : ""}
+                    ${section.color === "emerald" ? "border-l-emerald-500 border-emerald-100" : ""}
+                    ${section.color === "cyan" ? "border-l-cyan-500 border-cyan-100" : ""}
+                    ${section.color === "rose" ? "border-l-rose-500 border-rose-100" : ""}
+                  `}
+                  >
+                    <h3 class="text-lg font-bold text-slate-900">{f.name}</h3>
+
+                    {/*
+                      `whitespace-pre` (not pre-wrap) so the column alignment in the
+                      tabular formulas survives a narrow viewport, and the expression sits
+                      flush against the tags because pre would otherwise render the
+                      template's own indentation as leading/trailing spaces. text-xs at
+                      mobile keeps every line inside the block without horizontal scroll.
+                    */}
+                    <div
+                      class="mt-3 rounded-xl bg-slate-900 px-5 py-4 font-mono text-xs sm:text-sm text-slate-100 whitespace-pre overflow-x-auto"
+                    >{f.formula}</div>
+
+                    <div class="mt-4">
+                      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Variables</p>
+                      <dl class="space-y-1">
+                        {f.vars.map((v) => (
+                          <div class="flex gap-2 text-sm">
+                            <dt class="font-mono font-bold text-slate-700 shrink-0">{v.sym}</dt>
+                            <dd class="text-slate-600">— {v.desc}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+
+                    <div class="mt-4 rounded-lg bg-slate-50 px-4 py-3">
+                      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                        Normal range / typical values
+                      </p>
+                      <p class="text-sm text-slate-600">{f.normal}</p>
+                    </div>
+
+                    {f.calc && (
+                      <div class="mt-4">
+                        <a
+                          href={f.calc.href}
+                          class="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-600 hover:text-orange-700 transition"
+                        >
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                          </svg>
+                          {f.calc.label} →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <p class="text-sm text-slate-600 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> International Plumbing Code (IPC) 2021 — 604.1, Table 604.3,
+            604.8, 607.1.2, 607.3, 704.1, Table 709.1, Tables 710.1(1) and 710.1(2), 906.2, Table 909.1, 916.2,
+            and Appendix E Tables E103.3(2) and E103.3(3). Gas piping figures are from the International Fuel Gas
+            Code (IFGC) 402.4 and NFPA 54, which are a separate code from the IPC. Velocity limits, fitting
+            equivalent lengths, and Hazen-Williams and Manning coefficients are ASPE and manufacturer design
+            practice, not code requirements.
+          </p>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Plumbing code adoption is split: much of the country is on the IPC, while other states use the Uniform
+            Plumbing Code (UPC), which differs on fixture-unit tables, drain slope allowances, and velocity limits.
+            Confirm which code your jurisdiction has adopted, and which edition. Local amendments override the model
+            code, and a licensed plumber plus the AHJ have final say on anything installed.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Quote the job, not just the math</h2>
+          <p class="mt-3 text-slate-600">
+            Every formula above has a calculator behind it. Work the numbers there, then let TradesQuote turn
+            the scope into a professional line-item estimate your client can sign online.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href="/calculators/plumbing"
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-6 py-3 text-sm font-bold text-white hover:bg-orange-700 transition"
+            >
+              All {plumbingCalculators.length} plumbing calculators →
+            </a>
+            <a
+              href="/calculators"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-orange-300 transition"
+            >
+              Other trades
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

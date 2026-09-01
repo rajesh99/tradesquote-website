@@ -836,6 +836,6 @@ export const hvacFaqs = [
   {
     question: "Will calculators for other trades be added?",
     answer:
-      "Yes. HVAC was the first set and there are now twelve free NEC-based electrical calculators too — wire size, voltage drop, ampacity derating, breaker sizing, grounding, conduit and box fill, load calculations, EV charger circuits, and job pricing. Calculators for plumbing, carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.",
+      "Yes. HVAC was the first set, followed by a full set of free NEC-based electrical calculators — wire size, voltage drop, ampacity derating, breaker sizing, grounding, conduit and box fill, load calculations, EV charger circuits, and job pricing — and a set of IPC-based plumbing calculators covering supply sizing, drainage, venting, water heating and pricing. Calculators for carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.",
   },
 ];

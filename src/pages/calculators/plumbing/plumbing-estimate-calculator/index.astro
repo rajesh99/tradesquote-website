@@ -1,0 +1,697 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import { estimateJob, fmt, usd } from "@/lib/plumbing";
+
+const title = "Plumbing Estimate Calculator — Markup vs Margin | TradesQuote";
+const description =
+  "Free plumbing job estimate calculator. Turn labour hours, fixtures and material into a price with overhead and target margin — and see exactly what applying the same percentage as a markup instead would cost you.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-estimate-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Plumbing Estimate Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Plumbing Estimate Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online plumbing job estimate calculator that builds a price from labour hours, fixture and material cost, overhead percentage and target profit margin, and contrasts margin pricing with markup pricing.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How do I price a plumbing job?",
+    answer:
+      "Add up what the job costs you, add overhead, then divide by one minus your margin. On the defaults — 10 hours at $110, $850 of fixtures, $450 of material, 15% overhead, 25% target — that is <strong>$2,400 direct + $360 overhead = $2,760 break-even</strong>, priced at <strong>$3,680</strong> for <strong>$920</strong> of profit.",
+  },
+  {
+    question: "What is the difference between markup and margin?",
+    answer:
+      "Markup is a percentage <em>of cost</em>; margin is a percentage <em>of price</em>. They are not the same number and confusing them costs money on every job. On the defaults, dividing by 0.75 for a 25% margin gives <strong>$3,680</strong>. Multiplying by 1.25 for a 25% markup gives <strong>$3,450</strong> — which is only a <strong>20% margin</strong> and <strong>$230 less profit</strong> for the identical work.",
+  },
+  {
+    question: "What markup equals what margin?",
+    answer:
+      "Worth memorising three pairs: a <strong>25% markup is a 20% margin</strong>, a <strong>50% markup is a 33% margin</strong>, and a <strong>100% markup is a 50% margin</strong>. Going the other way, to hit a 40% margin you need a 67% markup. If someone quotes you a percentage, ask which one they mean.",
+  },
+  {
+    question: "What should my overhead percentage be?",
+    answer:
+      "Overhead is everything that does not attach to a specific job — vehicles, insurance, licensing, office, advertising, unbilled admin time. For a small plumbing outfit <strong>12% to 20%</strong> of direct cost is typical; the default here is 15%. Work out your own by taking last year's non-job expenses and dividing by last year's direct job costs.",
+  },
+  {
+    question: "Is labour or material the bigger part of a plumbing job?",
+    answer:
+      "Labour, usually — but less lopsidedly than in some trades, because plumbing fixtures are expensive. On the defaults labour is <strong>$1,100 of $2,400 direct cost, 46%</strong>, with fixtures at 35% and material at 19%. On a repipe labour dominates completely; on a bathroom remodel the fixtures can outweigh it.",
+  },
+  {
+    question: "Should I quote a range or a fixed price?",
+    answer:
+      "Fixed, where you can see the scope. A range invites the client to hear the bottom number and reads as uncertainty. Where the scope is genuinely unknown — behind a wall, under a slab — quote the investigation as its own fixed price and the work separately once you can see it.",
+  },
+  {
+    question: "What margin should a plumbing contractor target?",
+    answer:
+      "Commonly <strong>20% to 35%</strong> gross on residential service work, with the higher end on small emergency jobs where mobilisation is a big share of the cost and the lower end on large planned work. The number matters less than applying it as a <em>margin</em> and not accidentally as a markup — that mistake alone quietly costs about a fifth of the profit.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Priced it? Send it as a professional quote in seconds.";
+const ctaDescription =
+  "A total is not a quote. TradesQuote turns a scope or a set of photos into a detailed, line-item estimate — fixtures, pipe, fittings and labor with quantities, unit prices and totals — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-labor-rate-calculator",
+    title: "Plumbing Labor Rate Calculator",
+    description: "Work out the hourly rate to feed this tool.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-repipe-cost-calculator",
+    title: "Repipe Cost Calculator",
+    description: "Price a whole-house repipe by area and access.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator",
+    title: "Water Heater Replacement Cost Calculator",
+    description: "The most common ticket, priced line by line.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "Get the scope right before you price it.",
+  },
+];
+
+/** Computed from the lib so the tables cannot drift from the calculator. */
+const base = {
+  labourHours: 10,
+  labourRate: 110,
+  fixtureCost: 850,
+  materialCost: 450,
+  overheadPercent: 15,
+};
+
+const marginTable = [15, 20, 25, 30, 35, 40].map((m) => {
+  const r = estimateJob({ ...base, marginPercent: m });
+  return { margin: m, price: r.price, profit: r.profit, markupPrice: r.markupPrice, markupProfit: r.markupProfit, effective: r.effectiveMargin };
+});
+
+const defaults = estimateJob({ ...base, marginPercent: 25 });
+
+const equivalence = [
+  { markup: 10, margin: (10 / 110) * 100 },
+  { markup: 25, margin: (25 / 125) * 100 },
+  { markup: 33, margin: (33 / 133) * 100 },
+  { markup: 50, margin: (50 / 150) * 100 },
+  { markup: 67, margin: (67 / 167) * 100 },
+  { markup: 100, margin: (100 / 200) * 100 },
+];
+
+const styles = plumbingAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Plumbing Estimate Calculator — Markup vs Margin" />
+    <meta
+      property="og:description"
+      content="Price a plumbing job from labour, fixtures, material, overhead and margin — and see what applying the same percentage as a markup instead would cost you. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Plumbing Estimate Calculator — Markup vs Margin" />
+    <meta
+      name="twitter:description"
+      content="Price a plumbing job properly, with the markup-versus-margin difference shown. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Plumbing Estimate Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Plumbing Tools · Job pricing · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Plumbing Estimate Calculator <span class="text-emerald-600">— Markup vs Margin</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Pricing a job is three additions and one division — and it is the division that trips people.
+              Add labour, fixtures and material, add overhead, then <strong>divide by one minus your
+              margin</strong>. Multiplying by one plus the same percentage looks equivalent and is not: on the
+              defaults it costs <strong>{usd(defaults.profit - defaults.markupProfit)}</strong> of profit on
+              identical work.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Price the job
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="est-hours" class="text-sm font-semibold text-slate-800">Labour hours</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="est-hours"
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="0.5"
+                      value="10"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">h</span>
+                  </div>
+                </div>
+                <input
+                  id="est-hours-range"
+                  type="range"
+                  min="1"
+                  max="80"
+                  step="1"
+                  value="10"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-emerald-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>80 h</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Include travel, fetching parts and clean-up, not just wrench time.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="est-rate" class="text-sm font-semibold text-slate-800">Billed labour rate</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="est-rate"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="110"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">/h</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="est-fixtures" class="text-sm font-semibold text-slate-800">Fixture cost</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="est-fixtures"
+                      type="number"
+                      min="0"
+                      max="100000"
+                      value="850"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="est-material" class="text-sm font-semibold text-slate-800">
+                    Pipe, fittings &amp; material
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="est-material"
+                      type="number"
+                      min="0"
+                      max="100000"
+                      value="450"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="est-overhead" class="text-sm font-semibold text-slate-800">Overhead</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="est-overhead"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value="15"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">% of direct</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Vehicles, insurance, office, advertising.</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="est-margin" class="text-sm font-semibold text-slate-800">
+                    Target profit margin
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="est-margin"
+                      type="number"
+                      min="0"
+                      max="90"
+                      value="25"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">% of price</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Of the price, not of cost — the calculator shows both so you can see the gap.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="est-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div
+              class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6"
+            >
+              <p class="text-sm font-medium text-slate-600">Quote this price</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="est-price" class="text-5xl font-extrabold tracking-tight text-emerald-600">
+                  $3,680
+                </span>
+              </div>
+              <p id="est-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Priced at a 25% margin. Applying the same 25% as a markup instead would price at $3,450 — $230
+                less profit on identical work.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Profit</p>
+                  <p id="est-profit" class="mt-1 text-2xl font-bold text-slate-900">$920</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Break-even</p>
+                  <p id="est-break-even" class="mt-1 text-2xl font-bold text-slate-900">$2,760</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Labour</span><span id="est-bd-labour" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Direct cost</span><span id="est-bd-direct" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Overhead</span><span id="est-bd-overhead" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Same % as markup</span><span id="est-bd-markup" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>What markup costs you</span><span id="est-bd-gap" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Permit fees, subcontractors, warranty reserve and sales tax are not
+                included — add them as material or as their own line before quoting.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Build the cost up, then apply the margin the right way round.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-emerald-300"># Step 1 — Direct cost</div>
+            <div>direct&nbsp;=&nbsp;hours × rate + fixtures + material</div>
+            <div class="mt-4 text-emerald-300"># Step 2 — Add overhead</div>
+            <div>break-even&nbsp;=&nbsp;direct × (1 + overhead%)</div>
+            <div class="mt-4 text-emerald-300"># Step 3 — Apply the margin — DIVIDE</div>
+            <div>price&nbsp;=&nbsp;break-even ÷ (<span class="text-amber-300">1 − margin</span>)</div>
+            <div class="mt-4 text-red-300"># The trap — this is NOT the same</div>
+            <div>wrong&nbsp;=&nbsp;break-even × (1 + margin)&nbsp;&nbsp;·&nbsp;&nbsp;that is a MARKUP</div>
+            <div class="mt-4 text-slate-400"># Converting between them</div>
+            <div>margin&nbsp;=&nbsp;markup ÷ (1 + markup)&nbsp;&nbsp;·&nbsp;&nbsp;markup&nbsp;=&nbsp;margin ÷ (1 − margin)</div>
+            <div>
+              25% markup&nbsp;→&nbsp;<span class="text-amber-300">20%</span>
+              margin&nbsp;·&nbsp;50%&nbsp;→&nbsp;<span class="text-amber-300">33%</span>&nbsp;·&nbsp;100%&nbsp;→&nbsp;<span
+                class="text-amber-300">50%</span
+              >
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why dividing is correct</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Margin is defined as a share of the <em>price</em>, and the price is what you are solving for.
+                If profit is 25% of price then cost is 75% of price, so price is cost ÷ 0.75. Multiplying
+                treats the percentage as a share of cost, which is a different thing.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The gap widens with the percentage</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At 15% the markup-versus-margin gap is small. At 40% it is enormous — a 40% markup is only a
+                28.6% margin. The bigger your target, the more the mistake costs.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Overhead is not profit</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Covering overhead gets you to break-even, not to a living. A job priced at cost plus overhead
+                and nothing else has funded the van and the insurance and left the business with zero.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Count all the hours</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Travel, the trip to the supply house, the phone call about the finish, the clean-up. Those
+                hours are real cost. Under-counting them is the most common way an accurate-looking estimate
+                loses money.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the same job priced wrongly, and a small service call where mobilisation dominates.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+              >
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Bathroom fixture replacement — the defaults</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              labour = 10 × $110 = $1,100<br />
+              direct = 1,100 + 850 + 450 = $2,400<br />
+              overhead = 2,400 × 0.15 = $360<br />
+              break-even = <span class="font-bold text-emerald-700">$2,760</span><br />
+              price = 2,760 ÷ 0.75 = <span class="font-bold text-emerald-700">$3,680</span>, profit $920
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> $3,680. Labour is 46% of the direct
+              cost and the fixtures 35% — plumbing carries more material than most trades, which is why
+              fixture pricing discipline matters.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+              >
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same job with a 25% markup instead</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              price = 2,760 × 1.25 = <span class="font-bold text-emerald-700">$3,450</span><br />
+              profit = 3,450 − 2,760 = $690<br />
+              margin = 690 ÷ 3,450 = <span class="font-bold text-red-600">20.0%, not 25%</span><br />
+              → <span class="font-bold text-red-600">$230 less profit</span> for identical work
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same job, the same percentage, a
+              quarter less profit. Do this on 100 jobs a year and it is $23,000 — for a keystroke.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+              >
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Small service call — 2 hours, $60 of parts</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              direct = 2 × 110 + 0 + 60 = $280<br />
+              overhead = $42&nbsp;·&nbsp;break-even = $322<br />
+              at 25% margin: price = <span class="font-bold text-emerald-700">$429</span>, profit $107<br />
+              at 35% margin: price = <span class="font-bold text-emerald-700">$495</span>, profit $173
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a two-hour call carries the same drive
+              time, the same truck and the same paperwork as a six-hour one, so the fixed cost is spread over
+              far fewer hours. This is exactly why small jobs are usually priced at a higher margin, or with a
+              minimum call-out charge on top.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The same job at every margin — done right and done wrong
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            {usd(defaults.breakEven)} of break-even cost, priced two ways. Computed from the same code the
+            calculator runs. The last column is what the markup percentage <em>actually</em> delivers.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Target %</th>
+                  <th class="py-3 px-5 font-semibold">As margin</th>
+                  <th class="py-3 px-5 font-semibold">Profit</th>
+                  <th class="py-3 px-5 font-semibold">As markup</th>
+                  <th class="py-3 px-5 font-semibold">Profit</th>
+                  <th class="py-3 px-5 font-semibold">Real margin</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  marginTable.map((row, index) => (
+                    <tr class={index === marginTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.margin}%</td>
+                      <td class="py-3 px-5">{usd(row.price)}</td>
+                      <td class="py-3 px-5">{usd(row.profit)}</td>
+                      <td class="py-3 px-5">{usd(row.markupPrice)}</td>
+                      <td class="py-3 px-5">{usd(row.markupProfit)}</td>
+                      <td class="py-3 px-5">
+                        {fmt(row.effective, 1)}%
+                        <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                          −{usd(row.profit - row.markupProfit)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Markup to margin conversion
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Worth committing to memory. Whenever someone quotes a percentage, this is the question to ask.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Markup on cost</th>
+                  <th class="py-3 px-5 font-semibold">Equals this margin</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  equivalence.map((row, index) => (
+                    <tr class={index === equivalence.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.markup}%</td>
+                      <td class="py-3 px-5">{fmt(row.margin, 1)}%</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: markup and margin are accounting definitions, not code — margin is profit
+            as a share of price, markup is profit as a share of cost. Overhead and margin ranges quoted here
+            are typical for small US residential plumbing contractors and should be replaced with your own
+            figures from last year's accounts. Permits, subcontractors, warranty reserve and sales tax are not
+            modelled.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about pricing plumbing work, overhead, and markup versus margin."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingEstimateCalculator } from "@/scripts/calculators/plumbing-estimate-calculator";
+    initPlumbingEstimateCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #059669;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

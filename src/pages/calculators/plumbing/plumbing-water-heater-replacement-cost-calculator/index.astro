@@ -1,0 +1,666 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  REGION_MULTIPLIERS,
+  WATER_HEATER_UNITS,
+  WATER_HEATER_UPGRADES,
+  fmt,
+  usd,
+  waterHeaterCost,
+} from "@/lib/plumbing";
+
+const title = "Water Heater Replacement Cost Calculator | TradesQuote";
+const description =
+  "Free water heater replacement cost calculator. Tank or tankless, gas or electric — unit, labour, permit and the code upgrades that turn a straight swap into a project, priced line by line.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Water Heater Replacement Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Water Heater Replacement Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online water heater replacement cost calculator covering tank and tankless, gas and electric units, with labour hours, permit, haul-away, code upgrades and a regional multiplier.",
+};
+
+const baseInput = {
+  unitKey: "tank-gas-50",
+  labourRate: 110,
+  permit: 200,
+  haulAway: 60,
+  upgrades: ["expansionTank", "pan"] as const,
+  regionKey: "average",
+};
+const defaults = waterHeaterCost({ ...baseInput, upgrades: [...baseInput.upgrades] });
+const tanklessFull = waterHeaterCost({
+  unitKey: "tankless-gas",
+  labourRate: 110,
+  permit: 250,
+  haulAway: 60,
+  upgrades: ["expansionTank", "ventUpgrade", "gasLineUpgrade", "condensateDrain"],
+  regionKey: "average",
+});
+const bareSwap = waterHeaterCost({ ...baseInput, upgrades: [] });
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does a new water heater cost installed?",
+    answer: `A like-for-like 50-gallon gas tank swap comes to <strong>${usd(defaults.total)}</strong> on the defaults here — ${usd(defaults.unit)} for the unit, ${usd(defaults.labour)} for four hours of labour, ${usd(defaults.upgradeTotal)} of code upgrades, plus permit and haul-away. The band is ${usd(defaults.low)} to ${usd(defaults.high)}. A gas tankless conversion with the full upgrade set is <strong>${usd(tanklessFull.total)}</strong>.`,
+  },
+  {
+    question: "Why is it more than the price of the heater?",
+    answer: `Because the appliance is only <strong>${fmt(defaults.unitShare, 0)}%</strong> of the invoice on a straightforward swap, and far less on a conversion. Labour, permit, disposal and the code upgrades make up the rest. The upgrades are the part clients never budget for — and the part an inspector will insist on.`,
+  },
+  {
+    question: "What code upgrades might be required?",
+    answer:
+      "The common ones are a <strong>thermal expansion tank</strong> (IPC 607.3, mandatory on any closed system — and fitting a pressure-reducing valve creates one), a <strong>drain pan and drain line</strong> where a leak would damage the structure, <strong>seismic strapping</strong> in seismic design categories C and above, and for a tankless a <strong>sealed vent</strong> plus often a <strong>gas line upsize</strong>. Which apply depends on your jurisdiction and the existing installation.",
+  },
+  {
+    question: "Is a tankless conversion worth the extra cost?",
+    answer: `It roughly doubles the ticket — ${usd(defaults.total)} for a tank swap against ${usd(tanklessFull.total)} for a gas tankless with vent, gas upsize and condensate drain. You get endless hot water, no standby loss and a lot of floor space back. You do not get better burst capacity, and the payback on energy alone is long. Convert because you want the endless supply or the space, not because the arithmetic says so.`,
+  },
+  {
+    question: "Why is a heat pump water heater so much more?",
+    answer: `The unit itself — ${usd(WATER_HEATER_UNITS.find((u) => u.key === "tank-hpwh-50")?.unit ?? 0)} against ${usd(WATER_HEATER_UNITS.find((u) => u.key === "tank-electric-50")?.unit ?? 0)} for a conventional electric tank of the same size — plus longer install and often a new circuit. It is two to three times as efficient in operation, needs a reasonable volume of warm air around it, and utility or federal incentives frequently exist. Check current eligibility rather than assuming: these programmes change often.`,
+  },
+  {
+    question: "Can I replace a water heater myself?",
+    answer:
+      "In many jurisdictions a homeowner may pull their own permit, but gas connections, venting and combustion air are genuinely dangerous to get wrong, and an improperly vented gas heater can produce carbon monoxide. Electric units avoid the combustion risk but still involve a circuit sized for the load. Whichever way you go, <strong>pull the permit and get the inspection</strong> — an unpermitted heater can void insurance and complicate a sale.",
+  },
+  {
+    question: "How long does a water heater last?",
+    answer:
+      "Roughly <strong>8 to 12 years</strong> for a conventional tank, longer with annual flushing and a maintained anode rod, and often 20 years for a tankless. Water hardness is the biggest variable. If yours is over ten years old and starting to leak from the tank body rather than a fitting, it is finished — tank corrosion is not repairable.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Priced the swap? Send it as a quote in seconds.";
+const ctaDescription =
+  "Water heater work is high volume and margin-sensitive, and the upgrades are what get missed. TradesQuote turns the scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-water-heater-size-calculator",
+    title: "Water Heater Size Calculator",
+    description: "Get the size right before you price it.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-tankless-water-heater-calculator",
+    title: "Tankless Water Heater Calculator",
+    description: "Check a tankless will actually keep up.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-estimate-calculator",
+    title: "Plumbing Estimate Calculator",
+    description: "Apply overhead and margin to any job.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "A PRV closes the system — and mandates expansion control.",
+  },
+];
+
+const DEFAULT_UPGRADES = new Set(["expansionTank", "pan"]);
+
+/** Table computed from the lib. */
+const unitTable = WATER_HEATER_UNITS.map((u) => {
+  const r = waterHeaterCost({ ...baseInput, unitKey: u.key, upgrades: [...baseInput.upgrades] });
+  return { label: u.label, unit: u.unit, hours: u.hours, total: r.total, share: r.unitShare };
+});
+
+const styles = plumbingAccentStyles.amber;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Water Heater Replacement Cost Calculator" />
+    <meta
+      property="og:description"
+      content="Installed cost to replace a water heater — tank or tankless, gas or electric — including the code upgrades that catch people out. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Water Heater Replacement Cost Calculator" />
+    <meta
+      name="twitter:description"
+      content="What a water heater really costs installed, line by line. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Water Heater Replacement Cost Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                />
+              </svg>
+              Plumbing Tools · 2026 pricing · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Water Heater Replacement Cost <span class="text-amber-600">— Installed, Line by Line</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              The sticker price of the heater is about <strong>{fmt(defaults.unitShare, 0)}%</strong> of what
+              the job costs. The rest is labour, permit, disposal — and the <strong>code upgrades</strong> that
+              turn a straight swap into a project. Tick the ones your install actually needs and see the real
+              number.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+            </svg>
+            Price the replacement
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <label for="whc-unit" class="text-sm font-semibold text-slate-800">Unit type</label>
+                <select
+                  id="whc-unit"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                >
+                  {
+                    WATER_HEATER_UNITS.map((u) => (
+                      <option value={u.key} selected={u.key === "tank-gas-50"}>
+                        {u.label} — {usd(u.unit)} unit, {u.hours} h
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Code upgrades required</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Which apply depends on your jurisdiction and the existing installation.
+                </p>
+                <div class="mt-3 space-y-2">
+                  {
+                    WATER_HEATER_UPGRADES.map((u) => (
+                      <label
+                        for={`whc-up-${u.key}`}
+                        class="flex items-start gap-3 rounded-lg border border-slate-200 p-3 cursor-pointer hover:border-amber-300 transition"
+                      >
+                        <input
+                          id={`whc-up-${u.key}`}
+                          data-whc-upgrade={u.key}
+                          type="checkbox"
+                          checked={DEFAULT_UPGRADES.has(u.key)}
+                          class="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                        />
+                        <span class="min-w-0">
+                          <span class="block text-sm font-medium text-slate-800">
+                            {u.label} — {usd(u.cost)}
+                          </span>
+                          <span class="block text-xs text-slate-500">{u.note}</span>
+                        </span>
+                      </label>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="whc-rate" class="text-sm font-semibold text-slate-800">Labour rate</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="whc-rate"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="110"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">/h</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="whc-region" class="text-sm font-semibold text-slate-800">Region</label>
+                  <select
+                    id="whc-region"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    {
+                      REGION_MULTIPLIERS.map((r) => (
+                        <option value={r.key} selected={r.key === "average"}>
+                          {r.label} (×{r.factor})
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="whc-permit" class="text-sm font-semibold text-slate-800">Permit</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="whc-permit"
+                      type="number"
+                      min="0"
+                      max="5000"
+                      value="200"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="whc-haul" class="text-sm font-semibold text-slate-800">Haul-away</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="whc-haul"
+                      type="number"
+                      min="0"
+                      max="2000"
+                      value="60"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="whc-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-amber-100 bg-amber-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Estimated installed cost</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="whc-total" class="text-5xl font-extrabold tracking-tight text-amber-600">
+                  {usd(defaults.total)}
+                </span>
+              </div>
+              <p id="whc-note" class="mt-1 text-sm font-semibold text-slate-700">
+                50 gal gas tank with 2 code upgrades adding {usd(defaults.upgradeTotal)}. The appliance is only
+                {" "}{fmt(defaults.unitShare, 0)}% of the invoice.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Likely range</p>
+                  <p id="whc-band" class="mt-1 text-lg font-bold text-slate-900">
+                    {usd(defaults.low)} – {usd(defaults.high)}
+                  </p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Unit is</p>
+                  <p id="whc-unit-share" class="mt-1 text-lg font-bold text-slate-900">
+                    {fmt(defaults.unitShare, 0)}%
+                  </p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-amber-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Unit</span><span id="whc-bd-unit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Labour</span><span id="whc-bd-labour" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 flex-wrap">
+                    <span>Upgrades</span><span id="whc-bd-upgrades" class="font-semibold text-slate-900 text-right">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Permit and disposal</span><span id="whc-bd-fixed" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>After region</span><span id="whc-bd-region" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate on 2026 US national-average pricing, not a quote. Relocating the heater,
+                repiping to it, structural work and emergency call-out premiums are not included. Utility and
+                federal incentives on heat-pump units change frequently — verify current eligibility.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">How the estimate is built</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Five lines, of which two are the ones people forget.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-amber-300"># The line items</div>
+            <div>total&nbsp;=&nbsp;(unit + labour + upgrades + permit + haul-away) × region</div>
+            <div class="mt-4 text-amber-300"># Labour comes with the unit type</div>
+            <div>
+              tank swap&nbsp;<span class="text-amber-300">3.5–4</span> h&nbsp;·&nbsp;heat
+              pump&nbsp;<span class="text-amber-300">6</span> h&nbsp;·&nbsp;gas tankless&nbsp;<span
+                class="text-amber-300">8</span
+              > h
+            </div>
+            <div class="mt-4 text-amber-300"># The upgrades that get missed</div>
+            <div>expansion tank <span class="text-amber-300">$150</span> — IPC 607.3, closed systems</div>
+            <div>pan and drain <span class="text-amber-300">$120</span> — where a leak would do damage</div>
+            <div>vent upgrade <span class="text-amber-300">$500</span> — sealed vent for condensing units</div>
+            <div>gas upsize <span class="text-amber-300">$600</span> — a 199k tankless outgrows 1/2 inch</div>
+            <div class="mt-4 text-slate-400"># Band</div>
+            <div>± <span class="text-amber-300">18%</span> either side of the total</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A PRV creates the requirement</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Fit a pressure-reducing valve or a backflow preventer and the system becomes closed, which
+                means heated water has nowhere to expand. IPC 607.3 then requires expansion control. Two jobs
+                that look unrelated are linked by this.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Tankless is a gas job too</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A 199,000 BTU unit can out-draw everything else in the house. The gas upsize and the sealed
+                vent together are {usd(1100)} of the conversion premium — more than the difference in
+                appliance price.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Emergency work costs more</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A tank that failed this morning is a different job from one replaced on schedule: after-hours
+                labour, whatever the supplier has in stock, and no time to compare. Planned replacement at
+                year ten is materially cheaper than reactive at year twelve.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Incentives move</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Heat-pump water heaters often attract utility rebates and federal credits, and those
+                programmes change frequently enough that no calculator should quote a figure. Check current
+                eligibility rather than assuming last year's number.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A straight swap, the same swap with no upgrades, and a tankless conversion.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">50-gallon gas swap — the defaults</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              unit {usd(defaults.unit)} + labour 4 h × $110 = {usd(defaults.labour)}<br />
+              expansion tank $150 + pan and drain $120 = {usd(defaults.upgradeTotal)}<br />
+              + $200 permit + $60 haul-away<br />
+              total = <span class="font-bold text-amber-700">{usd(defaults.total)}</span>, band{" "}
+              {usd(defaults.low)} – {usd(defaults.high)}
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> {usd(defaults.total)}, of which the
+              appliance is {fmt(defaults.unitShare, 0)}%. This is the job most people picture when they say
+              "just swap the water heater".
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same swap with nothing added</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              no upgrades ticked<br />
+              total = <span class="font-bold text-amber-700">{usd(bareSwap.total)}</span><br />
+              difference = {usd(defaults.total - bareSwap.total)} of code work<br />
+              appliance share rises to {fmt(bareSwap.unitShare, 0)}%
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> {usd(bareSwap.total)} — and this is the
+              number a low quote is usually built on. If a competing bid is {usd(defaults.total - bareSwap.total)}{" "}
+              cheaper, check whether the expansion tank and pan are in it before assuming you are overpriced.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Tank to gas tankless conversion</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              unit {usd(tanklessFull.unit)} + labour 8 h × $110 = {usd(tanklessFull.labour)}<br />
+              expansion tank + vent upgrade + gas upsize + condensate ={" "}
+              {usd(tanklessFull.upgradeTotal)}<br />
+              + $250 permit + $60 haul-away<br />
+              total = <span class="font-bold text-amber-700">{usd(tanklessFull.total)}</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> {usd(tanklessFull.total)} — roughly
+              double the tank swap, and the appliance is only {fmt(tanklessFull.unitShare, 0)}% of it. The vent
+              and the gas line are what make a conversion expensive, not the unit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLE ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Installed cost by unit type
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            All at $110/hour with an expansion tank and drain pan, permit and haul-away — computed from the
+            same code the calculator runs. The last column shows how little of the invoice the appliance is.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Unit</th>
+                  <th class="py-3 px-5 font-semibold">Unit price</th>
+                  <th class="py-3 px-5 font-semibold">Labour</th>
+                  <th class="py-3 px-5 font-semibold">Installed</th>
+                  <th class="py-3 px-5 font-semibold">Unit share</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  unitTable.map((row, index) => (
+                    <tr class={index === unitTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">{usd(row.unit)}</td>
+                      <td class="py-3 px-5">{row.hours} h</td>
+                      <td class="py-3 px-5 font-semibold">{usd(row.total)}</td>
+                      <td class="py-3 px-5">{fmt(row.share, 0)}%</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            The code upgrades and when they apply
+          </h2>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Upgrade</th>
+                  <th class="py-3 px-5 font-semibold">Cost</th>
+                  <th class="py-3 px-5 font-semibold">When it applies</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  WATER_HEATER_UPGRADES.map((row, index) => (
+                    <tr class={index === WATER_HEATER_UPGRADES.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">{usd(row.cost)}</td>
+                      <td class="py-3 px-5 text-slate-600">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: prices are <strong>market assumptions, not code</strong> — 2026 US
+            national-average retail with a ±18% band and the same 0.85/1.00/1.25/1.50 regional ladder used
+            across these calculators. The requirements behind the upgrades come from <a
+              class="underline hover:text-amber-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 607.3 (thermal expansion control on closed systems) and 504 (relief valves, pans and drains),
+            with venting under the IFGC and seismic strapping under the IBC where the seismic design category
+            requires it. Heat-pump incentives change frequently — check current eligibility with your utility
+            and the <a
+              class="underline hover:text-amber-600"
+              href="https://www.energy.gov/energysaver/sizing-new-water-heater"
+              target="_blank"
+              rel="noopener">DOE</a
+            >. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about water heater replacement cost, code upgrades, and tankless conversions."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingWaterHeaterReplacementCostCalculator } from "@/scripts/calculators/plumbing-water-heater-replacement-cost-calculator";
+    initPlumbingWaterHeaterReplacementCostCalculator();
+  </script>
+</Layout>

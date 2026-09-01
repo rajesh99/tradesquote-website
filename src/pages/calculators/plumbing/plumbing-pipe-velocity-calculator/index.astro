@@ -1,0 +1,665 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  MAX_VELOCITY_COLD,
+  MAX_VELOCITY_HOT,
+  PIPE_MATERIAL_LABELS,
+  fmt,
+  flowAtVelocity,
+  insideDiameter,
+  nominalSizes,
+  sizeLabel,
+  velocity,
+  type PipeMaterial,
+} from "@/lib/plumbing";
+
+const title = "Pipe Velocity Calculator — GPM to FT/S | TradesQuote";
+const description =
+  "Free pipe velocity calculator. Enter flow and pipe size to get water velocity in ft/s, checked against the 8 ft/s cold and 5 ft/s hot design limits that keep a system quiet and stop copper eroding. Copper, PEX, CPVC, PVC and steel.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-pipe-velocity-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Pipe Velocity Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Pipe Velocity Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online pipe velocity calculator that converts flow in gallons per minute and pipe inside diameter into water velocity in feet per second, and reports the maximum flow each size can carry at the cold and hot design limits.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How fast is water moving in a 3/4 inch pipe?",
+    answer:
+      "At 10 gpm through 3/4-inch Type L copper (0.785-inch bore) the answer is <strong>6.63 ft/s</strong> — comfortably inside the 8 ft/s cold-water limit but well <em>over</em> the 5 ft/s hot-water limit. That same pipe maxes out at <strong>12.07 gpm cold</strong> and only <strong>7.54 gpm hot</strong>.",
+  },
+  {
+    question: "What is the maximum water velocity in a pipe?",
+    answer:
+      "The long-standing design values are <strong>8 ft/s for cold water and 5 ft/s for hot</strong>. Recirculating loops that run continuously are often held lower still, around 4 ft/s. These come from ASPE and the tube manufacturers — the IPC requires a system free of excessive noise and erosion but does not print a number, so this is design practice rather than a code limit you can be cited for.",
+  },
+  {
+    question: "Why is the hot water limit lower than cold?",
+    answer:
+      "Erosion-corrosion. Fast-moving water strips the protective oxide film off the inside of a copper tube, and the rate of attack rises sharply with temperature — so the same velocity that is harmless at 55 °F will thin a hot line over years. The damage concentrates just downstream of elbows and tees where the flow is turbulent, which is why pinhole leaks in old copper appear there first.",
+  },
+  {
+    question: "What does too-fast water actually sound like?",
+    answer:
+      "A rushing hiss while a fixture runs, and often a crack or bang when it shuts — velocity and water hammer are related problems, because fast-moving water carries more momentum to dissipate. Anything much above 8 ft/s is audible through a wall. A whistle usually means a restriction or a partly closed valve rather than the pipe itself.",
+  },
+  {
+    question: "Does the pipe material change the velocity?",
+    answer:
+      "Not directly — velocity depends only on flow and bore. But bore depends heavily on material at the same nominal size: nominal 3/4-inch is 0.785 in in Type L copper, 0.824 in Schedule 40, and only <strong>0.681 in in PEX</strong>. At 10 gpm that is 6.63 ft/s in copper against <strong>8.81 ft/s</strong> in PEX — over the limit purely because the hole is smaller.",
+  },
+  {
+    question: "Is velocity or friction loss the thing that limits my pipe size?",
+    answer:
+      'Both, and which one binds depends on length. Velocity does not care how long the run is; friction accumulates with every foot. So short runs are usually velocity-governed and long runs friction-governed. The <a href="/calculators/plumbing/plumbing-pipe-size-calculator" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">Water Pipe Size Calculator</a> applies both and tells you which one decided.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Flow checked? Quote the whole job in seconds.";
+const ctaDescription =
+  "Velocity is one check among many. TradesQuote turns the whole job into a detailed, line-item estimate — pipe, fittings, fixtures, and labor with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Size the pipe against velocity and pressure together.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-friction-loss-calculator",
+    title: "Pipe Friction Loss Calculator",
+    description: "See what that velocity costs in pressure.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator",
+    title: "Water Supply Fixture Unit Calculator",
+    description: "Work out the flow figure to enter here.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "Velocity head is one term of total dynamic head.",
+  },
+];
+
+const MATERIALS: PipeMaterial[] = ["copper-l", "copper-m", "pex", "cpvc-40", "pvc-40", "steel-40"];
+const COPPER_SIZES = nominalSizes("copper-l");
+
+/** Both tables computed from the lib so they cannot drift from the calculator. */
+const capacityTable = COPPER_SIZES.map((n) => {
+  const id = insideDiameter("copper-l", n) ?? 0;
+  return {
+    nominal: n,
+    id,
+    cold: flowAtVelocity(MAX_VELOCITY_COLD, id),
+    hot: flowAtVelocity(MAX_VELOCITY_HOT, id),
+  };
+});
+
+const materialTable = MATERIALS.map((m) => {
+  const id = insideDiameter(m, 0.75) ?? 0;
+  return { material: m, id, v: velocity(10, id) };
+});
+
+const styles = plumbingAccentStyles.cyan;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pipe Velocity Calculator — GPM to FT/S" />
+    <meta
+      property="og:description"
+      content="Water velocity in ft/s from flow and pipe size, against the 8 ft/s cold and 5 ft/s hot design limits. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pipe Velocity Calculator — GPM to FT/S" />
+    <meta
+      name="twitter:description"
+      content="Water velocity in ft/s from flow and pipe size, with the max gpm each size can carry. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Pipe Velocity Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Plumbing Tools · ASPE practice · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Pipe Velocity Calculator <span class="text-cyan-600">— GPM to FT/S</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Water moving too fast is the cause of two problems that show up years apart: it is
+              <strong>audible</strong> straight away, and it <strong>erodes copper from the inside</strong>
+              slowly. Both are governed by one number — velocity in feet per second — which depends only on the
+              flow and the real bore of the pipe. Enter both and see where you sit against the cold and hot
+              design limits.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Check your velocity
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="pv-gpm" class="text-sm font-semibold text-slate-800">Flow rate</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="pv-gpm"
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="0.1"
+                      value="10"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">gpm</span>
+                  </div>
+                </div>
+                <input
+                  id="pv-gpm-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="10"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>100 gpm</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                  <label for="pv-material" class="text-sm font-semibold text-slate-800">Pipe material</label>
+                  <select
+                    id="pv-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    {
+                      MATERIALS.map((m) => (
+                        <option value={m} selected={m === "copper-l"}>
+                          {PIPE_MATERIAL_LABELS[m]}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Changes the available sizes and the real bore behind each one.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="pv-size" class="text-sm font-semibold text-slate-800">Nominal size</label>
+                  <select
+                    id="pv-size"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    {
+                      COPPER_SIZES.map((n) => (
+                        <option value={n} selected={n === 0.75}>
+                          {sizeLabel(n)}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="pv-service" class="text-sm font-semibold text-slate-800">Service</label>
+                  <select
+                    id="pv-service"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                  >
+                    <option value="cold" selected>Cold water — 8 ft/s limit</option>
+                    <option value="hot">Hot water — 5 ft/s limit</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="pv-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Water velocity</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="pv-velocity" class="text-5xl font-extrabold tracking-tight text-cyan-600">
+                  6.63 ft/s
+                </span>
+              </div>
+              <p id="pv-verdict" class="mt-1 text-sm font-semibold text-slate-700">
+                Inside the 8 ft/s cold design limit, with 1.37 ft/s to spare.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Max flow at the limit</p>
+                  <p id="pv-max-flow" class="mt-1 text-2xl font-bold text-slate-900">12.1 gpm</p>
+                </div>
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Actual bore</p>
+                  <p id="pv-id" class="mt-1 text-2xl font-bold text-slate-900">0.785 in</p>
+                </div>
+              </div>
+
+              <div id="pv-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Over the design limit</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  Expect audible flow noise now, and erosion-corrosion in copper over years — worst just
+                  downstream of elbows and tees. Go up a size or reduce the flow.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Design limit applied</span><span id="pv-bd-limit" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Headroom</span><span id="pv-bd-headroom" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>One size up</span><span id="pv-bd-next-size" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Same pipe, other service</span><span id="pv-bd-other-service" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The 8 and 5 ft/s figures are <strong>ASPE and tube-manufacturer design practice</strong>, not a
+                numeric IPC limit — the code requires a system free of excessive noise and erosion without
+                naming a value. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Velocity is flow divided by area. Everything else is unit conversion — and the whole constant
+            falls out of it.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># The working form</div>
+            <div>
+              V (ft/s)&nbsp;=&nbsp;<span class="text-amber-300">0.4085</span> × Q (gpm) ÷ d² (in²)
+            </div>
+            <div class="mt-4 text-slate-400"># Where the 0.4085 comes from</div>
+            <div>1 gpm&nbsp;=&nbsp;<span class="text-amber-300">0.0022280</span> ft³/s</div>
+            <div>area&nbsp;=&nbsp;π d² ÷ 4 in²&nbsp;=&nbsp;π d² ÷ <span class="text-amber-300">576</span> ft²</div>
+            <div>so K&nbsp;=&nbsp;0.0022280 × 576 ÷ π&nbsp;=&nbsp;<span class="text-amber-300">0.40850</span></div>
+            <div class="mt-4 text-cyan-300"># Rearranged for the flow a pipe can take</div>
+            <div>Q max&nbsp;=&nbsp;V limit × d² ÷ 0.4085</div>
+            <div class="mt-4 text-cyan-300"># The limits (ASPE / manufacturer practice)</div>
+            <div>
+              cold&nbsp;<span class="text-amber-300">8</span> ft/s&nbsp;&nbsp;·&nbsp;&nbsp;hot&nbsp;<span
+                class="text-amber-300">5</span
+              > ft/s&nbsp;&nbsp;·&nbsp;&nbsp;recirculating loop&nbsp;<span class="text-amber-300">4</span> ft/s
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">It goes as diameter squared</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Doubling the bore quarters the velocity at the same flow. That is why going up one size is such
+                an effective fix — from 3/4 to 1 inch copper cuts 6.63 ft/s to 3.89 ft/s, a 41% drop.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Nominal size lies</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Nominal 3/4 inch means 0.785 in of bore in Type L copper, 0.824 in Schedule 40, and 0.681 in in
+                PEX. Velocity uses the real number, which is computed here from outside diameter and wall
+                thickness rather than transcribed.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Length is irrelevant</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Unlike friction loss, velocity does not accumulate. A 6-foot run and a 600-foot run at the same
+                flow and bore have identical velocity — which is exactly why the two checks bind on different
+                jobs.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Where erosion actually happens</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Not evenly along the pipe. Turbulence just past an elbow or tee strips the oxide film locally,
+                so pinholes in old copper appear a few inches downstream of fittings, not in the middle of a
+                straight run.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the same pipe carrying hot water, and the PEX substitution that quietly breaks the
+          limit.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">10 gpm through 3/4 inch copper — cold</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              ID = 0.875 − 2 × 0.045 = 0.785 in<br />
+              V = 0.4085 × 10 ÷ 0.785² = 4.085 ÷ 0.6162<br />
+              → <span class="font-bold text-cyan-700">6.63 ft/s</span> against an 8 ft/s limit ✓<br />
+              max cold flow = 8 × 0.6162 ÷ 0.4085 = 12.07 gpm
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> fine for cold water with 1.37 ft/s of
+              headroom, and the pipe would take 12.1 gpm before it hit the limit.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same pipe on hot water</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              same 6.63 ft/s, limit now 5 ft/s<br />
+              → <span class="font-bold text-red-600">33% over the hot limit ✗</span><br />
+              max hot flow = 5 × 0.6162 ÷ 0.4085 = 7.54 gpm<br />
+              1" copper at 10 gpm = 3.89 ft/s ✓
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> nothing about the pipe changed and it
+              now fails. A 3/4-inch hot line tops out at 7.54 gpm — which is why hot mains on multi-fixture
+              branches go to 1 inch far earlier than cold ones.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Swapping copper for PEX, same nominal size</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              3/4" PEX bore = 0.875 × 7/9 = 0.681 in<br />
+              V = 0.4085 × 10 ÷ 0.681² = 4.085 ÷ 0.4638<br />
+              → <span class="font-bold text-red-600">8.81 ft/s — over the 8 ft/s cold limit ✗</span><br />
+              same nominal size, 33% more velocity than copper
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a like-for-like PEX substitution breaks
+              a limit that copper met. PEX is outside-diameter controlled at SDR-9, so the wall eats into the
+              bore — 0.681 in against copper's 0.785 in, and velocity goes as the square of that.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Maximum flow per pipe size
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Type L copper, computed from the same code the calculator runs. The hot column is
+            <strong>always 62.5% of the cold column</strong> — because 5 ÷ 8 is a constant, and velocity is
+            linear in flow.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Nominal size</th>
+                  <th class="py-3 px-5 font-semibold">Actual bore</th>
+                  <th class="py-3 px-5 font-semibold">Max cold (8 ft/s)</th>
+                  <th class="py-3 px-5 font-semibold">Max hot (5 ft/s)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  capacityTable.map((row, index) => (
+                    <tr class={index === capacityTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.nominal)}</td>
+                      <td class="py-3 px-5">{fmt(row.id, 3)} in</td>
+                      <td class="py-3 px-5">{fmt(row.cold, 1)} gpm</td>
+                      <td class="py-3 px-5">{fmt(row.hot, 1)} gpm</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            10 gpm in 3/4 inch — every material
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Same flow, same nominal size, six different answers. Bore is what velocity actually depends on.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Material</th>
+                  <th class="py-3 px-5 font-semibold">Bore at 3/4"</th>
+                  <th class="py-3 px-5 font-semibold">Velocity at 10 gpm</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  materialTable.map((row, index) => (
+                    <tr class={index === materialTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {PIPE_MATERIAL_LABELS[row.material]}
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.id, 3)} in</td>
+                      <td class="py-3 px-5">
+                        {fmt(row.v, 2)} ft/s
+                        {row.v > MAX_VELOCITY_COLD && (
+                          <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            over 8 ft/s
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: velocity limits per <a
+              class="underline hover:text-cyan-600"
+              href="https://www.aspe.org/"
+              target="_blank"
+              rel="noopener">ASPE</a
+            > design guidance and the <a
+              class="underline hover:text-cyan-600"
+              href="https://www.copper.org/applications/plumbing/"
+              target="_blank"
+              rel="noopener">Copper Development Association</a
+            > erosion-corrosion guidance — the <a
+              class="underline hover:text-cyan-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > requires a system free of excessive noise and erosion without printing a figure. Pipe dimensions
+            from <a class="underline hover:text-cyan-600" href="https://www.astm.org/" target="_blank" rel="noopener"
+              >ASTM</a
+            > B88, F876 and D1785, with every bore computed from outside diameter and wall thickness. Local
+            amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about water velocity, noise, and erosion in supply piping."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingPipeVelocityCalculator } from "@/scripts/calculators/plumbing-pipe-velocity-calculator";
+    initPlumbingPipeVelocityCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -1,0 +1,645 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import { fmt, minSlope, sizeLabel, slopeToPercent, totalFall } from "@/lib/plumbing";
+
+const title = "Drain Pipe Slope Calculator — Fall & Grade | TradesQuote";
+const description =
+  "Free drain pipe slope calculator. Get the minimum slope IPC Table 704.1 requires for your pipe size, the total fall over the run, and the percent grade — plus why too steep is as bad as too flat.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-pipe-slope-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Drain Pipe Slope Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Drain Pipe Slope Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online drain pipe slope calculator that returns the IPC Table 704.1 minimum slope for a pipe size, the total fall over a run, the percent grade, and the resulting half-full flow velocity.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What slope does a drain pipe need?",
+    answer:
+      "It depends on the size, and the step is at 3 inches. IPC Table 704.1 requires <strong>1/4 inch per foot</strong> for pipe 2-1/2 inches and smaller, <strong>1/8 inch per foot</strong> for 3 to 6 inch, and <strong>1/16 inch per foot</strong> for 8 inch and larger. So a 3-inch drain legally runs at half the fall a 2-inch drain needs.",
+  },
+  {
+    question: "How much fall is 1/4 inch per foot over 40 feet?",
+    answer:
+      "Exactly <strong>10 inches</strong> — the slope multiplied by the run, nothing more complicated. At 1/8 inch per foot the same 40-foot run drops 5 inches. That difference is often what decides whether a drain clears a footing or a beam, which is why upsizing a long run to 3 inch buys you real headroom under a floor.",
+  },
+  {
+    question: "What is 1/4 inch per foot as a percentage?",
+    answer:
+      "<strong>2.08%</strong>. Divide the slope in inches per foot by 12 and multiply by 100. The three code minimums are 2.08% for 1/4, <strong>1.04%</strong> for 1/8, and 0.52% for 1/16. Surveyors and excavators work in percent, plumbers work in inches per foot, and job sites mix the two constantly.",
+  },
+  {
+    question: "Can a drain be too steep?",
+    answer:
+      "Yes, and this surprises people who assume more fall is always safer. Above roughly <strong>1/2 inch per foot</strong> the liquid can accelerate away and leave the solids behind, which then dry out and build up. Drainage wants a self-scouring flow of about 2 ft/s, not the fastest possible one. A vertical drop is fine — it is the long, over-steep <em>horizontal</em> run that causes trouble.",
+  },
+  {
+    question: "Why does a bigger pipe need less slope?",
+    answer:
+      "Because a larger pipe has a bigger hydraulic radius — more cross-section per unit of wetted wall — so it reaches the same scouring velocity on a gentler grade. Manning's equation makes that explicit: velocity rises with the hydraulic radius to the two-thirds power, so a 4-inch line at 1/8 in/ft moves water about as fast as a 2-inch line at 1/4.",
+  },
+  {
+    question: "What happens if my drain is laid flat?",
+    answer:
+      "It stops scouring. Water still finds its way out under a gentle gradient, but solids and grease settle and accumulate until the line blocks — often years after installation, which makes the cause hard to trace. A back-fall or a belly in the run is worse still, because it holds standing water permanently.",
+  },
+  {
+    question: "Does the vent pipe need slope too?",
+    answer:
+      'Yes, but for a different reason. Horizontal vent piping must be graded to drain back to the drainage pipe so condensate and any rainwater cannot pond in it. There is no scouring requirement — nothing solid is meant to be in a vent. Size it with the <a href="/calculators/plumbing/plumbing-vent-size-calculator" class="font-semibold text-violet-700 underline decoration-violet-300 hover:decoration-violet-600">Vent Pipe Size Calculator</a>.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Fall set? Quote the whole job in seconds.";
+const ctaDescription =
+  "Grade decides the excavation, and excavation decides the price. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+    title: "Drain Pipe Size Calculator",
+    description: "Size the pipe this fall is carrying.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "Total the load the drain has to take.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-vent-size-calculator",
+    title: "Vent Pipe Size Calculator",
+    description: "Trap arm length is a slope problem too.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "When there is no fall available at all.",
+  },
+];
+
+const SIZES = [1.25, 1.5, 2, 2.5, 3, 4, 6, 8, 10, 12];
+
+/** Reference table computed from the lib. */
+const slopeTable = SIZES.map((n) => {
+  const required = minSlope(n);
+  return {
+    nominal: n,
+    required,
+    percent: slopeToPercent(required),
+    fall10: totalFall(required, 10),
+    fall40: totalFall(required, 40),
+    fall100: totalFall(required, 100),
+  };
+});
+
+const fallTable = [10, 20, 30, 40, 50, 75, 100].map((run) => ({
+  run,
+  quarter: totalFall(0.25, run),
+  eighth: totalFall(0.125, run),
+  sixteenth: totalFall(0.0625, run),
+}));
+
+const styles = plumbingAccentStyles.violet;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Drain Pipe Slope Calculator — Fall & Grade" />
+    <meta
+      property="og:description"
+      content="Minimum slope by pipe size from IPC Table 704.1, total fall over any run, and percent grade — plus why too steep is as bad as too flat. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Drain Pipe Slope Calculator — Fall & Grade" />
+    <meta
+      name="twitter:description"
+      content="Minimum drain slope, total fall, and percent grade from IPC Table 704.1. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Drain Pipe Slope Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6l16 12M4 18h16" />
+              </svg>
+              Plumbing Tools · IPC Table 704.1 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Drain Pipe Slope Calculator <span class="text-violet-600">— Fall &amp; Grade</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A drain has to run fast enough to carry solids and slow enough not to leave them behind. The code
+              sets the floor — <strong>1/4 inch per foot up to 2-1/2 inch, 1/8 above it</strong> — and physics
+              sets the ceiling. Pick your size and run length to get the minimum slope, the total fall you need
+              to find, and the grade as a percentage.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6l16 12M4 18h16"></path>
+            </svg>
+            Set the fall
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="sl-run" class="text-sm font-semibold text-slate-800">Run length</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="sl-run"
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value="40"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="sl-run-range"
+                  type="range"
+                  min="5"
+                  max="200"
+                  step="1"
+                  value="40"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-violet-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5</span><span>200 ft</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="sl-size" class="text-sm font-semibold text-slate-800">Pipe size</label>
+                  <select
+                    id="sl-size"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                  >
+                    {
+                      SIZES.map((n) => (
+                        <option value={n} selected={n === 3}>
+                          {sizeLabel(n)}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Decides the Table 704.1 minimum.</p>
+                </div>
+
+                <div>
+                  <label for="sl-slope" class="text-sm font-semibold text-slate-800">Slope</label>
+                  <select
+                    id="sl-slope"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                  >
+                    <option value="min" selected>Code minimum for this size</option>
+                    <option value="0.0625">1/16 in/ft (0.52%)</option>
+                    <option value="0.125">1/8 in/ft (1.04%)</option>
+                    <option value="0.25">1/4 in/ft (2.08%)</option>
+                    <option value="0.5">1/2 in/ft (4.17%)</option>
+                    <option value="0.75">3/4 in/ft (6.25%)</option>
+                    <option value="1">1 in/ft (8.33%)</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Pick a value to test it against the minimum.</p>
+                </div>
+              </div>
+
+              <button
+                id="sl-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-violet-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div
+              class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-violet-100 bg-violet-50 p-5 sm:p-6"
+            >
+              <p class="text-sm font-medium text-slate-600">Total fall over the run</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sl-fall" class="text-5xl font-extrabold tracking-tight text-violet-600">5.0 in</span>
+              </div>
+              <p id="sl-verdict" class="mt-1 text-sm font-semibold text-slate-700">
+                Meets the Table 704.1 minimum of 0.125 in/ft for 3" pipe, with a self-scouring flow.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Slope used</p>
+                  <p id="sl-slope-used" class="mt-1 text-2xl font-bold text-slate-900">0.125 in/ft</p>
+                </div>
+                <div class="rounded-xl border border-violet-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Percent grade</p>
+                  <p id="sl-percent" class="mt-1 text-2xl font-bold text-slate-900">1.04%</p>
+                </div>
+              </div>
+
+              <div id="sl-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Below the code minimum</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  This grade is under what IPC Table 704.1 requires for this size. It will not pass inspection,
+                  and it will not scour — solids settle and the line blocks later.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-violet-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Code minimum for this size</span><span id="sl-bd-required" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Drop per 10 ft</span><span id="sl-bd-per-10" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Flowing half full</span><span id="sl-bd-velocity" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Fall at the minimum</span><span id="sl-bd-min-fall" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Run before 4 ft of drop</span><span id="sl-bd-max-run" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Half-full velocity is Manning's equation at n = 0.013. Fixture drains, trap
+                arms and vents have their own rules. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The arithmetic is trivial. The interesting part is why the code minimum steps down as the pipe
+            gets bigger.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-violet-300"># The three numbers you need</div>
+            <div>fall (in)&nbsp;=&nbsp;slope (in/ft) × run (ft)</div>
+            <div>percent grade&nbsp;=&nbsp;slope ÷ <span class="text-amber-300">12</span> × 100</div>
+            <div class="mt-4 text-violet-300"># Minimum slope (IPC Table 704.1)</div>
+            <div>
+              ≤ 2-1/2"&nbsp;→&nbsp;<span class="text-amber-300">1/4</span> in/ft&nbsp;=&nbsp;2.08%
+            </div>
+            <div>3" to 6"&nbsp;→&nbsp;<span class="text-amber-300">1/8</span> in/ft&nbsp;=&nbsp;1.04%</div>
+            <div>≥ 8"&nbsp;→&nbsp;<span class="text-amber-300">1/16</span> in/ft&nbsp;=&nbsp;0.52%</div>
+            <div class="mt-4 text-violet-300"># Why bigger pipe needs less — Manning's equation</div>
+            <div>
+              V&nbsp;=&nbsp;(<span class="text-amber-300">1.486</span> ÷ n) × R^(2/3) ×
+              S^(1/2)&nbsp;&nbsp;·&nbsp;&nbsp;R&nbsp;=&nbsp;d ÷ 4 half full
+            </div>
+            <div>a bigger R reaches the same scouring speed on a gentler S</div>
+            <div class="mt-4 text-slate-400"># The target, not in the code but in every textbook</div>
+            <div>about <span class="text-amber-300">2</span> ft/s — fast enough to scour, slow enough to carry</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The step at 3 inches</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A 3-inch drain needs half the fall of a 2-inch one — 5 inches over 40 feet instead of 10. On a
+                long run under a floor, upsizing is often the only way to keep the pipe above a beam.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Too steep is a real failure</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Past about 1/2 inch per foot the water can run away from the solids on a long horizontal line.
+                A vertical drop is not a problem — it is the over-steep horizontal run that strands waste.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Uniform beats average</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The code asks for uniform slope, not an average that works out. A belly in an otherwise
+                correct run holds standing water permanently and is worse than a slightly flat line.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Percent versus inches per foot</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Excavators, surveyors and laser levels work in percent; plumbers work in inches per foot. 1/4
+                is 2.08%, 1/8 is 1.04%. Mixing them up by a factor of two is a genuinely common site error.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the upsize that saves five inches of depth, and a sewer run where fall is the whole
+          problem.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold"
+              >
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">3-inch house drain, 40 ft at code minimum</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 704.1: 3" falls in the 3–6" band → 1/8 in/ft<br />
+              fall = 0.125 × 40 = <span class="font-bold text-violet-700">5.00 in</span><br />
+              grade = 0.125 ÷ 12 × 100 = <span class="font-bold text-violet-700">1.04%</span><br />
+              drop per 10 ft = 1.25 in
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> five inches of fall to find across the
+              whole run. Set the invert at both ends first, then work to a string line — chasing it fitting by
+              fitting is how bellies get built in.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold"
+              >
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same run in 2-inch pipe</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 704.1: 2" is in the ≤ 2-1/2" band → 1/4 in/ft<br />
+              fall = 0.25 × 40 = <span class="font-bold text-violet-700">10.00 in</span><br />
+              versus 5.00 in for 3" pipe<br />
+              → upsizing saves <span class="font-bold text-violet-700">5 inches of depth</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the larger pipe needs half the fall.
+              Where a 2-inch line would clash with a beam or bust through a slab, a 3-inch line at half the
+              grade often clears it — and it carries far more load as a bonus.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-700 font-bold"
+              >
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">100-foot sewer run — where the depth goes</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              4" at 1/8 in/ft: fall = <span class="font-bold text-violet-700">12.5 in</span>, carries 180
+              DFU<br />
+              4" at 1/4 in/ft: fall = <span class="font-bold text-violet-700">25.0 in</span>, carries 216
+              DFU<br />
+              difference = 12.5 in of extra trench depth at the far end
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the steeper grade adds 20% of capacity
+              and just over a foot of digging. On a long run to a street main, that trade — depth against
+              capacity — is usually what sets the design, not the fixture count.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Minimum slope by pipe size
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            IPC Table 704.1, with the fall it produces over three common run lengths — computed from the same
+            code the calculator uses.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-5 font-semibold">Min slope</th>
+                  <th class="py-3 px-5 font-semibold">Percent</th>
+                  <th class="py-3 px-5 font-semibold">Fall / 10 ft</th>
+                  <th class="py-3 px-5 font-semibold">Fall / 40 ft</th>
+                  <th class="py-3 px-5 font-semibold">Fall / 100 ft</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  slopeTable.map((row, index) => (
+                    <tr class={index === slopeTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.nominal)}</td>
+                      <td class="py-3 px-5">{row.required} in/ft</td>
+                      <td class="py-3 px-5">{fmt(row.percent, 2)}%</td>
+                      <td class="py-3 px-5">{fmt(row.fall10, 2)} in</td>
+                      <td class="py-3 px-5">{fmt(row.fall40, 2)} in</td>
+                      <td class="py-3 px-5">{fmt(row.fall100, 1)} in</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">Fall by run length</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            How much depth each grade costs you. Useful when the question is whether the fall is available at
+            all.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Run</th>
+                  <th class="py-3 px-5 font-semibold">1/4 in/ft</th>
+                  <th class="py-3 px-5 font-semibold">1/8 in/ft</th>
+                  <th class="py-3 px-5 font-semibold">1/16 in/ft</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  fallTable.map((row, index) => (
+                    <tr class={index === fallTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.run} ft</td>
+                      <td class="py-3 px-5">{fmt(row.quarter, 2)} in</td>
+                      <td class="py-3 px-5">{fmt(row.eighth, 2)} in</td>
+                      <td class="py-3 px-5">{fmt(row.sixteenth, 2)} in</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-violet-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 Table 704.1 (slope of horizontal drainage piping) and 704.1 on uniform alignment and slope;
+            half-full velocity from Manning's equation at n = 0.013 for cast iron. The self-scouring target of
+            roughly 2 ft/s is standard sanitary engineering practice, not a code figure. Roughly fifteen
+            states use the <a
+              class="underline hover:text-violet-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="violet"
+        subtitle="Common questions about drain slope, fall, percent grade, and self-scouring flow."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingPipeSlopeCalculator } from "@/scripts/calculators/plumbing-pipe-slope-calculator";
+    initPlumbingPipeSlopeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #7c3aed;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #7c3aed;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

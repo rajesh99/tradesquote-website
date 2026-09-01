@@ -1,0 +1,784 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  PIPE_MATERIAL_LABELS,
+  availableFrictionPsi,
+  fmt,
+  sizeLabel,
+  sizeSupplyPipe,
+  type PipeMaterial,
+} from "@/lib/plumbing";
+
+const title = "Water Pipe Size Calculator — Velocity & Pressure | TradesQuote";
+const description =
+  "Free water pipe size calculator. Enter peak demand, run length and available pressure to get the nominal pipe size — checked against both the velocity ceiling and the friction budget, with the governing rule named. Copper, PEX, CPVC, PVC and steel.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-pipe-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Water Pipe Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Water Pipe Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online water supply pipe size calculator that determines the required nominal pipe size from peak demand, developed length, available pressure, elevation and meter loss, checking both the velocity limit and the Hazen-Williams friction budget.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size water line do I need for a house?",
+    answer:
+      "For a typical two-bathroom house drawing about <strong>18 gpm</strong> over a 120-foot developed run on 60 psi, the answer is <strong>1 inch</strong> Type L copper — 7.00 ft/s and 8.98 psi per 100 ft. Those are the defaults above. The 3/4-inch pipe most people guess at would run 11.93 ft/s and lose 32.91 psi per 100 ft, failing both tests at once.",
+  },
+  {
+    question: "Why are there two rules instead of one?",
+    answer:
+      "Because a pipe can pass one and fail the other, and you have to satisfy both — so the <strong>larger size wins</strong>. <strong>Velocity</strong> is a durability and noise problem: fast water is loud and erodes copper from the inside. <strong>Friction</strong> is a performance problem: a pipe that is thermally and acoustically fine can still fail to deliver pressure at the far fixture. Short runs are usually velocity-governed; long runs are friction-governed. The calculator names which one decided.",
+  },
+  {
+    question: "Does PEX need a bigger size than copper?",
+    answer:
+      "Often yes, by one size — and it catches people out. PEX is <strong>outside-diameter controlled</strong>, so nominal 1-inch PEX has a <strong>0.875-inch bore</strong> against Type L copper's 1.025 inch. At 18 gpm copper needs 1 inch and PEX needs <strong>1-1/4 inch</strong>. PEX has the better roughness coefficient (150 against copper's 140) and still loses, because bore beats smoothness — the friction term goes as diameter to the power of 4.87.",
+  },
+  {
+    question: "What is developed length, and why not just measure the pipe?",
+    answer:
+      'Developed length is the measured run <em>plus</em> the equivalent length of every fitting and valve, because an elbow costs pressure the same way a length of pipe does. On 3/4-inch copper a 90° elbow is worth about 2 feet of pipe and a tee taken through the branch about 4 feet. The <a href="/calculators/plumbing/plumbing-friction-loss-calculator" class="font-semibold text-sky-700 underline decoration-sky-300 hover:decoration-sky-600">Friction Loss Calculator</a> adds them up for you.',
+  },
+  {
+    question: "What pressure does a fixture actually need?",
+    answer:
+      "It varies by fixture and it is a real design input, not a rounding error. Most ordinary fixtures want <strong>8 to 15 psi</strong> at the inlet; a flushometer valve wants closer to 25 psi, and some tankless water heaters and body-spray showers specify more. The default here is 15 psi, which suits a normal residential mix. Check the fixture spec on anything unusual — it comes straight off the top of your budget.",
+  },
+  {
+    question: "Why does the meter get its own loss figure?",
+    answer:
+      "Because it is often the single largest fixed loss in a residential system, and it is easy to forget. A 5/8-inch meter at 20 gpm can cost 8 to 12 psi on its own. The default 8 psi is typical for a residential meter at moderate flow; get the real curve from the utility if the budget is tight, because the difference can be a whole pipe size.",
+  },
+  {
+    question: "Can I just size the pipe on velocity and ignore pressure?",
+    answer:
+      "Only on short runs. Velocity does not care how long the pipe is, but friction accumulates with every foot — so the two rules swap places as the run grows. At 18 gpm on this page's defaults, both land on 1 inch; stretch the developed length to 400 feet and the friction budget alone forces 1-1/4 inch while velocity still says 1 inch is fine.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Pipe sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "The main is one line item. TradesQuote turns the whole job into a detailed, line-item estimate — pipe, fittings, fixtures, valves, and labor with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator",
+    title: "Water Supply Fixture Unit Calculator",
+    description: "Get the peak demand this tool needs.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-velocity-calculator",
+    title: "Pipe Velocity Calculator",
+    description: "Check flow against the noise and erosion limits.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-friction-loss-calculator",
+    title: "Pipe Friction Loss Calculator",
+    description: "Add fittings into the developed length.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "See what a storey of lift costs in psi.",
+  },
+];
+
+const MATERIALS: PipeMaterial[] = ["copper-l", "copper-m", "pex", "cpvc-40", "pvc-40", "steel-40"];
+
+/** Computed from the lib so the table cannot disagree with the calculator. */
+const defaultAvailable = availableFrictionPsi({
+  supplyPsi: 60,
+  highestFixtureFeet: 20,
+  fixtureRequiredPsi: 15,
+  meterLossPsi: 8,
+  otherLossPsi: 0,
+});
+
+const gpmLadder = [5, 8, 12, 18, 25, 40].map((gpm) => {
+  const r = sizeSupplyPipe({
+    gpm,
+    material: "copper-l",
+    developedFeet: 120,
+    availablePsi: defaultAvailable,
+    maxVelocity: 8,
+  });
+  return { gpm, ...r };
+});
+
+const materialLadder = MATERIALS.map((m) => {
+  const r = sizeSupplyPipe({
+    gpm: 18,
+    material: m,
+    developedFeet: 120,
+    availablePsi: defaultAvailable,
+    maxVelocity: 8,
+  });
+  return { material: m, ...r };
+});
+
+const styles = plumbingAccentStyles.sky;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Water Pipe Size Calculator — Velocity & Pressure" />
+    <meta
+      property="og:description"
+      content="Get the water supply pipe size your job needs from demand, run length and available pressure — checked against both the velocity ceiling and the friction budget. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Water Pipe Size Calculator — Velocity & Pressure" />
+    <meta
+      name="twitter:description"
+      content="The water pipe size your job needs, sized by velocity and pressure. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Water Pipe Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · IPC 2021 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Water Pipe Size Calculator <span class="text-sky-600">— Velocity &amp; Pressure</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Sizing a supply line means satisfying two separate rules, and the larger answer wins. First
+              <strong>velocity</strong>: water moving too fast is noisy and erodes the pipe from the inside.
+              Second <strong>pressure</strong>: after the lift to the top fixture, the fixture's own
+              requirement and the meter have taken their cut, only so much psi is left to spend on friction.
+              This calculator runs both and tells you which one governed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+            </svg>
+            Size your supply line
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="ps-gpm" class="text-sm font-semibold text-slate-800">Peak demand</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="ps-gpm"
+                      type="number"
+                      min="0"
+                      max="200"
+                      step="0.1"
+                      value="18"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">gpm</span>
+                  </div>
+                </div>
+                <input
+                  id="ps-gpm-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="18"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-sky-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>100 gpm</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  From the Water Supply Fixture Unit Calculator, or a measured figure if you have one.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                  <label for="ps-material" class="text-sm font-semibold text-slate-800">Pipe material</label>
+                  <select
+                    id="ps-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    {
+                      MATERIALS.map((m) => (
+                        <option value={m} selected={m === "copper-l"}>
+                          {PIPE_MATERIAL_LABELS[m]}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="ps-length" class="text-sm font-semibold text-slate-800">Developed length</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ps-length"
+                      type="number"
+                      min="1"
+                      max="2000"
+                      value="120"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Measured run plus fitting equivalents.</p>
+                </div>
+
+                <div>
+                  <label for="ps-supply" class="text-sm font-semibold text-slate-800">Supply pressure</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ps-supply"
+                      type="number"
+                      min="0"
+                      max="200"
+                      value="60"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Static street or well pressure at the meter.</p>
+                </div>
+
+                <div>
+                  <label for="ps-rise" class="text-sm font-semibold text-slate-800">
+                    Height to highest fixture
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ps-rise"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="20"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Costs 0.4331 psi per foot, regardless of flow.</p>
+                </div>
+
+                <div>
+                  <label for="ps-fixture-psi" class="text-sm font-semibold text-slate-800">
+                    Pressure needed at the fixture
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ps-fixture-psi"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value="15"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">8–15 psi typical; a flushometer wants about 25.</p>
+                </div>
+
+                <div>
+                  <label for="ps-meter" class="text-sm font-semibold text-slate-800">Meter loss</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="ps-meter"
+                      type="number"
+                      min="0"
+                      max="60"
+                      value="8"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Plus any softener or backflow device.</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="ps-max-velocity" class="text-sm font-semibold text-slate-800">
+                    Velocity ceiling
+                  </label>
+                  <select
+                    id="ps-max-velocity"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="8" selected>8 ft/s — cold water</option>
+                    <option value="5">5 ft/s — hot water (erosion-corrosion)</option>
+                    <option value="4">4 ft/s — quiet / recirculating loop</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    ASPE and tube-manufacturer design practice, not a numeric IPC figure.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="ps-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-sky-100 bg-sky-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Required nominal size</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="ps-size" class="text-5xl font-extrabold tracking-tight text-sky-600">1"</span>
+              </div>
+              <p id="ps-governed" class="mt-1 text-sm font-semibold text-slate-700">
+                Both rules land on this size — the next size down fails the velocity cap and the friction
+                budget at the same time.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-sky-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Velocity</p>
+                  <p id="ps-velocity" class="mt-1 text-2xl font-bold text-slate-900">7.00 ft/s</p>
+                </div>
+                <div class="rounded-xl border border-sky-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Loss per 100 ft</p>
+                  <p id="ps-loss" class="mt-1 text-2xl font-bold text-slate-900">8.98 psi</p>
+                </div>
+              </div>
+
+              <div id="ps-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Over the pressure budget</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  The chosen size satisfies velocity but spends more pressure than the system has. Shorten the
+                  run, reduce fittings, or raise the supply pressure.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-sky-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Elevation cost</span><span id="ps-bd-elevation" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Left for friction</span><span id="ps-bd-available" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Allowable loss</span><span id="ps-bd-allowable" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Actual inside diameter</span><span id="ps-bd-id" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Loss over the whole run</span><span id="ps-bd-loss-total" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Arriving at the fixture</span><span id="ps-bd-arriving" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Simultaneous-use diversity beyond the demand figure you enter, water
+                quality, and existing piping are not modelled. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Build a pressure budget, then find the smallest pipe that lives inside it without moving the water
+            too fast.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-sky-300"># Step 1 — What's left for the pipe to spend</div>
+            <div>
+              available&nbsp;=&nbsp;supply&nbsp;−&nbsp;<span class="text-amber-300">0.4331</span> ×
+              lift&nbsp;−&nbsp;fixture psi&nbsp;−&nbsp;meter&nbsp;−&nbsp;other
+            </div>
+            <div class="mt-4 text-sky-300"># Step 2 — Spread it over the run</div>
+            <div>allowable psi/100 ft&nbsp;=&nbsp;available ÷ developed length × <span class="text-amber-300">100</span></div>
+            <div class="mt-4 text-sky-300"># Step 3 — Velocity check (ASPE practice)</div>
+            <div>
+              V&nbsp;=&nbsp;<span class="text-amber-300">0.4085</span> × Q ÷
+              d²&nbsp;&nbsp;·&nbsp;&nbsp;cap&nbsp;=&nbsp;<span class="text-amber-300">8</span> ft/s
+              cold,&nbsp;<span class="text-amber-300">5</span> hot
+            </div>
+            <div class="mt-4 text-sky-300"># Step 4 — Friction check (Hazen-Williams)</div>
+            <div>
+              psi/ft&nbsp;=&nbsp;<span class="text-amber-300">4.52</span> × Q^<span class="text-amber-300"
+                >1.852</span
+              > ÷ (C^<span class="text-amber-300">1.852</span> × d^<span class="text-amber-300">4.8704</span>)
+            </div>
+            <div class="mt-4 text-sky-300"># Step 5 — The larger size wins</div>
+            <div>answer&nbsp;=&nbsp;max(smallest size passing velocity, smallest size passing friction)</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why d to the power of 4.87</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Friction is brutally sensitive to bore. Going up one size from 3/4 to 1 inch copper widens the
+                bore by 31% and cuts the loss by roughly 73% at the same flow. This is why upsizing beats
+                almost every other fix.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Nominal size is not the bore</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Nominal 1 inch means 1.025 in of bore in Type L copper, 1.055 in Type M, 1.049 in Schedule 40
+                — and only 0.875 in PEX. Every calculation here uses the real inside diameter, computed from
+                the outside diameter and wall thickness.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The lift is free of flow</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Elevation costs 0.4331 psi per foot whether you are drawing 2 gpm or 200. It is the one loss in
+                the system you cannot design away — and the reason top-floor fixtures are always the worst case.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Hot water gets a lower cap</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Erosion-corrosion in copper accelerates with temperature, so hot lines are held to about 5 ft/s
+                against 8 for cold. A recirculating loop that runs constantly is often designed lower still.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the same job in PEX, and the long run where friction takes over from velocity.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Two-bathroom house main — 18 gpm, 120 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Type L copper · 60 psi supply · 20 ft to the highest fixture · 15 psi at the fixture · 8 psi
+              meter · 8 ft/s cap. These are the calculator's defaults.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              elevation = 0.4331 × 20 = 8.66 psi<br />
+              available = 60 − 8.66 − 15 − 8 = 28.34 psi<br />
+              allowable = 28.34 ÷ 120 × 100 = 23.62 psi/100 ft<br />
+              3/4": v = 11.93 ft/s <span class="font-bold text-red-600">✗</span>, loss = 32.91 psi/100 ft
+              <span class="font-bold text-red-600">✗</span><br />
+              1": v = 7.00 ft/s ✓, loss = 8.98 psi/100 ft ✓<br />
+              → <span class="font-bold text-sky-700">1 inch — both rules agree</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 1 inch, using 10.77 psi of a 28.34 psi
+              budget. The 3/4-inch pipe most people reach for fails on velocity by 49% and on friction by 39%
+              simultaneously.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same job in PEX — one size up</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Identical inputs, material changed to PEX.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              nominal 1" PEX bore = 0.875 in (copper L = 1.025 in)<br />
+              1" PEX: v = 0.4085 × 18 ÷ 0.875² = 9.60 ft/s
+              <span class="font-bold text-red-600">✗ over 8</span><br />
+              1-1/4" PEX bore 1.069: v = 6.43 ft/s ✓<br />
+              → <span class="font-bold text-sky-700">1-1/4 inch PEX</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> PEX needs a size up despite having the
+              better roughness coefficient — 150 against copper's 140. Outside-diameter-controlled tubing
+              trades bore for wall thickness, and the friction term cares about bore far more.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Long run to an outbuilding — 12 gpm, 400 ft</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Type L copper · same 60 psi and 28.34 psi budget · developed length stretched to 400 ft.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              allowable = 28.34 ÷ 400 × 100 = 7.08 psi/100 ft<br />
+              3/4": v = 7.96 ft/s ✓ velocity, loss = 15.53 psi/100 ft
+              <span class="font-bold text-red-600">✗ friction</span><br />
+              1": v = 4.67 ft/s, loss = 4.24 psi/100 ft ✓<br />
+              → <span class="font-bold text-sky-700">1 inch — friction governs alone</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> at 120 ft this flow rides 3/4 inch
+              comfortably; at 400 ft the same flow needs 1 inch on friction alone, while velocity still says
+              3/4 inch is fine. Distance, not flow, moved the answer.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Pipe size by demand</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Type L copper over a 120-foot developed run on the default 28.34 psi friction budget — computed by
+            the same code that runs the calculator above.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Demand</th>
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-5 font-semibold">Velocity</th>
+                  <th class="py-3 px-5 font-semibold">Loss / 100 ft</th>
+                  <th class="py-3 px-5 font-semibold">Governed by</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  gpmLadder.map((row, index) => (
+                    <tr class={index === gpmLadder.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.gpm} gpm</td>
+                      <td class="py-3 px-5">{row.size === null ? "—" : sizeLabel(row.size)}</td>
+                      <td class="py-3 px-5">{fmt(row.velocity, 2)} ft/s</td>
+                      <td class="py-3 px-5">{fmt(row.lossPer100, 2)} psi</td>
+                      <td class="py-3 px-5 capitalize">{row.governedBy}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            The same 18 gpm in every material
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Nominal size is not bore. This is why a material swap can quietly change the size you need.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Material</th>
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-5 font-semibold">Actual bore</th>
+                  <th class="py-3 px-5 font-semibold">Velocity</th>
+                  <th class="py-3 px-5 font-semibold">Loss / 100 ft</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  materialLadder.map((row, index) => (
+                    <tr class={index === materialLadder.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {PIPE_MATERIAL_LABELS[row.material]}
+                      </td>
+                      <td class="py-3 px-5">
+                        {row.size === null ? "—" : sizeLabel(row.size)}
+                        {row.size !== null && row.size > 1 && (
+                          <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            size up
+                          </span>
+                        )}
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.id, 3)} in</td>
+                      <td class="py-3 px-5">{fmt(row.velocity, 2)} ft/s</td>
+                      <td class="py-3 px-5">{fmt(row.lossPer100, 2)} psi</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: IPC 2021 Appendix E — <a
+              class="underline hover:text-sky-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">Sizing of Water Piping System</a
+            >; IPC 604.3 maximum fixture flow rates; pipe dimensions from <a
+              class="underline hover:text-sky-600"
+              href="https://www.astm.org/"
+              target="_blank"
+              rel="noopener">ASTM</a
+            > B88 (copper), F876 (PEX) and D1785 (Schedule 40), with every inside diameter computed from
+            outside diameter and wall thickness; velocity limits and the Hazen-Williams method per <a
+              class="underline hover:text-sky-600"
+              href="https://www.aspe.org/"
+              target="_blank"
+              rel="noopener">ASPE</a
+            > and the <a
+              class="underline hover:text-sky-600"
+              href="https://www.copper.org/applications/plumbing/"
+              target="_blank"
+              rel="noopener">Copper Development Association</a
+            >. Appendix E applies only where adopted; UPC jurisdictions size differently. Local amendments
+            override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about water pipe sizing, velocity limits, and pressure budgets."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingPipeSizeCalculator } from "@/scripts/calculators/plumbing-pipe-size-calculator";
+    initPlumbingPipeSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0284c7;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0284c7;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

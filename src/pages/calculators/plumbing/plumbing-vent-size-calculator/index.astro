@@ -1,0 +1,634 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  TABLE_909_1,
+  VENT_LENGTH_UPSIZE_FEET,
+  fmt,
+  sizeLabel,
+  totalFall,
+  trapArmMaxFeet,
+  ventSize,
+} from "@/lib/plumbing";
+
+const title = "Vent Pipe Size Calculator — IPC 906.2 & Trap Arm | TradesQuote";
+const description =
+  "Free vent pipe size calculator. Get the individual or branch vent size from the drain it serves under IPC 906.2, plus the Table 909.1 maximum distance from the trap weir to the vent fitting.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-vent-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Vent Pipe Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Vent Pipe Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online vent pipe size calculator applying IPC 906.2 — vent diameter at least half the drain served, never below 1-1/4 inch, upsized one nominal size past 40 feet of developed length — with IPC Table 909.1 trap arm limits.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size vent pipe do I need?",
+    answer:
+      "Under IPC 906.2 an individual or branch vent must be at least <strong>half the diameter of the drain it serves</strong>, and never smaller than 1-1/4 inch. So a 3-inch drain takes a <strong>1-1/2 inch</strong> vent, a 2-inch drain takes 1-1/4 inch, and a 4-inch drain takes 2 inch. Past 40 feet of developed length the vent goes up one nominal size for its whole run.",
+  },
+  {
+    question: "How far can a toilet be from its vent?",
+    answer:
+      'Two different answers, and this is where people get caught. IPC Table 909.1 gives a 3-inch fixture drain a <strong>12-foot</strong> trap arm, but the code also says the developed length is <strong>not limited for self-siphoning fixtures such as water closets</strong> — a toilet\'s own trap refills from the bowl, so it cannot siphon itself dry. The 12-foot figure binds on other 3-inch fixtures, not on the closet.',
+  },
+  {
+    question: "What is a trap arm and why is it limited?",
+    answer:
+      "The trap arm is the run from the trap weir to the vent fitting. If it is too long, the drain fills and flows full, and full flow pulls a vacuum behind it that <strong>siphons the trap seal out</strong> — leaving an open path for sewer gas. The limits in Table 909.1 keep the arm short enough that the pipe never runs full: 5 ft at 1-1/4 inch, 6 ft at 1-1/2, <strong>8 ft at 2 inch</strong>, 12 ft at 3 inch and 16 ft at 4 inch.",
+  },
+  {
+    question: "Why does a vent get bigger past 40 feet?",
+    answer:
+      "Because a vent has to move air, and air moving through a long small pipe meets real friction. IPC 906.2 requires a vent exceeding <strong>40 feet of developed length</strong> to be increased by one nominal pipe size <em>for the entire developed length</em> — not just the far end. A 3-inch drain's 1-1/2 inch vent becomes 2 inch across the whole run.",
+  },
+  {
+    question: "Does this size a vent stack for a multi-storey building?",
+    answer:
+      "No, and the page will not pretend otherwise. This tool covers <strong>individual, common and branch vents</strong> under 906.2, which is the great majority of residential and light-commercial work. A <strong>vent stack or stack vent</strong> serving a multi-storey drainage stack is sized by <strong>IPC Table 906.1</strong> against the stack diameter, the total DFU connected and the developed length — go to the code for that one.",
+  },
+  {
+    question: "Can I use an air admittance valve instead?",
+    answer:
+      "Sometimes. An AAV lets air in but not out, so it can relieve a vacuum without a roof penetration — useful for an island sink or a retrofit. But it does not relieve <em>positive</em> pressure, so a building still needs at least one conventional vent to atmosphere, and some jurisdictions restrict or prohibit AAVs entirely. Check locally before designing around one.",
+  },
+  {
+    question: "What slope does a trap arm need?",
+    answer:
+      "The same as any drain of its size, and Table 909.1 states it alongside the length: <strong>1/4 inch per foot</strong> for 2 inch and smaller, <strong>1/8 inch per foot</strong> for 3 and 4 inch. There is also an upper bound implied by the rule that the vent connection must be above the trap weir — a trap arm that falls more than one pipe diameter over its length puts the vent below the weir and re-creates the siphon it was meant to prevent.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Vented? Quote the whole job in seconds.";
+const ctaDescription =
+  "Vent pipe, fittings, roof flashings and labor all land on the invoice. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+    title: "Drain Pipe Size Calculator",
+    description: "Size the drain this vent protects.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "Total the load on the system.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+    title: "Drain Pipe Slope Calculator",
+    description: "The fall a trap arm needs on its way to the vent.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "The pressure side of the same system.",
+  },
+];
+
+const DRAIN_SIZES = [1.25, 1.5, 2, 3, 4, 6];
+
+/** Reference table computed from the lib. */
+const ventTable = DRAIN_SIZES.map((d) => {
+  const short = ventSize(d, 30);
+  const long = ventSize(d, 60);
+  const row = TABLE_909_1.find((r) => r.size === d);
+  return {
+    drain: d,
+    short: short.size,
+    long: long.size,
+    armMax: trapArmMaxFeet(d),
+    slope: row?.slope ?? null,
+    armFall: row ? totalFall(row.slope, trapArmMaxFeet(d) ?? 0) : null,
+  };
+});
+
+const styles = plumbingAccentStyles.rose;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Vent Pipe Size Calculator — IPC 906.2 & Trap Arm" />
+    <meta
+      property="og:description"
+      content="Individual and branch vent size from the drain it serves, plus the Table 909.1 maximum trap-arm length. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Vent Pipe Size Calculator — IPC 906.2 & Trap Arm" />
+    <meta
+      name="twitter:description"
+      content="Vent size under IPC 906.2 and trap arm limits from Table 909.1. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Vent Pipe Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              Plumbing Tools · IPC 906.2 &amp; 909.1 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Vent Pipe Size Calculator <span class="text-rose-600">— IPC 906.2 &amp; Trap Arm</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A vent exists to let air in behind draining water so the trap seals stay put. Two rules govern
+              it: the vent must be at least <strong>half the diameter of the drain it serves</strong>, and the
+              <strong>trap arm</strong> — from the trap weir to the vent fitting — has a maximum length by
+              size. Get both wrong and the trap siphons dry, which is how sewer gas reaches a room.
+            </p>
+
+            <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-sm text-slate-600 leading-relaxed">
+                <span class="font-semibold text-slate-900">Scope:</span> this covers
+                <strong>individual, common and branch vents</strong> under IPC 906.2. A vent stack or stack
+                vent on a multi-storey drainage stack is sized by <strong>IPC Table 906.1</strong> against
+                stack diameter, total DFU and developed length — that table is not reproduced here, so go to
+                the code for it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+            </svg>
+            Size your vent
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="vs-length" class="text-sm font-semibold text-slate-800">
+                    Vent developed length
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="vs-length"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="30"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft</span>
+                  </div>
+                </div>
+                <input
+                  id="vs-length-range"
+                  type="range"
+                  min="5"
+                  max="200"
+                  step="1"
+                  value="30"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>5</span><span>200 ft</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  From the vent connection to the open air. Over {VENT_LENGTH_UPSIZE_FEET} ft adds a size.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="vs-drain" class="text-sm font-semibold text-slate-800">Drain size served</label>
+                  <select
+                    id="vs-drain"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  >
+                    {
+                      DRAIN_SIZES.map((n) => (
+                        <option value={n} selected={n === 3}>
+                          {sizeLabel(n)}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="vs-trap-arm" class="text-sm font-semibold text-slate-800">
+                    Trap arm length
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="vs-trap-arm"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value="6"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Trap weir to the vent fitting.</p>
+                </div>
+              </div>
+
+              <button
+                id="vs-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-rose-100 bg-rose-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Minimum vent size</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="vs-size" class="text-5xl font-extrabold tracking-tight text-rose-600">1-1/2"</span>
+              </div>
+              <p id="vs-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Half the 3" drain it serves, subject to the 1-1/4 inch floor, under IPC 906.2.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Max trap arm</p>
+                  <p id="vs-trap-max" class="mt-1 text-2xl font-bold text-slate-900">12 ft</p>
+                </div>
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Trap arm status</p>
+                  <p id="vs-trap-verdict" class="mt-1 text-sm font-semibold text-slate-900 leading-snug">
+                    Trap arm has 6.0 ft of slack against the 12 ft Table 909.1 limit.
+                  </p>
+                </div>
+              </div>
+
+              <div id="vs-trap-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Trap arm too long</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  Past the Table 909.1 limit the fixture drain runs full, and full flow pulls the trap seal out
+                  behind it. Move the vent closer to the trap, or add a vent.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-rose-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Half the drain diameter</span><span id="vs-bd-half" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>1-1/4 inch minimum</span><span id="vs-bd-floor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Upsized for length</span><span id="vs-bd-upsize" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Trap arm slope</span><span id="vs-bd-slope" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Trap arm fall</span><span id="vs-bd-fall" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate for individual, common and branch vents. Vent stacks and stack vents need
+                IPC Table 906.1. Developed length is not limited for self-siphoning fixtures such as water
+                closets. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The rules, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Venting is three short rules and one physical mechanism worth understanding.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-rose-300"># Vent diameter (IPC 906.2)</div>
+            <div>vent&nbsp;≥&nbsp;drain diameter ÷ <span class="text-amber-300">2</span></div>
+            <div>and never below <span class="text-amber-300">1-1/4"</span></div>
+            <div class="mt-4 text-rose-300"># The length penalty (IPC 906.2)</div>
+            <div>
+              developed length &gt; <span class="text-amber-300">40</span> ft&nbsp;→&nbsp;+1 nominal size for
+              the WHOLE run
+            </div>
+            <div class="mt-4 text-rose-300"># Trap arm maximum (IPC Table 909.1)</div>
+            <div>
+              1-1/4"&nbsp;<span class="text-amber-300">5</span> ft&nbsp;·&nbsp;1-1/2"&nbsp;<span
+                class="text-amber-300">6</span
+              >&nbsp;·&nbsp;2"&nbsp;<span class="text-amber-300">8</span>&nbsp;·&nbsp;3"&nbsp;<span
+                class="text-amber-300">12</span
+              >&nbsp;·&nbsp;4"&nbsp;<span class="text-amber-300">16</span>
+            </div>
+            <div>slope 1/4 in/ft to 2"&nbsp;·&nbsp;1/8 in/ft at 3" and 4"</div>
+            <div class="mt-4 text-slate-400"># The exception people forget</div>
+            <div>self-siphoning fixtures (water closets) — developed length NOT limited</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why a long trap arm siphons</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A short arm never fills; water runs along the bottom with air above it. A long arm fills and
+                flows full, and a full slug of water pulls a vacuum behind it — which drags the trap seal out
+                with it and leaves the room open to the drain.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why toilets are exempt</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A water closet siphons itself on purpose — that is how it flushes — and then refills its own
+                trap from the bowl at the end of the cycle. It cannot be left dry by its own discharge, so
+                the trap arm length is not limited for it.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The vent must sit above the weir</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A trap arm that falls more than one pipe diameter over its length puts the vent connection
+                below the trap weir, which re-creates the siphon the vent was meant to prevent. Length and
+                slope interact.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Half the drain, not half the fixture</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The rule keys off the <em>required drain diameter</em>, not the fixture outlet or the trap. If
+                the drain was upsized for any reason, the vent follows it up.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the 40-foot penalty, and the lavatory that fails on trap arm rather than vent size.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">3-inch drain, 30 ft of vent, 6 ft trap arm</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              half of 3" = 1.5 in → <span class="font-bold text-rose-700">1-1/2 inch vent</span><br />
+              30 ft developed, under 40 → no upsize<br />
+              Table 909.1 for 3": max 12 ft at 1/8 in/ft<br />
+              6 ft arm → <span class="font-bold text-rose-700">6.0 ft of slack ✓</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 1-1/2 inch vent, and the trap sits
+              comfortably inside its limit. This is the ordinary residential case.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same drain, 60 ft of vent</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              half of 3" = 1.5 in → 1-1/2 inch on diameter alone<br />
+              60 ft &gt; 40 ft → +1 nominal size for the ENTIRE run<br />
+              → <span class="font-bold text-rose-700">2 inch vent, all 60 feet of it</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 2 inch. The word that costs money here
+              is <em>entire</em> — you cannot run 1-1/2 inch for the first 40 feet and step up. A long
+              horizontal vent run to a shared stack quietly upsizes the whole thing.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Lavatory on a long wall — the arm fails first</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              A 1-1/2 inch lavatory drain, vent 15 ft away, trap arm run 9 ft along a wall to reach a stack.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              vent size: half of 1-1/2" = 0.75 in → floor applies →
+              <span class="font-bold text-rose-700">1-1/4 inch ✓</span><br />
+              Table 909.1 for 1-1/2": max <span class="font-bold text-rose-700">6 ft</span><br />
+              9 ft arm → <span class="font-bold text-red-600">3 ft too long ✗</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the vent size is fine and the
+              installation still fails. Fixes are to move the vent within 6 feet, upsize the fixture drain to 2
+              inch to buy 8 feet, or add a vent. Small fixtures have short arms — 1-1/4 inch gets only 5 feet.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLE ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Vent size and trap arm by drain size
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Computed from the same code the calculator uses. The two vent columns show the 906.2 length
+            penalty: everything gains a nominal size once the developed run passes 40 feet.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Drain served</th>
+                  <th class="py-3 px-5 font-semibold">Vent ≤ 40 ft</th>
+                  <th class="py-3 px-5 font-semibold">Vent &gt; 40 ft</th>
+                  <th class="py-3 px-5 font-semibold">Max trap arm</th>
+                  <th class="py-3 px-5 font-semibold">Arm slope</th>
+                  <th class="py-3 px-5 font-semibold">Fall at max</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ventTable.map((row, index) => (
+                    <tr class={index === ventTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.drain)}</td>
+                      <td class="py-3 px-5">{sizeLabel(row.short)}</td>
+                      <td class="py-3 px-5">{sizeLabel(row.long)}</td>
+                      <td class="py-3 px-5">{row.armMax === null ? "not listed" : `${row.armMax} ft`}</td>
+                      <td class="py-3 px-5">{row.slope === null ? "—" : `${row.slope} in/ft`}</td>
+                      <td class="py-3 px-5">
+                        {row.armFall === null || row.armMax === null ? "—" : `${fmt(row.armFall, 1)} in`}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-rose-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 906.2 (vent diameter at least half the drain served, 1-1/4 inch minimum, one size larger past
+            40 feet of developed length) and Table 909.1 (distance of trap from vent), which also states that
+            developed length is not limited for self-siphoning fixtures. Vent stacks and stack vents are sized
+            by Table 906.1, which is deliberately not reproduced here. Air admittance valves are governed by
+            IPC 917 and are restricted in some jurisdictions. Roughly fifteen states use the <a
+              class="underline hover:text-rose-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative, which vents differently. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about vent sizing, trap arms, and why traps siphon."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingVentSizeCalculator } from "@/scripts/calculators/plumbing-vent-size-calculator";
+    initPlumbingVentSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

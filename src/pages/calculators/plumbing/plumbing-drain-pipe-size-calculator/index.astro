@@ -1,0 +1,688 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  DRAIN_APPLICATION_LABELS,
+  TABLE_710_1_1,
+  TABLE_710_1_2,
+  minSlope,
+  sizeLabel,
+  type DrainApplication,
+} from "@/lib/plumbing";
+
+const title = "Drain Pipe Size Calculator — IPC Table 710.1 | TradesQuote";
+const description =
+  "Free drain pipe size calculator. Enter the DFU load to size a building drain, sewer, horizontal branch or stack from IPC Tables 710.1(1) and 710.1(2) — with the water-closet rule that floors a building drain at 3 inches applied automatically.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-drain-pipe-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Drain Pipe Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Drain Pipe Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online drain pipe size calculator that sizes building drains, sewers, horizontal fixture branches and soil stacks from a drainage fixture unit load using IPC Tables 710.1(1) and 710.1(2).",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size drain pipe do I need?",
+    answer:
+      "For a typical house at <strong>18 DFU</strong> on a building drain at 1/4 inch per foot, the answer is <strong>3 inch</strong> — and not because of the load. Table 710.1(1) would carry 18 DFU on a 2-inch drain, but a water closet anywhere on a building drain floors it at 3 inches. The 3-inch pipe then carries 42 DFU, well over double what the house produces.",
+  },
+  {
+    question: "Why does a taller stack carry more than a short one?",
+    answer:
+      "This is the most counter-intuitive line in the whole table, and almost nobody explains it. A 2-inch stack carries <strong>10 DFU over three branch intervals or less, but 24 DFU over more than three</strong>. The reason is terminal velocity: water falling in a stack accelerates until friction against the pipe wall balances gravity, then settles into a stable annular sheet clinging to the wall with air down the middle. That regime only develops with height — a short stack never reaches it, so it is rated more conservatively.",
+  },
+  {
+    question: "Does slope change the size I need?",
+    answer:
+      "For a building drain or sewer, yes — steeper carries more. A 4-inch building drain takes <strong>180 DFU at 1/8 in/ft, 216 at 1/4, and 250 at 1/2</strong>. For horizontal branches and stacks, no: Table 710.1(2) is slope-independent, because those runs are already assumed to be at the fall the code requires.",
+  },
+  {
+    question: "Can I put a toilet on a 2-inch drain?",
+    answer:
+      "No. Independently of DFU load, a water closet needs a <strong>3-inch</strong> branch, and any building drain serving one is floored at 3 inches by the footnote to Table 710.1(1). The load arithmetic will happily tell you 2 inch is enough — it is wrong, and this is the mistake the calculator is built to catch.",
+  },
+  {
+    question: "How many toilets can I put on a 3-inch pipe?",
+    answer:
+      "The DFU capacity is not the binding limit here — the footnotes to Table 710.1(2) are. A 3-inch <strong>horizontal branch</strong> is limited to <strong>two</strong> water closets, and a 3-inch <strong>stack</strong> to six, regardless of what the DFU column allows. Check the footnotes rather than the number whenever water closets are involved.",
+  },
+  {
+    question: "What is a branch interval?",
+    answer:
+      "A vertical length of stack, at least 8 feet high, within which the horizontal branches from one storey connect. In practice it is one floor of a building. It matters because the stack columns in Table 710.1(2) split at three intervals, and because there is a separate limit on how much can discharge into any single interval.",
+  },
+  {
+    question: "Should I oversize the drain to be safe?",
+    answer:
+      "Not much, and never at the expense of slope. A drain flowing too slowly does not carry solids — the liquid outruns them and they settle. An oversized pipe at minimum grade runs shallower and slower than a correctly sized one, which is how a 4-inch line in a house that needs 3-inch ends up blocking. Size it right and get the fall right.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Drain sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "Pipe, fittings, excavation, and labor all follow from the size. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "Work out the DFU load to enter here.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+    title: "Drain Pipe Slope Calculator",
+    description: "Get the fall this size needs to scour.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-vent-size-calculator",
+    title: "Vent Pipe Size Calculator",
+    description: "Size the vent from the drain it protects.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "For anything below the sewer that has to be lifted.",
+  },
+];
+
+const APPLICATIONS: DrainApplication[] = [
+  "building-drain",
+  "horizontal-branch",
+  "stack-short",
+  "stack-tall",
+];
+
+const styles = plumbingAccentStyles.indigo;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Drain Pipe Size Calculator — IPC Table 710.1" />
+    <meta
+      property="og:description"
+      content="Size a building drain, sewer, branch or stack from its DFU load, with the water-closet 3-inch floor applied. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Drain Pipe Size Calculator — IPC Table 710.1" />
+    <meta
+      name="twitter:description"
+      content="Drain, sewer, branch and stack sizing from DFU load. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Drain Pipe Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · IPC Table 710.1 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Drain Pipe Size Calculator <span class="text-indigo-600">— IPC Table 710.1</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Drainage sizing is a table lookup with one important override. Enter the
+              <strong>DFU load</strong> and what you are sizing — a building drain or sewer, a horizontal
+              fixture branch, or a stack — and this returns the smallest pipe the code allows, the capacity
+              you are left with, and the minimum fall it needs. If a water closet is on the run, the 3-inch
+              floor is applied and flagged.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Size your drain
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="dps-dfu" class="text-sm font-semibold text-slate-800">
+                    Drainage fixture unit load
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="dps-dfu"
+                      type="number"
+                      min="0"
+                      max="12000"
+                      value="18"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">DFU</span>
+                  </div>
+                </div>
+                <input
+                  id="dps-dfu-range"
+                  type="range"
+                  min="1"
+                  max="500"
+                  step="1"
+                  value="18"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-indigo-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>500 DFU</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                  <label for="dps-application" class="text-sm font-semibold text-slate-800">
+                    What are you sizing?
+                  </label>
+                  <select
+                    id="dps-application"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    {
+                      APPLICATIONS.map((a) => (
+                        <option value={a} selected={a === "building-drain"}>
+                          {DRAIN_APPLICATION_LABELS[a]}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Building drains use Table 710.1(1); branches and stacks use Table 710.1(2).
+                  </p>
+                </div>
+
+                <div>
+                  <label for="dps-slope" class="text-sm font-semibold text-slate-800">Slope</label>
+                  <select
+                    id="dps-slope"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    <option value="0.0625">1/16 in/ft (0.52%)</option>
+                    <option value="0.125">1/8 in/ft (1.04%)</option>
+                    <option value="0.25" selected>1/4 in/ft (2.08%)</option>
+                    <option value="0.5">1/2 in/ft (4.17%)</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Applies to building drains and sewers only.</p>
+                </div>
+
+                <div>
+                  <label for="dps-water-closet" class="text-sm font-semibold text-slate-800">
+                    Serves a water closet?
+                  </label>
+                  <select
+                    id="dps-water-closet"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    <option value="yes" selected>Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Floors a building drain at 3 inches.</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="dps-run" class="text-sm font-semibold text-slate-800">Run length</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="dps-run"
+                      type="number"
+                      min="0"
+                      max="2000"
+                      value="40"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Used to work out the total fall the run needs.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="dps-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div
+              class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6"
+            >
+              <p class="text-sm font-medium text-slate-600">Minimum drain size</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="dps-size" class="text-5xl font-extrabold tracking-tight text-indigo-600">3"</span>
+              </div>
+              <p id="dps-note" class="mt-1 text-sm font-semibold text-slate-700">
+                The DFU load alone would ride 2", but a building drain serving a water closet is floored at 3
+                inches.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">That size carries</p>
+                  <p id="dps-capacity" class="mt-1 text-2xl font-bold text-slate-900">42 DFU</p>
+                </div>
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Spare capacity</p>
+                  <p id="dps-headroom" class="mt-1 text-2xl font-bold text-slate-900">24 DFU</p>
+                </div>
+              </div>
+
+              <div id="dps-wc-notice" class="mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">The water-closet floor applied</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  The footnote to Table 710.1(1) sets a 3-inch minimum on any building drain serving a water
+                  closet, whatever the DFU total says. Turn the toggle off to see the load-only answer.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Size from the table</span><span id="dps-bd-table" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Minimum slope (704.1)</span><span id="dps-bd-min-slope" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Total fall over the run</span><span id="dps-bd-fall" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Flowing half full</span><span id="dps-bd-velocity" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>One size up</span><span id="dps-bd-next" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Water-closet <em>count</em> limits in the Table 710.1(2) footnotes (two on a
+                3-inch branch, six on a 3-inch stack) are not applied automatically — check them. A licensed
+                plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Two tables, chosen by what you are sizing, plus the rules that sit on top of them.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-indigo-300"># Building drain or sewer — Table 710.1(1), slope matters</div>
+            <div>size&nbsp;=&nbsp;smallest whose DFU capacity at that slope ≥ load</div>
+            <div class="mt-4 text-indigo-300"># Branch or stack — Table 710.1(2), slope-independent</div>
+            <div>
+              columns: horizontal branch&nbsp;·&nbsp;one branch interval&nbsp;·&nbsp;stack ≤3&nbsp;·&nbsp;stack
+              &gt;3
+            </div>
+            <div class="mt-4 text-indigo-300"># The override (footnote to Table 710.1(1))</div>
+            <div>
+              building drain serving a water closet&nbsp;≥&nbsp;<span class="text-amber-300">3"</span>
+            </div>
+            <div class="mt-4 text-indigo-300"># Then the slope the size demands (Table 704.1)</div>
+            <div>
+              ≤ 2-1/2"&nbsp;→&nbsp;<span class="text-amber-300">1/4</span> in/ft&nbsp;·&nbsp;3" to
+              6"&nbsp;→&nbsp;<span class="text-amber-300">1/8</span>&nbsp;·&nbsp;≥ 8"&nbsp;→&nbsp;<span
+                class="text-amber-300">1/16</span
+              >
+            </div>
+            <div class="mt-4 text-slate-400"># And the footnote limits worth remembering</div>
+            <div>3" horizontal branch&nbsp;≤&nbsp;2 water closets&nbsp;·&nbsp;3" stack&nbsp;≤&nbsp;6</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why stacks are rated by height</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Water falling in a stack reaches terminal velocity within a couple of storeys and settles into
+                an annular sheet on the wall with an air core down the middle. That regime moves more than
+                unsteady falling water, so a stack over three branch intervals gets a higher rating.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Steeper is not always better</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Above about 1/2 inch per foot the liquid can outrun the solids and leave them behind. Drainage
+                wants a self-scouring flow, roughly 2 ft/s, not the fastest possible one.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Oversizing causes blockages</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A too-large pipe at minimum grade runs shallow and slow, and solids settle. This is the
+                counter-intuitive failure mode behind a lot of 4-inch house drains that should have been 3.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The branch interval</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A vertical length of stack at least 8 feet high taking the branches of one storey. It is why
+                the stack columns split at three, and why there is a separate cap on discharge into any single
+                interval.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The same 18 DFU in three places, and what the slope choice buys on a bigger sewer.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+              >
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">House building drain — 18 DFU, 1/4 in/ft</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Table 710.1(1) at 1/4 in/ft: 2" = 21 DFU → 2" carries it<br />
+              water closet on the run → floor at 3"<br />
+              → <span class="font-bold text-indigo-700">3 inch</span>, capacity 42 DFU, 24 spare<br />
+              min slope for 3" = 1/8 in/ft, so 1/4 is comfortably compliant<br />
+              fall over 40 ft at 1/4 = 10.0 in
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 3 inch. Note the calculator is run at
+              1/4 in/ft here even though 3-inch only requires 1/8 — extra fall is fine and helps scouring, it
+              is <em>too little</em> that causes trouble.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+              >
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same 18 DFU as a branch and as a stack</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              horizontal branch: 2-1/2" = 12, 3" = 20 → <span class="font-bold text-indigo-700">3 inch</span
+              ><br />
+              stack, ≤3 branch intervals: 2" = 10, 2-1/2" = 20 →
+              <span class="font-bold text-indigo-700">2-1/2 inch</span><br />
+              stack, &gt;3 branch intervals: 2" = <span class="font-bold text-indigo-700">24</span> →
+              <span class="font-bold text-indigo-700">2 inch</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> three different answers for one load.
+              The tall stack is the smallest — a 2-inch pipe carries 10 DFU over three storeys but
+              <strong>24 over more than three</strong>, because terminal-velocity annular flow only develops
+              with height.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+              >
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Apartment block sewer — what slope buys</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">200 DFU on a building sewer, three slope options.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              at 1/8 in/ft: 4" carries 180 <span class="font-bold text-red-600">✗</span> → 5 inch<br />
+              at 1/4 in/ft: 4" carries 216 ✓ → <span class="font-bold text-indigo-700">4 inch</span><br />
+              at 1/2 in/ft: 4" carries 250 ✓ → 4 inch
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> going from 1/8 to 1/4 inch per foot
+              saves a whole pipe size. Over a long sewer run that is a meaningful saving in pipe and trench
+              width — as long as the fall is available, since 1/4 in/ft over 100 feet needs 25 inches of depth.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            IPC Table 710.1(1) — building drains and sewers
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Maximum DFU load at each slope, rendered from the same data the calculator uses. A dash means the
+            size is not listed at that slope. The last column is the minimum slope the size itself requires
+            under Table 704.1.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-5 font-semibold">1/16 in/ft</th>
+                  <th class="py-3 px-5 font-semibold">1/8 in/ft</th>
+                  <th class="py-3 px-5 font-semibold">1/4 in/ft</th>
+                  <th class="py-3 px-5 font-semibold">1/2 in/ft</th>
+                  <th class="py-3 px-5 font-semibold">Min slope</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  TABLE_710_1_1.map((row, index) => (
+                    <tr class={index === TABLE_710_1_1.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.size)}</td>
+                      <td class="py-3 px-5">{row.slopes["0.0625"] ?? "—"}</td>
+                      <td class="py-3 px-5">{row.slopes["0.125"] ?? "—"}</td>
+                      <td class="py-3 px-5">{row.slopes["0.25"] ?? "—"}</td>
+                      <td class="py-3 px-5">{row.slopes["0.5"] ?? "—"}</td>
+                      <td class="py-3 px-5 text-slate-500">{minSlope(row.size)} in/ft</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            IPC Table 710.1(2) — horizontal branches and stacks
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Slope-independent. Compare the last two columns and watch the tall-stack figures overtake the short
+            ones at every size — that is terminal velocity doing the work.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-5 font-semibold">Horizontal branch</th>
+                  <th class="py-3 px-5 font-semibold">One branch interval</th>
+                  <th class="py-3 px-5 font-semibold">Stack, ≤3 intervals</th>
+                  <th class="py-3 px-5 font-semibold">Stack, &gt;3 intervals</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  TABLE_710_1_2.map((row, index) => (
+                    <tr class={index === TABLE_710_1_2.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.size)}</td>
+                      <td class="py-3 px-5">{row.branch}</td>
+                      <td class="py-3 px-5">{row.oneInterval ?? "see footnote"}</td>
+                      <td class="py-3 px-5">{row.stackShort ?? "see footnote"}</td>
+                      <td class="py-3 px-5">{row.stackTall ?? "see footnote"}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-indigo-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 Table 710.1(1) (building drains and sewers), Table 710.1(2) (horizontal fixture branches and
+            stacks) with its water-closet count footnotes, Table 704.1 (minimum slope), and Table 709.1
+            (drainage fixture unit values). Roughly fifteen states use the <a
+              class="underline hover:text-indigo-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative, which sizes drainage differently. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about drain sizing, stacks, slope, and the water-closet rule."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingDrainPipeSizeCalculator } from "@/scripts/calculators/plumbing-drain-pipe-size-calculator";
+    initPlumbingDrainPipeSizeCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>
