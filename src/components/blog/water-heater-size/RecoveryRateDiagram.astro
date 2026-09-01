@@ -1,0 +1,58 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  recoveryGph,
+} from "@/lib/plumbing";
+/** Recovery is what separates fuels, and it is the term people leave out.
+ * Gallons per hour at a 90 F rise, which is a 50 F inlet to 140 F stored. */
+const RISE = 90;
+const UNITS = [
+  { label: "Electric, 3,800 W", btu: 3800 * 3.412142, eff: 1.0 },
+  { label: "Electric, 4,500 W", btu: 4500 * 3.412142, eff: 1.0 },
+  { label: "Electric, 5,500 W", btu: 5500 * 3.412142, eff: 1.0 },
+  { label: "Gas, 32,000 BTU", btu: 32000, eff: 0.8 },
+  { label: "Gas, 40,000 BTU", btu: 40000, eff: 0.8 },
+  { label: "Gas, 50,000 BTU", btu: 50000, eff: 0.8 },
+];
+const withRecovery = UNITS.map((u) => ({ ...u, gph: recoveryGph(u.btu, u.eff, RISE) }));
+const maxGph = Math.max(...withRecovery.map((u) => u.gph));
+
+const rows = withRecovery.map((u) => ({
+  label: u.label,
+  value: u.gph,
+  frac: u.gph / maxGph,
+  display: `${u.gph.toFixed(1)} gallons per hour`,
+  highlight: u.label === "Gas, 40,000 BTU",
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 166;
+const BAR_MAX = 280;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>Recovery rate at a 90 F rise — where the fuels part company</title>
+  <desc>gph = BTU/hr x efficiency divided by 8.33 lb/gal times the temperature rise</desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Recovery rate at a 90 F rise — where the fuels part company</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">gph = BTU/hr x efficiency divided by 8.33 lb/gal times the temperature rise</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">The largest common element still recovers less than the smallest common gas burner. That gap is the whole sizing story.</text>
+</svg>

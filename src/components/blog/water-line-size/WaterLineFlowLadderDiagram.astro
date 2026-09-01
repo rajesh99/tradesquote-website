@@ -1,0 +1,60 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  sizeSupplyPipe, sizeLabel,
+} from "@/lib/plumbing";
+/** Peak demand against the size that carries it. Velocity governs the whole
+ * ladder here, which is typical of residential runs at ordinary pressure. */
+const BASE = {
+  material: "copper-l",
+  developedFeet: 120,
+  supplyPsi: 60,
+  liftFeet: 20,
+  fixturePsi: 15,
+  meterPsi: 8,
+  otherPsi: 0,
+  maxVelocity: 8,
+};
+const FLOWS = [5, 8, 12, 18, 25, 40];
+const results = FLOWS.map((gpm) => ({ gpm, r: sizeSupplyPipe({ ...BASE, gpm }) }));
+const maxSize = Math.max(...results.map((x) => x.r.size));
+
+const rows = results.map(({ gpm, r }) => ({
+  label: `${gpm} gpm`,
+  value: r.size,
+  frac: r.size / maxSize,
+  display: `${sizeLabel(r.size)}  ·  ${r.velocity.toFixed(2)} ft/s  ·  governed by ${r.governedBy}`,
+  highlight: gpm === 18,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 118;
+const BAR_MAX = 214;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>Peak demand into nominal size — copper Type L</title>
+  <desc>120 ft developed run, 60 psi supply, 20 ft of lift, 15 psi needed at the fixture</desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Peak demand into nominal size — copper Type L</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">120 ft developed run, 60 psi supply, 20 ft of lift, 15 psi needed at the fixture</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">Velocity governs every rung of this ladder. Lengthen the run or drop the supply pressure and friction takes over.</text>
+</svg>

@@ -1,0 +1,154 @@
+---
+title: "What Size Water Heater Do I Need? First-Hour Rating, Not Gallons"
+meta_title: "What Size Water Heater Do I Need - FHR Sizing Guide (2026) | TradesQuote"
+description: "A 66-gallon peak hour is met by a 40-gallon gas heater — and needs a 75-gallon electric one. Why first-hour rating decides the answer and the number on the label barely matters."
+image: /images/posts/what-size-water-heater-do-i-need-hero.svg
+date: 2026-09-01T09:40:00Z
+categories: ["plumbing"]
+tags: ["water heater sizing","first hour rating","recovery rate","peak hour demand","gas vs electric"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import PeakHourDemandDiagram from "@/components/blog/water-heater-size/PeakHourDemandDiagram.astro";
+import RecoveryRateDiagram from "@/components/blog/water-heater-size/RecoveryRateDiagram.astro";
+import FhrGasVsElectricDiagram from "@/components/blog/water-heater-size/FhrGasVsElectricDiagram.astro";
+
+Ask what size water heater a house needs and you will get a number of gallons. Forty for a small family, fifty for a bigger one, eighty if you have teenagers.
+
+Gallons is the wrong spec. Here is the case that proves it:
+
+```
+Same house.  Same 66-gallon peak hour.
+
+40 gallon GAS       →  first-hour rating 70.7   fits
+50 gallon ELECTRIC  →  first-hour rating 55.5   fails
+75 gallon ELECTRIC  →  first-hour rating 73.0   fits
+```
+
+A tank with **35 fewer gallons** in it beats one with more, and the bigger tank misses the target the smaller one clears. Nothing about that is explicable in gallons.
+
+## The spec that actually matters
+
+**First-hour rating** is how much hot water a heater delivers in one hour starting from a fully heated tank. It has two parts:
+
+```
+FHR  =  0.70 × tank gallons  +  recovery in one hour
+```
+
+The 0.70 is there because you never get all the tank. As hot water leaves the top, cold enters the bottom and mixes; by the time you have drawn about 70% of the volume the outlet is no longer usefully hot. The rest of the tank is real water you cannot use in that hour.
+
+The second term is the one people leave out entirely, and it is where the whole argument lives.
+
+## Step 1 — what does your peak hour look like?
+
+Not daily consumption. The **busiest single hour**, which for most households is a weekday morning.
+
+<BlogInfographic
+  title="Peak-hour demand for a family morning"
+  caption="Three showers, a dishwasher, a laundry load and two hand-washings inside one hour. This is the number a heater has to beat."
+>
+  <PeakHourDemandDiagram />
+</BlogInfographic>
+
+Three showers, a dishwasher run, a load of laundry and a couple of hand-washings comes to **66 gallons** in the hour. The **[Water Heater Size Calculator](/calculators/plumbing/plumbing-water-heater-size-calculator)** builds this from your own usage.
+
+Be honest about the count. The failure mode people report — "it runs out" — is almost always a peak-hour problem, not a daily-total problem. A household using 200 gallons a day spread evenly needs a far smaller heater than one using 120 gallons with 70 of them between seven and eight in the morning.
+
+## Step 2 — recovery is what separates the fuels
+
+Recovery rate is how many gallons an hour the burner or element can heat through your temperature rise:
+
+```
+gph  =  BTU/hr × efficiency ÷ (8.33 lb/gal × temperature rise)
+```
+
+At a 90 °F rise — 50 °F incoming, 140 °F stored — the numbers are not close.
+
+<BlogInfographic
+  title="Recovery rate at a 90 F rise — where the fuels part company"
+  caption="The largest common electric element still recovers less than the smallest common gas burner. That gap is the entire sizing story."
+>
+  <RecoveryRateDiagram />
+</BlogInfographic>
+
+A 40,000 BTU gas burner at 80% efficiency recovers **42.7 gallons an hour**. A 4,500 W element — the standard residential size — recovers **20.5**. Gas is more than twice as fast, and the reason is simply input: 4,500 W is about 15,400 BTU/hr, roughly a third of what a modest gas burner puts in.
+
+Electric heaters are nearly 100% efficient at converting energy to heat, which is true and irrelevant here. Efficiency is not throughput. You cannot make up a 3:1 input deficit with a 20% efficiency advantage.
+
+## Step 3 — put them together
+
+<BlogInfographic
+  title="First-hour rating, gas against electric — a 66 gallon peak"
+  caption="FHR = 0.70 x tank + one hour of recovery. The 40 gallon gas heater clears the peak; the 50 gallon electric everyone reaches for does not."
+>
+  <FhrGasVsElectricDiagram />
+</BlogInfographic>
+
+At the same 66-gallon peak:
+
+- **40 gallon gas** → 28 usable + 42.7 recovered = **70.7**. Clears it with 4.7 gallons in hand.
+- **50 gallon electric** → 35 usable + 20.5 recovered = **55.5**. Misses by more than ten gallons.
+- **75 gallon electric** → 52.5 + 20.5 = **73.0**. Clears it.
+
+The electric answer to this house is **75 gallons** — nearly double the gas answer for identical performance. That is not a marginal difference in a utility closet, and it is not something you discover from a chart of gallons.
+
+## What actually goes wrong
+
+The complaint is always "we run out of hot water." Underneath it are three different faults.
+
+**Genuinely undersized.** FHR is below peak demand. Adding people, adding a bathroom, or swapping gas for electric like-for-like on gallons all produce this. It is the common one.
+
+**Thermostat set low.** Storage temperature sets both usable draw and effective recovery. Dropping from 140 °F to 120 °F because it "feels safer" cuts capacity meaningfully. The correct answer is to store hot and temper down with a mixing valve — which delivers safe water at the tap *and* stretches the tank, because you are blending cold in at the point of use. On a 140 °F store delivering 120 °F from a 50 °F supply, only about 78% of the flow is hot water, so a 50-gallon tank behaves like roughly 64. The **[Mixing Valve Calculator](/calculators/plumbing/plumbing-mixing-valve-calculator)** works it through, and it is also the answer to *Legionella* risk, which is real below about 122 °F.
+
+**Long waits mistaken for running out.** If it takes 45 seconds to get hot at the fixture, that is pipe volume, not heater capacity. A 50 ft run of 3/4 inch copper holds 1.26 gallons and takes 38 seconds to clear at 2 gpm. Upsizing the hot line makes it *worse* — a 1 inch run takes 65 seconds. The **[Pipe Volume Calculator](/calculators/plumbing/plumbing-pipe-volume-calculator)** quantifies it; the fix is a recirculation loop or a smaller bore, never a bigger heater.
+
+## Incoming water temperature moves everything
+
+Recovery depends on temperature rise, so it is seasonal and regional. The same 40,000 BTU heater that recovers 42.7 gph on a 90 °F rise recovers considerably more on a mild Gulf-coast inlet and less on a northern February.
+
+The practical consequence: **size for winter.** A heater that is comfortable in September and marginal in January was sized on the wrong month. This effect is much more dramatic on tankless units, where it is the dominant sizing variable — see **[sizing a tankless water heater](/blog/tankless-water-heater-sizing)**.
+
+## Two things to size at the same time
+
+**A thermal expansion tank**, if the system is closed. A check valve or backflow preventer at the meter — increasingly standard — makes the system closed, and heated water in a closed system has nowhere to expand. IPC 607.3 requires somewhere for it to go. The **[Thermal Expansion Tank Calculator](/calculators/plumbing/plumbing-expansion-tank-calculator)** sizes it, and the headline there is that the **pre-charge matters more than the tank**: the same job needs 2.02 gallons at a 40 psi pre-charge and 8.10 at 70 psi.
+
+**The installed cost**, which is rarely just the appliance. On a like-for-like 50-gallon gas swap the unit is only about **53%** of the invoice; the rest is labour, permit, haul-away and the code upgrades an inspector will want. The **[Water Heater Replacement Cost Calculator](/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator)** breaks it down.
+
+## Frequently asked questions
+
+### What size water heater do I need for a family of 4?
+
+Work from the peak hour, not the headcount. A typical four-person morning — three showers, a dishwasher and a laundry load — is about **66 gallons**, which needs a 40 gallon gas heater or a 75 gallon electric one. Build your own with the **[Water Heater Size Calculator](/calculators/plumbing/plumbing-water-heater-size-calculator)**.
+
+### Is a 40 gallon water heater enough?
+
+For a 66-gallon peak hour, a **40 gallon gas** heater is enough — its first-hour rating is 70.7 gallons. A 40 gallon **electric** heater rates 48.5 and is not. The fuel changes the answer more than the gallons do.
+
+### What is first-hour rating on a water heater?
+
+The gallons of hot water it can deliver in one hour starting from fully heated: **0.70 × tank gallons + one hour of recovery**. The 0.70 accounts for cold mixing in at the bottom as hot leaves the top. FHR is the number to compare against peak demand — the tank size on the label is not.
+
+### Why is my electric water heater always running out?
+
+Recovery. A 4,500 W element recovers about 20.5 gallons an hour against a gas burner's 42.7, so once an electric tank's usable volume is drawn you wait roughly twice as long for it back. Either move up in tank size — 75 gallons for a 66-gallon peak — or change fuel.
+
+### Is gas or electric better for a water heater?
+
+For peak-hour capacity, gas, by a wide margin — more than twice the recovery rate at the same temperature rise. Electric wins on installation simplicity, safety (no combustion or venting), and in some markets on running cost. A heat pump water heater changes the economics again but recovers slowly, so size it on FHR like any other.
+
+### Does turning up the thermostat give me more hot water?
+
+Yes, meaningfully — storage temperature affects both usable draw and effective recovery. The right way to do it is to store at 140 °F and fit a **thermostatic mixing valve** to temper down to 120 °F at the tap. That gives you the extra capacity, protects against scalding, and keeps the tank out of the *Legionella* growth range.
+
+### Do I need an expansion tank with a new water heater?
+
+If the system is closed — a check valve, backflow preventer or pressure-reducing valve at the meter — then yes, IPC 607.3 requires one. Most systems on municipal water are closed now whether the owner knows it or not. Size it with the **[Thermal Expansion Tank Calculator](/calculators/plumbing/plumbing-expansion-tank-calculator)**, and set the pre-charge to match static pressure.
+
+### How long should I wait for hot water at the tap?
+
+That is a pipe question, not a heater one. A 50 ft run of 3/4 inch copper holds 1.26 gallons and clears in about 38 seconds at 2 gpm. Upsizing the line makes the wait longer, not shorter. A recirculation loop or a smaller-bore dedicated run is the fix.
+
+---
+
+**Sources & standards:** US DOE first-hour-rating worksheet for the per-use peak-hour allowances; the FHR relationship (0.70 × tank + recovery) and the recovery formula are standard industry practice. IPC 2021 Section 607.3 for thermal expansion control on closed systems, and Chapter 5 for water heater installation generally. Storage temperature guidance balances scald risk against *Legionella* growth below about 122 °F. Figures here are computed from the same model the calculators use. The IPC is a model code — confirm the edition your jurisdiction adopts, and have a licensed plumber sign off anything installed.

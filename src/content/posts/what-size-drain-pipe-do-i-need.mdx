@@ -1,0 +1,147 @@
+---
+title: "What Size Drain Pipe Do I Need? DFU, Tables 710.1, and the Rule That Overrides Them"
+meta_title: "What Size Drain Pipe Do I Need - DFU Sizing Chart (2026) | TradesQuote"
+description: "18 DFU rides a 2 inch building drain on the table — until a toilet floors it at 3 inch. Plus the rule almost every site gets backwards: a taller stack carries more per size, not less."
+image: /images/posts/what-size-drain-pipe-do-i-need-hero.svg
+date: 2026-09-01T09:10:00Z
+categories: ["plumbing"]
+tags: ["drain pipe size","drainage fixture units","ipc table 710.1","building drain","drainage stack"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import DrainApplicationDiagram from "@/components/blog/drain-size/DrainApplicationDiagram.astro";
+import DrainStackHeightDiagram from "@/components/blog/drain-size/DrainStackHeightDiagram.astro";
+import DrainWaterClosetFloorDiagram from "@/components/blog/drain-size/DrainWaterClosetFloorDiagram.astro";
+
+Drain sizing looks like a lookup and behaves like one — right up to the moment the table gives you an answer the code will not let you use.
+
+The method is genuinely simple:
+
+```
+1. Add up the drainage fixture units.
+2. Find where in the system this pipe sits.
+3. Read the size off the right table.
+4. Apply the floors that override the table.
+```
+
+Step 4 is the one that gets skipped, and it is the one that fails inspection.
+
+## Step 1 — drainage fixture units
+
+A DFU is a load weight, not a flow rate. It bundles how much a fixture discharges, how fast, and how often it is likely to be running when its neighbours are. IPC Table 709.1 assigns the values.
+
+A two-bathroom house — two bathroom groups on 1.6 gpf toilets, a kitchen sink, a dishwasher, a clothes washer and a laundry tray — totals **18 DFU**. The **[Drainage Fixture Unit Calculator](/calculators/plumbing/plumbing-drainage-fixture-unit-calculator)** adds them up and gives the minimum trap size for each fixture at the same time.
+
+Worth noticing: a whole bathroom group counts as **5 DFU** at 1.6 gpf, less than the sum of its parts counted separately. The code assumes a toilet, a lavatory and a shower in one room are not all discharging at once, which is a reasonable bet about how bathrooms get used.
+
+## Step 2 — where the pipe sits changes the answer
+
+This is where most quick answers go wrong. There is no single "drain size for 18 DFU". There are four, depending on what the pipe is.
+
+<BlogInfographic
+  title="Same 18 DFU, four places in the system, four answers"
+  caption="Table 710.1(1) sizes building drains and sewers by slope; Table 710.1(2) sizes horizontal branches and stacks. They are not interchangeable."
+>
+  <DrainApplicationDiagram />
+</BlogInfographic>
+
+The one that looks backwards is the **horizontal fixture branch**, which needs a *larger* pipe than the building drain it discharges into. That is not an error. A branch serves a handful of fixtures that can genuinely all run at once, so it sees the full surge. The building drain downstream is fed by many branches whose peaks do not coincide, so it can be sized on a smoothed load.
+
+Size any of them with the **[Drain Pipe Size Calculator](/calculators/plumbing/plumbing-drain-pipe-size-calculator)**, which picks the right table for the application and tells you which rule governed.
+
+## Step 3 — the rule that overrides the table
+
+Here is the trap. Run 18 DFU through Table 710.1(1) at 1/4 in/ft and it says **2 inch**, with capacity for 21.
+
+Put a toilet on that drain and the answer is **3 inch**.
+
+<BlogInfographic
+  title="A water closet overrides the DFU table"
+  caption="Below 21 DFU the table alone permits 2 inch. A single water closet anywhere on a building drain floors it at 3 inch regardless of the arithmetic."
+>
+  <DrainWaterClosetFloorDiagram />
+</BlogInfographic>
+
+The DFU arithmetic is about volume and coincidence. It says nothing about **solids**, and solids need bore. A footnote to the table applies the floor, and it applies to the *whole* building drain — one toilet anywhere on the run and the entire drain is 3 inch minimum, not just the section downstream of it.
+
+This is the single most common drain-sizing violation on residential work, and it is almost always an honest mistake: the arithmetic was done correctly and the footnote was not read.
+
+## The one nearly every site gets backwards
+
+Stack capacity.
+
+Ask most sources what a 2 inch stack carries and you will get one number. The code gives two, and the taller stack carries **more**.
+
+<BlogInfographic
+  title="A taller stack carries more, not less"
+  caption="Every size gains capacity above three branch intervals. A 2 inch stack goes from 10 DFU to 24 — a 2.4x increase for being taller."
+>
+  <DrainStackHeightDiagram />
+</BlogInfographic>
+
+A 2 inch stack of **three branch intervals or fewer** carries **10 DFU**. The same 2 inch stack of **more than three branch intervals** carries **24**.
+
+The physics is real. Water entering a stack does not free-fall indefinitely — within roughly one to two storeys it reaches **terminal velocity** and settles into an annular sheet clinging to the pipe wall, with an open air core down the middle. That air core is what lets the system breathe, and it is what makes the flow stable and predictable. A short stack never develops it fully; a tall one does, and the code credits it.
+
+Two consequences worth carrying:
+
+**Do not reason from a short-stack number to a tall stack.** You will oversize, sometimes by a lot.
+
+**Do not reason the other way either.** A three-storey stack that gets an extension to a fourth floor changes category, but a tall stack that gets shortened during a remodel loses capacity it was relying on.
+
+## Slope and capacity
+
+For building drains and sewers, capacity depends on slope. A 4 inch building drain carries **180 DFU** at 1/8 in/ft, **216** at 1/4, and **250** at 1/2.
+
+That is roughly a 39% gain from the flattest to the steepest allowed grade, which is real but rarely decisive — most drains are sized a full size above what the load needs anyway. Slope matters far more for whether the pipe *scours* than for how much it carries. The **[Drain Pipe Slope Calculator](/calculators/plumbing/plumbing-pipe-slope-calculator)** covers that side, and there is a fuller treatment in **[how much fall a drain pipe needs](/blog/drain-pipe-slope)**.
+
+## Common mistakes
+
+**Using the branch table for the building drain, or vice versa.** They are different tables with different numbers. Table 710.1(1) is slope-dependent and covers drains and sewers; 710.1(2) is not and covers branches and stacks.
+
+**Missing the water-closet floor.** Covered above. It is the most common one.
+
+**Sizing a stack from a short-stack figure when the stack is tall.** Costs money rather than compliance, but it costs real money on a multi-storey job.
+
+**Forgetting that the vent is sized off the drain.** Once the drain size is settled, IPC 906.2 sets the vent at half the drain diameter, minimum 1-1/4 inch — see **[how far a vent can be from a trap](/blog/how-far-can-a-vent-be-from-a-trap)**.
+
+**Assuming bigger is always safer.** An oversized drain runs shallower, which means slower, which means it scours less well. A 4 inch drain carrying a 2 inch load can silt up in a way the correctly-sized pipe would not.
+
+## Frequently asked questions
+
+### What size drain pipe do I need for a house?
+
+For a typical two-bath house at **18 DFU**, the building drain is **3 inch** — the table alone would allow 2 inch, but the water closet floors it at 3. Larger homes with more bathroom groups move to 4 inch. Work out your own load with the **[Drainage Fixture Unit Calculator](/calculators/plumbing/plumbing-drainage-fixture-unit-calculator)** and size it with the **[Drain Pipe Size Calculator](/calculators/plumbing/plumbing-drain-pipe-size-calculator)**.
+
+### How many DFU is a bathroom group?
+
+**5 DFU** for a group with a 1.6 gpf water closet, and 6 for a group with a toilet over 1.6 gpf. That is less than counting the fixtures individually, because the code assumes they do not all discharge simultaneously.
+
+### Can a toilet drain into a 2 inch line?
+
+No. A water closet requires a minimum 3 inch drain, and its presence anywhere on a building drain floors the whole drain at 3 inch regardless of the DFU total. The rule is about clearing solids, which the DFU arithmetic does not account for.
+
+### How many fixtures can a 3 inch drain handle?
+
+A 3 inch building drain at 1/4 in/ft carries **42 DFU**. As a horizontal fixture branch it carries **20 DFU**, and as a stack it carries 48 over three branch intervals or fewer and 72 over more than three. The application decides, not the diameter alone.
+
+### Does a taller stack really carry more?
+
+Yes. A 2 inch stack carries **10 DFU** over three branch intervals or fewer, and **24 DFU** over more than three. Water in a stack reaches terminal velocity within one to two storeys and forms a stable annular sheet with an open air core; a short stack never fully develops that regime, and the code table reflects it.
+
+### What is the difference between a horizontal branch and a building drain?
+
+A horizontal fixture branch collects a few fixtures on one floor and can see all of them discharging at once, so it is sized on the full surge. The building drain collects every branch in the building, whose peaks do not coincide, so it is sized on a smoothed load — which is why a branch often needs a bigger pipe than the drain it feeds.
+
+### Does slope change how much a drain carries?
+
+For building drains and sewers, yes: a 4 inch drain carries 180 DFU at 1/8 in/ft, 216 at 1/4 and 250 at 1/2. Horizontal branches and stacks are sized from a table that does not vary with slope.
+
+### Is a bigger drain always better?
+
+No. An oversized drain runs shallower and slower, so it scours less effectively and is more prone to silting. Size it for the load and the applicable floors, then stop.
+
+---
+
+**Sources & standards:** IPC 2021 Chapter 7 (sanitary drainage) — Table 709.1 for drainage fixture unit values, Table 710.1(1) for building drains and sewers, Table 710.1(2) for horizontal branches and stacks, and Table 704.1 for minimum slope. The 3 inch minimum where a water closet is served comes from the footnote to Table 710.1(1). The IPC is a model code; roughly fifteen states enforce the UPC or a derivative such as California's CPC, where fixture-unit values and sizing tables differ. Confirm the edition your jurisdiction adopts, and have a licensed plumber and your AHJ sign off anything installed.

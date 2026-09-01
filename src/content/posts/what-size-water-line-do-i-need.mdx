@@ -1,0 +1,168 @@
+---
+title: "What Size Water Line Do I Need? Velocity and Pressure, Both"
+meta_title: "What Size Water Line Do I Need - Pipe Sizing Chart (2026) | TradesQuote"
+description: "At 18 gpm, 3/4 inch copper runs 11.93 ft/s and loses 32.91 psi per 100 ft — it fails both rules at once. Why a water line has to clear velocity and pressure, and why PEX needs a size up on copper."
+image: /images/posts/what-size-water-line-do-i-need-hero.svg
+date: 2026-09-01T09:00:00Z
+categories: ["plumbing"]
+tags: ["water pipe sizing","pipe velocity","friction loss","pex vs copper","ipc chapter 6"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import WaterLineBothRulesDiagram from "@/components/blog/water-line-size/WaterLineBothRulesDiagram.astro";
+import WaterLineFlowLadderDiagram from "@/components/blog/water-line-size/WaterLineFlowLadderDiagram.astro";
+import WaterLineMaterialDiagram from "@/components/blog/water-line-size/WaterLineMaterialDiagram.astro";
+
+Most answers to this question are a chart. Chart says 3/4 inch, buy 3/4 inch.
+
+The trouble is that a water line has to satisfy **two independent rules**, and a chart usually only encodes one of them. A pipe can be quiet and still starve the top-floor shower. A pipe can deliver plenty of pressure and sound like a jet engine at 2 a.m. You have to check both, and then take the larger answer.
+
+```
+Rule 1 — VELOCITY.  Keep it under about 8 ft/s cold, 5 ft/s hot.
+                    Above that: noise, water hammer, erosion.
+
+Rule 2 — PRESSURE.  Friction over the whole run must fit inside
+                    what is left after lift, meter and fixture.
+
+The size you buy is whichever rule asks for MORE pipe.
+```
+
+## The short answer
+
+For a typical single-family house on a 3/4 inch or 1 inch meter:
+
+- **3/4 inch** serves the main run of a small house or a branch feeding two or three fixtures.
+- **1 inch** is the usual main for a two-bath house at any real distance from the meter.
+- **1-1/4 inch** shows up on longer runs, three-plus baths, or where street pressure is marginal.
+
+But those are starting points, not answers. Feed your own numbers into the **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)** and it will tell you which of the two rules governed — which is the part that matters when someone questions the size.
+
+## Why one rule is never enough
+
+Take a real case: 18 gpm of peak demand, copper Type L, 120 ft of developed length, 60 psi at the street, the highest fixture 20 ft up, 15 psi needed at that fixture, 8 psi lost crossing the meter.
+
+<BlogInfographic
+  title="One flow, two rules — a pipe must clear both"
+  caption="At 18 gpm through copper Type L, 3/4 inch misses the velocity cap and the friction budget simultaneously. 1 inch is the smallest size that clears both."
+>
+  <WaterLineBothRulesDiagram />
+</BlogInfographic>
+
+Three-quarter inch fails at **11.93 ft/s** — half again the sensible ceiling — *and* at **32.91 psi per 100 ft** against a budget of 23.62. It is not close on either count. One inch lands at **7.00 ft/s** and **8.98 psi per 100 ft**, comfortable on both.
+
+Notice the shape of that result. The pipe that fails velocity also fails pressure, and the pipe that clears velocity clears pressure with room to spare. That is common on short residential runs, and it is exactly why a velocity-only chart usually gets away with it. Stretch the run to 250 ft or drop the street pressure to 45 psi and the two rules come apart — friction starts governing while velocity still looks fine.
+
+## Where the pressure actually goes
+
+Sixty psi sounds like a lot until you watch it get spent. On that same house:
+
+- **8 psi** disappears crossing the water meter.
+- **8.66 psi** is lost lifting water 20 ft — that is 0.4331 psi for every foot of height, and it is the one loss in the whole system that does not care about flow, pipe material or fittings.
+- **15 psi** has to still be there at the fixture, or the fixture does not work properly.
+
+That leaves **28.34 psi** for friction. Spread across 120 ft of developed length, the pipe is allowed to lose **23.62 psi per 100 ft**. That number, not a chart, is the actual budget.
+
+Two things people routinely get wrong here. *Developed length* is not the tape measure — every elbow, tee and valve adds equivalent feet, and on a fitting-heavy run that can add 20% or more. And the elevation loss is charged whether water is moving or not, which is why the top floor of a three-storey house feels weak even when nothing else is running. The **[Water Pressure Calculator](/calculators/plumbing/plumbing-water-pressure-calculator)** works that side of it, and the **[Pipe Friction Loss Calculator](/calculators/plumbing/plumbing-friction-loss-calculator)** converts fittings into equivalent length for you.
+
+## Demand first, then pipe
+
+You cannot size a line until you know what it has to carry, and the answer is never the sum of every fixture — nobody runs all of them at once. The IPC handles this with **water supply fixture units**: each fixture gets a weight, you add the weights, and a demand curve converts the total into probable peak flow.
+
+A two-bath house with a kitchen sink, dishwasher, clothes washer and two hose bibbs comes to **16.4 WSFU**, which the curve turns into about **18.2 gpm** on a flush-tank system. Run it yourself with the **[Water Supply Fixture Unit Calculator](/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator)**.
+
+The interesting property of that curve is that demand per fixture unit *falls* as the building gets bigger. At 5 fixture units you are getting about 1.88 gpm per unit; at 100 you are getting 0.43. A hotel does not need twenty times the pipe of a house with twenty times the fixtures, because the odds of simultaneous use collapse as the count rises.
+
+<BlogInfographic
+  title="Peak demand into nominal size — copper Type L"
+  caption="Across ordinary residential flows on a 120 ft run, velocity governs every rung. Lengthen the run or drop the supply pressure and friction takes over."
+>
+  <WaterLineFlowLadderDiagram />
+</BlogInfographic>
+
+## The one that surprises people: PEX needs a size up
+
+Here is the result that catches experienced plumbers out.
+
+PEX has a **better** friction coefficient than copper — a Hazen-Williams C of 150 against copper's 140. Smoother wall, less drag. So PEX should need the same size or smaller, right?
+
+It needs a size larger.
+
+<BlogInfographic
+  title="Bore beats smoothness — same 18 gpm, four materials"
+  caption="A nominal 1 inch PEX tube bores 0.875 inches against copper Type L's 1.025. The better C factor cannot make up for 27% less flow area."
+>
+  <WaterLineMaterialDiagram />
+</BlogInfographic>
+
+The reason is that PEX is **outside-diameter controlled**. A nominal 1 inch PEX tube has the same outside diameter as 1 inch copper, but its wall is far thicker, so the bore is **0.875 inches** against copper's **1.025**. That is 27% less flow area in a pipe that is nominally the same size.
+
+And friction does not scale gently with diameter. In the Hazen-Williams equation, loss goes as **diameter to the power of 4.87**. Shrink the bore by 15% and friction rises by roughly 90%. No plausible improvement in wall smoothness competes with that.
+
+**Bore beats smoothness, every time.** The practical rule: when you substitute PEX for copper on a sized drawing, go up a nominal size on the mains and long branches. Short fixture drops are usually fine as-is. Check any specific case with the **[Pipe Velocity Calculator](/calculators/plumbing/plumbing-pipe-velocity-calculator)**.
+
+## Why the velocity limits are what they are
+
+The 8 ft/s cold and 5 ft/s hot figures are worth understanding rather than memorising, because — and this matters — **they are not numbers the IPC prints**. The code requires a system free of excessive noise and erosion without naming a velocity. The 8 and 5 come from ASPE and from manufacturers' own guidance, and they are near-universal design practice.
+
+Three things go wrong above them:
+
+**Noise.** Turbulence at the pipe wall is audible through framing, and it gets worse fast — perceived noise climbs roughly with the square of velocity.
+
+**Water hammer.** The pressure spike when a fast-closing valve shuts is proportional to how fast the water was moving. Same valve, twice the velocity, twice the shock.
+
+**Erosion-corrosion.** This is the one that actually destroys pipe. Fast water scours the protective oxide layer off the inside of copper tube, particularly at elbows where it turns. Hot water does it faster, which is the entire reason the hot limit is 5 ft/s and not 8. Pinhole leaks on the hot side of a house with high velocity are a classic signature.
+
+## Common mistakes
+
+**Sizing from the tape measure.** Fittings are pipe. A run with six elbows, two branch tees and a couple of valves can carry 20% more developed length than the physical distance suggests.
+
+**Forgetting the meter.** A 5/8 inch meter at high flow can eat 10 psi or more. It sits ahead of everything and it is easy to leave out of the budget entirely.
+
+**Sizing the whole house off the main.** The main carries total demand; each branch carries only what is downstream of it. Running 1 inch everywhere wastes money and makes the hot-water wait worse.
+
+**Ignoring what a bigger hot line costs you.** More bore means more water sitting in the pipe going cold between draws. Upsizing a hot run makes the wait at the tap *longer*, not shorter — the **[Pipe Volume Calculator](/calculators/plumbing/plumbing-pipe-volume-calculator)** quantifies it.
+
+**Assuming street pressure is stable.** It varies by season, time of day and elevation within the distribution zone. Size against a realistic low, not the number you measured on a Sunday morning.
+
+## Frequently asked questions
+
+### What size water line do I need for a house?
+
+For most two-bath single-family homes, a **1 inch main** from the meter with 3/4 inch trunk branches and 1/2 inch fixture drops. Larger homes, longer runs from the street, or low supply pressure push the main to 1-1/4 inch. Size it properly with the **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)** rather than working from a rule of thumb.
+
+### Is 3/4 inch enough for a whole house?
+
+Sometimes — a compact single-bath house close to the meter with good pressure. But at 18 gpm of demand, 3/4 inch copper runs at 11.93 ft/s and loses 32.91 psi per 100 ft. Both are failures. The honest answer is that 3/4 inch is enough for a small house and marginal for anything else.
+
+### Does PEX need to be bigger than copper?
+
+Usually yes, by one nominal size on mains and long branches. Nominal 1 inch PEX bores 0.875 inches against copper Type L's 1.025 — about 27% less flow area — and friction goes as diameter to the 4.87 power, so PEX's better C factor of 150 cannot make up the difference.
+
+### What is a good water velocity in a pipe?
+
+Under about **8 ft/s on cold** and **5 ft/s on hot**. These are ASPE and manufacturer design limits, not IPC numbers — the code requires a system free of noise and erosion without naming a figure. The hot limit is stricter because erosion-corrosion accelerates with temperature.
+
+### How do I calculate friction loss in a water pipe?
+
+Hazen-Williams: psi per foot = 4.52 × Q^1.852 ÷ (C^1.852 × d^4.8704), where Q is gpm, C is the material coefficient and d is the actual inside diameter. Multiply by developed length — including equivalent length for every fitting. The **[Pipe Friction Loss Calculator](/calculators/plumbing/plumbing-friction-loss-calculator)** does the fitting conversion for you.
+
+### How many fixture units is my house?
+
+A two-bath house with a kitchen sink, dishwasher, clothes washer and two hose bibbs totals **16.4 WSFU**, which converts to about **18.2 gpm** peak demand on flush tanks. The **[Water Supply Fixture Unit Calculator](/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator)** adds it up and applies the demand curve.
+
+### Why does my upstairs shower have low pressure?
+
+Height. Every foot of lift costs 0.4331 psi before water moves at all, so a second-floor fixture starts about 4.33 psi down on the ground floor and a third-floor fixture about 8.66 psi down. Add friction on top of that and an undersized main shows up upstairs first. See **[normal water pressure for a house](/blog/normal-water-pressure-for-a-house)** for the full budget.
+
+### Does the water meter really matter?
+
+Yes — it commonly costs 8 to 12 psi at peak flow, and it sits ahead of everything else in the system. Leaving it out of the pressure budget is one of the most common ways a correctly-drawn pipe size turns out to be a size too small.
+
+### Should I just oversize everything to be safe?
+
+No. Oversizing the cold side wastes money; oversizing the **hot** side actively makes the house worse, because more water sits in the pipe cooling between draws and the wait at the tap gets longer. Size each segment for what is downstream of it.
+
+---
+
+**Sources & standards:** IPC 2021 Chapter 6 (water supply and distribution) and Appendix E (water pipe sizing, enforceable only where adopted); ASPE for the velocity design limits and the Hunter's-curve demand method; ASTM B88 for copper tube and F876 for PEX dimensions. Pipe inside diameters used throughout are computed from published outside diameter and wall thickness, not transcribed. The IPC is a model code — roughly fifteen states enforce the UPC or a derivative such as California's CPC, where fixture-unit values differ. Confirm the edition your jurisdiction adopts, and have a licensed plumber sign off anything installed.

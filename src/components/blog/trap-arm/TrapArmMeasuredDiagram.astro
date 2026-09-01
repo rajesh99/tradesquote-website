@@ -1,0 +1,65 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { trapArmMaxFeet, sizeLabel } from "@/lib/plumbing";
+
+/**
+ * Where the trap arm is actually measured. Almost every failed inspection on
+ * this rule comes from measuring to the stack instead of to the vent fitting,
+ * or from forgetting that the fall along the arm counts toward the limit.
+ */
+const defs = markerDefs("trap-arm");
+const ARM_SIZE = 2;
+const MAX_FEET = trapArmMaxFeet(ARM_SIZE)!;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Where a trap arm is measured, from the trap weir to the vent fitting</title>
+  <desc>
+    The trap arm is the horizontal run between the weir of the P-trap and the inner edge of the vent fitting. It is not
+    measured to the stack, and the fall along the arm counts toward the limit. A 2 inch arm is capped at 8 feet.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The trap arm is weir to vent fitting — not weir to stack</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A ${sizeLabel(ARM_SIZE)} trap arm is capped at ${MAX_FEET} ft of developed length. Fall along the arm counts toward it.`}
+  </text>
+
+  <!-- fixture -->
+  <rect x="52" y="82" width="86" height="26" rx="5" fill={C.white} stroke={C.dark} stroke-width="1.6" />
+  <text x="95" y="99" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">fixture</text>
+  <line x1="95" y1="108" x2="95" y2="130" stroke={C.dark} stroke-width="2.4" />
+
+  <!-- P-trap -->
+  <path d="M95 130 L95 150 Q95 166 111 166 Q127 166 127 150 L127 138" stroke={C.blue} stroke-width="3.2" fill="none" stroke-linecap="round" />
+  <text x="86" y="186" fill={C.blue} font-family={FONT} font-size="9.5" font-weight="700">P-trap</text>
+  <circle cx="127" cy="138" r="3.4" fill={C.blue} />
+  <text x="112" y="126" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">weir</text>
+
+  <!-- trap arm, drawn with a slight fall -->
+  <line x1="127" y1="138" x2="470" y2="150" stroke={C.primary} stroke-width="3.2" stroke-linecap="round" />
+  <line x1="127" y1="120" x2="470" y2="120" stroke={C.primary} stroke-width="1.6" marker-start={`url(#trap-arm-arrow-primary)`} marker-end={`url(#trap-arm-arrow-primary)`} />
+  <text x="298" y="113" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`TRAP ARM — max ${MAX_FEET} ft`}
+  </text>
+  <text x="298" y="172" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9.5">the fall along here counts too</text>
+
+  <!-- vent fitting -->
+  <circle cx="470" cy="150" r="5" fill={C.primary} />
+  <line x1="470" y1="150" x2="470" y2="86" stroke={C.primary} stroke-width="3.2" stroke-linecap="round" />
+  <text x="480" y="92" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">vent</text>
+  <text x="480" y="140" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">vent fitting</text>
+  <text x="480" y="153" fill={C.muted} font-family={FONT} font-size="9">measurement ends here</text>
+
+  <!-- drain continues to the stack -->
+  <line x1="470" y1="150" x2="646" y2="156" stroke={C.muted} stroke-width="3" stroke-linecap="round" stroke-dasharray="7 5" />
+  <line x1="470" y1="196" x2="646" y2="196" stroke={C.red} stroke-width="1.6" marker-start={`url(#trap-arm-arrow-orange)`} marker-end={`url(#trap-arm-arrow-orange)`} />
+  <text x="558" y="212" text-anchor="middle" fill={C.red} font-family={FONT} font-size="9.5" font-weight="700">NOT part of the trap arm</text>
+  <line x1="646" y1="86" x2="646" y2="220" stroke={C.dark} stroke-width="3.4" stroke-linecap="round" />
+  <text x="656" y="150" fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">stack</text>
+
+  <text x="24" y="232" fill={C.muted} font-family={FONT} font-size="10">
+    Self-siphoning fixtures — water closets above all — are not length limited, because the fixture reseals its own trap.
+  </text>
+</svg>

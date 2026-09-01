@@ -1,0 +1,51 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  totalFall,
+} from "@/lib/plumbing";
+/** Fall is linear in run length, which is obvious on paper and startling on a
+ * job — 100 ft at the shallow-pipe minimum drops more than two feet. */
+const RUNS = [10, 20, 40, 60, 80, 100];
+const SLOPE = 0.25;
+const falls = RUNS.map((run) => ({ run, fall: totalFall(SLOPE, run) }));
+const maxFall = Math.max(...falls.map((f) => f.fall));
+
+const rows = falls.map(({ run, fall }) => ({
+  label: `${run} ft run`,
+  value: fall,
+  frac: fall / maxFall,
+  display: `${fall.toFixed(2)} in of fall  ·  ${(fall / 12).toFixed(2)} ft`,
+  highlight: run === 100,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 130;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>Fall at 1/4 in per foot, by run length</title>
+  <desc>The minimum grade for pipe up to 2-1/2 inch, accumulated over the length of the run</desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Fall at 1/4 in per foot, by run length</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">The minimum grade for pipe up to 2-1/2 inch, accumulated over the length of the run</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">Over 100 ft that is more than two feet of drop — often more headroom than a crawlspace or a slab has to give.</text>
+</svg>

@@ -2450,3 +2450,240 @@ export const BACKFLOW_APPLICATIONS: {
     why: "The check valve is already there — it is what makes the system closed. IPC 607.3 then requires somewhere for the expansion to go.",
   },
 ];
+
+/* ------------------------------------------------------------------ *
+ * Nonpotable water reuse — rainwater harvesting and grey water
+ *
+ * !! Read before changing. This is the least code-governed subject in the
+ * module. The IPC covers nonpotable systems in Chapter 13 where that chapter
+ * is adopted; the IAPMO green supplement and the IRC cover it elsewhere; and
+ * in practice STATE AND COUNTY rules decide, ranging from by-right with no
+ * permit to outright prohibited. So every factor below is an editable input on
+ * the page and every default is presented as a common value, NOT as code —
+ * the same call made for septic, storm sizing and grease interceptors.
+ *
+ * Potable reuse, treatment and disinfection are out of scope entirely.
+ *
+ * Provenance:
+ *   TIER 1 (derived)  — GAL_PER_SQFT_PER_INCH, rainwaterYieldGallons,
+ *                       cisternSizing, irrigableArea.
+ *   TIER 3 (common,   — ROOF_RUNOFF_COEFFICIENTS, COLLECTION_EFFICIENCY,
+ *   unverified here)    FIRST_FLUSH_PER_SQFT, GREYWATER_SOURCE_YIELD,
+ *                       IRRIGATION_DEMAND, STANDARD_CISTERN_SIZES.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Gallons caught per square foot of catchment per inch of rain, before any
+ * losses. DERIVED, not quoted: one inch over one square foot is 1/12 ft³, and
+ * a cubic foot is 7.48052 gallons.
+ *
+ * This is the same basis as `roofRunoffGpm`, one step earlier — that function
+ * divides this by 60 to reach gpm, which is why
+ * `60 / ROOF_RUNOFF_DIVISOR === GAL_PER_SQFT_PER_INCH` exactly. The familiar
+ * "0.62 gallons" rule of thumb is this number rounded.
+ */
+export const GAL_PER_SQFT_PER_INCH = GALLONS_PER_CUBIC_FOOT / 12;
+
+/**
+ * Fraction of rain landing on a surface that reaches the tank, before filter
+ * and first-flush losses. TIER 3 — commonly published ranges, not code.
+ */
+export const ROOF_RUNOFF_COEFFICIENTS: { label: string; coefficient: number }[] = [
+  { label: "Standing-seam metal", coefficient: 0.95 },
+  { label: "Asphalt shingle", coefficient: 0.85 },
+  { label: "Concrete or clay tile", coefficient: 0.8 },
+  { label: "Built-up or membrane (flat)", coefficient: 0.9 },
+  { label: "Gravel-surfaced flat roof", coefficient: 0.7 },
+  { label: "Green roof", coefficient: 0.3 },
+];
+
+/**
+ * Losses at the screen, the first-flush diverter and the filter, as a fraction
+ * retained. TIER 3 — a common planning figure; measure yours if it matters.
+ */
+export const COLLECTION_EFFICIENCY = 0.85;
+
+/**
+ * First flush diverted before collection begins, gallons per square foot of
+ * catchment. TIER 3 — practice ranges from roughly 0.01 to 0.02 gal/ft²
+ * depending on how dirty the roof gets between storms.
+ */
+export const FIRST_FLUSH_PER_SQFT = 0.015;
+
+/** Cistern shells commonly stocked, gallons. */
+export const STANDARD_CISTERN_SIZES = [
+  50, 100, 205, 305, 530, 865, 1100, 1550, 2500, 3000, 5000, 10000,
+];
+
+export type RainwaterYield = {
+  /** Gallons the catchment sheds before any loss. */
+  gross: number;
+  /** Diverted as first flush. */
+  firstFlush: number;
+  /** Gallons reaching the tank. */
+  net: number;
+};
+
+/**
+ * Rainwater caught over a period, gallons. `inches` is the rainfall for
+ * whatever period you care about — a month, a season, a year.
+ */
+export function rainwaterYieldGallons(args: {
+  areaSqFt: number;
+  inches: number;
+  coefficient: number;
+  efficiency?: number;
+  firstFlushPerSqFt?: number;
+  events?: number;
+}): RainwaterYield {
+  const area = Math.max(0, args.areaSqFt);
+  const gross = area * Math.max(0, args.inches) * GAL_PER_SQFT_PER_INCH;
+  const events = Math.max(0, args.events ?? 1);
+  const firstFlush = Math.min(
+    gross,
+    area * (args.firstFlushPerSqFt ?? FIRST_FLUSH_PER_SQFT) * events,
+  );
+  const efficiency = args.efficiency ?? COLLECTION_EFFICIENCY;
+  const net = Math.max(0, (gross - firstFlush) * Math.max(0, Math.min(1, args.coefficient)) * efficiency);
+  return { gross, firstFlush, net };
+}
+
+export type CisternResult = {
+  /** Gallons the roof delivers over the design period. */
+  supply: number;
+  /** Gallons the demand consumes over the design period. */
+  periodDemand: number;
+  /** Storage the dry spell asks for. */
+  demandStorage: number;
+  /** Storage the roof can actually keep filled. */
+  yieldStorage: number;
+  required: number;
+  governedBy: "demand" | "yield";
+  /** Smallest stocked shell at or above `required`, or null if past the ladder. */
+  selected: number | null;
+  /** Days the selected shell covers at this demand. */
+  daysCovered: number;
+};
+
+/**
+ * Cistern storage. Two limits apply and the smaller one governs:
+ *
+ *   demand-limited — the dry spell you want to ride out, at your daily draw;
+ *   yield-limited  — no point storing more than the roof can refill.
+ *
+ * Reporting which one governed is the whole point; a tank sized past its own
+ * catchment is money spent on an empty shell.
+ */
+export function cisternSizing(args: {
+  areaSqFt: number;
+  periodInches: number;
+  periodDays: number;
+  coefficient: number;
+  demandGpd: number;
+  drySpellDays: number;
+  efficiency?: number;
+  firstFlushPerSqFt?: number;
+  events?: number;
+}): CisternResult {
+  const supply = rainwaterYieldGallons({
+    areaSqFt: args.areaSqFt,
+    inches: args.periodInches,
+    coefficient: args.coefficient,
+    efficiency: args.efficiency,
+    firstFlushPerSqFt: args.firstFlushPerSqFt,
+    events: args.events,
+  }).net;
+
+  const demand = Math.max(0, args.demandGpd);
+  const periodDemand = demand * Math.max(0, args.periodDays);
+  const demandStorage = demand * Math.max(0, args.drySpellDays);
+  const yieldStorage = supply;
+
+  const required = Math.min(demandStorage, yieldStorage);
+  const selected = STANDARD_CISTERN_SIZES.find((g) => g >= required) ?? null;
+  return {
+    supply,
+    periodDemand,
+    demandStorage,
+    yieldStorage,
+    required,
+    governedBy: demandStorage <= yieldStorage ? "demand" : "yield",
+    selected,
+    daysCovered: demand > 0 && selected !== null ? selected / demand : Infinity,
+  };
+}
+
+/**
+ * The rule that separates the two halves of this page: untreated grey water
+ * may not be held. Twenty-four hours is the near-universal ceiling, because
+ * beyond it the water goes septic. So a grey-water surge tank is sized on
+ * DAILY flow, while a cistern is sized on the DRY SPELL. Sizing one with the
+ * other's method produces a plausible number that means nothing.
+ */
+export const GREYWATER_MAX_STORAGE_HOURS = 24;
+
+/**
+ * Grey-water yield by source, gallons per person per day, except the clothes
+ * washer which is per load. TIER 3 — commonly published planning figures.
+ *
+ * Kitchen sink and dishwasher are deliberately absent: food solids and grease
+ * put them outside grey water in most rules that define the term at all.
+ */
+export const GREYWATER_SOURCE_YIELD: {
+  key: string;
+  label: string;
+  galPerPersonPerDay: number;
+  perLoad?: boolean;
+}[] = [
+  { key: "shower", label: "Shower and bath", galPerPersonPerDay: 25 },
+  { key: "lavatory", label: "Bathroom sink", galPerPersonPerDay: 5 },
+  { key: "washer", label: "Clothes washer (per load)", galPerPersonPerDay: 20, perLoad: true },
+];
+
+/** Irrigation demand, gallons per square foot per week. TIER 3 — climate-dependent. */
+export const IRRIGATION_DEMAND: { label: string; galPerSqFtPerWeek: number }[] = [
+  { label: "Native or drought-tolerant planting", galPerSqFtPerWeek: 0.3 },
+  { label: "Shrubs and ornamental beds", galPerSqFtPerWeek: 0.6 },
+  { label: "Mixed landscape", galPerSqFtPerWeek: 0.9 },
+  { label: "Cool-season lawn", galPerSqFtPerWeek: 1.2 },
+];
+
+export type GreywaterResult = {
+  /** Gallons per day available. */
+  dailyYield: number;
+  /** Per-source breakdown, gallons per day. */
+  bySource: { key: string; label: string; gpd: number }[];
+  /** Surge tank ceiling — daily flow, because it may not be held longer. */
+  maxStorage: number;
+  /** Landscape this supports, ft². */
+  irrigableSqFt: number;
+};
+
+export function greywaterYield(args: {
+  occupants: number;
+  sources: Record<string, boolean>;
+  loadsPerWeek: number;
+  irrigationRate: number;
+}): GreywaterResult {
+  const people = Math.max(0, args.occupants);
+  const bySource = GREYWATER_SOURCE_YIELD.filter((s) => args.sources[s.key]).map((s) => ({
+    key: s.key,
+    label: s.label,
+    gpd: s.perLoad
+      ? (s.galPerPersonPerDay * Math.max(0, args.loadsPerWeek)) / 7
+      : s.galPerPersonPerDay * people,
+  }));
+  const dailyYield = bySource.reduce((sum, s) => sum + s.gpd, 0);
+  return {
+    dailyYield,
+    bySource,
+    maxStorage: dailyYield * (GREYWATER_MAX_STORAGE_HOURS / 24),
+    irrigableSqFt: irrigableArea(dailyYield, args.irrigationRate),
+  };
+}
+
+/** Landscape a daily supply covers, ft², at a weekly application rate. */
+export function irrigableArea(gpd: number, galPerSqFtPerWeek: number): number {
+  if (galPerSqFtPerWeek <= 0) return Infinity;
+  return (Math.max(0, gpd) * 7) / galPerSqFtPerWeek;
+}

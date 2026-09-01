@@ -75,7 +75,7 @@ export const calculatorCategories: CalculatorCategory[] = [
     slug: "plumbing",
     name: "Plumbing",
     description:
-      "Supply sizing, drainage, venting, and pricing built on the IPC — water supply and drainage fixture units, water pipe size, pipe velocity, Hazen-Williams friction loss, drain and sewer sizing, minimum slope and fall, vent size and trap arm length, pressure and head, pump total dynamic head, water heater and tankless sizing, repipe and water heater replacement cost, labor rate, and job pricing.",
+      "Supply sizing, drainage, venting, and pricing built on the IPC — water supply and drainage fixture units, water pipe size, pipe velocity, Hazen-Williams friction loss, drain and sewer sizing, minimum slope and fall, vent size and trap arm length, storm drainage, septic and grease interceptor sizing, rainwater and grey water reuse, pressure and head, pump total dynamic head, well pressure tank drawdown, water heater, tankless, expansion tank and mixing valve sizing, pipe volume, unit conversion, repipe and water heater replacement cost, labor rate, and job pricing.",
     // Derived so the card can never disagree with the number of calculators shipped.
     toolCount: plumbingCalculators.length,
     status: "live",

@@ -1,0 +1,54 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  drainCapacity, sizeLabel,
+} from "@/lib/plumbing";
+/** The counter-intuitive one: a stack carries MORE per size when it is taller,
+ * because terminal-velocity annular flow only develops with height. */
+const SIZES = [1.5, 2, 2.5, 3, 4];
+const pairs = SIZES.map((n) => ({
+  n,
+  short: drainCapacity(n, "stack-short", 0.25),
+  tall: drainCapacity(n, "stack-tall", 0.25),
+}));
+const maxTall = Math.max(...pairs.map((p) => p.tall));
+
+const rows = pairs.map((p) => ({
+  label: sizeLabel(p.n),
+  value: p.tall,
+  frac: p.tall / maxTall,
+  display: `${p.short} DFU short  →  ${p.tall} DFU tall  (${(p.tall / p.short).toFixed(2)}x)`,
+  highlight: p.n === 2,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 110;
+const BAR_MAX = 190;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 278" fill="none" aria-hidden="true">
+  <title>A taller stack carries more, not less</title>
+  <desc>Table 710.1(2) capacity for a stack of 3 branch intervals or fewer, against more than 3</desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A taller stack carries more, not less</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Table 710.1(2) capacity for a stack of 3 branch intervals or fewer, against more than 3</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">Every size gains capacity with height. Competitors routinely present stack capacity as if it only ever falls.</text>
+</svg>

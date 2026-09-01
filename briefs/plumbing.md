@@ -1,4 +1,4 @@
-# Category Brief — Plumbing (Waves 1 & 2 — 22 calculators)
+# Category Brief — Plumbing (Waves 1–4 — 25 calculators, 3 reference pages, 8 posts)
 
 > Written alongside the build, not before it. **Every number in the "Defaults compute to"
 > lines below was produced by running `src/lib/plumbing.ts`**, not typed from a draft — the
@@ -554,3 +554,211 @@ rendered with `set:html`.
   scroll inside their own `overflow-x-auto` containers as intended.
 - HVAC 43 and electrical 39 untouched — `git status` shows no non-plumbing source changes — and
   **the electrical hub's derived plumbing count moved 22 → 24 on its own**.
+
+---
+
+# Wave 4 — the last pending page, and the first blog posts (category now 25 calculators + 3 reference pages + 8 posts)
+
+The hub's own "coming soon" card promised exactly two things after wave 3: plumbing blog content,
+and a grey-water / rainwater-harvesting calculator. Both shipped here. Same discipline as waves
+1–3 — **every "Defaults compute to" line below was produced by running `src/lib/plumbing.ts`**,
+and **33 further independent-invariant assertions pass (261 across the four waves)**.
+
+`plumbing.ts` is now **2,689 lines / 181 exports**. Sitemap **688 → 738**. The new calculator
+joined **Drainage, Waste & Vent**, so no new group was needed and
+`ungroupedPlumbingCalculators` stayed empty.
+
+## 4.1 New calculator
+
+### `plumbing-rainwater-harvesting-calculator` · cyan · Drainage, Waste & Vent
+
+**Search question:** What size rainwater tank do I need?
+**Two methods side by side — the same call the grease-trap page makes, and for the same reason.**
+
+**Method 1 — rainwater harvesting, sized on the DRY SPELL.**
+`gal = area × inches × GAL_PER_SQFT_PER_INCH × Cr × Ce`, then storage is the **smaller** of
+`demand × dry-spell days` and what the roof can actually refill that month.
+
+**Defaults:** 2,000 ft², asphalt shingle (Cr 0.85), 3.5 in in the design month, 4 storm events,
+60 gpd of demand, 21-day dry spell.
+**Defaults compute to:** caught per inch **1,060 gal**; supply **3,066 gal/month**; demand storage
+**1,260**; yield storage 3,066; required **1,260** → **1,550 gallon shell, governed by the dry
+spell**, covering **25.8 days**; monthly balance **+1,266 gal**.
+
+**Method 2 — grey water, sized on a 24-HOUR HOLD.**
+`gpd = Σ (occupants × per-person yield) + loads/wk × gal ÷ 7`; irrigable area from a weekly
+application rate.
+
+**Defaults:** 3 occupants, shower + bathroom sink + clothes washer, 5 loads/week, 0.6 gal/ft²/wk.
+**Defaults compute to:** **104.3 gpd** (75.0 shower + 15.0 lavatory + 14.3 washer), max storage
+**104 gal — one day, no more**, **1,217 ft²** irrigable, **38,064 gal/year**.
+
+**Dry-spell ladder (required / stocked shell / governed by):** 7 d → 420 / 530 / demand ·
+14 → 840 / 865 / demand · **21 → 1,260 / 1,550 / demand** · 30 → 1,800 / 2,500 / demand ·
+45 → 2,700 / 3,000 / demand · **60 → 3,066 / 5,000 / yield** · 90 → 3,066 / 5,000 / yield.
+**Roof-material ladder (supply / shell / governed):** metal 0.95 → 3,427 / 1,550 / demand ·
+asphalt 0.85 → 3,066 / 1,550 / demand · membrane 0.90 → 3,246 / 1,550 / demand ·
+tile 0.80 → 2,886 / 1,550 / demand · gravel 0.70 → 2,525 / 1,550 / demand ·
+**green roof 0.30 → 1,082 / 1,100 / yield**.
+**Occupant ladder (gpd / irrigable / annual):** 1 → 44.3 / 517 / 16,164 · 2 → 74.3 / 867 / 27,114 ·
+**3 → 104.3 / 1,217 / 38,064** · 4 → 134.3 / 1,567 / 49,014 · 5 → 164.3 / 1,917 / 59,964 ·
+6 → 194.3 / 2,267 / 70,914.
+
+**Best differentiator:** the two methods answer *different questions*. A cistern separates supply
+from demand **in time**, so it is sized on the gap between storms. Grey water **cannot be stored
+at all** past ~24 hours before it goes septic, so its tank is a surge vessel sized on one day and
+the design work moves to the distribution field. Sizing one with the other's method gives a
+plausible number that means nothing.
+**Second — the dry spell is the lever, not the roof.** 7 → 45 days moves required storage
+420 → 2,700 (**6.4×**), then it **plateaus at 3,066** past ~60 days because the catchment cannot
+refill more. Publish the plateau; it is the honest ceiling on what harvesting can do.
+**Third — a green roof is the only common surface that flips the governing rule.** Every other
+material lands on the same 1,550 gallon tank.
+**Fourth — grey water beats rainwater when it matters.** Annually they are within a few percent
+(38,064 vs 36,749 gal on the same house), but in the driest month it is **3,129 vs 407 gal —
+7.7×** — exactly when irrigation demand peaks.
+**Fifth — the yield constant is derived, not quoted.** `GAL_PER_SQFT_PER_INCH` =
+`GALLONS_PER_CUBIC_FOOT / 12` = **0.62338**, and `60 ÷ ROOF_RUNOFF_DIVISOR` must equal it exactly
+(96.25 → 0.62338). Asserted. The familiar "0.62 gallons" rule of thumb is that rounded.
+
+**SCOPE HEDGE — same class as septic, storm and grease. Do not tighten.** Nonpotable reuse is the
+least code-governed subject in the module: **IPC Chapter 13 where adopted**, IAPMO green
+supplement / IRC elsewhere, and overwhelmingly **state and county rules ranging from by-right to
+prohibited**. Every factor is an editable input with defaults presented as common values, not
+code. The page publishes **no jurisdiction table** — the same call as `nec-adoption-by-state` and
+the backflow page. Potable reuse, treatment and disinfection are explicitly out of scope, and
+kitchen sink / dishwasher are deliberately absent from the grey-water source list.
+`ROOF_RUNOFF_COEFFICIENTS`, `COLLECTION_EFFICIENCY`, `FIRST_FLUSH_PER_SQFT`,
+`GREYWATER_SOURCE_YIELD` and `IRRIGATION_DEMAND` are **tier 3 — commonly published, unverified
+here** and labelled so in the lib, on the page and in the sources line.
+
+## 4.2 First 8 blog posts
+
+Each = 1 mdx + 3 computed SVG diagrams + 1 hero SVG. Covers **5 of the 6 hub groups**; Volume &
+Conversions was deliberately deferred (weakest informational intent) and is now Cluster 6 of
+`docs/notebooklm/plumbing-content-strategy.md`.
+
+| Slug | Dir | Funnels to | Its differentiator |
+| --- | --- | --- | --- |
+| `what-size-water-line-do-i-need` | `water-line-size/` | pipe-size, velocity, friction | Must clear **both** rules; **PEX needs a size up on copper** |
+| `what-size-drain-pipe-do-i-need` | `drain-size/` | drain-pipe-size, dfu | The **WC 3" floor overrides the table**; a **taller stack carries MORE** |
+| `drain-pipe-slope` | `drain-slope/` | pipe-slope | A **3" drain needs half the fall of a 2"**; too steep is a real failure mode |
+| `how-far-can-a-vent-be-from-a-trap` | `trap-arm/` | vent-size | Weir to **vent fitting**, not stack; **water closets have no length limit** |
+| `what-size-water-heater-do-i-need` | `water-heater-size/` | water-heater-size | **40 gal gas beats 50 gal electric** on the same 66-gal peak |
+| `tankless-water-heater-sizing` | `tankless-sizing/` | tankless | **37.5% output loss** between a 70 °F and 40 °F inlet |
+| `normal-water-pressure-for-a-house` | `water-pressure/` | water-pressure | A storey costs **4.33 psi**, the one loss independent of flow |
+| `how-much-does-it-cost-to-repipe-a-house` | `repipe-cost/` | repipe-cost | Material and access **compound to 3.05×**, not add |
+
+**Verified anchors (all computed from the lib — reuse rather than re-deriving):**
+
+- **Water line:** 18 gpm / copper L / 120 ft / 60 psi / 20 ft lift / 15 psi fixture / 8 psi meter →
+  **1 inch**, 7.00 ft/s, 8.98 psi/100, **governed by velocity**; available **28.34 psi**, allowable
+  **23.62** psi/100. **3/4 in fails both: 11.93 ft/s and 32.91 psi/100.** gpm ladder: 5 → 1/2" ·
+  8 → 3/4" (5.30) · 12 → 3/4" (7.95) · 18 → 1" (7.00) · 25 → 1-1/4" (6.38) · 40 → 1-1/2" (7.21).
+  **Bore at nominal 1 in: copper 1.025, PEX 0.875, CPVC/PVC/steel 1.049.** WSFU defaults
+  **16.4 total (12.4 cold, 6.4 hot) → 18.16 gpm tank / 32.12 valve**.
+- **Drain size:** 2-bath house = **18 DFU**; table says 2" (cap 21), the WC floors it at **3"**.
+  Across applications: building-drain 2" · horizontal-branch **3"** (cap 20) · stack-short 2-1/2"
+  (cap 20) · stack-tall 2" (cap 24). **Stack short/tall: 1-1/2" 4/8 · 2" 10/24 · 2-1/2" 20/42 ·
+  3" 48/72 · 4" 240/500 · 6" 960/1900.** Building drain at 1/4: 2" 21 · 3" 42 · 4" 216 · 6" 840 ·
+  8" 1920. 4" by slope: 1/8 180 · 1/4 216 · 1/2 250.
+- **Slope:** 1-1/2"–2-1/2" 1/4 in/ft 2.08% · 3"–6" 1/8 1.04% · 8"+ 1/16 0.52%; fall over 40 ft
+  10 / 5 / 2.5 in. At 1/4: 10 ft 2.5 · 20 5 · 40 10 · 60 15 · 100 **25 in**.
+  **2" over 50 ft = 12.50 in vs 3" = 6.25 in — exactly half.**
+- **Trap arm (Table 909.1):** 1-1/4" 5 ft @1/4 · 1-1/2" 6 · 2" 8 · 3" 12 @1/8 · 4" 16. Vent at
+  30/60 ft: 1-1/2" → 1-1/4"/1-1/2" · 2" → 1-1/4"/1-1/2" · **3" → 1-1/2"/2"** · 4" → 2"/2-1/2" ·
+  6" → 3"/4". Past 40 ft the **whole run** upsizes.
+- **Water heater:** peak **66 gal**; gas 40k@80% recovery **42.68 gph** → **40 gal, FHR 70.68**;
+  electric 4,500 W recovery **20.48 gph** → **75 gal, FHR 72.98**. **A 50-gal electric rates 55.5
+  and fails the peak a 40-gal gas clears.** FHR gas/elec: 30 63.7/41.5 · 40 70.7/48.5 ·
+  50 77.7/55.5 · 60 84.7/62.5 · 75 95.2/73.0 · 80 98.7/76.5 · 100 112.7/90.5.
+- **Tankless:** 199k @95%, 120 °F target — inlet 70 → **7.57** · 60 → 6.30 · 50 → 5.40 ·
+  40 → **4.73** gpm = **37.5% loss**. BTU for 5 gpm: inlet 70 → 131,526 · 60 → 157,832 ·
+  50 → 184,137 · 40 → **210,442, past the 199,000 residential ceiling**.
+- **Pressure:** 65 psi = **150.1 ft**; 25 ft of lift = 10.83 psi → 54.17 left. Storey ladder at 65:
+  1 → 60.67 · 2 → 56.34 · 3 → **52.01** · 4 → 47.68 · 5 → 43.34. **One storey = 4.33 psi flat.**
+  Head: 40 → 92.4 · 50 → 115.4 · 60 → 138.5 · 80 → 184.7 · 100 → 230.9 (PRV over 80, IPC 604.8).
+- **Repipe:** 1,800 ft² PEX average → **$10,950 = $6.08/ft²**, band $9,308–$12,592. Access: easy
+  $9,150 ($5.08) · average $10,950 · difficult $16,350 ($9.08) = **79% swing**. Material: PEX
+  $10,950 · CPVC $12,750 · copper $18,150 (**+$7,200**). **PEX/easy $9,150 → copper/difficult
+  $27,870 = 3.05×.** 2 storeys $12,300; 3 baths $11,700. Per-ft² **falls** with size: 1,000 $6.95 ·
+  1,800 $6.08 · 3,500 $5.56.
+
+**Hero convention confirmed:** `.svg`, 1000×500, gradient + two blurred ellipses, left white text
+card, right graphic, `<rect y="496" height="4" fill="#01AD9F">`. **Plumbing heroes use ORANGE**
+(`#EA580C` / `#FB923C`) with the teal bar retained. All 8 generated from one parameterised
+template and XML-validated.
+
+## 4.3 Registry, taxonomy and ripple
+
+- Four-edit registration done; `ungroupedPlumbingCalculators` stayed empty.
+- **`blogTaxonomy.ts` gained a `plumbing` `categorySeo` entry — load-bearing, not cosmetic.**
+  Without it `resolveTaxonomySeo`'s fallback describes the page as being for "HVAC and electrical
+  contractors" and links the HVAC hub. **`/blog/categories/plumbing` and the hub's "From the
+  Blog" strip are now LIVE** — both had been dormant inside a `length > 0` guard since wave 1.
+- Hub: meta description and ItemList description extended; DWV group description widened;
+  coming-soon card refreshed to name the rest of the written side and a **leak / water-waste
+  calculator**.
+- Glossary **80 → 85 terms** (cistern, first flush, grey water, purple pipe, runoff coefficient);
+  the count is still computed before the title string, so it cannot go stale.
+- Formula reference **24 → 25 blocks**; 83 lines, all ≤ 36 chars.
+- New tool added to the storm-drainage and septic related-calculator lists (septic trimmed back
+  to the house count of 4).
+
+## 4.4 Bug found and fixed in passing
+
+**`calculatorCategories.ts`'s plumbing description had gone stale by three waves** — it named
+only the wave-1 sixteen calculators while `toolCount` correctly derived 25, so the `/calculators`
+card advertised 25 tools and then listed sixteen. Same class as the old HVAC `toolCount: 32` bug:
+the number was derived, the prose was not. Refreshed to name all 25 and verified in-browser.
+**Rule: when a card derives its count, the description beside it has to be maintained too, or
+derive that as well.**
+
+## 4.5 Wave 4 acceptance — all passed
+
+- `npm run build` clean; sitemap **688 → 738**.
+- **1,295 reconciliation checks**: 25 registered = 25 grouped = 25 guide rows = 25 unique hub card
+  hrefs = the badge; ungrouped empty; every slug has page + script + `init…` + wiring; element ids
+  reconciled **both** directions; guide accents match registry accents; accents distinct per group;
+  no stray page dirs or scripts; canonical on `www`, 3 JSON-LD blocks and OG/Twitter on every page;
+  4 related links each; no HTML entities in interpolated data strings.
+- **33 invariant assertions** on the new lib exports (the `60 / ROOF_RUNOFF_DIVISOR` cross-check,
+  monotonicity in every input, `governedBy` flipping at the crossover, round-trips, and the
+  24-hour storage ceiling).
+- **204 post checks**: all 8 prerender with **exactly 3 figures** and a hero each; 5 tags, ≥8 FAQ
+  headings, sources line, `draft:false`, no year in slug; **25 unique internal links resolve**
+  (blog against `dist`, calculators against `src/pages` since they are SSR); every post has ≥1
+  inbound link; no self-links; heroes 1000×500 with the teal bar.
+- **`getBBox()` sweep: 0 overflows across 24 diagrams / 959 elements.**
+- **48/48 prose figures appear in the rendered diagram SVG text** — after fixing one real drift
+  (see below).
+- Calculator driven in-browser: every default matched, plus the method toggle, the green-roof rule
+  flip, presets writing into their editable fields, zero rainfall, a tiny roof, a 90-day dry spell,
+  demand above supply, no sources selected, and reset restoring everything including the toggle.
+- Mobile 375 px: `scrollWidth === clientWidth === 375` on the calculator, hub, glossary, category
+  page and posts; 0 unwrapped wide tables; 0 oversize SVG.
+- HVAC 43 and electrical 39 untouched.
+
+## 4.6 Gotcha worth carrying — `fmt` vs `toFixed` bites DIAGRAMS too
+
+The prose-vs-diagram sweep caught `PressureBudgetDiagram` rendering **23.61** psi/100 ft where the
+calculator page and the prose both read **23.62**. Cause: the diagram used `.toFixed(2)`
+(half-even) while the calculators use `fmt` (`toLocaleString`, half-up), and the true value is
+23.615. **Rule: import `fmt` from `@/lib/plumbing` in diagram components rather than calling
+`toFixed`, so a diagram cannot disagree with the calculator it funnels to.** Worth sweeping the
+hvac and electrical diagram components for the same pattern.
+
+**Also re-confirmed, three times in one session:** the Bash heredoc backslash/EOF problem is not
+occasional. It broke a `.mts` (an escaped newline inside a JS string became a real newline), two
+regex literals (`[^"\\]` collapsing to `[^"\]`), and silently failed on a long append with
+"unexpected EOF". **Write escape-heavy or long scripts to a file and run the file.** And the Bash
+tool's **cwd persists across calls**.
+
+## 4.7 Still open for plumbing
+
+- **The Appendix E verification.** `WSFU_FIXTURES` and `HUNTER_DEMAND` remain the category's only
+  unverified tier-3 exports — now the highest-value non-content fix left.
+- **A leak / water-waste calculator**, which the coming-soon card currently promises.
+- **39 blog posts**, mapped in `docs/notebooklm/plumbing-content-strategy.md` (47 titles in 8
+  clusters; 25 tier-1 of which 8 are done). Every tier-1 and tier-2 funnel target already exists.
+- **No plumbing keyword CSV** — every tier in the strategy doc is reasoned, not measured.

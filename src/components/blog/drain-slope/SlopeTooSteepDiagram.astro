@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  minSlope, slopeToPercent, totalFall, sizeLabel,
+} from "@/lib/plumbing";
+/** Both ends of the range are failure modes. Too flat will not scour; too steep
+ * lets the liquid outrun the solids and leaves them behind. */
+const SLOPES = [
+  { s: 0.0625, verdict: "too flat for 3 in", tone: "bad" },
+  { s: 0.125, verdict: "code minimum, 3 in", tone: "good" },
+  { s: 0.25, verdict: "good working grade", tone: "good" },
+  { s: 0.5, verdict: "steep — watch for stranding", tone: "neutral" },
+  { s: 1, verdict: "liquid outruns the solids", tone: "bad" },
+];
+
+const rows = SLOPES.map(({ s, verdict, tone }) => ({
+  label: `${s} in/ft`,
+  cells: [
+    `${slopeToPercent(s).toFixed(2)}%`,
+    `${totalFall(s, 50).toFixed(2)} in`,
+    verdict,
+  ],
+  tone: ["neutral", "neutral", tone],
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Too steep is a failure mode, not a safety margin</title>
+  <desc>Grade against percent, fall over a 50 ft run, and what happens to a 3 inch drain at each</desc>
+
+  <rect x="8" y="8" width="704" height="266" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Too steep is a failure mode, not a safety margin</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Grade against percent, fall over a 50 ft run, and what happens to a 3 inch drain at each</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">GRADE</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PERCENT</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">FALL OVER 50 FT</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT HAPPENS</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="260" fill={C.muted} font-family={FONT} font-size="10">A drain wants roughly 2 ft/s to scour. Below that solids settle; far above it the water leaves them behind on the invert.</text>
+</svg>

@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  minSlope, slopeToPercent, totalFall, sizeLabel,
+} from "@/lib/plumbing";
+/** Minimum slope steps DOWN as the pipe gets bigger, which is the opposite of
+ * what most people assume, and it is what makes upsizing buy headroom. */
+const SIZES = [1.5, 2, 2.5, 3, 4, 6, 8];
+const RUN = 40;
+
+const fractions: Record<string, string> = { "0.25": "1/4 in/ft", "0.125": "1/8 in/ft", "0.0625": "1/16 in/ft" };
+
+const rows = SIZES.map((n) => {
+  const s = minSlope(n);
+  return {
+    label: sizeLabel(n),
+    cells: [
+      fractions[String(s)] ?? `${s} in/ft`,
+      `${slopeToPercent(s).toFixed(2)}%`,
+      `${totalFall(s, RUN).toFixed(2)} in`,
+    ],
+    tone: ["neutral", "neutral", s <= 0.125 ? "good" : "neutral"],
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" fill="none" aria-hidden="true">
+  <title>Minimum slope falls as the pipe grows — Table 704.1</title>
+  <desc>Code minimum by nominal size, as a fraction, as a percent, and as fall over a 40 ft run</desc>
+
+  <rect x="8" y="8" width="704" height="326" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Minimum slope falls as the pipe grows — Table 704.1</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Code minimum by nominal size, as a fraction, as a percent, and as fall over a 40 ft run</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NOMINAL SIZE</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CODE MINIMUM</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PERCENT GRADE</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">FALL OVER 40 FT</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="320" fill={C.muted} font-family={FONT} font-size="10">The step at 3 inch halves the required fall. That single row is why a long buried run is often upsized rather than re-routed.</text>
+</svg>

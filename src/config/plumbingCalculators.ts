@@ -59,6 +59,7 @@ const ICON_SEPTIC = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stro
 const ICON_FILTER = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>`;
 const ICON_TANK = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M7 6a5 5 0 0110 0v11a5 5 0 01-10 0V6zM7 12h10"/></svg>`;
 const ICON_CLOCK = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+const ICON_CISTERN = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M6 8v9a4 4 0 004 4h4a4 4 0 004-4V8M9 4h6M8 13h8"/></svg>`;
 
 export const plumbingCalculators: PlumbingCalculator[] = [
   {
@@ -277,6 +278,15 @@ export const plumbingCalculators: PlumbingCalculator[] = [
     accent: "blue",
     icon: ICON_TANK,
   },
+  {
+    slug: "plumbing-rainwater-harvesting-calculator",
+    title: "Rainwater Harvesting & Grey Water Calculator",
+    description:
+      "Cistern size from catchment area, rainfall and dry-spell length, plus grey water yield and the landscape it irrigates — two sources, two sizing rules.",
+    question: "What size rainwater tank do I need?",
+    accent: "cyan",
+    icon: ICON_CISTERN,
+  },
 ];
 
 export type PlumbingCalculatorGroup = {
@@ -300,7 +310,7 @@ export const plumbingCalculatorGroups: PlumbingCalculatorGroup[] = [
   {
     label: "Drainage, Waste & Vent",
     description:
-      "Gravity side of the system. Total the drainage fixture units, size the drain, set the fall, and vent it so the traps hold their seal.",
+      "Gravity side of the system. Total the drainage fixture units, size the drain, set the fall, and vent it so the traps hold their seal — then deal with what leaves the roof, whether you shed it or keep it.",
     slugs: [
       "plumbing-drainage-fixture-unit-calculator",
       "plumbing-drain-pipe-size-calculator",
@@ -309,6 +319,7 @@ export const plumbingCalculatorGroups: PlumbingCalculatorGroup[] = [
       "plumbing-storm-drainage-calculator",
       "plumbing-septic-tank-calculator",
       "plumbing-grease-trap-calculator",
+      "plumbing-rainwater-harvesting-calculator",
     ],
   },
   {
@@ -630,6 +641,13 @@ export const plumbingCalculatorGuide = [
     tool: "Well Pressure Tank",
     accent: "blue" as const,
     rule: "Pump gpm x run minutes, divided by the Boyle's-law drawdown",
+  },
+  {
+    question: "What size rainwater tank do I need?",
+    slug: "plumbing-rainwater-harvesting-calculator",
+    tool: "Rainwater Harvesting & Grey Water",
+    accent: "cyan" as const,
+    rule: "The smaller of the dry spell and what the roof can refill",
   },
 ];
 

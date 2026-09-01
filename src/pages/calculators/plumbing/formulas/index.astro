@@ -257,6 +257,24 @@ const sections: Section[] = [
         normal:
           "Two devices, two units. A hydromechanical interceptor is rated in GPM and separates by slowing flow; a gravity interceptor is rated in gallons and separates by holding wastewater still. A standard 24 × 24 × 12 three-compartment sink already needs 75 GPM, near the top of the hydromechanical range — which is why full-service kitchens usually end up outside. The local FOG programme sets the minimum size and normally overrides the arithmetic below about 65 seats",
       },
+      {
+        name: "Rainwater Yield & Cistern Storage",
+        calc: {
+          href: "/calculators/plumbing/plumbing-rainwater-harvesting-calculator",
+          label: "Rainwater Harvesting & Grey Water Calculator",
+        },
+        formula:
+          "gal = area × in × 0.62338 × Cr × Ce\n\n0.62338 is DERIVED, not quoted:\n1 in over 1 ft2 = 1/12 ft3\n  × 7.48052 gal/ft3 = 0.62338\n\ncistern = the SMALLER of\n  demand × dry-spell days\n  what the roof refills\n\ngrey water: max hold 24 hours\n  so the tank = one day of flow",
+        vars: [
+          { sym: "area", desc: "Horizontal projection of the catchment, not slope length — rain falls vertically" },
+          { sym: "Cr", desc: "Runoff coefficient: about 0.95 standing-seam metal, 0.85 asphalt shingle, 0.30 green roof" },
+          { sym: "Ce", desc: "Collection efficiency after screen, filter and first-flush losses — commonly 0.85" },
+          { sym: "dry-spell days", desc: "How long the system has to run with no rain; the single biggest lever on tank size" },
+          { sym: "24 hours", desc: "Untreated grey water goes septic past a day, so it cannot be stored between storms" },
+        ],
+        normal:
+          "Two sources, two sizing rules. A cistern separates supply from demand in time, so it is sized on the gap between storms — but never past what the catchment can refill, or it just sits part-empty. Grey water cannot do that at all: it is a surge vessel that has to empty daily, so the design work moves to the distribution field. These are planning values rather than code, because nonpotable reuse falls to IPC Chapter 13 where adopted and to state and county rules everywhere else",
+      },
     ],
   },
   {

@@ -71,6 +71,39 @@ export const categorySeo: Record<string, TaxonomySeo> = {
       { label: "Blog home", href: "/blog/" },
     ],
   },
+  plumbing: {
+    title: "Plumbing",
+    description:
+      "Plumbing articles for contractors covering IPC supply and drain sizing, slope and venting, water heater selection, pressure, and repipe cost.",
+    intro: [
+      "This plumbing category collects contractor-focused guides built on the International Plumbing Code — supply pipe sizing against both velocity and pressure, drainage fixture units into drain size, the fall a run actually needs, vent and trap arm limits, water heater selection, and what a repipe really costs.",
+      "Every guide names the table or section behind its answer and shows the working, because the IPC is a model code: roughly fifteen states enforce the UPC or a derivative such as California's CPC instead, and local amendments override either one. Knowing which rule governed an answer is what lets you defend it to an inspector.",
+      "Pair the reading with the free plumbing calculator hub when you need the numbers rather than the reasoning — fixture units, pipe size, slope, vent size, water heater sizing, and job pricing all have interactive tools.",
+    ],
+    faqs: [
+      {
+        question: "Who are these plumbing articles for?",
+        answer:
+          "Licensed plumbers, apprentices, and trade estimators who need clear explanations of IPC sizing rules, plus homeowners trying to understand a quote. Each guide starts from the question someone actually asks and works to a defensible number.",
+      },
+      {
+        question: "Which plumbing code do these follow?",
+        answer:
+          "The 2021 International Plumbing Code, with the table or section named on every claim. The IPC is a model code, so confirm the edition and amendments your jurisdiction enforces before you pull a permit — and note that UPC states use different fixture-unit values and sizing tables entirely.",
+      },
+      {
+        question: "Do these posts replace a licensed plumber or a stamped design?",
+        answer:
+          "No. They explain the reasoning so you can size faster, sanity-check someone else's numbers, and quote with more confidence. Final design and code compliance still rest with a licensed plumber and your authority having jurisdiction.",
+      },
+    ],
+    relatedLinks: [
+      { label: "Plumbing calculators", href: "/calculators/plumbing/" },
+      { label: "Plumbing formula reference", href: "/calculators/plumbing/formulas/" },
+      { label: "Plumbing glossary", href: "/calculators/plumbing/glossary/" },
+      { label: "All blog tags", href: "/blog/tags/" },
+    ],
+  },
 };
 
 export const tagSeo: Record<string, TaxonomySeo> = {

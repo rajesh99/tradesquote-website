@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter, sizeSupplyPipe, HAZEN_WILLIAMS_C, PIPE_MATERIAL_LABELS, sizeLabel,
+} from "@/lib/plumbing";
+/** The differentiator: PEX has the best C factor and the smallest bore, and the
+ * bore wins, because friction goes as diameter to the 4.87 power. */
+const BASE = {
+  gpm: 18,
+  developedFeet: 120,
+  supplyPsi: 60,
+  liftFeet: 20,
+  fixturePsi: 15,
+  meterPsi: 8,
+  otherPsi: 0,
+  maxVelocity: 8,
+};
+const MATERIALS = ["copper-l", "pex", "cpvc-40", "pvc-40"] as const;
+
+const rows = MATERIALS.map((material) => {
+  const r = sizeSupplyPipe({ ...BASE, material });
+  const boreAtOneInch = insideDiameter(material, 1)!;
+  const oversize = r.size > 1;
+  return {
+    label: PIPE_MATERIAL_LABELS[material],
+    cells: [
+      `${boreAtOneInch.toFixed(3)} in`,
+      String(HAZEN_WILLIAMS_C[material]),
+      sizeLabel(r.size),
+    ],
+    tone: ["neutral", "neutral", oversize ? "bad" : "good"],
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>Bore beats smoothness — same 18 gpm, four materials</title>
+  <desc>Nominal 1 inch bore, the Hazen-Williams C factor, and the size each material actually needs</desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Bore beats smoothness — same 18 gpm, four materials</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Nominal 1 inch bore, the Hazen-Williams C factor, and the size each material actually needs</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MATERIAL</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BORE AT 1 IN</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">C FACTOR</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SIZE FOR 18 GPM</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">PEX has the best C factor of the four and still needs a size up, because a nominal 1 inch PEX bores 0.875 against copper's 1.025.</text>
+</svg>
