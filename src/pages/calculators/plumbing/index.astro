@@ -25,7 +25,7 @@ import { electricalCalculators } from "@/config/electricalCalculators";
 
 const title = "Free Plumbing Calculators (IPC) | TradesQuote";
 const description =
-  "Free IPC-based plumbing calculators — water supply and drainage fixture units, water pipe size, pipe velocity, Hazen-Williams friction loss, drain and sewer sizing, minimum slope and fall, vent size and trap arm length, water pressure and head, pump total dynamic head, water heater and tankless sizing, repipe and water heater replacement cost, labor rate, and job pricing. Every formula explained in plain English with the code section cited.";
+  "Free IPC-based plumbing calculators — water supply and drainage fixture units, water pipe size, pipe velocity, Hazen-Williams friction loss, drain and sewer sizing, minimum slope and fall, vent size and trap arm length, storm drainage, septic and grease interceptor sizing, water pressure and head, pump total dynamic head, well pressure tank drawdown, water heater, tankless, expansion tank and mixing valve sizing, pipe volume, unit conversion, repipe and water heater replacement cost, labor rate, and job pricing. Every formula explained in plain English with the code section cited.";
 
 const pageUrl = "https://www.tradesquote.ai/calculators/plumbing";
 const basePath = "/calculators/plumbing";
@@ -47,7 +47,7 @@ const itemListData = {
   "@type": "ItemList",
   name: "Free Plumbing Calculators",
   description:
-    "Free online plumbing calculators built on the International Plumbing Code: water supply fixture units and peak demand, water pipe sizing against velocity and friction, pipe velocity, Hazen-Williams friction loss, drainage fixture units from Table 709.1, drain and sewer sizing from Tables 710.1(1) and 710.1(2), minimum slope from Table 704.1, vent sizing under 906.2 with Table 909.1 trap arm limits, pressure and head conversion with the IPC 604.8 pressure-reducing valve threshold, pump total dynamic head, storage and tankless water heater sizing, whole-house repipe cost, water heater replacement cost, loaded labor rate, and contractor job pricing.",
+    "Free online plumbing calculators built on the International Plumbing Code: water supply fixture units and peak demand, water pipe sizing against velocity and friction, pipe velocity, Hazen-Williams friction loss, drainage fixture units from Table 709.1, drain and sewer sizing from Tables 710.1(1) and 710.1(2), minimum slope from Table 704.1, vent sizing under 906.2 with Table 909.1 trap arm limits, roof and storm drainage runoff, septic tank and leach field sizing, grease interceptor sizing under 1003.3, pressure and head conversion with the IPC 604.8 pressure-reducing valve threshold, pump total dynamic head, well pressure tank drawdown, storage and tankless water heater sizing, thermal expansion tank and mixing valve sizing, pipe volume and purge time, unit conversion, whole-house repipe cost, water heater replacement cost, loaded labor rate, and contractor job pricing.",
   itemListElement: plumbingCalculators.map((calc, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -138,7 +138,7 @@ const plumbingResources: ExternalResource[] = [
     <meta property="og:title" content="Free Plumbing Calculators (IPC)" />
     <meta
       property="og:description"
-      content="Water supply and drainage fixture units, pipe size, velocity, friction loss, drain sizing, slope, venting, pressure and pump head, water heater sizing, and job pricing — sixteen free IPC-based tools with every formula explained."
+      content="Water supply and drainage fixture units, pipe size, velocity, friction loss, drain sizing, slope, venting, pressure and pump head, water heater sizing, and job pricing — free IPC-based tools with every formula explained."
     />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:site_name" content="TradesQuote" />
@@ -328,8 +328,9 @@ const plumbingResources: ExternalResource[] = [
             <h2 class="text-lg font-bold text-slate-700">More plumbing tools on the way</h2>
           </div>
           <p class="mt-3 text-sm text-slate-600 leading-relaxed">
-            Thermal expansion tank sizing, pipe volume, mixing-valve ratios, storm and roof drainage, septic
-            tank sizing, and a plumbing unit converter are next. Calculators for these trades are also planned:
+            Every tool the last round promised is now built. Next for plumbing is the written side — guides
+            and how-tos, which this category does not have yet — plus a grey-water and rainwater-harvesting
+            calculator. Calculators for these trades are also planned:
           </p>
           <div class="mt-3 flex flex-wrap gap-2">
             {
@@ -397,9 +398,10 @@ const plumbingResources: ExternalResource[] = [
           Every plumbing formula on one page
         </h2>
         <p class="mt-4 text-slate-600 leading-relaxed">
-          Rather than repeat them here, all twenty-two formulas behind these tools live on one reference page
-          — each with what every variable means, the values you should expect back, and the IPC section it
-          comes from.
+          Rather than repeat them here, every formula behind these tools lives on one reference page — each
+          with what every variable means, the values you should expect back, and the IPC section it comes
+          from. Two more reference pages sit alongside it: the vocabulary, and the one subject where getting
+          the device wrong is a health risk rather than a callback.
         </p>
 
         <a
@@ -432,6 +434,58 @@ const plumbingResources: ExternalResource[] = [
             </span>
           </span>
         </a>
+
+        <div class="mt-5 grid sm:grid-cols-2 gap-5">
+          <a
+            href={`${basePath}/glossary`}
+            class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-orange-300 hover:shadow-md transition-all"
+          >
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 6h16M4 12h16M4 18h7"
+                />
+              </svg>
+            </span>
+            <span class="mt-4 block text-lg font-bold text-slate-900 group-hover:text-orange-600">
+              Plumbing Glossary
+            </span>
+            <span class="mt-2 block text-sm text-slate-600 leading-relaxed">
+              The vocabulary in plain English — trap arm, wet vent, WSFU, drawdown, flood level rim,
+              scour velocity — weighted toward the pairs people mix up.
+            </span>
+            <span class="mt-auto pt-4 block text-sm font-semibold text-orange-600 group-hover:underline">
+              Open the glossary →
+            </span>
+          </a>
+
+          <a
+            href={`${basePath}/backflow-prevention`}
+            class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-orange-300 hover:shadow-md transition-all"
+          >
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+            </span>
+            <span class="mt-4 block text-lg font-bold text-slate-900 group-hover:text-orange-600">
+              Backflow Prevention
+            </span>
+            <span class="mt-2 block text-sm text-slate-600 leading-relaxed">
+              Backpressure against backsiphonage, hazard class, every assembly from air gap to RPZ, and the
+              device each connection takes — because no vacuum breaker stops backpressure.
+            </span>
+            <span class="mt-auto pt-4 block text-sm font-semibold text-orange-600 group-hover:underline">
+              Open the reference →
+            </span>
+          </a>
+        </div>
 
         <p class="mt-6 text-sm text-slate-500">
           These reproduce IPC tables and standard hydraulic formulas, but they cannot see your existing

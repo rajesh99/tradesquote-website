@@ -1,0 +1,614 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import { FEET_HEAD_PER_PSI, UNIT_CATEGORIES, convertUnit, fmt } from "@/lib/plumbing";
+
+const title = "Plumbing Unit Converter — Flow, Pressure, Head & Volume | TradesQuote";
+const description =
+  "Free plumbing unit converter. Move between gpm and litres per minute, psi and bar, psi and feet of head, gallons and litres, inches and millimetres, and °F and °C — with the exact conversion factors shown.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-unit-converter";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Plumbing Unit Converter", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Plumbing Unit Converter",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online plumbing unit converter covering flow rate, pressure and head, volume, length and diameter, velocity and temperature, between US customary and metric units.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many litres per minute is 10 gpm?",
+    answer: `<strong>${fmt(convertUnit("flow", "gpm", "lpm", 10), 4)} L/min</strong>. One US gallon is exactly 3.785411784 litres by definition, so the factor is exact rather than rounded. Going the other way, 100 L/min is ${fmt(convertUnit("flow", "lpm", "gpm", 100), 2)} gpm.`,
+  },
+  {
+    question: "How do I convert psi to feet of head?",
+    answer: `Multiply psi by <strong>${fmt(FEET_HEAD_PER_PSI, 3)}</strong>, or feet by 0.4331. So 60 psi is <strong>${fmt(convertUnit("pressure", "psi", "ftH2O", 60), 1)} feet</strong> of water column. Unlike the metric conversions this one is not a definition — it comes from the density of water at 60 °F, so it shifts very slightly with temperature.`,
+  },
+  {
+    question: "Why is an imperial gallon different from a US gallon?",
+    answer: `They are separate historical definitions that were never reconciled. An imperial gallon is 4.54609 litres against the US gallon's 3.785411784 — about <strong>${fmt(convertUnit("volume", "ukgal", "gal", 1), 3)} US gallons</strong>. On a fixture flow rate that is a 20% error, which is more than enough to change a pipe size. Always check which gallon a spec sheet means.`,
+  },
+  {
+    question: "What is a bar in psi?",
+    answer: `<strong>${fmt(convertUnit("pressure", "bar", "psi", 1), 4)} psi</strong>. Bar is common on European fixture and pump data, so 3 bar of required inlet pressure is ${fmt(convertUnit("pressure", "bar", "psi", 3), 1)} psi — well above the 8 to 15 psi most US fixtures want, and worth catching before you size the supply.`,
+  },
+  {
+    question: "Why is temperature handled differently?",
+    answer:
+      "Because the scales have different zero points, not just different sizes of degree. Every other conversion here is a single multiplication; temperature needs an offset as well, so <strong>°F = °C × 9/5 + 32</strong>. That is also why a <em>temperature rise</em> converts differently from a temperature: a 90 °F rise is a 50 °C rise, not 32.2 °C.",
+  },
+  {
+    question: "Is 1 cfs really 448.83 gpm?",
+    answer: `Yes — <strong>${fmt(convertUnit("flow", "cfs", "gpm", 1), 2)} gpm</strong>, which is just 7.48052 gallons per cubic foot times 60 seconds. Cubic feet per second turns up in storm drainage and municipal work rather than building plumbing, but it is the unit a civil engineer will hand you.`,
+  },
+  {
+    question: "Are these factors exact?",
+    answer:
+      "The metric ones are, by definition: the inch is exactly 25.4 mm and the US gallon is exactly 3.785411784 litres. The water-based ones — psi to feet of head — depend on water density and are quoted at 60 °F. Every conversion on this page round-trips exactly, which is verified by test rather than assumed.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Units sorted? Quote the whole job in seconds.";
+const ctaDescription =
+  "Converting a spec sheet is the easy part. TradesQuote turns a scope or a set of photos into a detailed, line-item estimate with quantities, unit prices and totals — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pipe-volume-calculator",
+    title: "Pipe Volume Calculator",
+    description: "Gallons and litres held in a run of pipe.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "psi and head applied to a real system.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-velocity-calculator",
+    title: "Pipe Velocity Calculator",
+    description: "ft/s against the design limits.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Put the converted numbers to work.",
+  },
+];
+
+/** Quick-reference rows computed from the lib. */
+const flowRows = ["lpm", "lps", "m3h", "gph", "cfs", "ukgpm"].map((u) => ({
+  label: UNIT_CATEGORIES[0].units.find((x) => x.key === u)?.label ?? u,
+  value: convertUnit("flow", "gpm", u, 10),
+}));
+
+const pressureRows = ["ftH2O", "bar", "kpa", "mH2O", "atm"].map((u) => ({
+  label: UNIT_CATEGORIES[1].units.find((x) => x.key === u)?.label ?? u,
+  value: convertUnit("pressure", "psi", u, 60),
+}));
+
+const anchors = [
+  { from: "1 US gallon", to: `${fmt(convertUnit("volume", "gal", "l", 1), 6)} litres`, note: "exact by definition" },
+  { from: "1 imperial gallon", to: `${fmt(convertUnit("volume", "ukgal", "gal", 1), 5)} US gallons`, note: "a 20% trap on spec sheets" },
+  { from: "1 inch", to: "25.4 mm", note: "exact by definition" },
+  { from: "1 psi", to: `${fmt(FEET_HEAD_PER_PSI, 3)} ft of head`, note: "water at 60 °F, not a definition" },
+  { from: "1 bar", to: `${fmt(convertUnit("pressure", "bar", "psi", 1), 4)} psi`, note: "European pump and fixture data" },
+  { from: "1 cfs", to: `${fmt(convertUnit("flow", "cfs", "gpm", 1), 2)} gpm`, note: "7.48052 gal/ft³ × 60 s" },
+  { from: "1 m/s", to: `${fmt(convertUnit("velocity", "mps", "fps", 1), 5)} ft/s`, note: "exact by definition" },
+  { from: "0 °C", to: "32 °F", note: "offset scale — needs the +32" },
+];
+
+const styles = plumbingAccentStyles.teal;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Plumbing Unit Converter — Flow, Pressure, Head & Volume" />
+    <meta
+      property="og:description"
+      content="Convert gpm and L/min, psi and bar, psi and feet of head, gallons and litres, inches and millimetres. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Plumbing Unit Converter — Flow, Pressure, Head & Volume" />
+    <meta
+      name="twitter:description"
+      content="Every unit a plumbing job gets quoted in, converted both ways. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Plumbing Unit Converter"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              Plumbing Tools · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Plumbing Unit Converter <span class="text-teal-600">— Flow, Pressure, Head &amp; Volume</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Pump curves come in feet, supply pressure in psi, European fixtures in bar and litres per
+              minute, and civil drawings in cubic feet per second. This converts between all of them and shows
+              the whole category at once — plus the factor it used, so you can check it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+            Convert
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <label for="uc-category" class="text-sm font-semibold text-slate-800">What are you converting?</label>
+                <select
+                  id="uc-category"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                >
+                  {
+                    UNIT_CATEGORIES.map((c) => (
+                      <option value={c.key} selected={c.key === "flow"}>
+                        {c.label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="uc-value" class="text-sm font-semibold text-slate-800">Value</label>
+                <input
+                  id="uc-value"
+                  type="number"
+                  step="any"
+                  value="10"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 text-lg font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                />
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="uc-from" class="text-sm font-semibold text-slate-800">From</label>
+                  <select
+                    id="uc-from"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    {
+                      UNIT_CATEGORIES[0].units.map((u) => (
+                        <option value={u.key} selected={u.key === "gpm"}>
+                          {u.label}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="uc-to" class="text-sm font-semibold text-slate-800">To</label>
+                  <select
+                    id="uc-to"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    {
+                      UNIT_CATEGORIES[0].units.map((u) => (
+                        <option value={u.key} selected={u.key === "lpm"}>
+                          {u.label}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-4">
+                <button
+                  id="uc-swap"
+                  type="button"
+                  class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:border-teal-300 hover:text-teal-600 transition"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"></path>
+                  </svg>
+                  Swap
+                </button>
+
+                <button
+                  id="uc-reset"
+                  type="button"
+                  class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    ></path>
+                  </svg>
+                  Reset to defaults
+                </button>
+              </div>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Result</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="uc-result" class="text-5xl font-extrabold tracking-tight text-teal-600">
+                  {fmt(convertUnit("flow", "gpm", "lpm", 10), 4)}
+                </span>
+              </div>
+              <p id="uc-result-note" class="mt-1 text-sm font-semibold text-slate-700">
+                10 US gallons per minute (gpm) = {fmt(convertUnit("flow", "gpm", "lpm", 10), 4)} Litres per
+                minute (L/min)
+              </p>
+
+              <div class="mt-6 grid grid-cols-1 gap-3">
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">The factor used</p>
+                  <p id="uc-factor" class="mt-1 text-lg font-bold text-slate-900">
+                    × {fmt(convertUnit("flow", "gpm", "lpm", 1), 6)}
+                  </p>
+                </div>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">And back the other way</p>
+                  <p id="uc-reverse" class="mt-1 text-sm font-semibold text-slate-900">
+                    1 Litres per minute (L/min) = {fmt(convertUnit("flow", "lpm", "gpm", 1), 6)} US gallons per
+                    minute (gpm)
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-5 rounded-xl border border-teal-100 bg-white px-4 py-3">
+                <p class="text-sm font-semibold text-slate-800">Everything in this category</p>
+                <div id="uc-all" class="mt-2 text-sm">
+                  {
+                    UNIT_CATEGORIES[0].units.map((u) => (
+                      <div class="flex justify-between gap-3 py-1.5 border-b border-slate-100 last:border-0">
+                        <span class="text-slate-600">{u.label}</span>
+                        <span class="font-semibold text-slate-900 tabular-nums">
+                          {fmt(convertUnit("flow", "gpm", u.key, 10), 4)}
+                        </span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Metric factors are exact by definition. The pressure-to-head conversion depends on water
+                density and is quoted at 60 °F, so it shifts slightly with temperature.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The conversions, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Everything here is one multiplication, except the one that is not.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-teal-300"># Flow</div>
+            <div>
+              1 gpm&nbsp;=&nbsp;<span class="text-amber-300">3.785412</span> L/min&nbsp;·&nbsp;1
+              cfs&nbsp;=&nbsp;<span class="text-amber-300">448.83</span> gpm
+            </div>
+            <div class="mt-4 text-teal-300"># Pressure and head</div>
+            <div>
+              1 psi&nbsp;=&nbsp;<span class="text-amber-300">{fmt(FEET_HEAD_PER_PSI, 3)}</span> ft of
+              water&nbsp;·&nbsp;1 bar&nbsp;=&nbsp;<span class="text-amber-300">14.5038</span> psi
+            </div>
+            <div class="text-slate-400">the head figure comes from water density, not a definition</div>
+            <div class="mt-4 text-teal-300"># Volume</div>
+            <div>
+              1 US gal&nbsp;=&nbsp;<span class="text-amber-300">3.785412</span> L&nbsp;·&nbsp;1 imperial
+              gal&nbsp;=&nbsp;<span class="text-amber-300">4.54609</span> L
+            </div>
+            <div class="mt-4 text-teal-300"># Length</div>
+            <div>1 in&nbsp;=&nbsp;<span class="text-amber-300">25.4</span> mm exactly</div>
+            <div class="mt-4 text-red-300"># Temperature — the one that needs an offset</div>
+            <div>°F&nbsp;=&nbsp;°C × <span class="text-amber-300">9/5</span> + <span class="text-amber-300">32</span></div>
+            <div>
+              but a temperature <em>rise</em> of 90 °F is a rise of <span class="text-amber-300">50</span> °C —
+              no offset
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Which gallon?</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                An imperial gallon is {fmt(convertUnit("volume", "ukgal", "gal", 1), 3)} US gallons — a 20%
+                difference. On a fixture flow rate that is easily a whole pipe size, and spec sheets rarely say
+                which one they mean.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Rises are not temperatures</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Converting a 90 °F temperature rise gives 50 °C, not 32.2 °C. Only the ratio applies to a
+                difference; the offset belongs to an absolute reading. This is the most common conversion
+                mistake in water heating.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Feet of head is physical</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Pump curves use feet because feet are independent of fluid density — the same curve works for
+                any liquid. Converting to psi puts water's density back in, which is why that factor is not a
+                definition.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Bar catches people out</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A European fixture wanting "3 bar" wants{" "}
+                {fmt(convertUnit("pressure", "bar", "psi", 3), 1)} psi at the inlet — several times what a
+                typical US fixture needs, and enough to change how you size the supply.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A European pump curve, an imported fixture spec, and the temperature-rise trap.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">A pump curve in metric</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">A datasheet quotes 2.3 m³/h at 18 m of head.</p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              2.3 m³/h = <span class="font-bold text-teal-700">
+                {fmt(convertUnit("flow", "m3h", "gpm", 2.3), 2)} gpm
+              </span><br />
+              18 m of head = <span class="font-bold text-teal-700">
+                {fmt(convertUnit("pressure", "mH2O", "ftH2O", 18), 1)} ft
+              </span> = {fmt(convertUnit("pressure", "mH2O", "psi", 18), 1)} psi
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> about{" "}
+              {fmt(convertUnit("flow", "m3h", "gpm", 2.3), 0)} gpm at{" "}
+              {fmt(convertUnit("pressure", "mH2O", "ftH2O", 18), 0)} feet — now comparable against a US pump
+              curve and against a total dynamic head figure.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The imperial gallon trap</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              A UK spec sheet lists a fixture at 3 gallons per minute. Which gallon?
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              read as US gallons: 3.00 gpm<br />
+              actually imperial: 3 × {fmt(convertUnit("volume", "ukgal", "gal", 1), 5)} ={" "}
+              <span class="font-bold text-teal-700">
+                {fmt(convertUnit("flow", "ukgpm", "gpm", 3), 2)} US gpm
+              </span><br />
+              → <span class="font-bold text-red-600">20% under-counted</span> if you assume US
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 20% error on every fixture in the
+              schedule. Across a building that is enough to undersize the main — and the spec sheet almost
+              never spells out which gallon it means.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Converting a temperature rise</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              A water heater needs a 90 °F rise. What is that in Celsius?
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              wrong: (90 − 32) × 5/9 = <span class="font-bold text-red-600">32.2 °C</span><br />
+              right: 90 × 5/9 = <span class="font-bold text-teal-700">50.0 °C</span><br />
+              because a <em>difference</em> has no zero point to offset
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 50 °C. Use the converter's temperature
+              mode for an actual thermostat setting, and the ratio alone for a rise — getting this wrong
+              understates the heating load by more than a third.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">10 gpm in every flow unit</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Computed from the same code the converter runs.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Unit</th>
+                  <th class="py-3 px-5 font-semibold">10 gpm equals</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  flowRows.map((row, index) => (
+                    <tr class={index === flowRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5 tabular-nums">{fmt(row.value, 4)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">60 psi in every pressure unit</h2>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Unit</th>
+                  <th class="py-3 px-5 font-semibold">60 psi equals</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  pressureRows.map((row, index) => (
+                    <tr class={index === pressureRows.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5 tabular-nums">{fmt(row.value, 3)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">The anchors worth knowing</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The handful that come up daily, and which of them are exact.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">This</th>
+                  <th class="py-3 px-5 font-semibold">Equals</th>
+                  <th class="py-3 px-5 font-semibold">Note</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  anchors.map((row, index) => (
+                    <tr class={index === anchors.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.from}</td>
+                      <td class="py-3 px-5 tabular-nums">{row.to}</td>
+                      <td class="py-3 px-5 text-slate-500">{row.note}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: metric conversions are exact by international definition — the inch is
+            25.4 mm and the US gallon is 3.785411784 litres. The psi-to-head factor is derived from the density
+            of water at 60 °F, the same constant used across these plumbing calculators, and is not a
+            definition. Every conversion on this page is verified to round-trip exactly.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about plumbing unit conversions and the traps in them."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingUnitConverter } from "@/scripts/calculators/plumbing-unit-converter";
+    initPlumbingUnitConverter();
+  </script>
+</Layout>

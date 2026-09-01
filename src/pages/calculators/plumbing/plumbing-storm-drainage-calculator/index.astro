@@ -1,0 +1,678 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  RAINFALL_EXAMPLES,
+  ROOF_RUNOFF_DIVISOR,
+  fmt,
+  roofRunoffGpm,
+  sizeLabel,
+  stormHorizontalCheck,
+} from "@/lib/plumbing";
+
+const title = "Storm & Roof Drainage Calculator — Runoff in GPM | TradesQuote";
+const description =
+  "Free storm and roof drainage calculator. Design runoff in gpm from roof area and rainfall rate, derived from first principles, with a Manning capacity check on the horizontal storm drain.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-storm-drainage-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Storm & Roof Drainage Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Storm & Roof Drainage Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online storm and roof drainage calculator returning design runoff in gallons per minute from roof area and rainfall rate, with a Manning hydraulic capacity check for the horizontal storm drain.",
+};
+
+const defaultFlow = roofRunoffGpm(2000, 4);
+const check4 = stormHorizontalCheck(4, 0.125)!;
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much water comes off a roof in a storm?",
+    answer: `More than people expect. A 2,000 ft² roof at a 4 in/hr design rainfall sheds <strong>${fmt(defaultFlow, 1)} gpm</strong> — roughly what thirty showers use at once, off an ordinary house. The arithmetic is <strong>area × rainfall ÷ ${fmt(ROOF_RUNOFF_DIVISOR, 2)}</strong>, and that divisor is derived here rather than quoted.`,
+  },
+  {
+    question: "Where does the 96.25 divisor come from?",
+    answer: `From unit conversion, not a table. One inch per hour falling on one square foot is 1/12 of a cubic foot per hour; a cubic foot is 7.48052 gallons; divide by 60 minutes and you get 0.0103896 gpm per ft² per in/hr. The reciprocal is <strong>${fmt(ROOF_RUNOFF_DIVISOR, 3)}</strong>. Published references usually round it to 96.23 — this computes it so you can see where it comes from.`,
+  },
+  {
+    question: "What rainfall rate should I use?",
+    answer:
+      "The <strong>100-year, one-hour</strong> rainfall for your location, which the IPC provides as a map (Figure 1106.1) and which NOAA also publishes. It ranges from roughly 2 in/hr in the Pacific Northwest to 5 in/hr or more on the Gulf coast. The examples in the dropdown are for orientation only — get the real figure for your site before designing anything.",
+  },
+  {
+    question: "Does this size the pipe to code?",
+    answer:
+      "No, and it says so deliberately. The code sizes storm drainage from <strong>IPC Table 1106.2</strong> (vertical leaders) and <strong>Table 1106.3</strong> (horizontal storm drains), which this calculator does not reproduce. What it gives you is the <em>design flow</em> — the number that is genuinely hard to work out — plus a Manning hydraulic check so a proposed size can be sanity-tested. Take the flow to the code tables for the actual size.",
+  },
+  {
+    question: "Why is a storm drain sized on full-bore flow when a sanitary drain is not?",
+    answer:
+      "Because the loads behave differently. A sanitary drain carries intermittent slugs with solids in them and is sized to run part-full so it scours. A storm drain carries clean water at a sustained rate during a storm, so it is designed to run full. That is why the capacity check here doubles the half-full figure rather than using it directly.",
+  },
+  {
+    question: "What about a flat roof or a parapet?",
+    answer:
+      "Flat roofs need <strong>secondary (overflow) drainage</strong> as well as primary — a separate system sized for the same flow, discharging somewhere visible so a blockage announces itself. A parapet turns a roof into a container: if the primary drain blocks and there is no overflow, water ponds, and ponded water is very heavy. This is a structural problem as much as a plumbing one.",
+  },
+  {
+    question: "Do I include walls that drain onto the roof?",
+    answer:
+      "Yes. Any vertical surface that sheds onto the roof adds to its effective area, and the code has a method for adding a share of adjacent wall area. Sloped roofs also project a smaller horizontal area than their actual surface — it is the <em>horizontal projection</em> that catches rain, so use the plan area, not the slope length.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Runoff worked out? Quote the whole job in seconds.";
+const ctaDescription =
+  "Gutters, leaders, drains and the excavation to bury them add up fast. TradesQuote turns the scope into a detailed, line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+    title: "Drain Pipe Size Calculator",
+    description: "The sanitary side, sized on fixture units.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+    title: "Drain Pipe Slope Calculator",
+    description: "The fall a buried storm line needs.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "For anything that has to be lifted out.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-unit-converter",
+    title: "Plumbing Unit Converter",
+    description: "gpm to cfs for the civil drawings.",
+  },
+];
+
+/** Tables computed from the lib. */
+const gridAreas = [1000, 2000, 3000, 5000];
+const gridRates = [2, 3, 4, 5, 6];
+const capacityTable = [3, 4, 6].flatMap((n) =>
+  [0.125, 0.25].map((slope) => {
+    const c = stormHorizontalCheck(n, slope)!;
+    return { nominal: n, slope, gpm: c.gpm, velocity: c.velocity };
+  }),
+);
+
+const styles = plumbingAccentStyles.sky;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Storm & Roof Drainage Calculator — Runoff in GPM" />
+    <meta
+      property="og:description"
+      content="Design runoff in gpm from roof area and rainfall rate, derived from first principles, with a Manning capacity check. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Storm & Roof Drainage Calculator — Runoff in GPM" />
+    <meta
+      name="twitter:description"
+      content="How much water a roof sheds in a storm, and what it takes to carry it. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Storm & Roof Drainage Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                />
+              </svg>
+              Plumbing Tools · IPC Chapter 11 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Storm &amp; Roof Drainage Calculator <span class="text-sky-600">— Runoff in GPM</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A 2,000 square foot roof in a 4-inch-per-hour storm sheds
+              <strong>{fmt(defaultFlow, 1)} gallons a minute</strong> — about thirty showers running at once,
+              off an ordinary house. This gives you that design flow from first principles, and checks a
+              proposed horizontal drain against it hydraulically.
+            </p>
+
+            <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-sm text-slate-600 leading-relaxed">
+                <span class="font-semibold text-slate-900">Scope:</span> the <strong>flow</strong> here is
+                derived and exact. The <strong>pipe size</strong> is not a code answer — the IPC sizes storm
+                drainage from <strong>Table 1106.2</strong> (vertical leaders) and
+                <strong>Table 1106.3</strong> (horizontal storm drains), which this deliberately does not
+                reproduce. Use the flow, then go to those tables.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+            </svg>
+            Work out the runoff
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="sd-area" class="text-sm font-semibold text-slate-800">
+                    Roof area (horizontal projection)
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="sd-area"
+                      type="number"
+                      min="0"
+                      max="200000"
+                      step="50"
+                      value="2000"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft²</span>
+                  </div>
+                </div>
+                <input
+                  id="sd-area-range"
+                  type="range"
+                  min="200"
+                  max="20000"
+                  step="100"
+                  value="2000"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-sky-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>200</span><span>20,000 ft²</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Plan area, not slope length — plus a share of any wall draining onto it.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                  <label for="sd-rainfall" class="text-sm font-semibold text-slate-800">
+                    Design rainfall rate
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="sd-rainfall"
+                      type="number"
+                      min="0"
+                      max="20"
+                      step="0.1"
+                      value="4"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">in/hr</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    100-year, one-hour rate for your site. For orientation only:{" "}
+                    {RAINFALL_EXAMPLES.map((r) => `${r.label} ~${r.inPerHr}`).join(" · ")}.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="sd-leaders" class="text-sm font-semibold text-slate-800">
+                    Number of leaders
+                  </label>
+                  <input
+                    id="sd-leaders"
+                    type="number"
+                    min="1"
+                    max="50"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Splits the load for the per-leader figure.</p>
+                </div>
+
+                <div>
+                  <label for="sd-slope" class="text-sm font-semibold text-slate-800">
+                    Horizontal drain slope
+                  </label>
+                  <select
+                    id="sd-slope"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                  >
+                    <option value="0.0625">1/16 in/ft</option>
+                    <option value="0.125" selected>1/8 in/ft</option>
+                    <option value="0.25">1/4 in/ft</option>
+                    <option value="0.5">1/2 in/ft</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Used for the hydraulic capacity check.</p>
+                </div>
+              </div>
+
+              <button
+                id="sd-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-sky-100 bg-sky-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Design runoff</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="sd-flow" class="text-5xl font-extrabold tracking-tight text-sky-600">
+                  {fmt(defaultFlow, 1)} gpm
+                </span>
+              </div>
+              <p id="sd-note" class="mt-1 text-sm font-semibold text-slate-700">
+                {fmt(defaultFlow, 1)} gpm off 2,000 ft² at 4.0 in/hr. A {sizeLabel(4)} horizontal drain at
+                0.125 in/ft carries {fmt(check4.gpm, 0)} gpm on the hydraulics — confirm against IPC Table
+                1106.3 before you build it.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-sky-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Per leader</p>
+                  <p id="sd-per-leader" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaultFlow / 2, 1)} gpm
+                  </p>
+                </div>
+                <div class="rounded-xl border border-sky-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Hydraulic check suggests</p>
+                  <p id="sd-suggested" class="mt-1 text-2xl font-bold text-slate-900">{sizeLabel(4)}</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-sky-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>The arithmetic</span><span id="sd-bd-divisor" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Drain capacity</span><span id="sd-bd-capacity" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Velocity</span><span id="sd-bd-velocity" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Spare capacity</span><span id="sd-bd-headroom" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>At twice the design rate</span><span id="sd-bd-doubled" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                The flow is derived and exact. The suggested size is a <strong>Manning hydraulic check
+                only</strong> — IPC Tables 1106.2 and 1106.3 govern, and secondary (overflow) drainage is a
+                separate requirement. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Rain falling on an area is a volume per unit time. The rest is unit conversion.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-sky-300"># The runoff</div>
+            <div>
+              gpm&nbsp;=&nbsp;area (ft²) × rainfall (in/hr) ÷
+              <span class="text-amber-300">{fmt(ROOF_RUNOFF_DIVISOR, 2)}</span>
+            </div>
+            <div class="mt-4 text-slate-400"># Where the divisor comes from — not a table</div>
+            <div>1 in/hr on 1 ft²&nbsp;=&nbsp;1/12 ft³/hr</div>
+            <div>× <span class="text-amber-300">7.48052</span> gal/ft³ ÷ 60 min&nbsp;=&nbsp;0.0103896 gpm</div>
+            <div>reciprocal&nbsp;=&nbsp;<span class="text-amber-300">{fmt(ROOF_RUNOFF_DIVISOR, 4)}</span></div>
+            <div class="mt-4 text-sky-300"># The capacity check (Manning, flowing full)</div>
+            <div>V&nbsp;=&nbsp;(1.486 ÷ n) × R^(2/3) × S^(1/2)&nbsp;&nbsp;·&nbsp;&nbsp;Q&nbsp;=&nbsp;A × V</div>
+            <div class="text-slate-400">storm drains run full, so this is twice the half-full figure</div>
+            <div class="mt-4 text-red-300"># What this does NOT do</div>
+            <div>IPC Table 1106.2 — vertical leaders&nbsp;&nbsp;·&nbsp;&nbsp;Table 1106.3 — horizontal drains</div>
+            <div class="text-slate-400">go to the code for the size; use this for the flow</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Horizontal projection, not surface area</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Rain falls vertically, so a steep roof catches no more than its plan area. Use the footprint,
+                and add a share of any wall that sheds onto it — walls are the part people forget.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Full-bore, not half-full</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Sanitary drains are sized part-full so they scour solids. Storm drains carry clean water at a
+                sustained rate and are designed to run full — which is why the check here doubles the
+                half-full flow.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Overflow is not optional</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A flat roof with a blocked primary drain and no secondary becomes a tank. Ponded water weighs
+                5.2 lb per square foot per inch of depth, so this stops being a plumbing problem and becomes a
+                structural one quickly.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Storms exceed the design rate</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The design figure is a 100-year hourly rate, not a ceiling. Short cloudbursts routinely beat
+                it, which is exactly what the secondary system and any freeboard are there for.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A house, the same house on the Gulf coast, and a warehouse where the numbers get serious.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">2,000 ft² house at 4 in/hr</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              2,000 × 4 ÷ {fmt(ROOF_RUNOFF_DIVISOR, 2)} ={" "}
+              <span class="font-bold text-sky-700">{fmt(defaultFlow, 1)} gpm</span><br />
+              across 2 leaders = {fmt(defaultFlow / 2, 1)} gpm each<br />
+              4" horizontal at 1/8 in/ft carries {fmt(check4.gpm, 0)} gpm ✓
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> {fmt(defaultFlow, 1)} gpm — more flow
+              than the whole house's supply system will ever see, arriving through the gutters.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same roof on the Gulf coast</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              Pacific Northwest, 2 in/hr: {fmt(roofRunoffGpm(2000, 2), 1)} gpm<br />
+              Mid-Atlantic, 4 in/hr: {fmt(roofRunoffGpm(2000, 4), 1)} gpm<br />
+              Gulf coast, 6 in/hr: <span class="font-bold text-sky-700">
+                {fmt(roofRunoffGpm(2000, 6), 1)} gpm
+              </span><br />
+              → <span class="font-bold text-sky-700">3× the flow</span> for the identical building
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> location matters more than anything
+              else on this page. The same drawing needs three times the drainage capacity in Louisiana as in
+              Oregon — which is why a rainfall figure copied from a previous job is a real hazard.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">A 20,000 ft² warehouse roof</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              20,000 × 4 ÷ {fmt(ROOF_RUNOFF_DIVISOR, 2)} ={" "}
+              <span class="font-bold text-sky-700">{fmt(roofRunoffGpm(20000, 4), 0)} gpm</span><br />
+              = {fmt(roofRunoffGpm(20000, 4) / 448.831, 2)} cubic feet per second<br />
+              across 6 leaders = {fmt(roofRunoffGpm(20000, 4) / 6, 0)} gpm each<br />
+              6" horizontal at 1/8 in/ft carries {fmt(stormHorizontalCheck(6, 0.125)!.gpm, 0)} gpm
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> over{" "}
+              {fmt(roofRunoffGpm(20000, 4), 0)} gpm, which is municipal-scale flow — and on a flat roof it
+              needs a full secondary system alongside. At this size the storm drainage is a bigger pipe
+              exercise than the entire sanitary system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Runoff by area and rainfall rate
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Design flow in gpm, computed from the same code the calculator runs.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Roof area</th>
+                  {gridRates.map((r) => <th class="py-3 px-5 font-semibold">{r} in/hr</th>)}
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  gridAreas.map((a, index) => (
+                    <tr class={index === gridAreas.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {a.toLocaleString("en-US")} ft²
+                      </td>
+                      {gridRates.map((r) => (
+                        <td class="py-3 px-5">{fmt(roofRunoffGpm(a, r), 1)}</td>
+                      ))}
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Horizontal drain capacity — hydraulic check
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Manning's equation for Schedule 40 flowing full. <strong>This is a sanity check, not the code
+            answer</strong> — IPC Table 1106.3 governs the actual size.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Size</th>
+                  <th class="py-3 px-5 font-semibold">Slope</th>
+                  <th class="py-3 px-5 font-semibold">Capacity flowing full</th>
+                  <th class="py-3 px-5 font-semibold">Velocity</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  capacityTable.map((row, index) => (
+                    <tr class={index === capacityTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.nominal)}</td>
+                      <td class="py-3 px-5">{row.slope} in/ft</td>
+                      <td class="py-3 px-5">{fmt(row.gpm, 0)} gpm</td>
+                      <td class="py-3 px-5">{fmt(row.velocity, 2)} ft/s</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: the runoff conversion is derived from 7.48052 gallons per cubic foot, not
+            quoted from a table. Design rainfall comes from the 100-year hourly rate — <a
+              class="underline hover:text-sky-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > Figure 1106.1 and <a
+              class="underline hover:text-sky-600"
+              href="https://hdsc.nws.noaa.gov/pfds/"
+              target="_blank"
+              rel="noopener">NOAA precipitation frequency data</a
+            >. <strong>Pipe sizing is governed by IPC Tables 1106.2 and 1106.3, which are deliberately not
+            reproduced here</strong>; the capacity column is Manning's equation as a hydraulic sanity check
+            only. Secondary (overflow) drainage under IPC 1107 is a separate requirement. Roughly fifteen
+            states use the <a
+              class="underline hover:text-sky-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="sky"
+        subtitle="Common questions about roof runoff, rainfall rates, and storm drain sizing."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingStormDrainageCalculator } from "@/scripts/calculators/plumbing-storm-drainage-calculator";
+    initPlumbingStormDrainageCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0284c7;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0284c7;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

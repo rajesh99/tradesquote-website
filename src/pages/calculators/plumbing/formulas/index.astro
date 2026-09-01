@@ -239,6 +239,24 @@ const sections: Section[] = [
         normal:
           "Self-siphoning fixtures — water closets above all — are not length-limited, because the fixture reseals its own trap. Everything else is, and exceeding the table is the most common reason a trap gurgles and then dries out",
       },
+      {
+        name: "Grease Interceptor Sizing",
+        calc: {
+          href: "/calculators/plumbing/plumbing-grease-trap-calculator",
+          label: "Grease Trap Size Calculator",
+        },
+        formula:
+          "gal = L × W × D × comps ÷ 231\ngpm = gal × fill ÷ drain min\nlb  = rated gpm × 2  [PDI-G101]\n\ngravity interceptor, gallons:\n= seats × turnover × gal/meal\n    × retention hr × storage\n         [IPC 1003.3.4, AHJ]",
+        vars: [
+          { sym: "L × W × D", desc: "Interior of one sink compartment in inches; 231 in³ is one US gallon" },
+          { sym: "fill", desc: "Fraction of the compartment assumed to drain — conventionally 75%" },
+          { sym: "drain min", desc: "Drainage period, normally taken as one minute" },
+          { sym: "retention hr", desc: "2.5 hours for a commercial kitchen with a dishwasher, 1.5 for single-service" },
+          { sym: "storage", desc: "1 for an 8-hour day, 2 for 16, 3 for 24 — a straight multiplier on the vessel" },
+        ],
+        normal:
+          "Two devices, two units. A hydromechanical interceptor is rated in GPM and separates by slowing flow; a gravity interceptor is rated in gallons and separates by holding wastewater still. A standard 24 × 24 × 12 three-compartment sink already needs 75 GPM, near the top of the hydromechanical range — which is why full-service kitchens usually end up outside. The local FOG programme sets the minimum size and normally overrides the arithmetic below about 65 seats",
+      },
     ],
   },
   {
@@ -304,8 +322,8 @@ const sections: Section[] = [
       {
         name: "Thermal Expansion Volume",
         calc: {
-          href: "/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator",
-          label: "Water Heater Replacement Cost Calculator",
+          href: "/calculators/plumbing/plumbing-expansion-tank-calculator",
+          label: "Thermal Expansion Tank Calculator",
         },
         formula: "ΔV ≈ V_system × expansion factor",
         vars: [
@@ -314,6 +332,23 @@ const sections: Section[] = [
         ],
         normal:
           "IPC 607.3 requires thermal expansion control wherever a storage water heater's cold feed passes a check valve, PRV, or backflow preventer — which is to say almost every system with a PRV. Water gains roughly 2% in volume over that rise, and in a closed system with nowhere to go it shows up as pressure on the T&P valve",
+      },
+      {
+        name: "Pressure Tank Drawdown",
+        calc: {
+          href: "/calculators/plumbing/plumbing-well-pressure-tank-calculator",
+          label: "Well Pressure Tank Calculator",
+        },
+        formula:
+          "P_abs = P_gauge + 14.7\nfrac = P_pre/P_on − P_pre/P_off\ndrawdown = tank gal × frac\ntank = gpm × run min ÷ frac",
+        vars: [
+          { sym: "P_pre", desc: "Pre-charge, set about 2 psi below cut-in and measured with the tank drained" },
+          { sym: "P_on / P_off", desc: "Cut-in and cut-out of the pressure switch — 30/50 psi is the common pair" },
+          { sym: "frac", desc: "Fraction of the shell delivered per cycle. Boyle’s law, so all three pressures are absolute" },
+          { sym: "run min", desc: "Minimum pump run per cycle — 1 minute to 10 gpm, 1.5 to 20, 2 above" },
+        ],
+        normal:
+          "About 29.5% at a 30/50 switch, so a 20-gallon tank delivers under 6 gallons. Because it is a ratio and not a difference, the same 20 psi span gives more at a lower band — 34.5% at 20/40 against 25.8% at 40/60. Widening the band is what actually helps: 30/70 reaches 45.1%. None of this is code; it is pump-industry practice",
       },
     ],
   },

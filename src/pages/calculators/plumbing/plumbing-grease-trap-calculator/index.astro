@@ -1,0 +1,1032 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  CUBIC_INCHES_PER_GALLON,
+  GREASE_INTERCEPTOR_MINIMUM_GAL,
+  GREASE_RETENTION_HOURS,
+  GREASE_SINK_FILL_FRACTION,
+  GREASE_STORAGE_FACTORS,
+  GREASE_WASTE_PER_MEAL,
+  PDI_GREASE_LB_PER_GPM,
+  PDI_GREASE_TRAPS,
+  fmt,
+  greaseInterceptorVolume,
+  greaseTrapHydraulic,
+} from "@/lib/plumbing";
+
+const title = "Grease Trap Size Calculator — PDI Flow & Interceptor Volume | TradesQuote";
+const description =
+  "Free grease trap calculator. Size an under-sink hydromechanical interceptor from sink volume in gpm, or a gravity grease interceptor from seats and meals in gallons — two methods that answer two different questions.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-grease-trap-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Grease Trap Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Grease Trap Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online grease trap calculator. Sizes a PDI-rated hydromechanical grease interceptor from three-compartment sink dimensions, and a gravity grease interceptor from seat count, meals, waste flow, retention time and storage factor.",
+};
+
+/* ---- Everything below is computed from the lib, never typed from a draft ---- */
+const sinkBase = { lengthIn: 24, widthIn: 24, depthIn: 12, compartments: 3 };
+const hydraulic = greaseTrapHydraulic(sinkBase);
+
+const interceptorBase = {
+  seats: 100,
+  turnoverPerHour: 1,
+  wasteFlowPerMeal: 6,
+  retentionHours: 2.5,
+  storageFactor: 1,
+};
+const interceptor = greaseInterceptorVolume(interceptorBase);
+
+const sinkTable = ([
+  [16, 16],
+  [18, 18],
+  [20, 20],
+  [24, 24],
+  [30, 24],
+] as [number, number][]).map(([lengthIn, widthIn]) => {
+  const r = greaseTrapHydraulic({ ...sinkBase, lengthIn, widthIn });
+  return { lengthIn, widthIn, gallons: r.gallons, flowGpm: r.flowGpm, ratedGpm: r.ratedGpm, capacityLb: r.capacityLb };
+});
+
+const seatTable = [30, 50, 75, 100, 150, 200, 300].map((seats) => {
+  const r = greaseInterceptorVolume({ ...interceptorBase, seats });
+  return { seats, calculated: r.calculated, required: r.required, stocked: r.stocked, governedBy: r.governedBy };
+});
+
+const storageTable = GREASE_STORAGE_FACTORS.map((f) => {
+  const r = greaseInterceptorVolume({ ...interceptorBase, storageFactor: f.factor });
+  return { label: f.label, factor: f.factor, calculated: r.calculated, stocked: r.stocked };
+});
+
+/** The single-compartment volume, used in prose and validated against 231 in³/gal. */
+const oneCompartment = (24 * 24 * 12) / CUBIC_INCHES_PER_GALLON;
+const smallKitchen = greaseInterceptorVolume({ ...interceptorBase, seats: 50 });
+const twentyInch = greaseTrapHydraulic({ ...sinkBase, lengthIn: 20, widthIn: 20 });
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size grease trap do I need?",
+    answer: `It depends which device you mean, and that is the whole problem. For a standard three-compartment sink at 24 × 24 × 12 inches, the hydraulic method gives <strong>${fmt(hydraulic.flowGpm, 1)} gpm</strong>, which takes a <strong>${hydraulic.ratedGpm} gpm PDI interceptor</strong> holding ${hydraulic.capacityLb} lb of grease. For a ${interceptorBase.seats}-seat restaurant, the meal-count method gives <strong>${fmt(interceptor.required, 0)} gallons</strong> of gravity interceptor. Both answers can be right on the same job, because they size two different devices.`,
+  },
+  {
+    question: "What is the difference between a grease trap and a grease interceptor?",
+    answer:
+      "In everyday use the words are swapped freely, but the devices are not. A <strong>hydromechanical interceptor</strong> — the small steel or plastic box under the sink — is rated in <strong>gpm</strong> and works by slowing flow enough for grease to float. A <strong>gravity grease interceptor</strong> — the buried concrete tank — is rated in <strong>gallons</strong> and works by holding the wastewater long enough for separation to happen on its own. Sizing one with the other's method is the commonest mistake on this subject.",
+  },
+  {
+    question: "Why is the grease capacity always double the flow rating?",
+    answer: `Because PDI-G101 defines it that way. A ${PDI_GREASE_TRAPS[4].gpm} gpm unit is rated for ${PDI_GREASE_TRAPS[4].capacityLb} lb of grease, a ${PDI_GREASE_TRAPS[7].gpm} gpm unit for ${PDI_GREASE_TRAPS[7].capacityLb} lb, and so on at ${PDI_GREASE_LB_PER_GPM} lb per gpm right across the range. So "how many pounds" and "how many gpm" are not two specifications to look up — they are one number expressed twice.`,
+  },
+  {
+    question: "Where does the 75% figure come from?",
+    answer: `The fixture-volume method assumes a sink compartment is filled to about <strong>${fmt(GREASE_SINK_FILL_FRACTION * 100, 0)}%</strong> of its geometric capacity before it drains, because nobody fills a sink to the rim. The full ${fmt(sinkBase.lengthIn * sinkBase.widthIn * sinkBase.depthIn, 0)} cubic inches of one 24 × 24 × 12 compartment is ${fmt(oneCompartment, 2)} gallons; three of them at ${fmt(GREASE_SINK_FILL_FRACTION * 100, 0)}% is ${fmt(hydraulic.drainedGallons, 1)} gallons, and draining that in one minute is the ${fmt(hydraulic.flowGpm, 1)} gpm the interceptor has to pass. The fill fraction and the drain period are both editable here because jurisdictions vary them.`,
+  },
+  {
+    question: "Why did my calculation come out bigger than the units on the shelf?",
+    answer: `Because a full-size three-compartment sink genuinely outruns the small end of the hydromechanical range. A 20 × 20 × 12 sink needs ${twentyInch.ratedGpm} gpm; a 24 × 24 × 12 needs ${hydraulic.ratedGpm}. Past about 50 gpm most authorities want an outdoor gravity interceptor instead, and many will not permit an indoor unit for a commercial kitchen at all. A <strong>flow control fitting</strong> is the other half of the answer — it throttles the line to the interceptor's rated flow, which is why the rating is a design figure rather than a peak one.`,
+  },
+  {
+    question: "Does the plumbing code tell me which size to fit?",
+    answer:
+      "Not on its own. IPC 1003.3.4 requires interception and permits the authority having jurisdiction to approve a sizing method, which means the real decision usually sits with your <strong>local sewer authority's FOG programme</strong> — fats, oils and grease. Those programmes routinely impose a flat minimum interceptor size, mandate outdoor installation, set pump-out intervals, and require a sample port. Run the numbers here to scope the job, then confirm with the authority before you order anything.",
+  },
+  {
+    question: "Why does a small restaurant still need a 1,000 gallon tank?",
+    answer: `Because the floor governs, not the formula. At ${smallKitchen.mealsPerPeakHour} meals in the peak hour the calculation gives only <strong>${fmt(smallKitchen.calculated, 0)} gallons</strong>, but the common ${fmt(GREASE_INTERCEPTOR_MINIMUM_GAL, 0)}-gallon minimum takes over. That crossover happens at around ${fmt(GREASE_INTERCEPTOR_MINIMUM_GAL / (interceptorBase.wasteFlowPerMeal * interceptorBase.retentionHours * interceptorBase.storageFactor), 0)} seats on these defaults — below it, every small kitchen in the jurisdiction gets the same tank.`,
+  },
+  {
+    question: "What is out of scope here?",
+    answer:
+      "Flow control fittings and their vent, sample ports, the pump-out schedule, effluent limits, and any automatic grease removal unit. Those are set by the FOG programme rather than by arithmetic. This tool sizes the vessel; it does not design the installation, and the meal-count factors are commonly published figures rather than values verified against a primary source — which is why every one of them is an editable field.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Interceptor sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "A grease interceptor is never a single line — there is excavation or a rough-in, a flow control fitting, the drain modification, and often a sample port. TradesQuote turns the whole scope into a detailed line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+    title: "Drain Pipe Size Calculator",
+    description: "Size the drain feeding the interceptor.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "The DFU load a commercial kitchen puts on it.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+    title: "Drain Pipe Slope Calculator",
+    description: "The fall on the run out to the tank.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-estimate-calculator",
+    title: "Plumbing Estimate Calculator",
+    description: "Price the install once it is scoped.",
+  },
+];
+
+const styles = plumbingAccentStyles.teal;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Grease Trap Size Calculator — PDI Flow & Interceptor Volume" />
+    <meta
+      property="og:description"
+      content="Size an under-sink hydromechanical grease interceptor in gpm, or a gravity grease interceptor in gallons. Two methods, two different devices. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Grease Trap Size Calculator — PDI Flow & Interceptor Volume" />
+    <meta
+      name="twitter:description"
+      content="Hydraulic sizing from sink volume and meal-count sizing for a gravity interceptor, with every FOG-programme variable left editable. Free, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Grease Trap Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · IPC 1003.3 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Grease Trap Size Calculator <span class="text-teal-600">— Flow &amp; Interceptor Volume</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Two devices answer to the name "grease trap", and they are sized by two unrelated methods. The
+              under-sink <strong>hydromechanical interceptor</strong> is rated in <strong>gpm</strong> and
+              sized from how fast the sink empties. The buried <strong>gravity interceptor</strong> is rated in
+              <strong>gallons</strong> and sized from how many meals the kitchen serves. Pick a method below —
+              and note that on most commercial jobs the local FOG programme, not the arithmetic, has the last
+              word.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+              ></path>
+            </svg>
+            Size the interceptor
+          </h2>
+
+          <div class="mt-6">
+            <label for="gt-method" class="text-sm font-semibold text-slate-800">Which device?</label>
+            <select
+              id="gt-method"
+              class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+            >
+              <option value="hydraulic" selected>
+                Hydromechanical interceptor — sized in gpm from the sink
+              </option>
+              <option value="interceptor">
+                Gravity grease interceptor — sized in gallons from the kitchen
+              </option>
+            </select>
+          </div>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <!-- Hydraulic inputs -->
+              <div id="gt-inputs-hydraulic" class="space-y-5">
+                <p class="text-sm text-slate-500 leading-relaxed">
+                  Measure the <strong>interior</strong> of one compartment, not the outside of the sink.
+                </p>
+
+                <div class="grid sm:grid-cols-3 gap-4">
+                  <div>
+                    <label for="gt-length" class="text-sm font-semibold text-slate-800">Length</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-length"
+                        type="number"
+                        min="1"
+                        max="120"
+                        value="24"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">in</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gt-width" class="text-sm font-semibold text-slate-800">Width</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-width"
+                        type="number"
+                        min="1"
+                        max="120"
+                        value="24"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">in</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gt-depth" class="text-sm font-semibold text-slate-800">Depth</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-depth"
+                        type="number"
+                        min="1"
+                        max="60"
+                        value="12"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">in</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid sm:grid-cols-3 gap-4">
+                  <div>
+                    <label for="gt-compartments" class="text-sm font-semibold text-slate-800">
+                      Compartments
+                    </label>
+                    <input
+                      id="gt-compartments"
+                      type="number"
+                      min="1"
+                      max="6"
+                      value="3"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="gt-fill" class="text-sm font-semibold text-slate-800">Fill fraction</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-fill"
+                        type="number"
+                        min="10"
+                        max="100"
+                        value="75"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gt-period" class="text-sm font-semibold text-slate-800">Drain period</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-period"
+                        type="number"
+                        min="0.5"
+                        max="10"
+                        step="0.5"
+                        value="1"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">min</span>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                  A one-minute drain period is the usual assumption. Some jurisdictions work it at two, which
+                  halves the required rating — check before you rely on it.
+                </p>
+              </div>
+
+              <!-- Interceptor inputs -->
+              <div id="gt-inputs-interceptor" class="hidden space-y-5">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <label for="gt-seats" class="text-sm font-semibold text-slate-800">Seats</label>
+                    <div class="flex items-center gap-1">
+                      <input
+                        id="gt-seats"
+                        type="number"
+                        min="1"
+                        max="1000"
+                        value="100"
+                        class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500">seats</span>
+                    </div>
+                  </div>
+                  <input
+                    id="gt-seats-range"
+                    type="range"
+                    min="10"
+                    max="400"
+                    step="5"
+                    value="100"
+                    class="plumb-range mt-3 w-full bg-slate-200 accent-teal-600"
+                  />
+                  <div class="flex justify-between text-xs text-slate-400 mt-1">
+                    <span>10</span><span>400 seats</span>
+                  </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label for="gt-turnover" class="text-sm font-semibold text-slate-800">
+                      Turnover per hour
+                    </label>
+                    <input
+                      id="gt-turnover"
+                      type="number"
+                      min="0.1"
+                      max="6"
+                      step="0.1"
+                      value="1"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    />
+                    <p class="mt-1.5 text-xs text-slate-500">Seatings in the busiest hour. Fast food is higher.</p>
+                  </div>
+
+                  <div>
+                    <label for="gt-storage" class="text-sm font-semibold text-slate-800">
+                      Hours of operation
+                    </label>
+                    <select
+                      id="gt-storage"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    >
+                      {
+                        GREASE_STORAGE_FACTORS.map((f) => (
+                          <option value={f.factor} selected={f.factor === 1}>
+                            {f.label}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="gt-waste-preset" class="text-sm font-semibold text-slate-800">Kitchen type</label>
+                    <select
+                      id="gt-waste-preset"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    >
+                      {
+                        GREASE_WASTE_PER_MEAL.map((w) => (
+                          <option value={w.gallons} selected={w.gallons === 6}>
+                            {w.label}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="gt-waste" class="text-sm font-semibold text-slate-800">
+                      Waste flow per meal
+                    </label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-waste"
+                        type="number"
+                        min="0.1"
+                        max="20"
+                        step="0.1"
+                        value="6"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">gal</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">Editable — jurisdictions differ.</p>
+                  </div>
+
+                  <div>
+                    <label for="gt-retention-preset" class="text-sm font-semibold text-slate-800">
+                      Retention basis
+                    </label>
+                    <select
+                      id="gt-retention-preset"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    >
+                      {
+                        GREASE_RETENTION_HOURS.map((r) => (
+                          <option value={r.hours} selected={r.hours === 2.5}>
+                            {r.label}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="gt-retention" class="text-sm font-semibold text-slate-800">Retention time</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-retention"
+                        type="number"
+                        min="0.5"
+                        max="12"
+                        step="0.5"
+                        value="2.5"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">hr</span>
+                    </div>
+                  </div>
+
+                  <div class="sm:col-span-2">
+                    <label for="gt-minimum" class="text-sm font-semibold text-slate-800">
+                      Local minimum size
+                    </label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="gt-minimum"
+                        type="number"
+                        min="0"
+                        max="10000"
+                        step="50"
+                        value="1000"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">gal</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">
+                      Most sewer authorities impose one. Set it to 0 to see the raw calculation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="gt-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+              <!-- Hydraulic result -->
+              <div id="gt-result-hydraulic">
+                <p class="text-sm font-medium text-slate-600">Interceptor rating</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span id="gt-rating" class="text-5xl font-extrabold tracking-tight text-teal-600">
+                    {hydraulic.ratedGpm} gpm
+                  </span>
+                </div>
+                <p id="gt-h-note" class="mt-1 text-sm font-semibold text-slate-700">
+                  Smallest PDI rating covering {fmt(hydraulic.flowGpm, 1)} gpm, holding{" "}
+                  {hydraulic.capacityLb} lb of grease — {PDI_GREASE_LB_PER_GPM}× the flow rating, by definition.
+                </p>
+
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                  <div class="rounded-xl border border-teal-100 bg-white p-4">
+                    <p class="text-xs text-slate-500">Required flow</p>
+                    <p id="gt-flow" class="mt-1 text-2xl font-bold text-slate-900">
+                      {fmt(hydraulic.flowGpm, 1)} gpm
+                    </p>
+                  </div>
+                  <div class="rounded-xl border border-teal-100 bg-white p-4">
+                    <p class="text-xs text-slate-500">Grease capacity</p>
+                    <p class="mt-1 text-2xl font-bold text-slate-900">{hydraulic.capacityLb} lb</p>
+                  </div>
+                </div>
+
+                <div id="gt-h-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                  <p class="text-sm font-semibold text-amber-800">Probably an outdoor job</p>
+                  <p class="mt-1 text-sm text-amber-800">
+                    Past about 50 gpm most authorities want a gravity grease interceptor outside rather than a
+                    hydromechanical unit under the sink. Check the FOG programme before specifying either.
+                  </p>
+                </div>
+
+                <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
+                  <summary
+                    class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                  >
+                    See the breakdown
+                    <svg
+                      class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </summary>
+                  <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                    <div class="flex justify-between gap-3">
+                      <span>Sink interior volume</span><span id="gt-bd-volume" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Volume that drains</span><span id="gt-bd-drained" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Flow over the drain period</span><span id="gt-bd-flow" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                      <span>Rated to hold</span><span id="gt-bd-capacity" class="font-semibold text-slate-900">—</span>
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <!-- Interceptor result -->
+              <div id="gt-result-interceptor" class="hidden">
+                <p class="text-sm font-medium text-slate-600">Interceptor size</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span id="gt-size" class="text-5xl font-extrabold tracking-tight text-teal-600">
+                    {fmt(interceptor.stocked ?? 0, 0)} gal
+                  </span>
+                </div>
+                <p id="gt-i-note" class="mt-1 text-sm font-semibold text-slate-700">
+                  Smallest stocked vessel covering the {fmt(interceptor.required, 0)} gallon requirement, well
+                  past the {fmt(interceptor.minimum, 0)} gallon floor.
+                </p>
+
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                  <div class="rounded-xl border border-teal-100 bg-white p-4">
+                    <p class="text-xs text-slate-500">Volume required</p>
+                    <p id="gt-calculated" class="mt-1 text-2xl font-bold text-slate-900">
+                      {fmt(interceptor.required, 0)} gal
+                    </p>
+                  </div>
+                  <div class="rounded-xl border border-teal-100 bg-white p-4">
+                    <p class="text-xs text-slate-500">Peak-hour meals</p>
+                    <p class="mt-1 text-2xl font-bold text-slate-900">
+                      {fmt(interceptor.mealsPerPeakHour, 0)}
+                    </p>
+                  </div>
+                </div>
+
+                <div id="gt-i-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                  <p class="text-sm font-semibold text-amber-800">Past a single vessel</p>
+                  <p class="mt-1 text-sm text-amber-800">
+                    Expect two interceptors in series or a custom-poured structure, and a design the authority
+                    will want to review rather than approve over the counter.
+                  </p>
+                </div>
+
+                <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
+                  <summary
+                    class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                  >
+                    See the breakdown
+                    <svg
+                      class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </summary>
+                  <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                    <div class="flex justify-between gap-3">
+                      <span>Peak-hour meals</span><span id="gt-bd-meals" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Formula result</span><span id="gt-bd-calculated" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Local floor</span><span id="gt-bd-minimum" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                      <span>Governed by</span><span id="gt-bd-governed" class="font-semibold text-slate-900">—</span>
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. <strong>The local sewer authority's FOG programme governs</strong>, and it
+                routinely imposes a minimum size, an outdoor location, a pump-out interval, and a sample port
+                that no calculation predicts. Confirm before ordering.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Both formulas, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One asks how fast water arrives. The other asks how long it has to sit still.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-teal-300"># Method 1 — Hydromechanical, rated in GPM</div>
+            <div>gallons&nbsp;=&nbsp;L × W × D × compartments ÷ {CUBIC_INCHES_PER_GALLON}</div>
+            <div>gpm&nbsp;=&nbsp;gallons × fill fraction ÷ drain minutes</div>
+            <div>lb of grease&nbsp;=&nbsp;rated gpm × {PDI_GREASE_LB_PER_GPM}&nbsp;&nbsp;<span class="text-slate-400">— PDI-G101</span></div>
+            <div class="mt-2 text-slate-400">
+              24 × 24 × 12 × 3 = {fmt(sinkBase.lengthIn * sinkBase.widthIn * sinkBase.depthIn * sinkBase.compartments, 0)} in³ = {fmt(hydraulic.gallons, 2)} gal
+            </div>
+            <div class="text-slate-400">
+              × {fmt(GREASE_SINK_FILL_FRACTION, 2)} ÷ 1 min ={" "}
+              <span class="text-amber-300">{fmt(hydraulic.flowGpm, 2)} gpm</span> → {hydraulic.ratedGpm} gpm /{" "}
+              {hydraulic.capacityLb} lb
+            </div>
+
+            <div class="mt-5 text-teal-300"># Method 2 — Gravity interceptor, rated in GALLONS</div>
+            <div>meals/hr&nbsp;=&nbsp;seats × turnover per hour</div>
+            <div>gallons&nbsp;=&nbsp;meals/hr × gal per meal</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× retention hr × storage</div>
+            <div>size&nbsp;=&nbsp;the larger of that and the local floor</div>
+            <div class="mt-2 text-slate-400">
+              {interceptorBase.seats} × {interceptorBase.turnoverPerHour} × {interceptorBase.wasteFlowPerMeal} ×{" "}
+              {interceptorBase.retentionHours} × {interceptorBase.storageFactor} ={" "}
+              <span class="text-amber-300">{fmt(interceptor.calculated, 0)} gal</span> → {interceptor.stocked}{" "}
+              gallon vessel
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Flow versus retention</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A hydromechanical unit separates grease by <em>slowing</em> flow, so its rating is the speed it
+                can cope with. A gravity interceptor separates by <em>waiting</em>, so its rating is how much
+                it can hold while that happens. Sizing one with the other's method produces a number that
+                looks plausible and means nothing.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Pounds and gpm are one number</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                PDI-G101 fixes grease capacity at {PDI_GREASE_LB_PER_GPM} lb per gpm across the whole ladder,
+                so a {PDI_GREASE_TRAPS[2].gpm} gpm unit is a {PDI_GREASE_TRAPS[2].capacityLb} lb unit and a{" "}
+                {PDI_GREASE_TRAPS[8].gpm} gpm unit is a {PDI_GREASE_TRAPS[8].capacityLb} lb unit. There is
+                nothing to look up.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The flow control fitting</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A hydromechanical interceptor is rated at a design flow, not a peak one, so an orifice fitting
+                upstream throttles the line to match it. Without one, a fast-emptying sink pushes flow straight
+                through and the unit separates nothing — a correctly sized trap installed without flow control
+                is still a failure.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The floor usually wins</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                On these defaults the meal-count formula only overtakes a {fmt(GREASE_INTERCEPTOR_MINIMUM_GAL, 0)}
+                -gallon minimum at around{" "}
+                {fmt(
+                  GREASE_INTERCEPTOR_MINIMUM_GAL /
+                    (interceptorBase.wasteFlowPerMeal *
+                      interceptorBase.retentionHours *
+                      interceptorBase.storageFactor),
+                  0,
+                )} seats. Below that, every small kitchen in the jurisdiction gets the same tank regardless of
+                what the arithmetic says.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The standard three-compartment sink, the small kitchen the floor governs, and the same restaurant
+          open around the clock.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">A 24 × 24 × 12 three-compartment sink</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              one compartment = 24 × 24 × 12 ÷ {CUBIC_INCHES_PER_GALLON} = {fmt(oneCompartment, 2)} gal<br />
+              three of them = {fmt(hydraulic.gallons, 2)} gal<br />
+              × {fmt(GREASE_SINK_FILL_FRACTION * 100, 0)}% = {fmt(hydraulic.drainedGallons, 2)} gal draining in
+              1 min<br />
+              → <span class="font-bold text-teal-700">{fmt(hydraulic.flowGpm, 2)} gpm</span> →
+              <span class="font-bold text-teal-700"> {hydraulic.ratedGpm} gpm PDI unit</span>,{" "}
+              {hydraulic.capacityLb} lb
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a standard commercial sink already
+              needs the {hydraulic.ratedGpm} gpm unit — near the top of the hydromechanical range. Drop to a
+              20 × 20 × 12 sink and it falls to {twentyInch.ratedGpm} gpm. This is why full-service kitchens so
+              often end up outside with a gravity interceptor instead.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">A 50-seat café — where the floor takes over</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              meals/hr = 50 × {interceptorBase.turnoverPerHour} = {fmt(smallKitchen.mealsPerPeakHour, 0)}<br />
+              formula = {fmt(smallKitchen.mealsPerPeakHour, 0)} × {interceptorBase.wasteFlowPerMeal} ×{" "}
+              {interceptorBase.retentionHours} × {interceptorBase.storageFactor} ={" "}
+              {fmt(smallKitchen.calculated, 0)} gal<br />
+              local floor = {fmt(smallKitchen.minimum, 0)} gal<br />
+              → <span class="font-bold text-teal-700">{fmt(smallKitchen.required, 0)} gal</span>, governed by{" "}
+              <span class="font-bold text-teal-700">the minimum</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the arithmetic asks for{" "}
+              {fmt(smallKitchen.calculated, 0)} gallons and the job gets {fmt(smallKitchen.required, 0)}. Worth
+              knowing before you quote, because the excavation for a{" "}
+              {fmt(smallKitchen.required, 0)}-gallon vessel is a different job from the one the customer
+              imagined.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same 100 seats, open 24 hours</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              {
+                storageTable.map((row) => (
+                  <>
+                    {row.label} (×{row.factor}): {fmt(row.calculated, 0)} gal → {row.stocked} gal vessel
+                    <br />
+                  </>
+                ))
+              }
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> hours of operation is a straight
+              multiplier, so the same dining room needs{" "}
+              {fmt(storageTable[2].calculated / storageTable[0].calculated, 0)}× the vessel running around the
+              clock. It is the input most often guessed at and the one with the largest single effect.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">PDI interceptor ratings</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The published ladder of hydromechanical units. The pound column is <strong>computed</strong> from
+            the gpm column at {PDI_GREASE_LB_PER_GPM} lb per gpm rather than transcribed alongside it, because
+            PDI-G101 defines it that way — the two can never disagree here.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Flow rating</th>
+                  <th class="py-3 px-5 font-semibold">Grease capacity</th>
+                  <th class="py-3 px-5 font-semibold">Typical application</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  PDI_GREASE_TRAPS.map((row, index) => (
+                    <tr class={index === PDI_GREASE_TRAPS.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.gpm} gpm</td>
+                      <td class="py-3 px-5">{row.capacityLb} lb</td>
+                      <td class="py-3 px-5">
+                        {row.gpm <= 10
+                          ? "Single sink or a bar"
+                          : row.gpm <= 25
+                            ? "Small two-compartment sink"
+                            : row.gpm <= 50
+                              ? "Three-compartment sink"
+                              : "Large sink — usually an outdoor job instead"}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Rating by sink size
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three compartments, 12 inches deep, drained in one minute at{" "}
+            {fmt(GREASE_SINK_FILL_FRACTION * 100, 0)}% fill.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Compartment</th>
+                  <th class="py-3 px-5 font-semibold">Total volume</th>
+                  <th class="py-3 px-5 font-semibold">Required flow</th>
+                  <th class="py-3 px-5 font-semibold">PDI unit</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  sinkTable.map((row, index) => (
+                    <tr class={index === sinkTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {row.lengthIn} × {row.widthIn} × 12 in
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.gallons, 1)} gal</td>
+                      <td class="py-3 px-5">{fmt(row.flowGpm, 2)} gpm</td>
+                      <td class="py-3 px-5">
+                        {row.ratedGpm === null ? "Outdoor interceptor" : `${row.ratedGpm} gpm / ${row.capacityLb} lb`}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Gravity interceptor by seat count
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Full kitchen with dishwashing, one turnover per hour, {interceptorBase.retentionHours} hour
+            retention, eight-hour day, and a {fmt(GREASE_INTERCEPTOR_MINIMUM_GAL, 0)}-gallon local floor.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Seats</th>
+                  <th class="py-3 px-5 font-semibold">Formula</th>
+                  <th class="py-3 px-5 font-semibold">Required</th>
+                  <th class="py-3 px-5 font-semibold">Governed by</th>
+                  <th class="py-3 px-5 font-semibold">Vessel</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  seatTable.map((row, index) => (
+                    <tr class={index === seatTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.seats}</td>
+                      <td class="py-3 px-5">{fmt(row.calculated, 0)} gal</td>
+                      <td class="py-3 px-5">{fmt(row.required, 0)} gal</td>
+                      <td class="py-3 px-5">
+                        {row.governedBy === "minimum" ? "The local floor" : "The calculation"}
+                      </td>
+                      <td class="py-3 px-5">{row.stocked === null ? "Two in series" : `${row.stocked} gal`}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-teal-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 1003.3 (grease interception) and the PDI-G101 rating standard for hydromechanical units. The
+            volume arithmetic is derived from {CUBIC_INCHES_PER_GALLON} cubic inches per US gallon and the pound
+            capacities are computed from the flow ratings, so neither is transcribed. <strong
+              >The meal-count factors — gallons per meal, retention time and storage factor — are commonly
+              published figures rather than values verified here against a primary source</strong
+            >, which is why all three are editable. IPC 1003.3.4 permits the authority having jurisdiction to
+            approve a sizing method, and in practice the local FOG programme sets the minimum size, the
+            location, the pump-out interval and the sampling requirement. Confirm before ordering.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about trap versus interceptor, PDI ratings, and FOG programme requirements."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingGreaseTrapCalculator } from "@/scripts/calculators/plumbing-grease-trap-calculator";
+    initPlumbingGreaseTrapCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

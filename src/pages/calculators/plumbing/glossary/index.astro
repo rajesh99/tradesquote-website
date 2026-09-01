@@ -1,0 +1,659 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+
+/**
+ * The term count is computed from the array below and then interpolated into
+ * the title, the meta description and the intro — so the page cannot claim a
+ * number it does not have. The electrical glossary shipped with a "70+" title
+ * against 56 actual terms before that check existed; this ordering makes the
+ * same mistake impossible.
+ */
+type GlossaryItem = { term: string; def: string; calc?: { href: string; label: string } };
+type GlossaryGroup = { letter: string; items: GlossaryItem[] };
+
+const terms: GlossaryGroup[] = [
+  {
+    letter: "A",
+    items: [
+      {
+        term: "Air Admittance Valve (AAV)",
+        def: "A one-way valve that lets air into a drainage system to break a siphon but will not let sewer gas out. It replaces a vent that would otherwise have to be run through the roof, and is the usual answer for an island sink. Not universally accepted — some jurisdictions restrict or prohibit them, and an AAV can never replace the one vent that must terminate outdoors.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "Air Gap",
+        def: "A physical vertical separation between a water outlet and the flood level rim of whatever it discharges into. The only backflow protection with no mechanism to fail, which is why it outranks every assembly. The required gap is <strong>twice the effective opening</strong>, or three times where it sits close to a wall, with a one-inch floor.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#air-gaps", label: "Minimum air gaps" },
+      },
+      {
+        term: "AHJ (Authority Having Jurisdiction)",
+        def: "The inspector, department, or official empowered to interpret and enforce the code where the work is being done. Their reading governs, which is why \"the IPC says\" is only ever half an answer — local amendments routinely modify the model code, and some jurisdictions use a different model code entirely.",
+      },
+      {
+        term: "ASSE",
+        def: "The American Society of Sanitary Engineering, whose numbered standards identify backflow devices — 1001 for an atmospheric vacuum breaker, 1013 for a reduced pressure principle assembly, 1015 for a double check. A device is specified by its ASSE number, not by its trade name.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#assemblies", label: "Backflow assemblies" },
+      },
+    ],
+  },
+  {
+    letter: "B",
+    items: [
+      {
+        term: "Backflow",
+        def: "Water travelling the wrong way through a potable system, carrying whatever it has picked up back toward the supply. It happens two ways — <strong>backsiphonage</strong> and <strong>backpressure</strong> — and which one is possible at a connection decides the device before hazard class does.",
+        calc: { href: "/calculators/plumbing/backflow-prevention", label: "Backflow Prevention Reference" },
+      },
+      {
+        term: "Backpressure",
+        def: "Backflow caused by the downstream system rising above supply pressure and pushing water back — a boiler, a booster pump, a CO<sub>2</sub> carbonator, or simply piping high enough that elevation head does it. <strong>No vacuum breaker of any kind protects against backpressure</strong>, which is the single most misunderstood point in cross-connection control.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#backpressure-vs-backsiphonage", label: "The two directions" },
+      },
+      {
+        term: "Backsiphonage",
+        def: "Backflow caused by supply pressure dropping below the downstream pressure, so the line siphons in reverse. A main break, a hydrant flowing, or a large pump starting nearby will do it. The classic case is a hose lying in a full bucket when the street pressure disappears.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#backpressure-vs-backsiphonage", label: "The two directions" },
+      },
+      {
+        term: "Backwater Valve",
+        def: "A check valve in a <em>drain</em> that stops sewage flowing back into a building when the public sewer surcharges. Frequently confused with a backflow preventer, which protects the <em>water supply</em>. They solve unrelated problems and are not interchangeable.",
+      },
+      {
+        term: "Ball Valve",
+        def: "A quarter-turn valve with a bored ball, giving near-zero restriction when open. Its equivalent length is tiny compared with a gate or globe valve, which is why swapping valve types changes a friction loss calculation far less than swapping pipe sizes does.",
+        calc: { href: "/calculators/plumbing/plumbing-friction-loss-calculator", label: "Friction Loss Calculator" },
+      },
+      {
+        term: "Branch Interval",
+        def: "A vertical length of drainage stack, at least eight feet, into which the horizontal branches of one storey discharge. It matters because stack capacity in Table 710.1(2) is quoted separately for stacks of three branch intervals or fewer and for taller ones — and the taller stack carries <em>more</em> per size, not less.",
+        calc: { href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator", label: "Drain Pipe Size Calculator" },
+      },
+      {
+        term: "Building Drain",
+        def: "The lowest horizontal piping inside the building that collects the discharge from all the soil and waste stacks and carries it out. It ends thirty inches beyond the wall, where it becomes the building sewer. Sized from Table 710.1(1), which is slope-dependent.",
+        calc: { href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator", label: "Drain Pipe Size Calculator" },
+      },
+      {
+        term: "Building Sewer",
+        def: "The run from thirty inches outside the building wall to the public sewer or private disposal system. Same sizing table as the building drain, but usually laid at a shallower slope over a longer distance, so the fall available is often what decides the size.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-slope-calculator", label: "Drain Pipe Slope Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "C",
+    items: [
+      {
+        term: "Cleanout",
+        def: "An accessible opening in a drainage line for rodding it clear. Required at changes of direction, at the base of stacks, and at intervals along horizontal runs. The one part of a drainage system whose position is decided by the person who will one day have to unblock it.",
+      },
+      {
+        term: "Closed System",
+        def: "A water system with no path back to the street main — created the moment a pressure-reducing valve, check valve, or backflow preventer is fitted. Heated water then has nowhere to expand to, so pressure spikes instead. IPC 607.3 requires thermal expansion control on any closed system.",
+        calc: { href: "/calculators/plumbing/plumbing-expansion-tank-calculator", label: "Thermal Expansion Tank Calculator" },
+      },
+      {
+        term: "CPVC",
+        def: "Chlorinated polyvinyl chloride — rigid plastic pipe rated for hot water, unlike plain PVC. Solvent-welded, cheaper than copper, more brittle than PEX, and dimensionally closer to copper than PEX is, so its bore penalty is smaller.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-size-calculator", label: "Water Pipe Size Calculator" },
+      },
+      {
+        term: "Critical Level",
+        def: "The mark on a vacuum breaker showing the lowest point at which it may be installed relative to the flood level rim it protects. Below that line the device does nothing. It is stamped on the body precisely because installing one too low is such a common error.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#assemblies", label: "Backflow assemblies" },
+      },
+      {
+        term: "Cross Connection",
+        def: "Any actual or potential link between the potable supply and a source of contamination. It does not require a mistake to exist — a hose bibb, an irrigation zone, and a boiler make-up line are all cross connections by design, which is why each carries a required device.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#applications", label: "Common applications" },
+      },
+    ],
+  },
+  {
+    letter: "D",
+    items: [
+      {
+        term: "Developed Length",
+        def: "The measured length of pipe plus the equivalent length of every fitting and valve on the run. Fittings are converted using an L/D ratio, so the same elbow adds more feet on a larger pipe. Pressure calculations use developed length; a tape measure alone always understates the loss.",
+        calc: { href: "/calculators/plumbing/plumbing-friction-loss-calculator", label: "Friction Loss Calculator" },
+      },
+      {
+        term: "DFU (Drainage Fixture Unit)",
+        def: "A weighting from IPC Table 709.1 representing a fixture's probable drainage load — a lavatory is 1, a bathroom group at 1.6 gpf is 5. Like a supply fixture unit it is a probability weight rather than a flow rate, because no building drains every fixture at once.",
+        calc: { href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator", label: "Drainage Fixture Unit Calculator" },
+      },
+      {
+        term: "Dielectric Union",
+        def: "A fitting that isolates two dissimilar metals — typically copper and steel — so galvanic corrosion cannot eat the joint. Most commonly seen at a water heater's nipples, and most commonly omitted there too.",
+      },
+      {
+        term: "Drain, Waste and Vent (DWV)",
+        def: "The gravity half of a plumbing system: the drains that carry waste away, and the vents that let air in behind it so traps hold their seal. Everything in DWV runs on gravity and atmospheric pressure, which is why slope and venting matter more than pipe strength.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "Drawdown",
+        def: "The water a pressure tank actually delivers between the pump cutting out and cutting back in — a <em>fraction</em> of the shell volume, not the shell volume. At a 30/50 psi switch that fraction is under a third, so a twenty-gallon tank gives up about six gallons.",
+        calc: { href: "/calculators/plumbing/plumbing-well-pressure-tank-calculator", label: "Well Pressure Tank Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "E",
+    items: [
+      {
+        term: "Effective Opening",
+        def: "The cross-sectional area of a water outlet, expressed as the diameter of a circle of equal area. It is what the required air gap is measured against — twice the effective opening, three times near a wall — so an odd-shaped outlet is converted to an equivalent round one first.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#air-gaps", label: "Minimum air gaps" },
+      },
+      {
+        term: "Expansion Tank",
+        def: "A small diaphragm tank that absorbs the volume increase when water is heated in a closed system. Heating 40 °F water to 140 °F expands it about 1.7%, and the tank has to be several times that volume because Boyle's law only lets you use the pressure window between pre-charge and maximum.",
+        calc: { href: "/calculators/plumbing/plumbing-expansion-tank-calculator", label: "Thermal Expansion Tank Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "F",
+    items: [
+      {
+        term: "First-Hour Rating (FHR)",
+        def: "The gallons of hot water a storage heater can deliver in one hour starting full — roughly 70% of the tank plus the recovery rate. It is <strong>the spec that matters, not tank gallons</strong>: a 40-gallon gas heater beats a 50-gallon electric one because recovery does more work in that hour than ten extra gallons of storage.",
+        calc: { href: "/calculators/plumbing/plumbing-water-heater-size-calculator", label: "Water Heater Size Calculator" },
+      },
+      {
+        term: "Fixture Unit",
+        def: "A probability weighting used to convert a list of fixtures into a design load. There are two unrelated kinds — the <strong>WSFU</strong> on the supply side and the <strong>DFU</strong> on the drainage side — and they are not interchangeable even for the same fixture.",
+        calc: { href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator", label: "Water Supply Fixture Unit Calculator" },
+      },
+      {
+        term: "Flood Level Rim",
+        def: "The edge over which water would spill from a fixture. Almost every backflow rule is measured from it — air gaps above it, vacuum breakers a set distance above it — because it defines the highest level contaminated water could reach.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#air-gaps", label: "Minimum air gaps" },
+      },
+      {
+        term: "Flow Control Fitting",
+        def: "An orifice fitting upstream of a hydromechanical grease interceptor that throttles the line to the unit's rated flow. Without one, a fast-emptying sink pushes flow straight through and nothing separates — a correctly sized trap installed without flow control is still a failure.",
+        calc: { href: "/calculators/plumbing/plumbing-grease-trap-calculator", label: "Grease Trap Size Calculator" },
+      },
+      {
+        term: "FOG (Fats, Oils and Grease)",
+        def: "The programme most sewer authorities run to keep kitchen grease out of the public system. It typically sets a minimum interceptor size, an outdoor location, a pump-out interval and a sampling requirement — and it, rather than the sizing arithmetic, usually decides what gets installed.",
+        calc: { href: "/calculators/plumbing/plumbing-grease-trap-calculator", label: "Grease Trap Size Calculator" },
+      },
+      {
+        term: "Friction Loss",
+        def: "Pressure given up to the pipe wall, normally quoted in psi per 100 feet. It rises roughly with the square of flow and falls with about the <strong>4.87th power of diameter</strong> — which is why bore beats smoothness, and why one size up transforms a marginal run.",
+        calc: { href: "/calculators/plumbing/plumbing-friction-loss-calculator", label: "Friction Loss Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "G",
+    items: [
+      {
+        term: "Grease Interceptor (gravity)",
+        def: "The buried tank outside a commercial kitchen. Rated in <strong>gallons</strong> and sized on retention time, because it separates grease by holding wastewater still long enough for it to float. Distinct from the under-sink unit in both method and units.",
+        calc: { href: "/calculators/plumbing/plumbing-grease-trap-calculator", label: "Grease Trap Size Calculator" },
+      },
+      {
+        term: "Grease Trap (hydromechanical)",
+        def: "The small under-sink interceptor. Rated in <strong>gpm</strong> and sized on flow, because it separates by slowing water down. PDI-G101 fixes its grease capacity at exactly <strong>two pounds per gpm</strong>, so a 20 gpm unit is a 40 lb unit — one number, not two.",
+        calc: { href: "/calculators/plumbing/plumbing-grease-trap-calculator", label: "Grease Trap Size Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "H",
+    items: [
+      {
+        term: "Hazen-Williams",
+        def: "The empirical formula behind almost every water friction-loss chart, using a roughness coefficient C — about 150 for plastic, 140 for copper, 120 for old galvanised steel. Valid for water at ordinary temperatures in full pipes; it is not a general fluid equation.",
+        calc: { href: "/calculators/plumbing/formulas", label: "Plumbing Formula Reference" },
+      },
+      {
+        term: "Head",
+        def: "Pressure expressed as a height of water. One foot of water is 0.4331 psi, so a psi is about 2.31 feet. It is the same quantity in different clothes, and pump curves use head because a pump lifts a height regardless of what fluid density does to the pressure.",
+        calc: { href: "/calculators/plumbing/plumbing-water-pressure-calculator", label: "Water Pressure Calculator" },
+      },
+      {
+        term: "Horizontal Branch",
+        def: "Drainage piping that collects from one or more fixtures and carries it to a stack or building drain. Sized from Table 710.1(2) rather than the building-drain table, and its capacity does not depend on slope the way a building drain's does.",
+        calc: { href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator", label: "Drain Pipe Size Calculator" },
+      },
+      {
+        term: "Hose Bibb",
+        def: "An exterior sillcock. Worth naming because it is the single most common cross connection in a house — a hose can reach a bucket, a pool, or a chemical sprayer — and the fix is the cheapest device in plumbing, a hose connection vacuum breaker.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#applications", label: "Common applications" },
+      },
+      {
+        term: "Hunter's Curve",
+        def: "The probability curve converting fixture units into a design flow, and the reason 100 WSFU is nowhere near 100 gpm. Demand <em>per fixture unit</em> falls as load rises — around 1.9 gpm per unit at 5 units, under 0.4 at 100 — because large buildings never run everything at once. It runs high for modern low-flow fixtures, so the error is toward larger pipe.",
+        calc: { href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator", label: "Water Supply Fixture Unit Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "I",
+    items: [
+      {
+        term: "Individual Vent",
+        def: "A vent serving one fixture trap. The simplest case of IPC 906.2 — at least half the drain diameter, never below 1-1/4 inch, and one nominal size larger for the whole run once developed length passes forty feet.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "IPC (International Plumbing Code)",
+        def: "The model code these calculators follow, published by the ICC. A <em>model</em> code: it has no force until a jurisdiction adopts it, adoption lags the publication cycle by years, and local amendments override it. Roughly fifteen states use the UPC or a derivative instead.",
+        calc: { href: "/calculators/plumbing/formulas", label: "Plumbing Formula Reference" },
+      },
+      {
+        term: "Island Vent",
+        def: "The loop arrangement used to vent a sink with no wall behind it, rising to just under the counter before returning down and back up to a dry vent. Fiddly enough that an air admittance valve is now the usual answer where one is permitted.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "L",
+    items: [
+      {
+        term: "Leach Field",
+        def: "The trenches that disperse septic effluent into the soil. Its area is daily flow divided by the soil application rate, which makes the ground a <strong>five-fold variable</strong> — the same house needs about 375 ft² in sand and 1,875 ft² in slow clay, while the tank does not change at all.",
+        calc: { href: "/calculators/plumbing/plumbing-septic-tank-calculator", label: "Septic Tank Size Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "M",
+    items: [
+      {
+        term: "Manning's Equation",
+        def: "The open-channel flow formula used for gravity drains and storm piping, based on slope, hydraulic radius and a roughness coefficient n. Sanitary drains are checked part-full so solids are carried; storm drains are checked full-bore, which is roughly twice the half-full flow.",
+        calc: { href: "/calculators/plumbing/plumbing-storm-drainage-calculator", label: "Storm & Roof Drainage Calculator" },
+      },
+      {
+        term: "Mixing Valve",
+        def: "A thermostatic valve that blends stored hot water with cold to a fixed delivery temperature. Storing at 140 °F and delivering 120 °F makes a 50-gallon tank behave like about 64 — and storing <em>at</em> the delivery temperature gives no capacity gain at all while parking the tank in the <em>Legionella</em> range.",
+        calc: { href: "/calculators/plumbing/plumbing-mixing-valve-calculator", label: "Mixing Valve Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "N",
+    items: [
+      {
+        term: "Nominal Size",
+        def: "The name of a pipe, not a measurement of it. A nominal 1-inch PEX bores 0.875 inch where nominal 1-inch Type L copper bores 1.025 — so at 18 gpm copper takes 1 inch and PEX needs 1-1/4. Always size on inside diameter, never on the label.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-size-calculator", label: "Water Pipe Size Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "P",
+    items: [
+      {
+        term: "PDI (Plumbing and Drainage Institute)",
+        def: "Publisher of PDI-G101, the rating standard for hydromechanical grease interceptors. A PDI rating carries a flow in gpm and a grease capacity in pounds that is always exactly twice it.",
+        calc: { href: "/calculators/plumbing/plumbing-grease-trap-calculator", label: "Grease Trap Size Calculator" },
+      },
+      {
+        term: "Percolation Test",
+        def: "A witnessed field test measuring how fast water drains through soil, in minutes per inch, which converts to the application rate a leach field is sized from. Required by the health department before a septic permit, and not something a calculator can substitute for.",
+        calc: { href: "/calculators/plumbing/plumbing-septic-tank-calculator", label: "Septic Tank Size Calculator" },
+      },
+      {
+        term: "PEX",
+        def: "Cross-linked polyethylene tubing. Flexible, freeze-tolerant, quick to install, and outside-diameter controlled to copper sizes — so its bore is noticeably smaller than copper of the same name. Best C factor of any common material and the worst friction loss, because <strong>bore beats smoothness</strong>.",
+        calc: { href: "/calculators/plumbing/plumbing-friction-loss-calculator", label: "Friction Loss Calculator" },
+      },
+      {
+        term: "Potable Water",
+        def: "Water fit to drink. The word matters in code because the entire structure of Chapter 6 is about keeping the potable system separated from everything else — every backflow rule follows from that one idea.",
+        calc: { href: "/calculators/plumbing/backflow-prevention", label: "Backflow Prevention Reference" },
+      },
+      {
+        term: "Pre-charge",
+        def: "The air pressure set in a diaphragm tank before it sees water. On an expansion tank it matches the supply pressure; on a well tank it sits about two psi below cut-in. Either way it is the strongest single lever on the tank's performance, and it must be measured with the tank isolated and drained.",
+        calc: { href: "/calculators/plumbing/plumbing-well-pressure-tank-calculator", label: "Well Pressure Tank Calculator" },
+      },
+      {
+        term: "Pressure-Reducing Valve (PRV)",
+        def: "A valve that drops incoming street pressure to a working level. IPC 604.8 requires one where static pressure exceeds <strong>80 psi</strong>. Fitting one closes the system, which is what then makes an expansion tank necessary — the two almost always arrive together.",
+        calc: { href: "/calculators/plumbing/plumbing-water-pressure-calculator", label: "Water Pressure Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "R",
+    items: [
+      {
+        term: "Recovery Rate",
+        def: "The gallons per hour a water heater can raise through a given temperature rise — BTU input times efficiency, divided by 8.33 times the rise. It is half of first-hour rating and the reason gas heaters punch above their storage volume.",
+        calc: { href: "/calculators/plumbing/plumbing-water-heater-size-calculator", label: "Water Heater Size Calculator" },
+      },
+      {
+        term: "RPZ / RPBA",
+        def: "Reduced pressure principle backflow preventer — two check valves with a relief port between them that dumps to atmosphere the instant the zone loses its differential. The <strong>only in-line assembly approved for high hazard under backpressure</strong>, and the only one that will flood a room when it fails, so the discharge has to be planned for. Never in a pit.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#assemblies", label: "Backflow assemblies" },
+      },
+      {
+        term: "Relief Valve (T&amp;P)",
+        def: "The temperature and pressure valve on a water heater, typically set to open at 150 psi or 210 °F. A valve that weeps on every heating cycle is almost never faulty — it is reporting thermal expansion with nowhere to go.",
+        calc: { href: "/calculators/plumbing/plumbing-expansion-tank-calculator", label: "Thermal Expansion Tank Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "S",
+    items: [
+      {
+        term: "Sanitary Tee",
+        def: "A drainage fitting with a swept branch, used where a horizontal line enters a vertical one. Using it flat — on a horizontal-to-horizontal connection — is a classic violation, because the sweep is too tight to keep solids moving; a wye and an eighth bend go there instead.",
+      },
+      {
+        term: "Scour Velocity",
+        def: "The flow speed a drain needs to carry solids rather than let them settle, conventionally about two feet per second. It is why a drain can be laid <em>too steep</em> as well as too flat — liquid outrunning solids leaves the solids behind.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-slope-calculator", label: "Drain Pipe Slope Calculator" },
+      },
+      {
+        term: "SDR (Standard Dimension Ratio)",
+        def: "The ratio of a plastic pipe's outside diameter to its wall thickness. PEX is SDR-9, so its bore is exactly seven-ninths of its outside diameter — which is why PEX inside diameters can be derived rather than looked up.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-volume-calculator", label: "Pipe Volume Calculator" },
+      },
+      {
+        term: "Septic Tank",
+        def: "A buried vessel that separates solids and lets clarified effluent pass to a leach field. Sized on retention time or a jurisdictional minimum, whichever is larger — and on typical figures the minimum governs until about five bedrooms. Septic is <strong>not IPC territory</strong>; it falls to the health department.",
+        calc: { href: "/calculators/plumbing/plumbing-septic-tank-calculator", label: "Septic Tank Size Calculator" },
+      },
+      {
+        term: "Soil Stack",
+        def: "A vertical drainage stack receiving discharge from water closets. Distinguished from a waste stack, which receives everything else — the distinction matters because a water closet anywhere on a building drain floors it at three inches regardless of what the DFU table alone would allow.",
+        calc: { href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator", label: "Drain Pipe Size Calculator" },
+      },
+      {
+        term: "Stack Vent",
+        def: "The dry extension of a soil or waste stack above the highest horizontal branch. Different from a vent stack, which is a separate pipe run purely for air; both are sized by IPC Table 906.1 rather than by the simple half-diameter rule.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "Static Pressure",
+        def: "Pressure with nothing flowing. It is the number a gauge on a hose bibb shows, the number IPC 604.8's 80 psi threshold is measured against, and the starting point every supply pipe calculation subtracts losses from.",
+        calc: { href: "/calculators/plumbing/plumbing-water-pressure-calculator", label: "Water Pressure Calculator" },
+      },
+      {
+        term: "Storm Drain",
+        def: "Piping carrying rainwater rather than sanitary waste, and in most jurisdictions kept entirely separate from it. Sized from roof area and the local rainfall rate — the same roof sheds three times as much in a 6 in/hr region as in a 2 in/hr one.",
+        calc: { href: "/calculators/plumbing/plumbing-storm-drainage-calculator", label: "Storm & Roof Drainage Calculator" },
+      },
+      {
+        term: "Sweep",
+        def: "A long-radius drainage bend. Long sweeps keep flow attached and solids moving, which is why a long-sweep ninety is preferred underground and a short-radius bend belongs in a vent, not a drain.",
+      },
+    ],
+  },
+  {
+    letter: "T",
+    items: [
+      {
+        term: "Tailpiece",
+        def: "The short length of tube between a fixture outlet and its trap. Its length is limited because a long unvented drop lets water gain enough speed to siphon the trap it is about to enter.",
+      },
+      {
+        term: "Tankless Water Heater",
+        def: "An on-demand heater with no storage, whose output is a flow rate that depends entirely on the temperature rise asked of it. The same 199,000 BTU unit gives about 7.6 gpm on a 70 °F inlet and 4.7 gpm on a 40 °F one — a <strong>37% swing from geography alone</strong>.",
+        calc: { href: "/calculators/plumbing/plumbing-tankless-water-heater-calculator", label: "Tankless Water Heater Calculator" },
+      },
+      {
+        term: "TDH (Total Dynamic Head)",
+        def: "Everything a pump has to work against: static lift, friction head, pressure head, and velocity head. Static lift usually dominates and velocity head is normally a couple of percent — real, routinely omitted, and almost never the thing that matters.",
+        calc: { href: "/calculators/plumbing/plumbing-pump-head-calculator", label: "Pump Head Calculator" },
+      },
+      {
+        term: "Trap",
+        def: "The U-bend holding a water seal that keeps sewer gas out of the building. Every fixture needs one, no fixture may have two in series, and the whole purpose of venting is to stop the seal being siphoned or blown out.",
+        calc: { href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator", label: "Drainage Fixture Unit Calculator" },
+      },
+      {
+        term: "Trap Arm",
+        def: "The drain between a trap weir and the vent fitting. Its maximum length is capped by IPC Table 909.1 — twelve feet on a three-inch arm at 1/8 in/ft — because beyond that the arm floods and vents itself instead of admitting air.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "Trap Primer",
+        def: "A device that trickles water into a rarely used trap — a floor drain, typically — so the seal does not evaporate away. The alternative failure mode is a room that smells of sewer only in dry weather.",
+      },
+      {
+        term: "Trap Seal",
+        def: "The depth of water standing in a trap, normally two to four inches. It is consumed by siphonage, by back pressure, by capillary action along a rag, and simply by evaporation — venting only solves the first two.",
+      },
+      {
+        term: "Type L Copper",
+        def: "The medium-wall copper tube used for most water distribution. Type M is thinner and Type K thicker; the wall thickness changes the bore, so the same nominal size carries different flow at the same velocity depending on type.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-velocity-calculator", label: "Pipe Velocity Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "U",
+    items: [
+      {
+        term: "UPC (Uniform Plumbing Code)",
+        def: "The other US model code, published by IAPMO and used by roughly fifteen states including California, whose CPC is a derivative. Its fixture-unit values and sizing tables differ from the IPC's, so an answer correct in one jurisdiction can be wrong in the next state.",
+      },
+    ],
+  },
+  {
+    letter: "V",
+    items: [
+      {
+        term: "Vacuum Breaker",
+        def: "A device admitting air to break a siphon. Atmospheric (AVB), pressure (PVB) and spill-resistant (SVB) types differ in whether they may sit under continuous pressure and how high above the flood level rim they must go — but <strong>none of them protects against backpressure</strong>.",
+        calc: { href: "/calculators/plumbing/backflow-prevention#assemblies", label: "Backflow assemblies" },
+      },
+      {
+        term: "Velocity",
+        def: "How fast water moves in a pipe, from V = 0.4085 × gpm ÷ ID². Design practice caps it at about 8 ft/s cold and 5 ft/s hot to keep the system quiet and to avoid erosion-corrosion — limits that come from ASPE and manufacturers, not from a number in the IPC.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-velocity-calculator", label: "Pipe Velocity Calculator" },
+      },
+      {
+        term: "Vent Stack",
+        def: "A vertical pipe run solely to carry air, connected to the drainage stack at its base and to the stack vent at its top. Sized from IPC Table 906.1 by the drainage stack's size, its fixture load and its developed length — not by the individual-vent half-diameter rule.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "Venting",
+        def: "The system of pipes admitting air behind draining water so pressure never gets far from atmospheric. Without it a fixture discharging upstream siphons the traps downstream, and a slug of water falling down a stack blows them out from below.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+    ],
+  },
+  {
+    letter: "W",
+    items: [
+      {
+        term: "Water Hammer",
+        def: "The shock wave when fast-moving water is stopped suddenly by a quick-closing valve — a solenoid on a washer or dishwasher, usually. High velocity makes it worse, which is one of the reasons the velocity cap exists at all.",
+        calc: { href: "/calculators/plumbing/plumbing-pipe-velocity-calculator", label: "Pipe Velocity Calculator" },
+      },
+      {
+        term: "Water Hammer Arrestor",
+        def: "A sealed air chamber with a piston or bladder that absorbs the shock. It replaces the old capped stub of pipe, which worked until the air in it dissolved into the water — which is why those stopped working after a few months and arrestors do not.",
+      },
+      {
+        term: "Wet Vent",
+        def: "A section of pipe serving as both drain and vent for a bathroom group, permitted within limits because the fixtures involved cannot fill it. It saves a great deal of pipe in a typical bathroom, and its rules are among the most commonly misread in the code.",
+        calc: { href: "/calculators/plumbing/plumbing-vent-size-calculator", label: "Vent Pipe Size Calculator" },
+      },
+      {
+        term: "Working Pressure",
+        def: "The pressure a system is designed to operate at, as distinct from static pressure with nothing flowing or the relief setting where things let go. Expansion tank sizing works off the maximum working pressure, not the relief valve's rating.",
+        calc: { href: "/calculators/plumbing/plumbing-expansion-tank-calculator", label: "Thermal Expansion Tank Calculator" },
+      },
+      {
+        term: "WSFU (Water Supply Fixture Unit)",
+        def: "The supply-side weighting from IPC Appendix E, converted to gpm through Hunter's curve. Note that Appendix E is an <em>appendix</em> — enforceable only where specifically adopted — and that its values run high for modern low-flow fixtures.",
+        calc: { href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator", label: "Water Supply Fixture Unit Calculator" },
+      },
+    ],
+  },
+];
+
+const totalTerms = terms.reduce((sum, g) => sum + g.items.length, 0);
+
+const title = `Plumbing Glossary — ${totalTerms} Terms Defined | TradesQuote`;
+const description = `Plain-English plumbing glossary: ${totalTerms} terms from air gap and backsiphonage to trap arm, WSFU, drawdown and wet vent — each with the IPC section behind it and a link to the free calculator that uses it.`;
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/glossary";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Glossary", item: pageUrl },
+  ],
+};
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`Plumbing Glossary — ${totalTerms} Terms Defined`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Plumbing Glossary | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb category="Plumbing" categoryHref="/calculators/plumbing" current="Glossary" />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600"
+            >
+              Plumbing Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Plumbing Glossary
+            </h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              {totalTerms} terms defined in plain English, with the IPC section behind each one where there is
+              one. Weighted toward the terms that actually cause trouble — the pairs people mix up, like a
+              backwater valve against a backflow preventer, and the ones where the obvious reading is the wrong
+              one.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-2">
+            {
+              terms.map((g) => (
+                <a
+                  href={`#letter-${g.letter}`}
+                  class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:border-orange-500 hover:text-orange-600 transition"
+                >
+                  {g.letter}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14 space-y-14">
+        {
+          terms.map((group) => (
+            <div id={`letter-${group.letter}`}>
+              <div class="flex items-center gap-4">
+                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100 text-xl font-extrabold text-orange-700">
+                  {group.letter}
+                </span>
+                <div class="h-px flex-1 bg-slate-200" />
+              </div>
+
+              <dl class="mt-6 space-y-6">
+                {group.items.map((item) => (
+                  <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <dt class="text-base font-bold text-slate-900" set:html={item.term} />
+                    <dd class="mt-2 text-sm leading-relaxed text-slate-600" set:html={item.def} />
+                    {item.calc && (
+                      <a
+                        href={item.calc.href}
+                        class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-orange-600 hover:text-orange-700 transition"
+                      >
+                        {item.calc.label} →
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))
+        }
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <p class="text-sm text-slate-600 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> definitions follow <a
+              class="underline hover:text-orange-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 usage, including the Chapter 2 definitions and the sections cited in each entry. Backflow device
+            designations are ASSE standards; grease interceptor ratings are PDI-G101; pipe dimensions are ASTM. The
+            velocity limits are ASPE and manufacturer design practice rather than a numeric IPC figure, and well
+            pressure tank sizing is pump-industry convention outside the code entirely. Septic falls to state and
+            county health departments, not the IPC. Local amendments override the model code, roughly fifteen states
+            use the UPC or a derivative instead, and a licensed plumber plus the AHJ have final say on anything
+            installed.
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Put the terms to work</h2>
+          <p class="mt-3 text-slate-600">
+            Every concept here has a free calculator or a reference table behind it.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href="/calculators/plumbing"
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-6 py-3 text-sm font-bold text-white hover:bg-orange-700 transition"
+            >
+              Browse all plumbing calculators →
+            </a>
+            <a
+              href="/calculators/plumbing/formulas"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-orange-500 hover:text-orange-600 transition"
+            >
+              Formula reference →
+            </a>
+            <a
+              href="/calculators/plumbing/backflow-prevention"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-orange-500 hover:text-orange-600 transition"
+            >
+              Backflow prevention →
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>

@@ -19,9 +19,13 @@
  *    while this module was written. Tables 709.1, 709.2, 710.1(1), 710.1(2),
  *    909.1 and the 906.2 vent rule are in this tier.
  * 3. **UNVERIFIED — flagged** — commonly published values that could not be
- *    confirmed against a primary source here. `WSFU_FIXTURES` and
- *    `HUNTER_DEMAND` are in this tier and say so at their definitions. Pages
- *    that use them must disclose it. See the block comment above each.
+ *    confirmed against a primary source here. `WSFU_FIXTURES`,
+ *    `HUNTER_DEMAND`, and the grease-interceptor meal-count factors
+ *    (`GREASE_WASTE_PER_MEAL`, `GREASE_RETENTION_HOURS`,
+ *    `GREASE_STORAGE_FACTORS`) are in this tier and say so at their
+ *    definitions. Pages that use them must disclose it, and every one of them
+ *    is an editable input rather than a hidden constant. See the block
+ *    comment above each.
  *
  * These are planning aids. The IPC is a model code: local amendments override
  * it, roughly fifteen states use the UPC or a UPC derivative instead, and a
@@ -1355,3 +1359,1094 @@ export function labourRate(input: LabourRateInput): LabourRateResult {
     utilisation: (input.billableHours / HOURS_PER_YEAR) * 100,
   };
 }
+
+/* ------------------------------------------------------------------ *
+ * Water density and thermal expansion — DERIVED
+ *
+ * Density is physical data, not code. It is here rather than transcribed into
+ * a calculator so the expansion fraction can be computed from it, and it
+ * cross-checks against a constant this module already uses: the 60 °F row is
+ * 62.37 lb/ft³, which is exactly what PSI_PER_FOOT_HEAD was derived from.
+ * ------------------------------------------------------------------ */
+
+/** Density of water in lb/ft³ at 10 °F steps. Peak density is near 39 °F. */
+export const WATER_DENSITY: { tempF: number; density: number }[] = [
+  { tempF: 40, density: 62.43 },
+  { tempF: 50, density: 62.41 },
+  { tempF: 60, density: 62.37 },
+  { tempF: 70, density: 62.3 },
+  { tempF: 80, density: 62.22 },
+  { tempF: 90, density: 62.12 },
+  { tempF: 100, density: 62.0 },
+  { tempF: 110, density: 61.86 },
+  { tempF: 120, density: 61.71 },
+  { tempF: 130, density: 61.55 },
+  { tempF: 140, density: 61.38 },
+  { tempF: 150, density: 61.2 },
+  { tempF: 160, density: 61.01 },
+  { tempF: 170, density: 60.79 },
+  { tempF: 180, density: 60.57 },
+  { tempF: 190, density: 60.35 },
+  { tempF: 200, density: 60.12 },
+];
+
+/** Density at any temperature, linearly interpolated between the rows above. */
+export function waterDensity(tempF: number): number {
+  const rows = WATER_DENSITY;
+  if (tempF <= rows[0].tempF) return rows[0].density;
+  if (tempF >= rows[rows.length - 1].tempF) return rows[rows.length - 1].density;
+  for (let i = 0; i < rows.length - 1; i += 1) {
+    const lo = rows[i];
+    const hi = rows[i + 1];
+    if (tempF >= lo.tempF && tempF <= hi.tempF) {
+      const t = (tempF - lo.tempF) / (hi.tempF - lo.tempF);
+      return lo.density + t * (hi.density - lo.density);
+    }
+  }
+  return rows[rows.length - 1].density;
+}
+
+/**
+ * Fractional volume increase when water is heated from `coldF` to `hotF`.
+ * Mass is conserved, so V2/V1 = ρ1/ρ2. Heating 40 °F water to 140 °F expands
+ * it about 1.7%, which is why a closed system needs somewhere to put it.
+ */
+export function expansionFraction(coldF: number, hotF: number): number {
+  const cold = waterDensity(coldF);
+  const hot = waterDensity(hotF);
+  if (hot <= 0) return 0;
+  return cold / hot - 1;
+}
+
+/** Atmospheric pressure at sea level, psi — used to convert gauge to absolute. */
+export const ATMOSPHERIC_PSI = 14.7;
+
+export type ExpansionTankResult = {
+  /** Fractional expansion of the system water. */
+  fraction: number;
+  /** Gallons of expansion the system produces. */
+  acceptance: number;
+  /** Minimum diaphragm tank volume, gallons. */
+  tankVolume: number;
+  /** The Boyle's-law acceptance ratio the tank achieves. */
+  acceptanceRatio: number;
+};
+
+/**
+ * Diaphragm expansion tank sizing.
+ *
+ *     V_tank = V_system × E ÷ (1 − P_precharge_abs ÷ P_max_abs)
+ *
+ * The denominator is Boyle's law: the air charge can only be squeezed from the
+ * pre-charge pressure up to the maximum working pressure, so only that fraction
+ * of the shell is usable. Pre-charge is normally set to the incoming supply
+ * pressure so the diaphragm sits just short of accepting water at rest.
+ */
+export function expansionTank(args: {
+  systemGallons: number;
+  coldF: number;
+  hotF: number;
+  supplyPsi: number;
+  maxPsi: number;
+}): ExpansionTankResult {
+  const fraction = expansionFraction(args.coldF, args.hotF);
+  const acceptance = args.systemGallons * fraction;
+  const pi = args.supplyPsi + ATMOSPHERIC_PSI;
+  const pf = args.maxPsi + ATMOSPHERIC_PSI;
+  const acceptanceRatio = pf > 0 ? 1 - pi / pf : 0;
+  return {
+    fraction,
+    acceptance,
+    tankVolume: acceptanceRatio > 0 ? acceptance / acceptanceRatio : Infinity,
+    acceptanceRatio,
+  };
+}
+
+/** Diaphragm tank shell sizes commonly stocked for potable water, gallons. */
+export const STANDARD_EXPANSION_TANKS = [2, 4.4, 8.6, 14, 20, 32, 44, 62, 86];
+
+/** Smallest stocked shell that covers a required tank volume. */
+export function selectExpansionTank(required: number): number | null {
+  return STANDARD_EXPANSION_TANKS.find((t) => t >= required) ?? null;
+}
+
+/* ------------------------------------------------------------------ *
+ * Pipe volume — DERIVED
+ * ------------------------------------------------------------------ */
+
+/** US gallons per cubic foot. */
+export const GALLONS_PER_CUBIC_FOOT = 7.48052;
+/** Cubic inches per US gallon. */
+export const CUBIC_INCHES_PER_GALLON = 231;
+
+/**
+ * Gallons held per foot of pipe.
+ *
+ *     gal/ft = π ÷ 4 × d² × 12 ÷ 231 = 0.04080 × d²
+ *
+ * d is the INSIDE diameter in inches. Cross-check: 1" Schedule 40 has a 1.049"
+ * bore, giving 0.0449 gal/ft against a published 0.0449.
+ */
+export function gallonsPerFoot(idInches: number): number {
+  return ((Math.PI / 4) * idInches * idInches * 12) / CUBIC_INCHES_PER_GALLON;
+}
+
+export type PipeVolumeResult = {
+  gallons: number;
+  litres: number;
+  cubicFeet: number;
+  perFoot: number;
+  weightLb: number;
+  /** Minutes to purge at a given flow. */
+  minutesToPurge: (gpm: number) => number;
+};
+
+export function pipeVolume(idInches: number, lengthFt: number): PipeVolumeResult {
+  const perFoot = gallonsPerFoot(idInches);
+  const gallons = perFoot * lengthFt;
+  return {
+    gallons,
+    litres: gallons * 3.785411784,
+    cubicFeet: gallons / GALLONS_PER_CUBIC_FOOT,
+    perFoot,
+    weightLb: gallons * LB_PER_GALLON,
+    minutesToPurge: (gpm: number) => (gpm > 0 ? gallons / gpm : Infinity),
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Tempering / mixing valve — DERIVED
+ * ------------------------------------------------------------------ */
+
+export type MixResult = {
+  hotFraction: number;
+  coldFraction: number;
+  hotGpm: number;
+  coldGpm: number;
+  /** How much more tempered water a tank yields than its stored volume. */
+  storageMultiplier: number;
+};
+
+/**
+ * Splitting a tempered flow into its hot and cold parts is a straight energy
+ * balance: hot fraction = (T_mix − T_cold) ÷ (T_hot − T_cold).
+ *
+ * The interesting consequence is the storage multiplier — storing at 140 °F and
+ * delivering at 120 °F means every delivered gallon is only part tank water, so
+ * a 50-gallon tank behaves like a larger one.
+ */
+export function mixedFlow(args: {
+  hotF: number;
+  coldF: number;
+  mixF: number;
+  mixedGpm: number;
+}): MixResult {
+  const f = hotFraction(args.mixF, args.coldF, args.hotF);
+  const clamped = Math.min(1, Math.max(0, f));
+  return {
+    hotFraction: clamped,
+    coldFraction: 1 - clamped,
+    hotGpm: args.mixedGpm * clamped,
+    coldGpm: args.mixedGpm * (1 - clamped),
+    storageMultiplier: clamped > 0 ? 1 / clamped : Infinity,
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Storm drainage — flow DERIVED, sizing tables deliberately NOT reproduced
+ *
+ * The design flow below is pure arithmetic and is the number that is actually
+ * hard to look up. The pipe SIZE, however, comes from IPC Tables 1106.2
+ * (vertical leaders) and 1106.3 (horizontal storm drains), which this module
+ * does not reproduce — the same call made for vent stacks and Table 906.1.
+ * `stormHorizontalCheck` gives a Manning hydraulic check so a size can be
+ * sanity-tested, and the page says plainly that the code tables govern.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Runoff from a roof, gpm.
+ *
+ * Derivation: 1 in/hr falling on 1 ft² is 1/12 ft³/hr, and one cubic foot is
+ * 7.48052 gallons, so it is 0.0103896 gpm — i.e. area × rate ÷ 96.25. Published
+ * references round the divisor to 96.23; this computes it rather than quoting it.
+ */
+export function roofRunoffGpm(areaSqFt: number, rainfallInPerHr: number): number {
+  const gpmPerSqFtPerInch = GALLONS_PER_CUBIC_FOOT / 12 / 60;
+  return areaSqFt * rainfallInPerHr * gpmPerSqFtPerInch;
+}
+
+/** The derived divisor, exposed so a page can show it rather than assert 96.23. */
+export const ROOF_RUNOFF_DIVISOR = 1 / (GALLONS_PER_CUBIC_FOOT / 12 / 60);
+
+/**
+ * Hydraulic check only: what a horizontal storm drain of this size and slope
+ * carries flowing full, from Manning. NOT a substitute for IPC Table 1106.3.
+ */
+export function stormHorizontalCheck(
+  nominalSize: number,
+  slopeInPerFt: number,
+  n = MANNING_N["plastic"],
+): { gpm: number; velocity: number } | null {
+  const id = insideDiameter("pvc-40", nominalSize);
+  if (id === null) return null;
+  // Storm drains are sized on full-bore flow; a full pipe has the same
+  // hydraulic radius as a half-full one, and twice the area.
+  const half = manningHalfFull(id, slopeInPerFt, n);
+  return { gpm: half.gpm * 2, velocity: half.velocity };
+}
+
+/** Rainfall rates for orientation only — use the IPC Figure 1106.1 map for a real design. */
+export const RAINFALL_EXAMPLES: { label: string; inPerHr: number }[] = [
+  { label: "Pacific Northwest / Great Lakes", inPerHr: 2 },
+  { label: "Northeast / Midwest", inPerHr: 3 },
+  { label: "Mid-Atlantic / Central", inPerHr: 4 },
+  { label: "Southeast / Gulf coast", inPerHr: 5 },
+];
+
+/* ------------------------------------------------------------------ *
+ * Septic — LOCAL HEALTH CODE, not the IPC
+ *
+ * !! Read before changing. Septic systems are governed by state and county
+ * health departments, and by the International Private Sewage Disposal Code
+ * where adopted — NOT by the IPC, which explicitly hands private disposal off.
+ * Requirements vary more between jurisdictions than anything else in this
+ * module. The daily-flow-per-bedroom figure and the soil application rate are
+ * therefore BOTH editable inputs on the page, with the values below offered
+ * only as common defaults. Do not present these as code.
+ * ------------------------------------------------------------------ */
+
+/** A widely used daily design flow allowance, gallons per bedroom per day. */
+export const DEFAULT_GAL_PER_BEDROOM = 150;
+
+/**
+ * Common minimum tank capacities by bedroom count, gallons. These are typical
+ * of many state codes; yours may differ, and some require more for garbage
+ * disposals or whirlpool tubs.
+ */
+export const SEPTIC_TANK_MINIMUMS: { maxBedrooms: number; gallons: number }[] = [
+  { maxBedrooms: 3, gallons: 1000 },
+  { maxBedrooms: 4, gallons: 1250 },
+  { maxBedrooms: 5, gallons: 1500 },
+  { maxBedrooms: 6, gallons: 1750 },
+  { maxBedrooms: Infinity, gallons: 2000 },
+];
+
+/**
+ * Soil application rates against percolation rate. Indicative only — these
+ * vary substantially between jurisdictions, which is why the page makes the
+ * rate directly editable rather than deriving it silently.
+ */
+export const PERC_APPLICATION_RATES: {
+  label: string;
+  maxMinPerInch: number;
+  galPerSqFtPerDay: number;
+}[] = [
+  { label: "Sand / sandy loam — 1 to 5 min/in", maxMinPerInch: 5, galPerSqFtPerDay: 1.2 },
+  { label: "Loam — 6 to 15 min/in", maxMinPerInch: 15, galPerSqFtPerDay: 0.8 },
+  { label: "Silt loam — 16 to 30 min/in", maxMinPerInch: 30, galPerSqFtPerDay: 0.45 },
+  { label: "Clay loam — 31 to 45 min/in", maxMinPerInch: 45, galPerSqFtPerDay: 0.36 },
+  { label: "Slow clay — 46 to 60 min/in", maxMinPerInch: 60, galPerSqFtPerDay: 0.24 },
+];
+
+export type SepticResult = {
+  dailyFlow: number;
+  /** Tank sized on retention time. */
+  retentionTank: number;
+  /** The jurisdictional minimum for this bedroom count. */
+  minimumTank: number;
+  tank: number;
+  governedBy: "retention" | "minimum";
+  leachFieldSqFt: number;
+  trenchFeet: number;
+};
+
+/** Retention multiple applied to daily flow — two days is a common requirement. */
+export const SEPTIC_RETENTION_DAYS = 2;
+
+export function septicSizing(args: {
+  bedrooms: number;
+  galPerBedroom: number;
+  applicationRate: number;
+  trenchWidthFt: number;
+}): SepticResult {
+  const dailyFlow = Math.max(0, args.bedrooms) * args.galPerBedroom;
+  const retentionTank = dailyFlow * SEPTIC_RETENTION_DAYS;
+  const minimumTank =
+    SEPTIC_TANK_MINIMUMS.find((r) => args.bedrooms <= r.maxBedrooms)?.gallons ?? 2000;
+  const tank = Math.max(retentionTank, minimumTank);
+  const leachFieldSqFt = args.applicationRate > 0 ? dailyFlow / args.applicationRate : Infinity;
+  return {
+    dailyFlow,
+    retentionTank,
+    minimumTank,
+    tank,
+    governedBy: retentionTank >= minimumTank ? "retention" : "minimum",
+    leachFieldSqFt,
+    trenchFeet: args.trenchWidthFt > 0 ? leachFieldSqFt / args.trenchWidthFt : Infinity,
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Unit conversions — DERIVED, all exact by definition
+ * ------------------------------------------------------------------ */
+
+export type UnitCategory = "flow" | "pressure" | "volume" | "length" | "velocity" | "temperature";
+
+/** Factor to the category's base unit. Temperature is handled separately. */
+export type UnitDef = { key: string; label: string; toBase: number };
+
+export const UNIT_CATEGORIES: {
+  key: UnitCategory;
+  label: string;
+  base: string;
+  units: UnitDef[];
+}[] = [
+  {
+    key: "flow",
+    label: "Flow rate",
+    base: "gpm",
+    units: [
+      { key: "gpm", label: "US gallons per minute (gpm)", toBase: 1 },
+      { key: "gph", label: "US gallons per hour (gph)", toBase: 1 / 60 },
+      { key: "lpm", label: "Litres per minute (L/min)", toBase: 1 / 3.785411784 },
+      { key: "lps", label: "Litres per second (L/s)", toBase: 60 / 3.785411784 },
+      { key: "m3h", label: "Cubic metres per hour (m³/h)", toBase: 1000 / 60 / 3.785411784 },
+      { key: "cfs", label: "Cubic feet per second (cfs)", toBase: (7.48052 * 60) / 1 },
+      { key: "ukgpm", label: "Imperial gallons per minute", toBase: 4.54609 / 3.785411784 },
+    ],
+  },
+  {
+    key: "pressure",
+    label: "Pressure",
+    base: "psi",
+    units: [
+      { key: "psi", label: "Pounds per square inch (psi)", toBase: 1 },
+      { key: "ftH2O", label: "Feet of water column (ft)", toBase: 0.4331 },
+      { key: "mH2O", label: "Metres of water column (m)", toBase: 0.4331 * 3.280839895 },
+      { key: "bar", label: "Bar", toBase: 14.503773773 },
+      { key: "kpa", label: "Kilopascals (kPa)", toBase: 0.1450377377 },
+      { key: "atm", label: "Atmospheres (atm)", toBase: 14.695948775 },
+    ],
+  },
+  {
+    key: "volume",
+    label: "Volume",
+    base: "gal",
+    units: [
+      { key: "gal", label: "US gallons", toBase: 1 },
+      { key: "l", label: "Litres", toBase: 1 / 3.785411784 },
+      { key: "ft3", label: "Cubic feet", toBase: 7.48052 },
+      { key: "m3", label: "Cubic metres", toBase: 1000 / 3.785411784 },
+      { key: "in3", label: "Cubic inches", toBase: 1 / 231 },
+      { key: "ukgal", label: "Imperial gallons", toBase: 4.54609 / 3.785411784 },
+    ],
+  },
+  {
+    key: "length",
+    label: "Length & diameter",
+    base: "in",
+    units: [
+      { key: "in", label: "Inches", toBase: 1 },
+      { key: "ft", label: "Feet", toBase: 12 },
+      { key: "mm", label: "Millimetres", toBase: 1 / 25.4 },
+      { key: "cm", label: "Centimetres", toBase: 1 / 2.54 },
+      { key: "m", label: "Metres", toBase: 1000 / 25.4 },
+    ],
+  },
+  {
+    key: "velocity",
+    label: "Velocity",
+    base: "fps",
+    units: [
+      { key: "fps", label: "Feet per second (ft/s)", toBase: 1 },
+      { key: "fpm", label: "Feet per minute (ft/min)", toBase: 1 / 60 },
+      { key: "mps", label: "Metres per second (m/s)", toBase: 3.280839895 },
+      { key: "kph", label: "Kilometres per hour (km/h)", toBase: 3.280839895 / 3.6 },
+    ],
+  },
+  {
+    key: "temperature",
+    label: "Temperature",
+    base: "f",
+    units: [
+      { key: "f", label: "Fahrenheit (°F)", toBase: 1 },
+      { key: "c", label: "Celsius (°C)", toBase: 1 },
+      { key: "k", label: "Kelvin (K)", toBase: 1 },
+    ],
+  },
+];
+
+/** Convert within a category. Temperature is offset-based, so it is special-cased. */
+export function convertUnit(
+  category: UnitCategory,
+  fromKey: string,
+  toKey: string,
+  value: number,
+): number {
+  if (category === "temperature") {
+    let f: number;
+    if (fromKey === "c") f = value * (9 / 5) + 32;
+    else if (fromKey === "k") f = (value - 273.15) * (9 / 5) + 32;
+    else f = value;
+    if (toKey === "c") return (f - 32) * (5 / 9);
+    if (toKey === "k") return (f - 32) * (5 / 9) + 273.15;
+    return f;
+  }
+  const cat = UNIT_CATEGORIES.find((c) => c.key === category);
+  if (!cat) return value;
+  const from = cat.units.find((u) => u.key === fromKey);
+  const to = cat.units.find((u) => u.key === toKey);
+  if (!from || !to || to.toBase === 0) return value;
+  return (value * from.toBase) / to.toBase;
+}
+
+/* ------------------------------------------------------------------ *
+ * Grease interceptors — MIXED PROVENANCE, read this before changing it
+ *
+ * !! Two different devices answer to the word "grease trap", and they are
+ * sized by two unrelated methods:
+ *
+ *   - A hydromechanical interceptor (the under-sink PDI-rated unit) is sized
+ *     on FLOW. Its rating is the gpm it can handle without losing separation.
+ *   - A gravity grease interceptor (the buried outdoor tank) is sized on
+ *     RETENTION VOLUME, from how much greasy wastewater the kitchen makes.
+ *
+ * Neither number is decided by the IPC alone. IPC 1003.3.4 lets the AHJ
+ * approve a sizing method, and in practice the local sewer authority's FOG
+ * (fats, oils and grease) programme sets both the method and a floor size.
+ * Every factor below is therefore an editable input on the page, with the
+ * values offered as common defaults. Do not present these as code.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Flow ratings of PDI-G101 hydromechanical grease interceptors, gpm.
+ * TIER 2 — the rating ladder is consistent across published PDI listings.
+ */
+export const PDI_GREASE_TRAP_GPM = [4, 7, 10, 15, 20, 25, 35, 50, 75, 100];
+
+/**
+ * Grease retention capacity is defined in PDI-G101 as exactly twice the flow
+ * rating: a 20 gpm interceptor holds 40 lb. It is a definition, not a
+ * coincidence, so `capacityLb` below is DERIVED rather than transcribed.
+ */
+export const PDI_GREASE_LB_PER_GPM = 2;
+
+/** Grease retention capacity in pounds for a PDI flow rating. */
+export function pdiGreaseCapacityLb(gpm: number): number {
+  return gpm * PDI_GREASE_LB_PER_GPM;
+}
+
+/** The PDI ladder with its derived pound capacity. TIER 1 for `capacityLb`. */
+export const PDI_GREASE_TRAPS: { gpm: number; capacityLb: number }[] =
+  PDI_GREASE_TRAP_GPM.map((gpm) => ({ gpm, capacityLb: pdiGreaseCapacityLb(gpm) }));
+
+/** Smallest PDI rating that covers a required flow. */
+export function selectPdiGreaseTrap(flowGpm: number): { gpm: number; capacityLb: number } | null {
+  return PDI_GREASE_TRAPS.find((t) => t.gpm >= flowGpm) ?? null;
+}
+
+/**
+ * Fraction of a sink compartment's interior volume assumed to actually drain.
+ * A sink is never filled to the rim, so the whole geometric volume overstates
+ * the load. 75% is the figure the fixture-volume method is normally worked at.
+ */
+export const GREASE_SINK_FILL_FRACTION = 0.75;
+
+/** Drainage period assumed for a sink compartment, minutes. */
+export const GREASE_DRAIN_PERIOD_MIN = 1;
+
+export type GreaseHydraulicResult = {
+  /** Interior volume of all compartments, cubic inches. */
+  cubicInches: number;
+  /** That volume in gallons. */
+  gallons: number;
+  /** Gallons actually assumed to drain, after the fill fraction. */
+  drainedGallons: number;
+  /** Required interceptor flow rating, gpm. */
+  flowGpm: number;
+  /** Smallest PDI rating that covers it, or null if past the published ladder. */
+  ratedGpm: number | null;
+  /** Grease capacity of that rating, pounds. */
+  capacityLb: number | null;
+};
+
+/**
+ * Fixture-volume (hydraulic) sizing for a hydromechanical grease interceptor.
+ *
+ *     gallons = L × W × D × compartments ÷ 231
+ *     gpm     = gallons × fill fraction ÷ drain period
+ *
+ * The 231 is `CUBIC_INCHES_PER_GALLON`, already derived in this module, so the
+ * volume step is self-validating.
+ */
+export function greaseTrapHydraulic(args: {
+  lengthIn: number;
+  widthIn: number;
+  depthIn: number;
+  compartments: number;
+  fillFraction?: number;
+  drainPeriodMin?: number;
+}): GreaseHydraulicResult {
+  const fill = args.fillFraction ?? GREASE_SINK_FILL_FRACTION;
+  const period = args.drainPeriodMin ?? GREASE_DRAIN_PERIOD_MIN;
+  const cubicInches =
+    Math.max(0, args.lengthIn) *
+    Math.max(0, args.widthIn) *
+    Math.max(0, args.depthIn) *
+    Math.max(0, args.compartments);
+  const gallons = cubicInches / CUBIC_INCHES_PER_GALLON;
+  const drainedGallons = gallons * fill;
+  const flowGpm = period > 0 ? drainedGallons / period : Infinity;
+  const rated = Number.isFinite(flowGpm) ? selectPdiGreaseTrap(flowGpm) : null;
+  return {
+    cubicInches,
+    gallons,
+    drainedGallons,
+    flowGpm,
+    ratedGpm: rated?.gpm ?? null,
+    capacityLb: rated?.capacityLb ?? null,
+  };
+}
+
+/** Gravity interceptor shell sizes commonly stocked, gallons. */
+export const GREASE_INTERCEPTOR_SIZES = [
+  500, 750, 1000, 1250, 1500, 2000, 2500, 3000, 4000, 5000,
+];
+
+/**
+ * A floor many sewer authorities impose on an outdoor gravity interceptor
+ * regardless of the calculation. Common, NOT universal — editable on the page.
+ */
+export const GREASE_INTERCEPTOR_MINIMUM_GAL = 1000;
+
+/**
+ * Wastewater generated per meal served, gallons. TIER 3 — widely published in
+ * municipal FOG guidance and older code appendices, not confirmed here against
+ * a primary source. Editable on the page.
+ */
+export const GREASE_WASTE_PER_MEAL: { key: string; label: string; gallons: number }[] = [
+  { key: "full-dish", label: "Full kitchen with dishwashing", gallons: 6 },
+  { key: "full-nodish", label: "Full kitchen, no dishwashing", gallons: 5 },
+  { key: "single-dish", label: "Single-service kitchen with dishwashing", gallons: 2 },
+  { key: "single-nodish", label: "Single-service kitchen, no dishwashing", gallons: 1 },
+];
+
+/** Retention time by kitchen type, hours. TIER 3 — same caveat. */
+export const GREASE_RETENTION_HOURS: { key: string; label: string; hours: number }[] = [
+  { key: "commercial", label: "Commercial kitchen with dishwasher", hours: 2.5 },
+  { key: "single", label: "Single-service kitchen", hours: 1.5 },
+];
+
+/** Storage factor by hours of operation. TIER 3 — same caveat. */
+export const GREASE_STORAGE_FACTORS: { key: string; label: string; factor: number }[] = [
+  { key: "h8", label: "Open about 8 hours a day", factor: 1 },
+  { key: "h16", label: "Open about 16 hours a day", factor: 2 },
+  { key: "h24", label: "Open 24 hours a day", factor: 3 },
+  { key: "single", label: "Single-service kitchen", factor: 1.5 },
+];
+
+export type GreaseInterceptorResult = {
+  /** Meals served in the peak hour. */
+  mealsPerPeakHour: number;
+  /** Volume the formula produces, gallons. */
+  calculated: number;
+  /** The jurisdictional floor applied. */
+  minimum: number;
+  /** The larger of the two. */
+  required: number;
+  /** Smallest stocked shell that covers it. */
+  stocked: number | null;
+  governedBy: "calculated" | "minimum";
+};
+
+/**
+ * Meal-count sizing for a gravity grease interceptor.
+ *
+ *     meals/hr = seats × turnover per hour
+ *     gallons  = meals/hr × waste per meal × retention hours × storage factor
+ *
+ * TIER 3 as a whole. This is the form published in municipal FOG guidance and
+ * in older code appendices; the page says so and leaves every factor editable.
+ */
+export function greaseInterceptorVolume(args: {
+  seats: number;
+  turnoverPerHour: number;
+  wasteFlowPerMeal: number;
+  retentionHours: number;
+  storageFactor: number;
+  minimumGallons?: number;
+}): GreaseInterceptorResult {
+  const minimum = Math.max(0, args.minimumGallons ?? GREASE_INTERCEPTOR_MINIMUM_GAL);
+  const mealsPerPeakHour = Math.max(0, args.seats) * Math.max(0, args.turnoverPerHour);
+  const calculated =
+    mealsPerPeakHour *
+    Math.max(0, args.wasteFlowPerMeal) *
+    Math.max(0, args.retentionHours) *
+    Math.max(0, args.storageFactor);
+  const required = Math.max(calculated, minimum);
+  return {
+    mealsPerPeakHour,
+    calculated,
+    minimum,
+    required,
+    stocked: GREASE_INTERCEPTOR_SIZES.find((s) => s >= required) ?? null,
+    governedBy: calculated >= minimum ? "calculated" : "minimum",
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Well pressure tanks — DERIVED (Boyle's law), same basis as expansionTank()
+ *
+ * A pre-charged diaphragm tank is an air spring. The air is compressed from
+ * its pre-charge pressure up to cut-out, and only the volume swept between
+ * cut-in and cut-out is water the pump does not have to run for. That swept
+ * fraction — the drawdown — is a RATIO of absolute pressures, which is why a
+ * nominal tank volume tells you almost nothing on its own.
+ * ------------------------------------------------------------------ */
+
+/** Diaphragm well tank shell sizes commonly stocked, gallons. */
+export const STANDARD_PRESSURE_TANKS = [2, 6, 14, 20, 26, 32, 44, 62, 86, 119];
+
+/**
+ * Pre-charge is set this far below cut-in so the diaphragm is just short of
+ * empty when the pump starts. Manufacturer practice, not code.
+ */
+export const PRECHARGE_BELOW_CUTIN_PSI = 2;
+
+/**
+ * Minimum pump run time per cycle, minutes. Pump-industry convention aimed at
+ * limiting motor starts — NOT a code requirement.
+ */
+export const PUMP_MIN_RUN_MINUTES: { maxGpm: number; minutes: number }[] = [
+  { maxGpm: 10, minutes: 1 },
+  { maxGpm: 20, minutes: 1.5 },
+  { maxGpm: Infinity, minutes: 2 },
+];
+
+/** The conventional minimum run time for a pump of this capacity. */
+export function minRunMinutes(pumpGpm: number): number {
+  return PUMP_MIN_RUN_MINUTES.find((r) => pumpGpm <= r.maxGpm)?.minutes ?? 2;
+}
+
+/**
+ * Fraction of a tank's shell volume delivered between cut-out and cut-in.
+ *
+ *     air at cut-in  = V × P_pre ÷ P_on      (capped at the whole shell)
+ *     air at cut-out = V × P_pre ÷ P_off
+ *     drawdown       = the difference
+ *
+ * All three pressures are ABSOLUTE. Working in gauge pressure is the classic
+ * error here exactly as it is in `expansionTank()`, and it overstates the
+ * drawdown badly at low pressures.
+ *
+ * Where the pre-charge is above cut-in the shell is already empty of water
+ * before the pump starts, so the first term saturates at 1 — which is the
+ * arithmetic behind a badly over-charged tank losing almost all its drawdown.
+ */
+export function drawdownFraction(
+  cutInPsi: number,
+  cutOutPsi: number,
+  prechargePsi: number,
+): number {
+  const pOn = cutInPsi + ATMOSPHERIC_PSI;
+  const pOff = cutOutPsi + ATMOSPHERIC_PSI;
+  const pPre = Math.max(0, prechargePsi) + ATMOSPHERIC_PSI;
+  if (pOff <= pOn || pOn <= 0) return 0;
+  const airAtCutIn = Math.min(1, pPre / pOn);
+  const airAtCutOut = Math.min(1, pPre / pOff);
+  return Math.max(0, airAtCutIn - airAtCutOut);
+}
+
+export type PressureTankResult = {
+  /** Pre-charge used, psi gauge. */
+  prechargePsi: number;
+  /** Fraction of the shell delivered per cycle. */
+  fraction: number;
+  /** Minimum run time applied, minutes. */
+  runMinutes: number;
+  /** Gallons the pump must deliver in one run. */
+  requiredDrawdown: number;
+  /** Shell volume that produces it, gallons. */
+  requiredTank: number;
+  /** Smallest stocked shell that covers it. */
+  stockedTank: number | null;
+  /** Gallons that stocked shell actually delivers. */
+  drawdownAtStocked: number;
+  /** Run time the stocked shell buys at the pump's rate, minutes. */
+  runMinutesAtStocked: number;
+};
+
+/**
+ * Size a well pressure tank from the pump's output and the pressure switch.
+ *
+ *     required drawdown = pump gpm × minimum run minutes
+ *     required tank     = required drawdown ÷ drawdown fraction
+ */
+export function pressureTankSizing(args: {
+  pumpGpm: number;
+  cutInPsi: number;
+  cutOutPsi: number;
+  prechargePsi?: number;
+  runMinutes?: number;
+}): PressureTankResult {
+  const prechargePsi =
+    args.prechargePsi ?? Math.max(0, args.cutInPsi - PRECHARGE_BELOW_CUTIN_PSI);
+  const fraction = drawdownFraction(args.cutInPsi, args.cutOutPsi, prechargePsi);
+  const runMinutes = args.runMinutes ?? minRunMinutes(args.pumpGpm);
+  const requiredDrawdown = Math.max(0, args.pumpGpm) * runMinutes;
+  const requiredTank = fraction > 0 ? requiredDrawdown / fraction : Infinity;
+  const stockedTank = Number.isFinite(requiredTank)
+    ? (STANDARD_PRESSURE_TANKS.find((t) => t >= requiredTank) ?? null)
+    : null;
+  const drawdownAtStocked = stockedTank !== null ? stockedTank * fraction : 0;
+  return {
+    prechargePsi,
+    fraction,
+    runMinutes,
+    requiredDrawdown,
+    requiredTank,
+    stockedTank,
+    drawdownAtStocked,
+    runMinutesAtStocked: args.pumpGpm > 0 ? drawdownAtStocked / args.pumpGpm : 0,
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Backflow prevention — IPC 2021 Chapter 6, Section 608
+ *
+ * Data for the backflow reference page. It lives here rather than on the page
+ * so there is exactly one copy, the same reason `nec-tables` reads its tables
+ * out of `nec.ts`. A future assembly-selector calculator gets it for free.
+ *
+ * !! The one distinction everything else hangs off: a vacuum breaker of ANY
+ * kind stops backsiphonage only. Nothing with "vacuum breaker" in its name
+ * protects against backpressure. Most published guidance blurs this.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Hazard classes as IPC 608 draws them. "Pollution" is an aesthetic or
+ * nuisance effect; "contamination" can make someone ill or kill them. The
+ * class decides the assembly, not the size of the pipe or the cost of the job.
+ */
+export const BACKFLOW_HAZARD_CLASSES: {
+  key: "low" | "high";
+  label: string;
+  codeTerm: string;
+  description: string;
+}[] = [
+  {
+    key: "low",
+    label: "Low hazard",
+    codeTerm: "Pollution",
+    description:
+      "A substance that would affect the taste, odour, or colour of the water but is not a health risk — a fire sprinkler line with nothing but potable water in it, or a plain irrigation zone.",
+  },
+  {
+    key: "high",
+    label: "High hazard",
+    codeTerm: "Contamination",
+    description:
+      "A substance that could cause illness or death — fertiliser or pesticide injection, boiler treatment chemicals, sewage, or any process water. Anything you are unsure about is treated as high hazard.",
+  },
+];
+
+/**
+ * The two directions backflow can happen. Which one is possible at a given
+ * connection is what narrows the assembly list before hazard class does.
+ */
+export const BACKFLOW_DIRECTIONS: { key: string; label: string; description: string }[] = [
+  {
+    key: "backsiphonage",
+    label: "Backsiphonage",
+    description:
+      "Supply pressure drops below the downstream pressure and the line siphons backwards — a water main break, a hydrant flowing, or a pump starting on the same main. The classic case is a hose left lying in a full bucket.",
+  },
+  {
+    key: "backpressure",
+    label: "Backpressure",
+    description:
+      "The downstream system is pushed above supply pressure and forces water back — a boiler, a pressurised process line, a booster pump, or elevation head from piping above the supply main.",
+  },
+];
+
+export type BackflowAssembly = {
+  key: string;
+  abbr: string;
+  name: string;
+  standard: string;
+  /** Stops backsiphonage. Every device here does. */
+  backsiphonage: boolean;
+  /** Stops backpressure. This is the column that separates the devices. */
+  backpressure: boolean;
+  /** May sit under supply pressure for more than 12 hours at a time. */
+  continuousPressure: boolean;
+  /** Highest hazard class it may protect. */
+  hazard: "low" | "high";
+  /** Where it has to sit relative to the flood level rim it protects. */
+  installation: string;
+  notes: string;
+};
+
+/**
+ * TIER 2 — the protection matrix and the ASSE designations are consistent
+ * across the standards and across published cross-connection control manuals.
+ * The ordering is deliberate: least to most protective.
+ */
+export const BACKFLOW_ASSEMBLIES: BackflowAssembly[] = [
+  {
+    key: "air-gap",
+    abbr: "Air gap",
+    name: "Air gap",
+    standard: "ASME A112.1.2 · IPC 608.15.1",
+    backsiphonage: true,
+    backpressure: true,
+    continuousPressure: true,
+    hazard: "high",
+    installation:
+      "A physical vertical separation between the outlet and the flood level rim, at least twice the effective opening.",
+    notes:
+      "The only method that cannot fail mechanically, because there is no mechanism — the pipe simply stops above the water. It also destroys the pressure in the line, which is why it is used at fixtures and tanks rather than mid-run.",
+  },
+  {
+    key: "hvb",
+    abbr: "HVB",
+    name: "Hose connection vacuum breaker",
+    standard: "ASSE 1011",
+    backsiphonage: true,
+    backpressure: false,
+    continuousPressure: false,
+    hazard: "high",
+    installation: "Screwed onto the hose thread of a sillcock or service sink faucet.",
+    notes:
+      "The cheapest device in plumbing and the one that prevents the single most common household cross connection: a hose left in a pool, a bucket, or a chemical sprayer.",
+  },
+  {
+    key: "avb",
+    abbr: "AVB",
+    name: "Atmospheric vacuum breaker",
+    standard: "ASSE 1001",
+    backsiphonage: true,
+    backpressure: false,
+    continuousPressure: false,
+    hazard: "high",
+    installation:
+      "At least 6 inches above the flood level rim of the fixture, with no shutoff valve downstream.",
+    notes:
+      "May not be under continuous pressure — more than 12 hours in any 24 and the float can stick shut. A valve downstream of it is the most common installation error, because it holds the device under pressure permanently.",
+  },
+  {
+    key: "pvb",
+    abbr: "PVB",
+    name: "Pressure vacuum breaker assembly",
+    standard: "ASSE 1020",
+    backsiphonage: true,
+    backpressure: false,
+    continuousPressure: true,
+    hazard: "high",
+    installation: "At least 12 inches above the highest downstream outlet or head.",
+    notes:
+      "The AVB's problem solved with a spring-loaded air inlet, so downstream valves are permitted. Still no backpressure protection at all — height above the system is what makes it work.",
+  },
+  {
+    key: "svb",
+    abbr: "SVB",
+    name: "Spill-resistant vacuum breaker assembly",
+    standard: "ASSE 1056",
+    backsiphonage: true,
+    backpressure: false,
+    continuousPressure: true,
+    hazard: "high",
+    installation: "At least 12 inches above the highest downstream outlet, same as a PVB.",
+    notes:
+      "A PVB that does not spit water when the air inlet opens, which is what makes it usable indoors and in finished spaces.",
+  },
+  {
+    key: "dc",
+    abbr: "DC / DCVA",
+    name: "Double check valve assembly",
+    standard: "ASSE 1015",
+    backsiphonage: true,
+    backpressure: true,
+    continuousPressure: true,
+    hazard: "low",
+    installation:
+      "In line, with shutoffs and test cocks, accessible for annual testing. May be installed below grade in an approved vault where permitted.",
+    notes:
+      "Two independent spring check valves in series. It handles both directions of backflow but is only approved for LOW hazard — a second check valve is redundancy, not containment.",
+  },
+  {
+    key: "dcda",
+    abbr: "DCDA",
+    name: "Double check detector assembly",
+    standard: "ASSE 1048",
+    backsiphonage: true,
+    backpressure: true,
+    continuousPressure: true,
+    hazard: "low",
+    installation: "On a fire service line, with a metered bypass around the assembly.",
+    notes:
+      "A DC with a small metered bypass so the water utility can detect a leak or an unauthorised tap on a fire line that should never register flow.",
+  },
+  {
+    key: "avb-vent",
+    abbr: "ASSE 1012",
+    name: "Backflow preventer with intermediate atmospheric vent",
+    standard: "ASSE 1012",
+    backsiphonage: true,
+    backpressure: true,
+    continuousPressure: true,
+    hazard: "low",
+    installation: "In line on a small branch, typically 1/2 or 3/4 inch.",
+    notes:
+      "Two checks with a vent between them. Used on residential boiler make-up where the system carries no chemical treatment; add treatment and it becomes a high-hazard connection needing an RPZ.",
+  },
+  {
+    key: "rpz",
+    abbr: "RPZ / RPBA",
+    name: "Reduced pressure principle backflow preventer",
+    standard: "ASSE 1013",
+    backsiphonage: true,
+    backpressure: true,
+    continuousPressure: true,
+    hazard: "high",
+    installation:
+      "Above grade, above the flood level of the space, with clearance for the relief port to discharge freely. Never in a pit or vault.",
+    notes:
+      "Two checks with a pressure-differential relief valve between them that dumps to atmosphere the moment the zone loses its differential. The only in-line assembly approved for high hazard under backpressure — and the only one that will flood a room when it fails, which is why the discharge has to be planned for.",
+  },
+  {
+    key: "rpda",
+    abbr: "RPDA",
+    name: "Reduced pressure detector assembly",
+    standard: "ASSE 1047",
+    backsiphonage: true,
+    backpressure: true,
+    continuousPressure: true,
+    hazard: "high",
+    installation: "On a fire service line, above grade, with a metered bypass.",
+    notes:
+      "An RPZ with the fire-line bypass meter. Required where a sprinkler system carries antifreeze, foam, or any additive rather than plain potable water.",
+  },
+];
+
+/**
+ * IPC Table 608.15.1 minimum air gaps. TIER 1 — the table is the rule
+ * "twice the effective opening, three times where it is close to a wall,"
+ * with a 1 inch floor, so the values below are COMPUTED from the openings
+ * rather than transcribed and cannot disagree with the rule stated on the page.
+ */
+export const AIR_GAP_MULTIPLIER = 2;
+export const AIR_GAP_MULTIPLIER_NEAR_WALL = 3;
+export const AIR_GAP_MINIMUM_IN = 1;
+export const AIR_GAP_MINIMUM_NEAR_WALL_IN = 1.5;
+
+/** Minimum air gap for an effective opening, inches. */
+export function minimumAirGap(effectiveOpeningIn: number, nearWall = false): number {
+  const multiplier = nearWall ? AIR_GAP_MULTIPLIER_NEAR_WALL : AIR_GAP_MULTIPLIER;
+  const floor = nearWall ? AIR_GAP_MINIMUM_NEAR_WALL_IN : AIR_GAP_MINIMUM_IN;
+  return Math.max(floor, effectiveOpeningIn * multiplier);
+}
+
+/** Representative openings, with both gaps derived from the rule above. */
+export const MINIMUM_AIR_GAPS: {
+  opening: number;
+  label: string;
+  awayFromWall: number;
+  nearWall: number;
+}[] = [0.5, 0.75, 1, 1.25, 1.5, 2].map((opening) => ({
+  opening,
+  label: sizeLabel(opening),
+  awayFromWall: minimumAirGap(opening, false),
+  nearWall: minimumAirGap(opening, true),
+}));
+
+/**
+ * Common connections and the assembly each normally takes. TIER 2 for the
+ * pairings, which follow directly from the direction-and-hazard matrix above.
+ * The purveyor's own cross-connection programme still governs.
+ */
+export const BACKFLOW_APPLICATIONS: {
+  application: string;
+  direction: string;
+  hazard: "low" | "high";
+  assembly: string;
+  why: string;
+}[] = [
+  {
+    application: "Hose bibb or sillcock",
+    direction: "Backsiphonage",
+    hazard: "high",
+    assembly: "HVB (ASSE 1011)",
+    why: "A hose can reach anything — a bucket, a pool, a sprayer of weedkiller. Cheap device, worst-case hazard.",
+  },
+  {
+    application: "Lawn irrigation, no chemical injection",
+    direction: "Backsiphonage",
+    hazard: "high",
+    assembly: "PVB or SVB",
+    why: "Buried heads sit in soil and standing water, so the code treats irrigation as high hazard even with nothing injected. An RPZ is required instead wherever any head can be below the assembly.",
+  },
+  {
+    application: "Irrigation with fertiliser or pesticide injection",
+    direction: "Both",
+    hazard: "high",
+    assembly: "RPZ (ASSE 1013)",
+    why: "An injection pump creates backpressure, which rules out every vacuum breaker on its own.",
+  },
+  {
+    application: "Fire sprinkler, potable water only",
+    direction: "Backpressure",
+    hazard: "low",
+    assembly: "DC or DCDA",
+    why: "Stagnant sprinkler water is a taste-and-odour problem, not a health one — and elevation in the riser is a permanent backpressure source.",
+  },
+  {
+    application: "Fire sprinkler with antifreeze or foam",
+    direction: "Backpressure",
+    hazard: "high",
+    assembly: "RPZ or RPDA",
+    why: "The additive turns a low-hazard system into a contaminant under standing backpressure.",
+  },
+  {
+    application: "Boiler feed, no chemical treatment",
+    direction: "Backpressure",
+    hazard: "low",
+    assembly: "ASSE 1012 or DC",
+    why: "System pressure sits above supply pressure whenever the boiler is hot.",
+  },
+  {
+    application: "Boiler feed with treatment chemicals",
+    direction: "Backpressure",
+    hazard: "high",
+    assembly: "RPZ (ASSE 1013)",
+    why: "Glycol and oxygen scavengers are contaminants; the boiler supplies the backpressure.",
+  },
+  {
+    application: "Carbonated beverage dispenser",
+    direction: "Backpressure",
+    hazard: "high",
+    assembly: "Dual check with vent, and no copper upstream",
+    why: "CO2 pushes back into the line and carbonic acid dissolves copper, so the material rule matters as much as the device.",
+  },
+  {
+    application: "Chemical or detergent dispenser",
+    direction: "Both",
+    hazard: "high",
+    assembly: "Air gap or RPZ",
+    why: "An air gap is preferred where the fixture allows it, because nothing can fail.",
+  },
+  {
+    application: "Fixture with a submerged inlet, or a tank fill",
+    direction: "Backsiphonage",
+    hazard: "high",
+    assembly: "Air gap, or AVB where an air gap is impossible",
+    why: "Any inlet below the flood level rim is a cross connection by definition.",
+  },
+  {
+    application: "Water heater on a metered service with a check valve",
+    direction: "Backpressure",
+    hazard: "low",
+    assembly: "Thermal expansion tank, not a backflow device",
+    why: "The check valve is already there — it is what makes the system closed. IPC 607.3 then requires somewhere for the expansion to go.",
+  },
+];

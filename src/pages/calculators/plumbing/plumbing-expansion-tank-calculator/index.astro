@@ -1,0 +1,735 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  ATMOSPHERIC_PSI,
+  expansionFraction,
+  expansionTank,
+  fmt,
+  selectExpansionTank,
+} from "@/lib/plumbing";
+
+const title = "Thermal Expansion Tank Calculator — Closed System Sizing | TradesQuote";
+const description =
+  "Free thermal expansion tank calculator. Size the tank a closed water system needs from the water's own expansion and the pressure window it works inside — the pre-charge matters more than the tank.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-expansion-tank-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Thermal Expansion Tank Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Thermal Expansion Tank Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online thermal expansion tank calculator that sizes a diaphragm tank for a closed potable water system from system volume, temperature rise, pre-charge pressure and maximum working pressure.",
+};
+
+const base = { systemGallons: 50, coldF: 40, hotF: 140, supplyPsi: 60, maxPsi: 80 };
+const defaults = expansionTank(base);
+const defaultShell = selectExpansionTank(defaults.tankVolume);
+const lowPrecharge = expansionTank({ ...base, supplyPsi: 40 });
+const highPrecharge = expansionTank({ ...base, supplyPsi: 70 });
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size expansion tank do I need?",
+    answer: `For a 50-gallon heater on a closed system, 40 °F inlet to 140 °F stored, 60 psi supply and an 80 psi ceiling, the required tank volume is <strong>${fmt(defaults.tankVolume, 2)} gallons</strong> — so the <strong>${defaultShell}-gallon</strong> shell, the common residential size. Only ${fmt(defaults.acceptance, 2)} gallons of that is actual expansion; the rest is the air the diaphragm needs to compress.`,
+  },
+  {
+    question: "Why does a closed system need one at all?",
+    answer:
+      "Because water expands when heated and cannot be compressed. On an open system it simply pushes back toward the street main. Fit a <strong>pressure-reducing valve, check valve or backflow preventer</strong> and that path closes — so the pressure spikes instead, popping the T&amp;P relief valve, stressing fittings, and shortening the life of the heater. IPC 607.3 requires thermal expansion control on any closed system.",
+  },
+  {
+    question: "How much does water actually expand?",
+    answer: `About <strong>${fmt(expansionFraction(40, 140) * 100, 2)}%</strong> going from 40 °F to 140 °F. That sounds trivial until you notice water is effectively incompressible, so 50 gallons producing ${fmt(defaults.acceptance, 2)} gallons of expansion with nowhere to go is what drives the pressure spike. The figure here is computed from water density at each temperature rather than taken from a chart.`,
+  },
+  {
+    question: "What should the pre-charge be, and does it matter?",
+    answer: `Set it to your <strong>static supply pressure</strong> — 60 psi here — measured with the tank empty and off the system. It matters more than any other input. At a 40 psi pre-charge this same job needs <strong>${fmt(lowPrecharge.tankVolume, 2)} gallons</strong>; at 70 psi it needs <strong>${fmt(highPrecharge.tankVolume, 2)}</strong>. That is a ${fmt(highPrecharge.tankVolume / lowPrecharge.tankVolume, 1)}× swing from one adjustment, because the tank can only use the pressure window between pre-charge and maximum.`,
+  },
+  {
+    question: "Why is the tank so much bigger than the expansion volume?",
+    answer: `Boyle's law. The air charge can only be squeezed from the pre-charge pressure up to the maximum working pressure, so only part of the shell is usable — here <strong>${fmt(defaults.acceptanceRatio * 100, 1)}%</strong>. That is why ${fmt(defaults.acceptance, 2)} gallons of expansion needs a ${fmt(defaults.tankVolume, 2)} gallon tank. Narrow the window and the usable fraction collapses.`,
+  },
+  {
+    question: "What happens if the tank is undersized or waterlogged?",
+    answer:
+      "The same symptom either way: pressure climbs on every heating cycle and the T&amp;P valve weeps or discharges. A waterlogged tank has lost its air charge through a failed diaphragm and is effectively just more pipe. Test it by tapping — the top should ring hollow and the bottom dull — or by pressing the Schrader valve, which should hiss air, not spit water.",
+  },
+  {
+    question: "Does a boiler or hydronic system use the same calculation?",
+    answer:
+      "The same physics, different numbers. Hydronic systems run much hotter, so the expansion fraction is far larger, and they often use a different tank type and a fill valve rather than street pressure. This calculator is set up for <strong>potable domestic hot water</strong>; use a hydronic-specific method for a heating loop.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Tank sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "An expansion tank is rarely the only line — it usually arrives with a PRV, a heater, or both. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "A PRV above 80 psi is what closes the system.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-heater-size-calculator",
+    title: "Water Heater Size Calculator",
+    description: "Get the system volume this tool needs.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator",
+    title: "Water Heater Replacement Cost Calculator",
+    description: "The expansion tank as a line on the invoice.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-mixing-valve-calculator",
+    title: "Mixing Valve Calculator",
+    description: "Store hot, deliver warm — and gain capacity.",
+  },
+];
+
+/** Tables computed from the lib. */
+const prechargeTable = [40, 50, 60, 70].map((supplyPsi) => {
+  const r = expansionTank({ ...base, supplyPsi });
+  return { supplyPsi, ratio: r.acceptanceRatio, tank: r.tankVolume, shell: selectExpansionTank(r.tankVolume) };
+});
+
+const systemTable = [30, 40, 50, 75, 80, 100, 120].map((systemGallons) => {
+  const r = expansionTank({ ...base, systemGallons });
+  return { systemGallons, acceptance: r.acceptance, tank: r.tankVolume, shell: selectExpansionTank(r.tankVolume) };
+});
+
+const riseTable: { cold: number; hot: number; pct: number; tank: number }[] = [
+  [70, 120],
+  [50, 120],
+  [40, 140],
+  [40, 180],
+].map(([cold, hot]) => {
+  const r = expansionTank({ ...base, coldF: cold, hotF: hot });
+  return { cold, hot, pct: r.fraction * 100, tank: r.tankVolume };
+});
+
+const styles = plumbingAccentStyles.cyan;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Thermal Expansion Tank Calculator — Closed System Sizing" />
+    <meta
+      property="og:description"
+      content="Size a diaphragm expansion tank from the water's own thermal expansion and the pressure window it works inside. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Thermal Expansion Tank Calculator — Closed System Sizing" />
+    <meta
+      name="twitter:description"
+      content="Expansion tank sizing for a closed potable system, with the pre-charge sensitivity shown. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Thermal Expansion Tank Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · IPC 607.3 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Thermal Expansion Tank Calculator <span class="text-cyan-600">— Closed System Sizing</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Water expands about <strong>{fmt(expansionFraction(40, 140) * 100, 2)}%</strong> heating from 40
+              to 140 °F, and it cannot be compressed. On a closed system — anything behind a
+              pressure-reducing valve, check valve or backflow preventer — that expansion has nowhere to go, so
+              the pressure spikes instead. This sizes the tank that absorbs it, and shows why the
+              <strong>pre-charge matters more than the tank you buy</strong>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 8V4m0 0h4M4 4l6 6m10-2V4m0 0h-4m4 0l-6 6M4 16v4m0 0h4m-4 0l6-6m10 6l-6-6m6 6v-4m0 4h-4"></path>
+            </svg>
+            Size the expansion tank
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="xt-system" class="text-sm font-semibold text-slate-800">System volume</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="xt-system"
+                      type="number"
+                      min="1"
+                      max="2000"
+                      value="50"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">gal</span>
+                  </div>
+                </div>
+                <input
+                  id="xt-system-range"
+                  type="range"
+                  min="20"
+                  max="200"
+                  step="5"
+                  value="50"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>20</span><span>200 gal</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Heater capacity plus the water in the piping — the tank is usually the bulk of it.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="xt-cold" class="text-sm font-semibold text-slate-800">Cold inlet</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="xt-cold"
+                      type="number"
+                      min="32"
+                      max="120"
+                      value="40"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">°F</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Use the coldest month.</p>
+                </div>
+
+                <div>
+                  <label for="xt-hot" class="text-sm font-semibold text-slate-800">Stored temperature</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="xt-hot"
+                      type="number"
+                      min="80"
+                      max="200"
+                      value="140"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">°F</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Thermostat setting, not delivery temperature.</p>
+                </div>
+
+                <div>
+                  <label for="xt-supply" class="text-sm font-semibold text-slate-800">
+                    Supply pressure / pre-charge
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="xt-supply"
+                      type="number"
+                      min="0"
+                      max="150"
+                      value="60"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">The strongest lever on this page.</p>
+                </div>
+
+                <div>
+                  <label for="xt-max" class="text-sm font-semibold text-slate-800">
+                    Maximum working pressure
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="xt-max"
+                      type="number"
+                      min="0"
+                      max="200"
+                      value="80"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Design to 80; the T&amp;P valve itself opens at 150.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="xt-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Tank to fit</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="xt-shell" class="text-5xl font-extrabold tracking-tight text-cyan-600">
+                  {defaultShell} gal
+                </span>
+              </div>
+              <p id="xt-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Smallest stocked shell covering the {fmt(defaults.tankVolume, 2)} gallon minimum. Pre-charge it
+                to 60 psi before it sees water.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Minimum tank volume</p>
+                  <p id="xt-required" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.tankVolume, 2)} gal
+                  </p>
+                </div>
+                <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Expansion to absorb</p>
+                  <p id="xt-acceptance" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.acceptance, 2)} gal
+                  </p>
+                </div>
+              </div>
+
+              <div id="xt-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Outside the usual range</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  Either the inputs are inconsistent, or the required tank is larger than a stocked residential
+                  shell. Widen the pressure window with a lower pre-charge, or move to a commercial tank.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Water expansion</span><span id="xt-bd-expansion" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Usable fraction of the shell</span><span id="xt-bd-ratio" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Pressure window, absolute</span><span id="xt-bd-absolute" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Set the pre-charge to</span><span id="xt-bd-precharge" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>10 psi lower pre-charge</span><span id="xt-bd-wider" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate for a <strong>potable domestic hot water</strong> system. Hydronic heating
+                loops run hotter and use a different tank type and fill arrangement. A licensed plumber and
+                your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            How much water appears, divided by how much of the tank can actually take it.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># Step 1 — How much the water expands</div>
+            <div>E&nbsp;=&nbsp;ρ(cold) ÷ ρ(hot) − 1&nbsp;&nbsp;·&nbsp;&nbsp;40→140 °F gives <span class="text-amber-300">{fmt(expansionFraction(40, 140) * 100, 2)}%</span></div>
+            <div class="text-slate-400">computed from water density, not read off a chart</div>
+            <div class="mt-4 text-cyan-300"># Step 2 — The expansion volume</div>
+            <div>acceptance&nbsp;=&nbsp;system gallons × E</div>
+            <div class="mt-4 text-cyan-300"># Step 3 — How much of the shell is usable (Boyle's law)</div>
+            <div>
+              ratio&nbsp;=&nbsp;1 − P<sub>pre</sub> ÷ P<sub>max</sub>&nbsp;&nbsp;<span class="text-slate-400"
+                >— both ABSOLUTE, so add {ATMOSPHERIC_PSI}</span
+              >
+            </div>
+            <div class="mt-4 text-cyan-300"># Step 4 — The tank</div>
+            <div>V<sub>tank</sub>&nbsp;=&nbsp;acceptance ÷ ratio&nbsp;&nbsp;→&nbsp;&nbsp;next stocked shell up</div>
+            <div class="mt-4 text-slate-400"># The defaults, worked through</div>
+            <div>
+              50 × {fmt(defaults.fraction, 5)} = {fmt(defaults.acceptance, 3)} gal&nbsp;&nbsp;·&nbsp;&nbsp;1 −
+              74.7 ÷ 94.7 = {fmt(defaults.acceptanceRatio, 4)}
+            </div>
+            <div>
+              {fmt(defaults.acceptance, 3)} ÷ {fmt(defaults.acceptanceRatio, 4)} =
+              <span class="text-amber-300">{fmt(defaults.tankVolume, 2)} gal</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Absolute, not gauge</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Boyle's law works in absolute pressure, so both figures get {ATMOSPHERIC_PSI} psi added before
+                the ratio is taken. Using gauge pressure here is the single commonest arithmetic mistake, and
+                it undersizes the tank.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The pre-charge dominates</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                At 40 psi pre-charge the job needs {fmt(lowPrecharge.tankVolume, 2)} gallons; at 70 psi it needs
+                {fmt(highPrecharge.tankVolume, 2)}. Same water, same heater — a{" "}
+                {fmt(highPrecharge.tankVolume / lowPrecharge.tankVolume, 1)}× swing from one Schrader valve.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Set it dry</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Check and adjust the pre-charge with the tank isolated or before installation. Measuring it
+                while the tank is pressurised by the system tells you the system pressure, not the charge.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why the T&amp;P valve weeps</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A missing, undersized or waterlogged tank shows up the same way — pressure climbing on every
+                heating cycle until the relief valve lets go. Replacing the valve without fixing the expansion
+                just moves the symptom.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the pre-charge mistake that doubles the tank, and a large system.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">50-gallon heater behind a PRV</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              expansion = {fmt(defaults.fraction * 100, 2)}% of 50 gal = {fmt(defaults.acceptance, 3)} gal<br />
+              ratio = 1 − 74.7 ÷ 94.7 = {fmt(defaults.acceptanceRatio, 4)}<br />
+              tank = {fmt(defaults.acceptance, 3)} ÷ {fmt(defaults.acceptanceRatio, 4)} =
+              <span class="font-bold text-cyan-700">{fmt(defaults.tankVolume, 2)} gal</span><br />
+              → <span class="font-bold text-cyan-700">{defaultShell} gallon shell</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the standard residential answer.
+              Under a gallon of actual expansion, but only {fmt(defaults.acceptanceRatio * 100, 1)}% of the
+              shell can take it.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The pre-charge left at the factory setting</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Tanks commonly ship pre-charged around 40 psi. Leaving it there on a 60 psi supply is a fault —
+              but the arithmetic is worth seeing in the other direction too.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              40 psi pre-charge: ratio {fmt(lowPrecharge.acceptanceRatio, 3)} → tank
+              <span class="font-bold text-cyan-700">{fmt(lowPrecharge.tankVolume, 2)} gal</span><br />
+              60 psi pre-charge: ratio {fmt(defaults.acceptanceRatio, 3)} → tank {fmt(defaults.tankVolume, 2)}
+              gal<br />
+              70 psi pre-charge: ratio {fmt(highPrecharge.acceptanceRatio, 3)} → tank
+              <span class="font-bold text-cyan-700">{fmt(highPrecharge.tankVolume, 2)} gal</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 70 psi pre-charge needs a{" "}
+              {selectExpansionTank(highPrecharge.tankVolume)}-gallon shell where 40 psi would fit in{" "}
+              {selectExpansionTank(lowPrecharge.tankVolume)}. But note the trap: pre-charging
+              <em>below</em> supply pressure means the diaphragm is already compressed at rest, so the tank
+              starts partly waterlogged. Match the supply — do not just go low.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">A 120-gallon system at high store temperature</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              120 gal, 40 → 180 °F: expansion {fmt(expansionFraction(40, 180) * 100, 2)}%<br />
+              acceptance ={" "}
+              {fmt(expansionTank({ ...base, systemGallons: 120, hotF: 180 }).acceptance, 2)} gal<br />
+              tank ={" "}
+              <span class="font-bold text-cyan-700">
+                {fmt(expansionTank({ ...base, systemGallons: 120, hotF: 180 }).tankVolume, 2)} gal
+              </span>{" "}
+              → {selectExpansionTank(expansionTank({ ...base, systemGallons: 120, hotF: 180 }).tankVolume)}{" "}
+              gallon shell
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> volume and temperature compound. Going
+              from 50 gallons at 140 °F to 120 gallons at 180 °F multiplies the expansion by more than four,
+              and pushes the tank two shell sizes up.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            What the pre-charge is worth
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A 50-gallon system, 40 → 140 °F, 80 psi ceiling, with only the pre-charge changing. Computed from
+            the same code the calculator runs.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Pre-charge</th>
+                  <th class="py-3 px-5 font-semibold">Usable fraction</th>
+                  <th class="py-3 px-5 font-semibold">Minimum tank</th>
+                  <th class="py-3 px-5 font-semibold">Shell</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  prechargeTable.map((row, index) => (
+                    <tr class={index === prechargeTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.supplyPsi} psi</td>
+                      <td class="py-3 px-5">{fmt(row.ratio * 100, 1)}%</td>
+                      <td class="py-3 px-5">{fmt(row.tank, 2)} gal</td>
+                      <td class="py-3 px-5">{row.shell === null ? "—" : `${row.shell} gal`}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">Tank by system volume</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            At the default 40 → 140 °F rise and a 60 → 80 psi window.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">System volume</th>
+                  <th class="py-3 px-5 font-semibold">Expansion</th>
+                  <th class="py-3 px-5 font-semibold">Minimum tank</th>
+                  <th class="py-3 px-5 font-semibold">Shell</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  systemTable.map((row, index) => (
+                    <tr class={index === systemTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.systemGallons} gal</td>
+                      <td class="py-3 px-5">{fmt(row.acceptance, 2)} gal</td>
+                      <td class="py-3 px-5">{fmt(row.tank, 2)} gal</td>
+                      <td class="py-3 px-5">{row.shell === null ? "—" : `${row.shell} gal`}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            What the temperature rise is worth
+          </h2>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Temperature range</th>
+                  <th class="py-3 px-5 font-semibold">Expansion</th>
+                  <th class="py-3 px-5 font-semibold">Minimum tank, 50 gal system</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  riseTable.map((row, index) => (
+                    <tr class={index === riseTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {row.cold} → {row.hot} °F
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.pct, 2)}%</td>
+                      <td class="py-3 px-5">{fmt(row.tank, 2)} gal</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-cyan-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 607.3 (thermal expansion control) and 504 (relief valves). The expansion fraction is computed
+            from the density of water at each temperature rather than read from a chart, and the tank equation
+            is Boyle's law applied to the diaphragm air charge. Shell sizes are common stocked capacities, not
+            a code list. This covers potable domestic hot water; hydronic heating loops need a hydronic method.
+            Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about thermal expansion, pre-charge pressure, and closed systems."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingExpansionTankCalculator } from "@/scripts/calculators/plumbing-expansion-tank-calculator";
+    initPlumbingExpansionTankCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

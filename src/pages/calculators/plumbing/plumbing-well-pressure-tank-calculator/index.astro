@@ -1,0 +1,843 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  ATMOSPHERIC_PSI,
+  PRECHARGE_BELOW_CUTIN_PSI,
+  STANDARD_PRESSURE_TANKS,
+  drawdownFraction,
+  fmt,
+  minRunMinutes,
+  pressureTankSizing,
+} from "@/lib/plumbing";
+
+const title = "Well Pressure Tank Calculator — Drawdown & Tank Size | TradesQuote";
+const description =
+  "Free well pressure tank calculator. Size a diaphragm tank from pump flow, cut-in and cut-out pressure, and pre-charge — and see why a 20-gallon tank delivers about six gallons, not twenty.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-well-pressure-tank-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Well Pressure Tank Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Well Pressure Tank Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online well pressure tank calculator that sizes a pre-charged diaphragm tank from pump capacity, pressure switch settings, pre-charge pressure and minimum pump run time, using Boyle's law on absolute pressures.",
+};
+
+/* ---- Everything below is computed from the lib, never typed from a draft ---- */
+const base = { pumpGpm: 10, cutInPsi: 30, cutOutPsi: 50 };
+const defaults = pressureTankSizing(base);
+
+const SHELL = 20;
+const bandTable = ([
+  [20, 40],
+  [30, 50],
+  [40, 60],
+  [50, 70],
+  [30, 70],
+  [40, 80],
+] as [number, number][]).map(([on, off]) => {
+  const fraction = drawdownFraction(on, off, on - PRECHARGE_BELOW_CUTIN_PSI);
+  return { on, off, span: off - on, fraction, delivered: SHELL * fraction };
+});
+
+const prechargeTable = [20, 25, 28, 30, 35, 40, 45].map((pre) => {
+  const fraction = drawdownFraction(30, 50, pre);
+  return { pre, fraction, delivered: SHELL * fraction };
+});
+
+const pumpTable = [5, 8, 10, 12, 15, 20, 25].map((pumpGpm) => {
+  const r = pressureTankSizing({ ...base, pumpGpm });
+  return {
+    pumpGpm,
+    runMinutes: r.runMinutes,
+    requiredDrawdown: r.requiredDrawdown,
+    requiredTank: r.requiredTank,
+    stockedTank: r.stockedTank,
+  };
+});
+
+const shellTable = STANDARD_PRESSURE_TANKS.filter((t) => t >= 6 && t <= 119).map((shell) => ({
+  shell,
+  delivered: shell * defaults.fraction,
+  minutesAt10: (shell * defaults.fraction) / 10,
+}));
+
+/** The 2 psi safety margin is not free — quantify it rather than assert it. */
+const atCutIn = drawdownFraction(30, 50, 30);
+const overCharged = drawdownFraction(30, 50, 45);
+const wideBand = pressureTankSizing({ ...base, cutOutPsi: 70 });
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size pressure tank do I need for my well pump?",
+    answer: `For a <strong>${base.pumpGpm} gpm</strong> pump on a ${base.cutInPsi}/${base.cutOutPsi} psi switch, you need <strong>${fmt(defaults.requiredDrawdown, 0)} gallons of drawdown</strong> — one full minute of pump run. Because a ${base.cutInPsi}/${base.cutOutPsi} tank only gives up <strong>${fmt(defaults.fraction * 100, 1)}%</strong> of its own volume, that takes a <strong>${fmt(defaults.requiredTank, 1)} gallon</strong> shell, so the <strong>${defaults.stockedTank}-gallon</strong> tank. It actually delivers ${fmt(defaults.drawdownAtStocked, 1)} gallons a cycle.`,
+  },
+  {
+    question: "Why does a 20-gallon tank only hold about 6 gallons of water?",
+    answer: `Because a pressure tank is an air spring, not a bucket. The air charge is compressed from the pre-charge up to cut-out, and only the volume swept between cut-out and cut-in is water you get without the pump running. At ${base.cutInPsi}/${base.cutOutPsi} that swept fraction is <strong>${fmt(defaults.fraction * 100, 1)}%</strong>, so a ${SHELL}-gallon shell delivers about <strong>${fmt(SHELL * defaults.fraction, 1)} gallons</strong>. The rest of the shell is air doing the work of holding pressure.`,
+  },
+  {
+    question: "Does a higher pressure setting give more drawdown?",
+    answer: `No — the opposite, and this surprises people. Drawdown is a <strong>ratio</strong> of absolute pressures, not a difference, so the same 20 psi span delivers more at a lower band. A ${SHELL}-gallon tank gives <strong>${fmt(bandTable[0].delivered, 2)} gallons</strong> at 20/40 but only <strong>${fmt(bandTable[2].delivered, 2)}</strong> at 40/60. What genuinely helps is a <em>wider</em> band: ${base.cutInPsi}/70 gives ${fmt(drawdownFraction(30, 70, 28) * 100, 1)}% and drops the required shell from ${fmt(defaults.requiredTank, 1)} to ${fmt(wideBand.requiredTank, 1)} gallons.`,
+  },
+  {
+    question: "What should the pre-charge be set to?",
+    answer: `<strong>About ${PRECHARGE_BELOW_CUTIN_PSI} psi below cut-in</strong> — ${base.cutInPsi - PRECHARGE_BELOW_CUTIN_PSI} psi on a ${base.cutInPsi}/${base.cutOutPsi} switch — measured with the tank isolated and drained, not while it is under system pressure. Setting it level with cut-in squeezes out a fraction more drawdown (${fmt(atCutIn * 100, 1)}% against ${fmt(defaults.fraction * 100, 1)}%), but leaves the diaphragm slapping the bottom of the shell on every cycle. The margin buys diaphragm life for about a point of performance.`,
+  },
+  {
+    question: "What happens if the pre-charge is too high?",
+    answer: `The drawdown collapses. At ${base.cutInPsi}/${base.cutOutPsi} a correct ${base.cutInPsi - PRECHARGE_BELOW_CUTIN_PSI} psi charge gives ${fmt(defaults.fraction * 100, 1)}%, but <strong>45 psi gives ${fmt(overCharged * 100, 1)}%</strong> — the tank empties before the pump even restarts, so it short-cycles as if there were no tank at all. It is the commonest fault on a system that "has a new tank and still hammers", and it costs nothing to check.`,
+  },
+  {
+    question: "Why does minimum run time matter more than tank size?",
+    answer: `Because pump motors are killed by <strong>starts</strong>, not by running. Each start draws locked-rotor current and heats the windings, and a submersible cannot shed that heat while stopped. The convention is at least <strong>one minute of run per cycle</strong> up to 10 gpm, ${minRunMinutes(15)} minutes to 20 gpm, and ${minRunMinutes(25)} minutes above that. The tank exists to buy that minute — which is why the calculation starts from run time and works backwards to a shell size.`,
+  },
+  {
+    question: "Is any of this in the plumbing code?",
+    answer:
+      "No. Tank sizing and minimum run time are <strong>pump-industry practice</strong>, not IPC requirements — the code governs the potable system downstream, not how the well equipment is proportioned. That is why every input here is editable. Manufacturers also publish per-model drawdown tables that account for real diaphragm geometry, and those figures usually land slightly under the theoretical Boyle's-law number below.",
+  },
+  {
+    question: "What about a constant-pressure or variable-speed pump?",
+    answer:
+      "Different problem entirely. A variable-speed pump modulates to match demand instead of cycling between two pressures, so it needs only a small tank — often 2 to 20 gallons — to absorb transients rather than to store a minute of flow. This calculator models a <strong>conventional on/off pump with a pressure switch</strong>. If the system is constant-pressure, size to the pump manufacturer's spec, not to a run-time rule.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Tank sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "A pressure tank rarely arrives alone — there is usually a switch, a gauge, fittings, and often a pump to go with it. TradesQuote turns the whole scope into a detailed line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "The total head the well pump has to make.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-expansion-tank-calculator",
+    title: "Thermal Expansion Tank Calculator",
+    description: "The same Boyle's law, pointed the other way.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "What the cut-in leaves at the top fixture.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Size the line running out of the tank.",
+  },
+];
+
+const styles = plumbingAccentStyles.blue;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Well Pressure Tank Calculator — Drawdown & Tank Size" />
+    <meta
+      property="og:description"
+      content="Size a well pressure tank from pump flow and the pressure switch, and see why a 20-gallon tank delivers about six gallons. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Well Pressure Tank Calculator — Drawdown & Tank Size" />
+    <meta
+      name="twitter:description"
+      content="Drawdown, minimum pump run time, and the shell size that buys it — with the pre-charge sensitivity shown. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Well Pressure Tank Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · Well Systems · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Well Pressure Tank Calculator <span class="text-blue-600">— Drawdown &amp; Tank Size</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A pressure tank is an air spring, not a bucket. On a {base.cutInPsi}/{base.cutOutPsi} switch it
+              gives up only <strong>{fmt(defaults.fraction * 100, 1)}%</strong> of its own volume before the
+              pump has to start again — so a {SHELL}-gallon tank delivers about{" "}
+              <strong>{fmt(SHELL * defaults.fraction, 1)} gallons</strong>, not twenty. This works backwards
+              from the run time your pump motor needs to the shell size that buys it, and shows what the
+              pre-charge is really worth.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3v3l2.5 2.5"></path>
+            </svg>
+            Size the pressure tank
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="pt-gpm" class="text-sm font-semibold text-slate-800">Pump output</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="pt-gpm"
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="0.5"
+                      value="10"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">gpm</span>
+                  </div>
+                </div>
+                <input
+                  id="pt-gpm-range"
+                  type="range"
+                  min="2"
+                  max="30"
+                  step="1"
+                  value="10"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-blue-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>2</span><span>30 gpm</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  The pump's delivery at your working pressure, not its nameplate maximum.
+                </p>
+              </div>
+
+              <div>
+                <label for="pt-preset" class="text-sm font-semibold text-slate-800">Pressure switch</label>
+                <select
+                  id="pt-preset"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                >
+                  <option value="20/40">20 / 40 psi</option>
+                  <option value="30/50" selected>30 / 50 psi — most common</option>
+                  <option value="40/60">40 / 60 psi</option>
+                  <option value="50/70">50 / 70 psi</option>
+                  <option value="30/70">30 / 70 psi — wide band</option>
+                  <option value="custom">Custom</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Picking a switch fills both settings below and re-derives the pre-charge.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="pt-cutin" class="text-sm font-semibold text-slate-800">Cut-in pressure</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="pt-cutin"
+                      type="number"
+                      min="0"
+                      max="120"
+                      value="30"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Where the pump starts.</p>
+                </div>
+
+                <div>
+                  <label for="pt-cutout" class="text-sm font-semibold text-slate-800">Cut-out pressure</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="pt-cutout"
+                      type="number"
+                      min="0"
+                      max="150"
+                      value="50"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Where it stops.</p>
+                </div>
+
+                <div>
+                  <label for="pt-precharge" class="text-sm font-semibold text-slate-800">
+                    Pre-charge pressure
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="pt-precharge"
+                      type="number"
+                      min="0"
+                      max="150"
+                      value="28"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    {PRECHARGE_BELOW_CUTIN_PSI} psi under cut-in. Measure it drained and isolated.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="pt-run" class="text-sm font-semibold text-slate-800">Minimum run time</label>
+                  <select
+                    id="pt-run"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  >
+                    <option value="auto" selected>Recommended for this pump</option>
+                    <option value="1">1 minute</option>
+                    <option value="1.5">1.5 minutes</option>
+                    <option value="2">2 minutes</option>
+                    <option value="3">3 minutes — long-life target</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Convention, not code. Longer is kinder.</p>
+                </div>
+              </div>
+
+              <button
+                id="pt-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Tank to fit</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="pt-tank" class="text-5xl font-extrabold tracking-tight text-blue-600">
+                  {defaults.stockedTank} gal
+                </span>
+              </div>
+              <p id="pt-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Smallest stocked shell covering the {fmt(defaults.requiredTank, 1)} gallon minimum. It delivers
+                {" "}{fmt(defaults.drawdownAtStocked, 1)} gallons a cycle — {fmt(defaults.fraction * 100, 1)}% of
+                its own volume.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Drawdown needed</p>
+                  <p id="pt-required" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.requiredDrawdown, 1)} gal
+                  </p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Drawdown fraction</p>
+                  <p id="pt-fraction" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.fraction * 100, 1)}%
+                  </p>
+                </div>
+              </div>
+
+              <div id="pt-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Check this before you buy</p>
+                <p id="pt-warning-text" class="mt-1 text-sm text-amber-800"></p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Pre-charge</span><span id="pt-bd-precharge" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Pressure window</span><span id="pt-bd-window" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Run time applied</span><span id="pt-bd-run" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Shell that produces it</span><span id="pt-bd-tank" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>The stocked tank delivers</span><span id="pt-bd-delivered" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Which buys a run of</span><span id="pt-bd-runtime" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Theoretical drawdown from Boyle's law. Real diaphragm tanks come in slightly under their
+                published figure, so check the manufacturer's own drawdown table before ordering. Tank sizing
+                is <strong>pump-industry practice, not plumbing code</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            How much water the pump has to deliver in one run, divided by the fraction of a shell that is
+            actually water.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-blue-300"># Step 1 — How much water one run has to deliver</div>
+            <div>drawdown&nbsp;=&nbsp;pump gpm × minimum run minutes</div>
+            <div class="text-slate-400">the tank exists to keep the motor off, not to store water</div>
+            <div class="mt-4 text-blue-300"># Step 2 — What fraction of a shell is water (Boyle's law)</div>
+            <div>air at cut-in&nbsp;&nbsp;=&nbsp;P<sub>pre</sub> ÷ P<sub>on</sub></div>
+            <div>air at cut-out&nbsp;=&nbsp;P<sub>pre</sub> ÷ P<sub>off</sub></div>
+            <div>
+              fraction&nbsp;=&nbsp;the difference&nbsp;&nbsp;<span class="text-slate-400"
+                >— all ABSOLUTE, so add {ATMOSPHERIC_PSI}</span
+              >
+            </div>
+            <div class="mt-4 text-blue-300"># Step 3 — The shell</div>
+            <div>V<sub>tank</sub>&nbsp;=&nbsp;drawdown ÷ fraction&nbsp;&nbsp;→&nbsp;&nbsp;next stocked size up</div>
+            <div class="mt-4 text-slate-400"># The defaults, worked through</div>
+            <div>
+              {base.pumpGpm} × {fmt(defaults.runMinutes, 0)} = {fmt(defaults.requiredDrawdown, 0)} gal needed
+            </div>
+            <div>
+              {fmt(defaults.prechargePsi + ATMOSPHERIC_PSI, 1)} ÷ {fmt(base.cutInPsi + ATMOSPHERIC_PSI, 1)} −{" "}
+              {fmt(defaults.prechargePsi + ATMOSPHERIC_PSI, 1)} ÷ {fmt(base.cutOutPsi + ATMOSPHERIC_PSI, 1)} ={" "}
+              <span class="text-amber-300">{fmt(defaults.fraction, 4)}</span>
+            </div>
+            <div>
+              {fmt(defaults.requiredDrawdown, 0)} ÷ {fmt(defaults.fraction, 4)} ={" "}
+              <span class="text-amber-300">{fmt(defaults.requiredTank, 2)} gal</span> → {defaults.stockedTank}{" "}
+              gallon tank
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Absolute, not gauge</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Boyle's law works on absolute pressure, so {ATMOSPHERIC_PSI} psi is added to all three figures
+                before any ratio is taken. Working in gauge pressure here overstates the drawdown badly, and
+                worst at low pressures — exactly where wells operate.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">It is a ratio, not a difference</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                This is why a higher pressure setting gives <em>less</em> drawdown for the same span. 20/40 and
+                40/60 are both 20 psi wide, but the first delivers {fmt(bandTable[0].fraction * 100, 1)}% and
+                the second only {fmt(bandTable[2].fraction * 100, 1)}%.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Starts kill pumps, not hours</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Every start draws locked-rotor current through a motor that cannot cool itself while stopped.
+                A tank that buys one extra minute per cycle can cut daily starts by an order of magnitude, and
+                that is the whole return on buying a larger shell.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Set the charge dry</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Check the pre-charge with the tank isolated and drained. A gauge on a Schrader valve under
+                system pressure reads the system, not the charge — the same trap as the domestic
+                <a href="/calculators/plumbing/plumbing-expansion-tank-calculator" class="font-semibold text-blue-600 hover:underline"
+                  >thermal expansion tank</a
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The standard house, the pre-charge fault that mimics a dead tank, and the case where widening the
+          band is cheaper than buying a bigger one.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">
+                A {base.pumpGpm} gpm submersible on a {base.cutInPsi}/{base.cutOutPsi} switch
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              drawdown needed = {base.pumpGpm} gpm × {fmt(defaults.runMinutes, 0)} min ={" "}
+              {fmt(defaults.requiredDrawdown, 0)} gal<br />
+              fraction at {fmt(defaults.prechargePsi, 0)} psi pre-charge ={" "}
+              {fmt(defaults.fraction * 100, 2)}%<br />
+              shell = {fmt(defaults.requiredDrawdown, 0)} ÷ {fmt(defaults.fraction, 4)} =
+              <span class="font-bold text-blue-700"> {fmt(defaults.requiredTank, 2)} gal</span><br />
+              → <span class="font-bold text-blue-700">{defaults.stockedTank} gallon tank</span>, delivering{" "}
+              {fmt(defaults.drawdownAtStocked, 2)} gal = {fmt(defaults.runMinutesAtStocked, 2)} min
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the tank people expect to be "about
+              20 gallons" is really a {defaults.stockedTank}. The {SHELL}-gallon tank on the shelf next to it
+              delivers {fmt(SHELL * defaults.fraction, 1)} gallons — only{" "}
+              {fmt((SHELL * defaults.fraction) / base.pumpGpm, 2)} minutes of run.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">"New tank, still short-cycling"</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Same {SHELL}-gallon shell, same {base.cutInPsi}/{base.cutOutPsi} switch, only the pre-charge
+              changing. Nothing else on the system is different.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              {fmt(defaults.prechargePsi, 0)} psi — correct: {fmt(defaults.fraction * 100, 2)}% →
+              <span class="font-bold text-blue-700"> {fmt(SHELL * defaults.fraction, 2)} gal</span><br />
+              40 psi — over-charged: {fmt(drawdownFraction(30, 50, 40) * 100, 2)}% →{" "}
+              {fmt(SHELL * drawdownFraction(30, 50, 40), 2)} gal<br />
+              45 psi — badly over-charged: {fmt(overCharged * 100, 2)}% →
+              <span class="font-bold text-blue-700"> {fmt(SHELL * overCharged, 2)} gal</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a charge sitting 15 psi high cuts the
+              delivery to {fmt((SHELL * overCharged) / (SHELL * defaults.fraction) * 100, 0)}% of what it
+              should be, and the symptom is indistinguishable from a waterlogged tank. Check the Schrader
+              valve before condemning the tank — it is a two-minute test.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Widening the band instead of buying a bigger tank</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              {base.cutInPsi}/{base.cutOutPsi} (20 psi span): {fmt(defaults.fraction * 100, 2)}% → shell{" "}
+              {fmt(defaults.requiredTank, 1)} gal → <span class="font-bold text-blue-700">{defaults.stockedTank} gal tank</span><br />
+              {base.cutInPsi}/70 (40 psi span): {fmt(wideBand.fraction * 100, 2)}% → shell{" "}
+              {fmt(wideBand.requiredTank, 1)} gal → <span class="font-bold text-blue-700">{wideBand.stockedTank} gal tank</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same pump and the same one-minute
+              run drop{" "}
+              {defaults.stockedTank !== null && wideBand.stockedTank !== null
+                ? `${defaults.stockedTank} gallons of shell to ${wideBand.stockedTank}`
+                : "a shell size"}{" "}
+              purely by giving the switch more room to work in. The trade is real though: the fixtures now see
+              70 psi at cut-out, which is close enough to the 80 psi
+              <a href="/calculators/plumbing/plumbing-water-pressure-calculator" class="font-semibold text-blue-600 hover:underline"
+                >IPC 604.8 threshold</a
+              > to be worth checking, and everything downstream cycles over a wider pressure swing.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            What the pressure switch is worth
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Drawdown as a fraction of the shell, with the pre-charge set {PRECHARGE_BELOW_CUTIN_PSI} psi under
+            cut-in each time. The last column is what a {SHELL}-gallon tank actually gives you. Note that the
+            three 20 psi bands are <strong>not</strong> equal.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Switch</th>
+                  <th class="py-3 px-5 font-semibold">Span</th>
+                  <th class="py-3 px-5 font-semibold">Drawdown fraction</th>
+                  <th class="py-3 px-5 font-semibold">{SHELL} gal tank gives</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  bandTable.map((row, index) => (
+                    <tr class={index === bandTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {row.on} / {row.off} psi
+                      </td>
+                      <td class="py-3 px-5">{row.span} psi</td>
+                      <td class="py-3 px-5">{fmt(row.fraction * 100, 2)}%</td>
+                      <td class="py-3 px-5">{fmt(row.delivered, 2)} gal</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            What the pre-charge is worth
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A {SHELL}-gallon tank on a 30/50 switch, with only the Schrader valve changing. The peak is at
+            cut-in; the {PRECHARGE_BELOW_CUTIN_PSI} psi margin below it costs about{" "}
+            {fmt((atCutIn - defaults.fraction) * 100, 1)} of a percentage point and saves the diaphragm from
+            bottoming out on every cycle.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Pre-charge</th>
+                  <th class="py-3 px-5 font-semibold">Drawdown fraction</th>
+                  <th class="py-3 px-5 font-semibold">{SHELL} gal tank gives</th>
+                  <th class="py-3 px-5 font-semibold">Verdict</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  prechargeTable.map((row, index) => (
+                    <tr class={index === prechargeTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.pre} psi</td>
+                      <td class="py-3 px-5">{fmt(row.fraction * 100, 2)}%</td>
+                      <td class="py-3 px-5">{fmt(row.delivered, 2)} gal</td>
+                      <td class="py-3 px-5">
+                        {row.pre === 28
+                          ? "Correct"
+                          : row.pre < 28
+                            ? "Low — diaphragm sits compressed"
+                            : row.pre === 30
+                              ? "At cut-in — best on paper, hard on the bag"
+                              : "Over-charged — short-cycles"}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">Tank by pump size</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            On a 30/50 switch, with the conventional minimum run time for each pump. The jump at 12 gpm is the
+            run-time rule stepping up, not the pump.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Pump</th>
+                  <th class="py-3 px-5 font-semibold">Min run</th>
+                  <th class="py-3 px-5 font-semibold">Drawdown needed</th>
+                  <th class="py-3 px-5 font-semibold">Shell</th>
+                  <th class="py-3 px-5 font-semibold">Tank</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  pumpTable.map((row, index) => (
+                    <tr class={index === pumpTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.pumpGpm} gpm</td>
+                      <td class="py-3 px-5">{fmt(row.runMinutes, 2)} min</td>
+                      <td class="py-3 px-5">{fmt(row.requiredDrawdown, 1)} gal</td>
+                      <td class="py-3 px-5">{fmt(row.requiredTank, 1)} gal</td>
+                      <td class="py-3 px-5">
+                        {row.stockedTank === null ? "Two in parallel" : `${row.stockedTank} gal`}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            What each stocked tank really delivers
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Every one of these is sold by its shell volume. At 30/50 with a correct pre-charge, this is the
+            water you get — and the run time it buys a {base.pumpGpm} gpm pump.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Tank sold as</th>
+                  <th class="py-3 px-5 font-semibold">Drawdown at 30/50</th>
+                  <th class="py-3 px-5 font-semibold">Run time at {base.pumpGpm} gpm</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  shellTable.map((row, index) => (
+                    <tr class={index === shellTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.shell} gal</td>
+                      <td class="py-3 px-5">{fmt(row.delivered, 2)} gal</td>
+                      <td class="py-3 px-5">{fmt(row.minutesAt10, 2)} min</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: the drawdown equation is <strong>Boyle's law</strong> applied to the
+            pre-charged air volume, computed here on absolute pressures with {ATMOSPHERIC_PSI} psi of
+            atmosphere added. Shell sizes are common stocked capacities and the minimum run times are
+            <strong> pump-industry convention, not code</strong> — the <a
+              class="underline hover:text-blue-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > governs the potable system downstream of the tank, not how the well equipment is proportioned. Real
+            diaphragm tanks deliver slightly under the theoretical figure, so confirm against the manufacturer's
+            published drawdown table. Constant-pressure and variable-speed systems are sized differently.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about drawdown, pre-charge pressure, and pump cycling."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingWellPressureTankCalculator } from "@/scripts/calculators/plumbing-well-pressure-tank-calculator";
+    initPlumbingWellPressureTankCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #2563eb;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

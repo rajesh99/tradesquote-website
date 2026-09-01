@@ -1,0 +1,749 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  DEFAULT_GAL_PER_BEDROOM,
+  PERC_APPLICATION_RATES,
+  SEPTIC_RETENTION_DAYS,
+  SEPTIC_TANK_MINIMUMS,
+  fmt,
+  septicSizing,
+} from "@/lib/plumbing";
+
+const title = "Septic Tank Size Calculator — Tank & Leach Field | TradesQuote";
+const description =
+  "Free septic tank size calculator. Daily design flow, tank capacity and leach field area from bedroom count and soil percolation rate — with every local variable left editable, because septic is health-department territory.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-septic-tank-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Septic Tank Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Septic Tank Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online septic tank size calculator estimating daily design flow, septic tank capacity and leach field area from bedroom count, per-bedroom flow allowance and soil application rate.",
+};
+
+const base = { bedrooms: 3, galPerBedroom: 150, applicationRate: 0.8, trenchWidthFt: 3 };
+const defaults = septicSizing(base);
+const fiveBed = septicSizing({ ...base, bedrooms: 5 });
+const fastSoil = septicSizing({ ...base, applicationRate: 1.2 });
+const slowSoil = septicSizing({ ...base, applicationRate: 0.24 });
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size septic tank do I need for a 3-bedroom house?",
+    answer: `On the common allowance of ${DEFAULT_GAL_PER_BEDROOM} gallons per bedroom per day, a 3-bedroom house produces <strong>${fmt(defaults.dailyFlow, 0)} gallons a day</strong>. Two days of retention would only need ${fmt(defaults.retentionTank, 0)} gallons, but the usual minimum for three bedrooms is <strong>${fmt(defaults.minimumTank, 0)} gallons</strong> — so the minimum governs, which is true for most small houses. Your health department's numbers may differ.`,
+  },
+  {
+    question: "Is septic sizing in the plumbing code?",
+    answer:
+      "Mostly no, and this is the important caveat. The IPC hands private sewage disposal off to other documents — typically the <strong>International Private Sewage Disposal Code</strong> where adopted, and far more often your <strong>state or county health department</strong>. Requirements vary between jurisdictions more than anything else in plumbing. Treat every number here as a starting point for a conversation with your local authority, not as an answer.",
+  },
+  {
+    question: "Why are all the inputs editable rather than fixed?",
+    answer:
+      "Because the values that matter most are exactly the ones that vary locally. Gallons per bedroom, the retention multiple, the tank minimums and the soil application rate are all set by your jurisdiction, and hard-coding them would produce a confident number that is wrong in half the country. The defaults here are common values; overwrite them with your local ones.",
+  },
+  {
+    question: "How does soil affect the leach field?",
+    answer: `Enormously — it is the single biggest variable on this page. The same ${fmt(defaults.dailyFlow, 0)} gallons a day needs <strong>${fmt(fastSoil.leachFieldSqFt, 0)} ft²</strong> in sandy soil that percolates quickly, and <strong>${fmt(slowSoil.leachFieldSqFt, 0)} ft²</strong> in slow clay — a <strong>${fmt(slowSoil.leachFieldSqFt / fastSoil.leachFieldSqFt, 1)}× difference</strong> from the ground alone. This is why a percolation test comes before a site plan, not after.`,
+  },
+  {
+    question: "What is a percolation test?",
+    answer:
+      "A hole is dug to the proposed absorption depth, pre-soaked, filled with water, and the drop is timed — giving a rate in <strong>minutes per inch</strong>. Faster than about 1 minute per inch and the soil may drain too quickly to treat the effluent; slower than about 60 and it usually will not accept it at all, which means a mound, sand filter or aerobic system instead of a conventional field. Most jurisdictions require the test to be witnessed.",
+  },
+  {
+    question: "Why is the tank minimum bigger than the retention calculation?",
+    answer: `Because retention time is not the only job the tank does. It also has to hold accumulating sludge and scum between pump-outs, buffer surge loads, and keep enough quiescent volume for solids to actually settle. On a 3-bedroom house the ${fmt(defaults.retentionTank, 0)}-gallon retention figure would be technically adequate for flow and useless in practice — hence the ${fmt(defaults.minimumTank, 0)}-gallon floor. Retention only overtakes the minimum at around five bedrooms.`,
+  },
+  {
+    question: "Does a garbage disposal or a whirlpool tub change things?",
+    answer:
+      "Often yes. A food waste disposer adds solids and many jurisdictions require a larger tank or an effluent filter when one is fitted. Whirlpool tubs, water softeners discharging brine, and high-efficiency fixtures all shift the loading in different directions. These are exactly the local variations the calculator cannot know about — ask before you dig.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "System scoped? Quote the whole job in seconds.";
+const ctaDescription =
+  "Tank, field, excavation, pipe, stone and permit — a septic install is one of the biggest tickets a plumber writes. TradesQuote turns the scope into a detailed, line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+    title: "Drain Pipe Size Calculator",
+    description: "Size the building drain running out to the tank.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+    title: "Drain Pipe Slope Calculator",
+    description: "The fall on the run to the tank.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "Fixture load on the house side.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "For a field uphill of the tank.",
+  },
+];
+
+/** Tables computed from the lib. */
+const bedroomTable = [2, 3, 4, 5, 6].map((bedrooms) => {
+  const r = septicSizing({ ...base, bedrooms });
+  return { bedrooms, ...r };
+});
+
+const soilTable = PERC_APPLICATION_RATES.map((s) => {
+  const r = septicSizing({ ...base, applicationRate: s.galPerSqFtPerDay });
+  return { label: s.label, rate: s.galPerSqFtPerDay, field: r.leachFieldSqFt, trench: r.trenchFeet };
+});
+
+const styles = plumbingAccentStyles.amber;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Septic Tank Size Calculator — Tank & Leach Field" />
+    <meta
+      property="og:description"
+      content="Daily design flow, tank capacity and leach field area from bedrooms and soil percolation rate. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Septic Tank Size Calculator — Tank & Leach Field" />
+    <meta
+      name="twitter:description"
+      content="Septic tank and leach field sizing from bedrooms and soil. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Septic Tank Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3z"
+                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" />
+              </svg>
+              Plumbing Tools · Local health code · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Septic Tank Size Calculator <span class="text-amber-600">— Tank &amp; Leach Field</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Bedrooms set the flow, the flow sets the tank, and the <strong>soil</strong> sets the field —
+              and the soil is by far the biggest variable. The same house needs{" "}
+              <strong>{fmt(fastSoil.leachFieldSqFt, 0)} ft²</strong> of field in fast sand and{" "}
+              <strong>{fmt(slowSoil.leachFieldSqFt, 0)} ft²</strong> in slow clay.
+            </p>
+
+            <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm text-amber-900 leading-relaxed">
+                <span class="font-semibold">Septic is not IPC territory.</span> The plumbing code hands
+                private sewage disposal off to the International Private Sewage Disposal Code where adopted,
+                and much more often to your <strong>state or county health department</strong>. Requirements
+                vary more here than anywhere else in plumbing, so every value on this page is
+                <strong>editable</strong> — the defaults are common figures, not code. Confirm all of them
+                locally before you dig.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7"></path>
+            </svg>
+            Size the system
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="st-bedrooms" class="text-sm font-semibold text-slate-800">Bedrooms</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="st-bedrooms"
+                      type="number"
+                      min="1"
+                      max="12"
+                      value="3"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                  </div>
+                </div>
+                <input
+                  id="st-bedrooms-range"
+                  type="range"
+                  min="1"
+                  max="8"
+                  step="1"
+                  value="3"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-amber-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>8</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Bedrooms, not occupants — that is how health departments rate a house.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="st-per-bedroom" class="text-sm font-semibold text-slate-800">
+                    Flow per bedroom
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="st-per-bedroom"
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="10"
+                      value="150"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">gal/day</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Local figure — 100 to 200 is the usual range.</p>
+                </div>
+
+                <div>
+                  <label for="st-trench" class="text-sm font-semibold text-slate-800">Trench width</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="st-trench"
+                      type="number"
+                      min="0.5"
+                      max="12"
+                      step="0.5"
+                      value="3"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Converts field area into trench length.</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="st-perc" class="text-sm font-semibold text-slate-800">Soil class</label>
+                  <select
+                    id="st-perc"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                  >
+                    {
+                      PERC_APPLICATION_RATES.map((s) => (
+                        <option value={s.galPerSqFtPerDay} selected={s.galPerSqFtPerDay === 0.8}>
+                          {s.label} — {s.galPerSqFtPerDay} gal/ft²/day
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Picking one fills the rate below. From a witnessed percolation test, not a guess.
+                  </p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="st-rate" class="text-sm font-semibold text-slate-800">
+                    Soil application rate
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="st-rate"
+                      type="number"
+                      min="0.05"
+                      max="5"
+                      step="0.01"
+                      value="0.8"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">gal/ft²/day</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Override this with your jurisdiction's own table — the classes above vary by state.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="st-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-amber-100 bg-amber-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Septic tank capacity</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="st-tank" class="text-5xl font-extrabold tracking-tight text-amber-600">
+                  {fmt(defaults.tank, 0)} gal
+                </span>
+              </div>
+              <p id="st-note" class="mt-1 text-sm font-semibold text-slate-700">
+                {fmt(defaults.retentionTank, 0)} gallons would cover {SEPTIC_RETENTION_DAYS} days of flow, but
+                the minimum for this bedroom count is {fmt(defaults.minimumTank, 0)} — so the minimum governs.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Daily design flow</p>
+                  <p id="st-flow" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.dailyFlow, 0)} gal/day
+                  </p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Leach field area</p>
+                  <p id="st-field" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.leachFieldSqFt, 0)} ft²
+                  </p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-amber-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Retention requirement</span><span id="st-bd-retention" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Jurisdictional minimum</span><span id="st-bd-minimum" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Governed by</span><span id="st-bd-governed" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Soil rate applied</span><span id="st-bd-rate" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Trench length</span><span id="st-bd-trench" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                <strong>Planning estimate only.</strong> Septic design is governed by your state or county
+                health department, needs a witnessed percolation test and a site evaluation, and is normally a
+                permitted, inspected and often licensed-designer activity. Setbacks from wells, boundaries,
+                water courses and the water table are not modelled here at all.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three steps, each of which your jurisdiction may set differently.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-amber-300"># Step 1 — Daily design flow</div>
+            <div>
+              gal/day&nbsp;=&nbsp;bedrooms × <span class="text-amber-300">{DEFAULT_GAL_PER_BEDROOM}</span>
+              &nbsp;&nbsp;<span class="text-slate-400">— local figure, 100 to 200 typical</span>
+            </div>
+            <div class="mt-4 text-amber-300"># Step 2 — Tank, the larger of two rules</div>
+            <div>
+              retention&nbsp;=&nbsp;daily flow × <span class="text-amber-300">{SEPTIC_RETENTION_DAYS}</span> days
+            </div>
+            <div>minimum&nbsp;=&nbsp;by bedroom count&nbsp;&nbsp;→&nbsp;&nbsp;tank = max(the two)</div>
+            <div class="mt-4 text-amber-300"># Step 3 — Leach field</div>
+            <div>ft²&nbsp;=&nbsp;daily flow ÷ soil application rate</div>
+            <div>trench ft&nbsp;=&nbsp;ft² ÷ trench width</div>
+            <div class="mt-4 text-red-300"># What sets these numbers</div>
+            <div>NOT the IPC — state and county health departments, and the IPSDC where adopted</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Bedrooms, not people</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A system is rated on bedrooms because occupancy changes and bedrooms do not. It also means
+                adding a bedroom can legally require a larger system, which catches renovations out.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The minimum usually wins</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                {SEPTIC_RETENTION_DAYS}-day retention only overtakes the floor at around five bedrooms. Below
+                that the minimum governs, because the tank also has to store sludge between pump-outs and give
+                solids quiet time to settle.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Soil is a 5× variable</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                {fmt(fastSoil.leachFieldSqFt, 0)} ft² in fast sand against{" "}
+                {fmt(slowSoil.leachFieldSqFt, 0)} ft² in slow clay, for identical houses. Nothing else on this
+                page moves the answer that far, which is why the perc test comes first.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Too fast is also a fail</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Soil that drains faster than about a minute per inch may not hold effluent long enough to
+                treat it before it reaches groundwater. Both ends of the range can disqualify a conventional
+                field.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the point where retention takes over, and the soil that changes everything.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">3-bedroom house on loam</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              flow = 3 × {DEFAULT_GAL_PER_BEDROOM} ={" "}
+              <span class="font-bold text-amber-700">{fmt(defaults.dailyFlow, 0)} gal/day</span><br />
+              retention = {fmt(defaults.dailyFlow, 0)} × {SEPTIC_RETENTION_DAYS} ={" "}
+              {fmt(defaults.retentionTank, 0)} gal<br />
+              minimum for 3 bedrooms = {fmt(defaults.minimumTank, 0)} gal → governs<br />
+              tank = <span class="font-bold text-amber-700">{fmt(defaults.tank, 0)} gal</span><br />
+              field = {fmt(defaults.dailyFlow, 0)} ÷ 0.8 ={" "}
+              <span class="font-bold text-amber-700">{fmt(defaults.leachFieldSqFt, 0)} ft²</span> ={" "}
+              {fmt(defaults.trenchFeet, 0)} ft of 3 ft trench
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the classic residential answer — a{" "}
+              {fmt(defaults.tank, 0)}-gallon tank and roughly {fmt(defaults.leachFieldSqFt, 0)} square feet of
+              field. Note the tank is set by the minimum, not by the arithmetic.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Five bedrooms — retention takes over</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              flow = 5 × {DEFAULT_GAL_PER_BEDROOM} = {fmt(fiveBed.dailyFlow, 0)} gal/day<br />
+              retention = {fmt(fiveBed.retentionTank, 0)} gal<br />
+              minimum for 5 bedrooms = {fmt(fiveBed.minimumTank, 0)} gal<br />
+              → <span class="font-bold text-amber-700">
+                retention governs at {fmt(fiveBed.tank, 0)} gal
+              </span><br />
+              field = <span class="font-bold text-amber-700">{fmt(fiveBed.leachFieldSqFt, 0)} ft²</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> five bedrooms is roughly where the
+              flow calculation finally overtakes the floor. Below it the minimum decides; above it the
+              arithmetic does — which is worth knowing before you assume a bigger house just needs the next
+              tank up.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same house on clay</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              sandy loam at 1.2 gal/ft²/day: {fmt(fastSoil.leachFieldSqFt, 0)} ft² ={" "}
+              {fmt(fastSoil.trenchFeet, 0)} ft of trench<br />
+              loam at 0.8: {fmt(defaults.leachFieldSqFt, 0)} ft² = {fmt(defaults.trenchFeet, 0)} ft<br />
+              slow clay at 0.24: <span class="font-bold text-amber-700">
+                {fmt(slowSoil.leachFieldSqFt, 0)} ft²
+              </span> = {fmt(slowSoil.trenchFeet, 0)} ft<br />
+              → <span class="font-bold text-amber-700">
+                {fmt(slowSoil.leachFieldSqFt / fastSoil.leachFieldSqFt, 1)}× the field
+              </span> for the identical house
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the tank does not change at all, and
+              the field goes from {fmt(fastSoil.trenchFeet, 0)} feet of trench to{" "}
+              {fmt(slowSoil.trenchFeet, 0)}. On a small lot that difference decides whether a conventional
+              system fits at all — and if it does not, you are into mounds, sand filters or aerobic treatment.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Tank and field by bedrooms</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            At {DEFAULT_GAL_PER_BEDROOM} gal per bedroom per day and a 0.8 gal/ft²/day soil rate. Computed
+            from the same code the calculator runs — and note the "governed by" column flipping at five
+            bedrooms.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Bedrooms</th>
+                  <th class="py-3 px-5 font-semibold">Daily flow</th>
+                  <th class="py-3 px-5 font-semibold">Tank</th>
+                  <th class="py-3 px-5 font-semibold">Governed by</th>
+                  <th class="py-3 px-5 font-semibold">Field</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  bedroomTable.map((row, index) => (
+                    <tr class={index === bedroomTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.bedrooms}</td>
+                      <td class="py-3 px-5">{fmt(row.dailyFlow, 0)} gal/day</td>
+                      <td class="py-3 px-5">{fmt(row.tank, 0)} gal</td>
+                      <td class="py-3 px-5 text-slate-500">
+                        {row.governedBy === "minimum" ? "minimum" : "retention"}
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.leachFieldSqFt, 0)} ft²</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            What the soil is worth
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A 3-bedroom house at {fmt(defaults.dailyFlow, 0)} gal/day, with only the soil changing.
+            <strong>These application rates are indicative</strong> — your jurisdiction publishes its own,
+            which is why the rate is editable above.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Soil</th>
+                  <th class="py-3 px-5 font-semibold">Rate</th>
+                  <th class="py-3 px-5 font-semibold">Field area</th>
+                  <th class="py-3 px-5 font-semibold">3 ft trench</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  soilTable.map((row, index) => (
+                    <tr class={index === soilTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">{row.rate}</td>
+                      <td class="py-3 px-5">{fmt(row.field, 0)} ft²</td>
+                      <td class="py-3 px-5">{fmt(row.trench, 0)} ft</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Common tank minimums
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Typical of many state codes. Yours may be higher, and a garbage disposal often pushes it up a step.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Bedrooms</th>
+                  <th class="py-3 px-5 font-semibold">Minimum tank</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  SEPTIC_TANK_MINIMUMS.map((row, index) => (
+                    <tr class={index === SEPTIC_TANK_MINIMUMS.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {row.maxBedrooms === Infinity ? "7 or more" : `up to ${row.maxBedrooms}`}
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.gallons, 0)} gal</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <strong>septic design is not governed by the IPC</strong>. Private sewage
+            disposal falls to the <a
+              class="underline hover:text-amber-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">International Private Sewage Disposal Code</a
+            > where adopted, and in most of the US to state and county health departments — whose figures for
+            per-bedroom flow, retention time, tank minimums and soil application rates vary substantially. The
+            defaults here are common values offered as a starting point, <strong>not code</strong>, which is
+            why every one of them is editable. General guidance on system types and siting is published by the
+            <a
+              class="underline hover:text-amber-600"
+              href="https://www.epa.gov/septic"
+              target="_blank"
+              rel="noopener">US EPA</a
+            >. A witnessed percolation test, a site evaluation, setback compliance and a permit are all
+            required before installation, and many jurisdictions require a licensed designer.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about septic tank sizing, leach fields, and percolation rates."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingSepticTankCalculator } from "@/scripts/calculators/plumbing-septic-tank-calculator";
+    initPlumbingSepticTankCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

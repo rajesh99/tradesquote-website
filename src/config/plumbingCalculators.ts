@@ -51,6 +51,13 @@ const ICON_FLAME = `<svg class="h-6 w-6" fill="none" stroke="currentColor" strok
 const ICON_DROP = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>`;
 const ICON_CURRENCY = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
 const ICON_HOME = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>`;
+const ICON_EXPANSION = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l6 6m10-2V4m0 0h-4m4 0l-6 6M4 16v4m0 0h4m-4 0l6-6m10 6l-6-6m6 6v-4m0 4h-4"/></svg>`;
+const ICON_BEAKER = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>`;
+const ICON_SWITCH = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>`;
+const ICON_RAIN = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 19v2m4-2v3m4-3v2"/></svg>`;
+const ICON_SEPTIC = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 12c0 1.657 3.582 3 8 3s8-1.343 8-3"/></svg>`;
+const ICON_FILTER = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>`;
+const ICON_TANK = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M7 6a5 5 0 0110 0v11a5 5 0 01-10 0V6zM7 12h10"/></svg>`;
 const ICON_CLOCK = `<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
 
 export const plumbingCalculators: PlumbingCalculator[] = [
@@ -198,6 +205,78 @@ export const plumbingCalculators: PlumbingCalculator[] = [
     accent: "teal",
     icon: ICON_CLOCK,
   },
+  {
+    slug: "plumbing-expansion-tank-calculator",
+    title: "Thermal Expansion Tank Calculator",
+    description:
+      "Size the expansion tank a closed system needs, from the water's own thermal expansion and the pressure window the tank has to work inside.",
+    question: "What size expansion tank do I need?",
+    accent: "cyan",
+    icon: ICON_EXPANSION,
+  },
+  {
+    slug: "plumbing-mixing-valve-calculator",
+    title: "Mixing Valve Calculator",
+    description:
+      "Split a tempered flow into its hot and cold parts, and see how much further storing hot and tempering down stretches a water heater.",
+    question: "How much hot water does a 120 degree mix actually use?",
+    accent: "violet",
+    icon: ICON_SWITCH,
+  },
+  {
+    slug: "plumbing-pipe-volume-calculator",
+    title: "Pipe Volume Calculator",
+    description:
+      "Gallons, litres and weight held in any run of pipe — and how long the tap runs before the water in it has been pushed out.",
+    question: "How many gallons are in my pipe?",
+    accent: "sky",
+    icon: ICON_BEAKER,
+  },
+  {
+    slug: "plumbing-unit-converter",
+    title: "Plumbing Unit Converter",
+    description:
+      "Flow, pressure, head, volume, diameter, velocity and temperature converted between US and metric units, with the exact factors.",
+    question: "How many litres per minute is 10 gpm?",
+    accent: "teal",
+    icon: ICON_CALCULATOR,
+  },
+  {
+    slug: "plumbing-storm-drainage-calculator",
+    title: "Storm & Roof Drainage Calculator",
+    description:
+      "Design runoff in gpm from roof area and rainfall rate, with a Manning capacity check on the horizontal storm drain.",
+    question: "How much water comes off my roof in a storm?",
+    accent: "sky",
+    icon: ICON_RAIN,
+  },
+  {
+    slug: "plumbing-septic-tank-calculator",
+    title: "Septic Tank Size Calculator",
+    description:
+      "Daily design flow, tank capacity and leach field area from bedroom count and soil percolation rate — with every local variable left editable.",
+    question: "What size septic tank do I need?",
+    accent: "amber",
+    icon: ICON_SEPTIC,
+  },
+  {
+    slug: "plumbing-grease-trap-calculator",
+    title: "Grease Trap Size Calculator",
+    description:
+      "Size an under-sink hydromechanical interceptor in gpm from the sink, or a gravity grease interceptor in gallons from the kitchen — two devices, two methods.",
+    question: "What size grease trap do I need?",
+    accent: "teal",
+    icon: ICON_FILTER,
+  },
+  {
+    slug: "plumbing-well-pressure-tank-calculator",
+    title: "Well Pressure Tank Calculator",
+    description:
+      "Drawdown, minimum pump run time, and the tank that buys it — plus why a 20-gallon shell only ever gives up about six gallons.",
+    question: "What size pressure tank do I need?",
+    accent: "blue",
+    icon: ICON_TANK,
+  },
 ];
 
 export type PlumbingCalculatorGroup = {
@@ -227,13 +306,20 @@ export const plumbingCalculatorGroups: PlumbingCalculatorGroup[] = [
       "plumbing-drain-pipe-size-calculator",
       "plumbing-pipe-slope-calculator",
       "plumbing-vent-size-calculator",
+      "plumbing-storm-drainage-calculator",
+      "plumbing-septic-tank-calculator",
+      "plumbing-grease-trap-calculator",
     ],
   },
   {
     label: "Pressure & Pump Head",
     description:
       "Pressure is head and head is pressure. Convert between them, find what is left at the top fixture, and size a pump against the total it has to lift.",
-    slugs: ["plumbing-water-pressure-calculator", "plumbing-pump-head-calculator"],
+    slugs: [
+      "plumbing-water-pressure-calculator",
+      "plumbing-pump-head-calculator",
+      "plumbing-well-pressure-tank-calculator",
+    ],
   },
   {
     label: "Water Heating",
@@ -242,7 +328,15 @@ export const plumbingCalculatorGroups: PlumbingCalculatorGroup[] = [
     slugs: [
       "plumbing-water-heater-size-calculator",
       "plumbing-tankless-water-heater-calculator",
+      "plumbing-expansion-tank-calculator",
+      "plumbing-mixing-valve-calculator",
     ],
+  },
+  {
+    label: "Volume & Conversions",
+    description:
+      "The utility drawer. How much water a run of pipe holds, and every unit a plumbing job gets quoted in, converted both ways.",
+    slugs: ["plumbing-pipe-volume-calculator", "plumbing-unit-converter"],
   },
   {
     label: "Cost & Business",
@@ -480,6 +574,62 @@ export const plumbingCalculatorGuide = [
     tool: "Plumbing Labor Rate",
     accent: "teal" as const,
     rule: "Wage + burden + overhead, divided by BILLABLE hours, then by margin",
+  },
+  {
+    question: "What size expansion tank does this heater need?",
+    slug: "plumbing-expansion-tank-calculator",
+    tool: "Thermal Expansion Tank",
+    accent: "cyan" as const,
+    rule: "System volume x expansion / (1 - precharge / max), both absolute",
+  },
+  {
+    question: "How much hot water does a tempered mix use?",
+    slug: "plumbing-mixing-valve-calculator",
+    tool: "Mixing Valve",
+    accent: "violet" as const,
+    rule: "Hot fraction = (mix - cold) / (hot - cold)",
+  },
+  {
+    question: "How many gallons does this pipe hold?",
+    slug: "plumbing-pipe-volume-calculator",
+    tool: "Pipe Volume",
+    accent: "sky" as const,
+    rule: "gal per ft = 0.0408 x ID squared, from pi/4 x d squared x 12 / 231",
+  },
+  {
+    question: "How many litres per minute is that in gpm?",
+    slug: "plumbing-unit-converter",
+    tool: "Plumbing Unit Converter",
+    accent: "teal" as const,
+    rule: "Flow, pressure, head, volume, diameter, velocity and temperature",
+  },
+  {
+    question: "How much runoff comes off this roof?",
+    slug: "plumbing-storm-drainage-calculator",
+    tool: "Storm & Roof Drainage",
+    accent: "sky" as const,
+    rule: "gpm = roof area x rainfall rate / 96.25, derived not quoted",
+  },
+  {
+    question: "What size septic tank and leach field?",
+    slug: "plumbing-septic-tank-calculator",
+    tool: "Septic Tank Size",
+    accent: "amber" as const,
+    rule: "Bedrooms x daily flow, 2-day retention, field = flow / soil rate",
+  },
+  {
+    question: "What size grease trap does this kitchen need?",
+    slug: "plumbing-grease-trap-calculator",
+    tool: "Grease Trap Size",
+    accent: "teal" as const,
+    rule: "Sink volume into gpm, or seats and meals into gallons",
+  },
+  {
+    question: "What size well pressure tank do I need?",
+    slug: "plumbing-well-pressure-tank-calculator",
+    tool: "Well Pressure Tank",
+    accent: "blue" as const,
+    rule: "Pump gpm x run minutes, divided by the Boyle's-law drawdown",
   },
 ];
 
