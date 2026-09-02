@@ -1,0 +1,61 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter, frictionLossPsiPer100Ft, velocity, HAZEN_WILLIAMS_C, PIPE_MATERIAL_LABELS, fmt,
+} from "@/lib/plumbing";
+/** The result that decides the argument: PEX has the BEST C factor of the four
+ * and the WORST friction loss, because bore beats smoothness. */
+const GPM = 10;
+const NOMINAL = 0.75;
+const MATERIALS = ["cpvc-40", "copper-m", "copper-l", "pex"] as const;
+
+const results = MATERIALS.map((m) => {
+  const id = insideDiameter(m, NOMINAL)!;
+  return {
+    m,
+    id,
+    loss: frictionLossPsiPer100Ft(GPM, id, HAZEN_WILLIAMS_C[m]),
+    v: velocity(GPM, id),
+  };
+});
+const maxLoss = Math.max(...results.map((r) => r.loss));
+
+const rows = results.map((r) => ({
+  label: PIPE_MATERIAL_LABELS[r.m],
+  value: r.loss,
+  frac: r.loss / maxLoss,
+  display: `${fmt(r.loss, 2)} psi/100  ·  C ${HAZEN_WILLIAMS_C[r.m]}  ·  ${fmt(r.v, 2)} ft/s`,
+  highlight: r.m === "pex",
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 176;
+const BAR_MAX = 248;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 248" fill="none" aria-hidden="true">
+  <title>10 gpm through nominal 3/4 inch — the best C factor loses</title>
+  <desc>PEX and CPVC share a Hazen-Williams C of 150; copper is 140. Only the bore differs</desc>
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">10 gpm through nominal 3/4 inch — the best C factor loses</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">PEX and CPVC share a Hazen-Williams C of 150; copper is 140. Only the bore differs</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="228" fill={C.muted} font-family={FONT} font-size="10">PEX loses 2.5x what CPVC does at the identical C factor, and at 8.82 ft/s it is already past the 8 ft/s cold ceiling.</text>
+</svg>

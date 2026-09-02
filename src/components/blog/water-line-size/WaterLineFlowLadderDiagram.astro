@@ -1,18 +1,24 @@
 ---
 import { C, FONT } from "../infographicTokens";
 import {
-  sizeSupplyPipe, sizeLabel,
+  sizeSupplyPipe, availableFrictionPsi, sizeLabel,
 } from "@/lib/plumbing";
-/** Peak demand against the size that carries it. Velocity governs the whole
- * ladder here, which is typical of residential runs at ordinary pressure. */
+/** Peak demand against the size that carries it, checked against BOTH the
+ * velocity ceiling and the friction budget — the size is whichever rule asks
+ * for more pipe, and the row says which one did. */
+/* The friction budget has to be computed first — `sizeSupplyPipe` takes a
+   single `availablePsi`, exactly as the calculator page does. */
+const AVAILABLE = availableFrictionPsi({
+  supplyPsi: 60,
+  highestFixtureFeet: 20,
+  fixtureRequiredPsi: 15,
+  meterLossPsi: 8,
+  otherLossPsi: 0,
+});
 const BASE = {
   material: "copper-l",
   developedFeet: 120,
-  supplyPsi: 60,
-  liftFeet: 20,
-  fixturePsi: 15,
-  meterPsi: 8,
-  otherPsi: 0,
+  availablePsi: AVAILABLE,
   maxVelocity: 8,
 };
 const FLOWS = [5, 8, 12, 18, 25, 40];
@@ -56,5 +62,5 @@ const BAR_MAX = 214;
     );
   })}
 
-  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">Velocity governs every rung of this ladder. Lengthen the run or drop the supply pressure and friction takes over.</text>
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">Below 25 gpm both rules land on the same size. Above it velocity alone decides, and a longer or lower-pressure run flips it to friction.</text>
 </svg>

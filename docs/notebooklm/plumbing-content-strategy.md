@@ -2,8 +2,8 @@
 
 The plan to bring `/blog` up to the same depth for plumbing that HVAC and electrical already
 have. Written **after** the calculators shipped, not before — waves 1–4 built 25 calculators and
-3 reference pages, and the first 8 posts went live in wave 4. This document exists so waves 5+
-stop being chosen post-by-post.
+3 reference pages, the first 8 posts went live in wave 4, and wave 5a added 6 more. This
+document exists so the remaining waves stop being chosen post-by-post.
 
 **Market assumption:** United States, imperial units, **IPC 2021** as the baseline authority —
 consistent with the calculators. Do not write UK/AU/EU content into this category.
@@ -28,7 +28,7 @@ than they are.
 | --- | --- |
 | Calculators | **25**, in 6 hub groups. Four-edit registration is structurally guarded by `ungroupedPlumbingCalculators`. |
 | Reference pages | **3** — `formulas` (25 blocks), `glossary` (85 terms), `backflow-prevention`. Parity with electrical, ahead of HVAC's 2. |
-| Blog posts | **8**, all shipped in wave 4. Against HVAC's 64 and electrical's 75. |
+| Blog posts | **14** — 8 in wave 4, 6 in wave 5a. Against HVAC's 64 and electrical's 75. |
 | Taxonomy | `categorySeo.plumbing` present in `blogTaxonomy.ts`. `/blog/categories/plumbing` live; the hub's "From the Blog" strip live. |
 | Keyword data | **None.** |
 
@@ -64,7 +64,7 @@ all worth repeating:
 
 Format matches the HVAC and electrical strategy docs: filename · title · target keyword ·
 calculator it funnels into · tier. **Tier 1 = build first** (highest intent × weakest incumbent
-content × has a calculator that already exists). ✅ marks the 8 shipped in wave 4.
+content × has a calculator that already exists). ✅ marks the 14 shipped so far.
 
 Every tier-1 and tier-2 funnel target below **already exists** — there is no calculator blocking
 any of them. Verify before writing with
@@ -74,9 +74,9 @@ any of them. Verify before writing with
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `what-size-water-line-do-i-need.mdx` ✅ | What Size Water Line Do I Need? Velocity and Pressure, Both | what size water line do i need | pipe-size | 1 |
-| `water-pipe-size-chart.mdx` | Water Pipe Size Chart: GPM and Fixture Units to Nominal Size | water pipe size chart | pipe-size | 1 |
-| `plumbing-fixture-units-explained.mdx` | Fixture Units Explained: WSFU, DFU, and Why They Are Different Numbers | plumbing fixture units | wsfu + dfu | 1 |
-| `pex-vs-copper-vs-cpvc.mdx` | PEX vs Copper vs CPVC: Bore, Cost, and Why PEX Needs a Size Up | pex vs copper | pipe-size | 1 |
+| `water-pipe-size-chart.mdx` ✅ | Water Pipe Size Chart: GPM and Fixture Units to Nominal Size | water pipe size chart | pipe-size | 1 |
+| `plumbing-fixture-units-explained.mdx` ✅ | Fixture Units Explained: WSFU, DFU, and Why They Are Different Numbers | plumbing fixture units | wsfu + dfu | 1 |
+| `pex-vs-copper-vs-cpvc.mdx` ✅ | PEX vs Copper vs CPVC: Bore, Cost, and Why PEX Needs a Size Up | pex vs copper | pipe-size | 1 |
 | `water-velocity-in-pipes.mdx` | Water Velocity in Pipes: The 8 and 5 ft/s Limits Nobody Can Cite | water velocity in pipes | pipe-velocity | 2 |
 | `friction-loss-in-pipes.mdx` | Friction Loss in Water Pipes: Hazen-Williams Without the Nomograph | pipe friction loss | friction-loss | 2 |
 | `how-many-fixtures-on-a-3-4-inch-line.mdx` | How Many Fixtures Can a 3/4 Inch Line Serve? | fixtures per pipe size | wsfu | 2 |
@@ -87,8 +87,8 @@ any of them. Verify before writing with
 | `what-size-drain-pipe-do-i-need.mdx` ✅ | What Size Drain Pipe Do I Need? DFU, Tables 710.1, and the Rule That Overrides Them | what size drain pipe | drain-pipe-size | 1 |
 | `drain-pipe-slope.mdx` ✅ | Drain Pipe Slope: How Much Fall Does a Drain Actually Need? | drain pipe slope | pipe-slope | 1 |
 | `how-far-can-a-vent-be-from-a-trap.mdx` ✅ | How Far Can a Vent Be From a Trap? Trap Arm Limits Explained | how far can a vent be from a trap | vent-size | 1 |
-| `drainage-fixture-unit-chart.mdx` | Drainage Fixture Unit Chart: Table 709.1 With the Trap Sizes | drainage fixture unit chart | dfu | 1 |
-| `wet-venting-explained.mdx` | Wet Venting Explained: When One Drain Legally Vents Another | wet vent | vent-size | 1 |
+| `drainage-fixture-unit-chart.mdx` ✅ | Drainage Fixture Unit Chart: Table 709.1 With the Trap Sizes | drainage fixture unit chart | dfu | 1 |
+| `wet-venting-explained.mdx` ✅ | Wet Venting Explained: When One Drain Legally Vents Another | wet vent | vent-size | 1 |
 | `why-is-my-drain-gurgling.mdx` | Why Is My Drain Gurgling? It Is Almost Always the Vent | drain gurgling | vent-size | 2 |
 | `air-admittance-valve-vs-vent.mdx` | Air Admittance Valves: Where They Are Legal and Where They Are Not | air admittance valve | vent-size | 2 |
 | `stack-vent-vs-vent-stack.mdx` | Stack Vent vs Vent Stack: Two Different Things With One Name | stack vent vs vent stack | vent-size | 3 |
@@ -129,7 +129,7 @@ any of them. Verify before writing with
 ### Cluster 6 — Volume, wait time & conversions (3)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
-| `how-long-does-it-take-hot-water-to-reach-the-tap.mdx` | Why Hot Water Takes So Long — and Why a Bigger Pipe Makes It Worse | hot water takes too long | pipe-volume | 1 |
+| `how-long-does-it-take-hot-water-to-reach-the-tap.mdx` ✅ | Why Hot Water Takes So Long — and Why a Bigger Pipe Makes It Worse | hot water takes too long | pipe-volume | 1 |
 | `how-many-gallons-in-a-pipe.mdx` | How Many Gallons Are in a Pipe? 0.0408 x Diameter Squared | gallons in a pipe | pipe-volume | 2 |
 | `plumbing-unit-conversions.mdx` | Plumbing Unit Conversions: GPM, LPM, PSI, Head — and the Imperial Gallon Trap | gpm to lpm | unit-converter | 3 |
 
@@ -153,10 +153,10 @@ any of them. Verify before writing with
 
 | Tier | Count | Shipped | Remaining |
 |---|---|---|---|
-| 1 | 25 | 8 | **17** |
+| 1 | 25 | 14 | **11** |
 | 2 | 15 | 0 | 15 |
 | 3 | 7 | 0 | 7 |
-| **Total** | **47** | **8** | **39** |
+| **Total** | **47** | **14** | **33** |
 
 Verify these totals against the tables with:
 `grep -oE '^\| \`[a-z0-9-]+\.mdx\`.*\| [123] \|$' docs/notebooklm/plumbing-content-strategy.md | grep -oE '\| [123] \|$' | sort | uniq -c`
@@ -166,12 +166,14 @@ Verify these totals against the tables with:
 
 ## 3. Wave 5 — the recommended next batch
 
-**The 17 remaining tier-1 posts**, in three sub-waves so each is reviewable:
+**The 17 tier-1 posts remaining after wave 4**, in three sub-waves so each is reviewable.
+**5a is DONE** — the 11 below are what is left:
 
-**5a — the sizing anchors that pair with wave 4 (6 posts).** `water-pipe-size-chart`,
-`plumbing-fixture-units-explained`, `drainage-fixture-unit-chart`, `wet-venting-explained`,
-`pex-vs-copper-vs-cpvc`, `how-long-does-it-take-hot-water-to-reach-the-tap`. These finish the
-supply/drainage spine and fill the Volume & Conversions gap wave 4 deliberately left.
+**5a — the sizing anchors that pair with wave 4 (6 posts). SHIPPED.**
+`water-pipe-size-chart`, `plumbing-fixture-units-explained`, `drainage-fixture-unit-chart`,
+`wet-venting-explained`, `pex-vs-copper-vs-cpvc`,
+`how-long-does-it-take-hot-water-to-reach-the-tap`. These finished the supply/drainage spine and
+filled the Volume & Conversions gap wave 4 deliberately left.
 
 **5b — site, pressure and water heating (7 posts).** `what-size-septic-tank-do-i-need`,
 `what-size-grease-trap-do-i-need`, `low-water-pressure-in-house`,

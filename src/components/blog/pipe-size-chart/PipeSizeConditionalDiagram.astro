@@ -1,0 +1,86 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  sizeSupplyPipe, availableFrictionPsi, sizeLabel, fmt,
+} from "@/lib/plumbing";
+/** Why a size chart cannot be universal: the same 15 gpm needs a different
+ * pipe depending on supply pressure and run length, and friction takes over
+ * exactly where the budget gets thin. */
+const GPM = 15;
+const LENGTHS = [100, 200, 300, 400];
+const PRESSURES = [80, 60, 50, 40];
+
+const rows = PRESSURES.map((psi) => {
+  const available = availableFrictionPsi({
+    supplyPsi: psi,
+    highestFixtureFeet: 20,
+    fixtureRequiredPsi: 15,
+    meterLossPsi: 8,
+    otherLossPsi: 0,
+  });
+  const cells = LENGTHS.map((len) => {
+    const r = sizeSupplyPipe({
+      gpm: GPM,
+      material: "copper-l",
+      developedFeet: len,
+      availablePsi: available,
+      maxVelocity: 8,
+    });
+    return r.size === null ? "—" : sizeLabel(r.size);
+  });
+  const results = LENGTHS.map((len) =>
+    sizeSupplyPipe({ gpm: GPM, material: "copper-l", developedFeet: len, availablePsi: available, maxVelocity: 8 }),
+  );
+  return {
+    label: `${psi} psi supply`,
+    cells,
+    tone: results.map((r) => (r.governedBy === "friction" ? "bad" : r.governedBy === "both" ? "neutral" : "good")),
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>The same 15 gpm, four pressures, four run lengths</title>
+  <desc>Green = velocity decides · amber = both rules agree · red = friction has taken over and forced a size up</desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The same 15 gpm, four pressures, four run lengths</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Green = velocity decides · amber = both rules agree · red = friction has taken over and forced a size up</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SUPPLY PRESSURE</text>
+  <text x={284} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">100 FT</text>
+  <text x={400} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">200 FT</text>
+  <text x={516} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">300 FT</text>
+  <text x={632} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">400 FT</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={104} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={104} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={284} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={348} y={y} width={104} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={348} y={y} width={104} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={400} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={464} y={y} width={104} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={464} y={y} width={104} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={516} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+            <rect x={580} y={y} width={104} height="24" rx="6" fill={row.tone[3] === "bad" ? C.red : row.tone[3] === "good" ? C.green : C.orange} opacity={row.tone[3] === "bad" ? 0.18 : 0.1} />
+            <rect x={580} y={y} width={104} height="24" rx="6" fill="none" stroke={row.tone[3] === "bad" ? C.red : row.tone[3] === "good" ? C.green : C.orange} stroke-width={row.tone[3] === "bad" ? 2 : 1.2} />
+            <text x={632} y={y + 16} text-anchor="middle" fill={row.tone[3] === "bad" ? C.red : row.tone[3] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[3] === "bad" ? 800 : 700}>
+              {row.cells[3]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">At 80 psi one size covers every run. At 40 psi the same flow needs two sizes more by 400 ft. No single chart can say that.</text>
+</svg>

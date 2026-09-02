@@ -1,0 +1,50 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  wsfuToGpm, fmt,
+} from "@/lib/plumbing";
+/** Hunter's curve is not linear, and the non-linearity is the whole point: the
+ * more fixtures there are, the less likely they are to run together. */
+const LOADS = [5, 10, 16.4, 20, 30, 50, 100, 200];
+const points = LOADS.map((fu) => ({ fu, gpm: wsfuToGpm(fu, "tank"), per: wsfuToGpm(fu, "tank") / fu }));
+const maxPer = Math.max(...points.map((p) => p.per));
+
+const rows = points.map((p) => ({
+  label: `${p.fu} FU`,
+  value: p.per,
+  frac: p.per / maxPer,
+  display: `${fmt(p.per, 2)} gpm per FU  ·  ${fmt(p.gpm, 1)} gpm total`,
+  highlight: p.fu === 16.4,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 100;
+const BAR_MAX = 230;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 368" fill="none" aria-hidden="true">
+  <title>Demand per fixture unit falls as the building grows</title>
+  <desc>Hunter's curve, flush-tank column. The highlighted row is a typical two-bath house at 16.4 WSFU</desc>
+
+  <rect x="8" y="8" width="704" height="354" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Demand per fixture unit falls as the building grows</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Hunter's curve, flush-tank column. The highlighted row is a typical two-bath house at 16.4 WSFU</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="348" fill={C.muted} font-family={FONT} font-size="10">A 200-unit building draws 65 gpm, not 40x the 5-unit figure. Simultaneous use collapses as the fixture count rises.</text>
+</svg>

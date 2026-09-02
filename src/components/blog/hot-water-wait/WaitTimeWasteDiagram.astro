@@ -1,55 +1,47 @@
 ---
 import { C, FONT } from "../infographicTokens";
 import {
-  insideDiameter, sizeSupplyPipe, availableFrictionPsi, HAZEN_WILLIAMS_C, PIPE_MATERIAL_LABELS, sizeLabel,
+  insideDiameter, pipeVolume, PIPE_MATERIAL_LABELS, sizeLabel, fmt,
 } from "@/lib/plumbing";
-/** The differentiator: PEX has the best C factor and the smallest bore, and the
- * bore wins, because friction goes as diameter to the 4.87 power. */
-/* The friction budget has to be computed first — `sizeSupplyPipe` takes a
-   single `availablePsi`, exactly as the calculator page does. */
-const AVAILABLE = availableFrictionPsi({
-  supplyPsi: 60,
-  highestFixtureFeet: 20,
-  fixtureRequiredPsi: 15,
-  meterLossPsi: 8,
-  otherLossPsi: 0,
-});
-const BASE = {
-  gpm: 18,
-  developedFeet: 120,
-  availablePsi: AVAILABLE,
-  maxVelocity: 8,
-};
-const MATERIALS = ["copper-l", "pex", "cpvc-40", "pvc-40"] as const;
+/** The annual cost of the wait, at four hot draws a day — the number that
+ * makes the case for a smaller bore or a recirculation loop. */
+const RUN_FT = 50;
+const DRAWS_PER_DAY = 4;
+const OPTIONS: { m: "copper-l" | "pex"; n: number }[] = [
+  { m: "pex", n: 0.5 },
+  { m: "pex", n: 0.75 },
+  { m: "copper-l", n: 0.75 },
+  { m: "copper-l", n: 1 },
+];
 
-const rows = MATERIALS.map((material) => {
-  const r = sizeSupplyPipe({ ...BASE, material });
-  const boreAtOneInch = insideDiameter(material, 1)!;
-  const oversize = r.size > 1;
+const rows = OPTIONS.map(({ m, n }) => {
+  const id = insideDiameter(m, n)!;
+  const gal = pipeVolume(id, RUN_FT).gallons;
+  const annual = gal * DRAWS_PER_DAY * 365;
   return {
-    label: PIPE_MATERIAL_LABELS[material],
+    label: `${PIPE_MATERIAL_LABELS[m].split(" (")[0].split(",")[0]} ${sizeLabel(n)}`,
     cells: [
-      `${boreAtOneInch.toFixed(3)} in`,
-      String(HAZEN_WILLIAMS_C[material]),
-      sizeLabel(r.size),
+      `${fmt(gal, 2)} gal`,
+      `${fmt((gal / 2) * 60, 0)} s`,
+      `${fmt(annual, 0)} gal`,
     ],
-    tone: ["neutral", "neutral", oversize ? "bad" : "good"],
+    tone: ["neutral", "neutral", annual > 2500 ? "bad" : annual > 1500 ? "neutral" : "good"],
   };
 });
 ---
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
-  <title>Bore beats smoothness — same 18 gpm, four materials</title>
-  <desc>Nominal 1 inch bore, the Hazen-Williams C factor, and the size each material actually needs</desc>
+  <title>What the wait costs over a year</title>
+  <desc>50 ft of hot line, four draws a day, 365 days — water heated, never used, and poured down the drain</desc>
 
   <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
-  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Bore beats smoothness — same 18 gpm, four materials</text>
-  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Nominal 1 inch bore, the Hazen-Williams C factor, and the size each material actually needs</text>
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What the wait costs over a year</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">50 ft of hot line, four draws a day, 365 days — water heated, never used, and poured down the drain</text>
 
-  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MATERIAL</text>
-  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BORE AT 1 IN</text>
-  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">C FACTOR</text>
-  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SIZE FOR 18 GPM</text>
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOT LINE</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HELD IN PIPE</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WAIT AT 2 GPM</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WASTED PER YEAR</text>
 
   {rows.map((row, i) => {
     const y = 86 + i * 30;
@@ -75,5 +67,5 @@ const rows = MATERIALS.map((material) => {
     );
   })}
 
-  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">PEX has the best C factor of the four and still needs a size up, because a nominal 1 inch PEX bores 0.875 against copper's 1.025.</text>
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">Same house, same heater, same habits: the pipe choice alone swings this by more than 1,700 gallons a year.</text>
 </svg>

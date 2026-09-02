@@ -36,7 +36,7 @@ For a typical single-family house on a 3/4 inch or 1 inch meter:
 - **1 inch** is the usual main for a two-bath house at any real distance from the meter.
 - **1-1/4 inch** shows up on longer runs, three-plus baths, or where street pressure is marginal.
 
-But those are starting points, not answers. Feed your own numbers into the **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)** and it will tell you which of the two rules governed — which is the part that matters when someone questions the size.
+But those are starting points, not answers. Feed your own numbers into the **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)** and it will tell you which of the two rules governed — which is the part that matters when someone questions the size. If you want the whole ladder laid out, the **[water pipe size chart](/blog/water-pipe-size-chart)** covers gpm to nominal size along with what each row is conditional on.
 
 ## Why one rule is never enough
 
@@ -51,7 +51,19 @@ Take a real case: 18 gpm of peak demand, copper Type L, 120 ft of developed leng
 
 Three-quarter inch fails at **11.93 ft/s** — half again the sensible ceiling — *and* at **32.91 psi per 100 ft** against a budget of 23.62. It is not close on either count. One inch lands at **7.00 ft/s** and **8.98 psi per 100 ft**, comfortable on both.
 
-Notice the shape of that result. The pipe that fails velocity also fails pressure, and the pipe that clears velocity clears pressure with room to spare. That is common on short residential runs, and it is exactly why a velocity-only chart usually gets away with it. Stretch the run to 250 ft or drop the street pressure to 45 psi and the two rules come apart — friction starts governing while velocity still looks fine.
+Notice the shape of that result. The pipe that fails velocity also fails pressure, and the pipe that clears velocity clears pressure with room to spare. That is common on short residential runs, and it is exactly why a velocity-only chart usually gets away with it.
+
+It stops getting away with it when the budget tightens. Take 15 gpm through copper and vary only the street pressure and the run:
+
+```
+60 psi  ·  up to 100 ft   velocity decides
+60 psi  ·  150 ft and up  both rules land on 1 inch
+50 psi  ·  300 ft         friction takes over -> 1-1/4 inch
+40 psi  ·  150 ft         friction takes over -> 1-1/4 inch
+40 psi  ·  400 ft         friction again     -> 1-1/2 inch
+```
+
+At 60 psi over a short run you could have used a velocity chart and been right. At 40 psi over 150 ft the same chart is a size small, and the fixture at the end of the run is the one that tells you.
 
 ## Where the pressure actually goes
 
@@ -69,13 +81,13 @@ Two things people routinely get wrong here. *Developed length* is not the tape m
 
 You cannot size a line until you know what it has to carry, and the answer is never the sum of every fixture — nobody runs all of them at once. The IPC handles this with **water supply fixture units**: each fixture gets a weight, you add the weights, and a demand curve converts the total into probable peak flow.
 
-A two-bath house with a kitchen sink, dishwasher, clothes washer and two hose bibbs comes to **16.4 WSFU**, which the curve turns into about **18.2 gpm** on a flush-tank system. Run it yourself with the **[Water Supply Fixture Unit Calculator](/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator)**.
+A two-bath house with a kitchen sink, dishwasher, clothes washer and two hose bibbs comes to **16.4 WSFU**, which the curve turns into about **18.2 gpm** on a flush-tank system. Run it yourself with the **[Water Supply Fixture Unit Calculator](/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator)**, and note that the same fixtures carry a *different* set of weights on the drainage side — **[fixture units explained](/blog/plumbing-fixture-units-explained)** covers why.
 
 The interesting property of that curve is that demand per fixture unit *falls* as the building gets bigger. At 5 fixture units you are getting about 1.88 gpm per unit; at 100 you are getting 0.43. A hotel does not need twenty times the pipe of a house with twenty times the fixtures, because the odds of simultaneous use collapse as the count rises.
 
 <BlogInfographic
   title="Peak demand into nominal size — copper Type L"
-  caption="Across ordinary residential flows on a 120 ft run, velocity governs every rung. Lengthen the run or drop the supply pressure and friction takes over."
+  caption="On a 120 ft run at 60 psi the two rules agree up to 18 gpm and velocity alone decides above it. Neither is redundant — a longer or lower-pressure run hands control to friction."
 >
   <WaterLineFlowLadderDiagram />
 </BlogInfographic>
@@ -99,7 +111,7 @@ The reason is that PEX is **outside-diameter controlled**. A nominal 1 inch PEX 
 
 And friction does not scale gently with diameter. In the Hazen-Williams equation, loss goes as **diameter to the power of 4.87**. Shrink the bore by 15% and friction rises by roughly 90%. No plausible improvement in wall smoothness competes with that.
 
-**Bore beats smoothness, every time.** The practical rule: when you substitute PEX for copper on a sized drawing, go up a nominal size on the mains and long branches. Short fixture drops are usually fine as-is. Check any specific case with the **[Pipe Velocity Calculator](/calculators/plumbing/plumbing-pipe-velocity-calculator)**.
+**Bore beats smoothness, every time.** The practical rule: when you substitute PEX for copper on a sized drawing, go up a nominal size on the mains and long branches. Short fixture drops are usually fine as-is. Check any specific case with the **[Pipe Velocity Calculator](/calculators/plumbing/plumbing-pipe-velocity-calculator)**, and see **[PEX vs copper vs CPVC](/blog/pex-vs-copper-vs-cpvc)** for the full comparison — including the one place PEX's small bore is an advantage.
 
 ## Why the velocity limits are what they are
 

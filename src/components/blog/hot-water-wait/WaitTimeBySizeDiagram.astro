@@ -1,0 +1,64 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter, pipeVolume, PIPE_MATERIAL_LABELS, sizeLabel, fmt,
+} from "@/lib/plumbing";
+/** The counter-intuitive headline: a bigger hot line holds more water, so it
+ * takes LONGER to clear. Upsizing makes the wait worse, not better. */
+const RUN_FT = 50;
+const FLOW_GPM = 2;
+const OPTIONS: { m: "copper-l" | "pex" | "cpvc-40"; n: number }[] = [
+  { m: "pex", n: 0.5 },
+  { m: "copper-l", n: 0.5 },
+  { m: "pex", n: 0.75 },
+  { m: "copper-l", n: 0.75 },
+  { m: "pex", n: 1 },
+  { m: "copper-l", n: 1 },
+];
+
+const results = OPTIONS.map(({ m, n }) => {
+  const id = insideDiameter(m, n)!;
+  const v = pipeVolume(id, RUN_FT);
+  return { m, n, gallons: v.gallons, seconds: (v.gallons / FLOW_GPM) * 60 };
+});
+const maxSec = Math.max(...results.map((r) => r.seconds));
+
+const rows = results.map((r) => ({
+  label: `${PIPE_MATERIAL_LABELS[r.m].split(",")[0].split(" (")[0]} ${sizeLabel(r.n)}`,
+  value: r.seconds,
+  frac: r.seconds / maxSec,
+  display: `${fmt(r.seconds, 0)} s  ·  ${fmt(r.gallons, 2)} gal sitting in the pipe`,
+  highlight: r.m === "copper-l" && r.n === 1,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 176;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>50 ft of hot line at 2 gpm — how long before it runs hot</title>
+  <desc>The wait is the water already in the pipe. Nothing about the water heater changes any of these numbers</desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">50 ft of hot line at 2 gpm — how long before it runs hot</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">The wait is the water already in the pipe. Nothing about the water heater changes any of these numbers</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">Upsizing 3/4 to 1 inch copper takes the wait from 38 to 64 seconds. The bigger pipe is strictly worse here.</text>
+</svg>

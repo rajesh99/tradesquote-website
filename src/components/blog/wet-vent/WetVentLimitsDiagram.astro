@@ -1,0 +1,56 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  trapArmMaxFeet, sizeLabel,
+} from "@/lib/plumbing";
+/** What wet venting does NOT permit. The rule is generous about arrangement
+ * and strict about scope, and the scope is where people get caught. */
+const RULES = [
+  { rule: "Fixtures on one or two floors", ok: true, note: "the arrangement the rule is written for" },
+  { rule: "Bathroom-group fixtures only", ok: true, note: "not kitchen sinks or laundry" },
+  { rule: "One dry vent for the group", ok: true, note: "taken off the most upstream fixture" },
+  { rule: "Trap arms still capped", ok: false, note: `2 in arm still stops at ${trapArmMaxFeet(2)} ft` },
+  { rule: "Kitchen sink into the wet vent", ok: false, note: "grease and solids — not permitted" },
+  { rule: "Replaces the outdoor vent", ok: false, note: "one vent must still reach open air" },
+];
+
+const rows = RULES.map((r) => ({
+  label: r.rule,
+  cells: [r.ok ? "permitted" : "NOT permitted", r.note],
+  tone: [r.ok ? "good" : "bad", r.ok ? "neutral" : "bad"],
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 310" fill="none" aria-hidden="true">
+  <title>What wet venting does and does not allow</title>
+  <desc>IPC 912 is generous about arrangement and strict about scope — the scope is where jobs fail inspection</desc>
+
+  <rect x="8" y="8" width="704" height="296" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What wet venting does and does not allow</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">IPC 912 is generous about arrangement and strict about scope — the scope is where jobs fail inspection</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">THE QUESTION</text>
+  <text x={294} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ANSWER</text>
+  <text x={460} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHY</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={214} y={y} width={160} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={214} y={y} width={160} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={294} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={380} y={y} width={160} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={380} y={y} width={160} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={460} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="290" fill={C.muted} font-family={FONT} font-size="10">Wet venting removes individual vents. It never removes the trap arm limits, and it never removes the vent through the roof.</text>
+</svg>
