@@ -287,6 +287,15 @@ export const plumbingCalculators: PlumbingCalculator[] = [
     accent: "cyan",
     icon: ICON_CISTERN,
   },
+  {
+    slug: "plumbing-leak-water-waste-calculator",
+    title: "Leak & Water Waste Calculator",
+    description:
+      "Turn a drip rate, a container fill test or a water meter reading into gallons per year and what it costs — including the energy on a hot-water leak that most calculators ignore.",
+    question: "What is this leak actually costing me?",
+    accent: "rose",
+    icon: ICON_DROP,
+  },
 ];
 
 export type PlumbingCalculatorGroup = {
@@ -346,8 +355,12 @@ export const plumbingCalculatorGroups: PlumbingCalculatorGroup[] = [
   {
     label: "Volume & Conversions",
     description:
-      "The utility drawer. How much water a run of pipe holds, and every unit a plumbing job gets quoted in, converted both ways.",
-    slugs: ["plumbing-pipe-volume-calculator", "plumbing-unit-converter"],
+      "The utility drawer. How much water a run of pipe holds, what a leak is quietly costing, and every unit a plumbing job gets quoted in, converted both ways.",
+    slugs: [
+      "plumbing-pipe-volume-calculator",
+      "plumbing-leak-water-waste-calculator",
+      "plumbing-unit-converter",
+    ],
   },
   {
     label: "Cost & Business",
@@ -606,6 +619,13 @@ export const plumbingCalculatorGuide = [
     tool: "Pipe Volume",
     accent: "sky" as const,
     rule: "gal per ft = 0.0408 x ID squared, from pi/4 x d squared x 12 / 231",
+  },
+  {
+    question: "What is this leak actually costing me?",
+    slug: "plumbing-leak-water-waste-calculator",
+    tool: "Leak & Water Waste",
+    accent: "rose" as const,
+    rule: "Drips to gallons at 15,140 per gallon, then water, sewer and the energy on a hot leak",
   },
   {
     question: "How many litres per minute is that in gpm?",

@@ -1,0 +1,109 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter,
+  velocity,
+  frictionLossPsiPer100Ft,
+  psiToHead,
+  velocityHead,
+  totalDynamicHead,
+  sizeLabel,
+  HAZEN_WILLIAMS_C,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * Why reducing the discharge to fit the plumbing you already have is the most
+ * expensive shortcut in the job. Same pump, same lift, same run — the only
+ * variable is the bore, and it more than doubles the head.
+ *
+ * Base copied from plumbing-pump-head-calculator: 30 gpm, 40 ft, 12 ft lift.
+ */
+const MATERIAL = "pvc-40";
+const GPM = 30;
+const LENGTH_FT = 40;
+const LIFT_FT = 12;
+
+const SIZES = [1, 1.25, 1.5, 2];
+
+const rows = SIZES.map((n) => {
+  const bore = insideDiameter(MATERIAL, n)!;
+  const v = velocity(GPM, bore);
+  const per100 = frictionLossPsiPer100Ft(GPM, bore, HAZEN_WILLIAMS_C[MATERIAL]);
+  const frictionFt = psiToHead((per100 / 100) * LENGTH_FT);
+  const vh = velocityHead(v);
+  return {
+    label: sizeLabel(n),
+    bore,
+    v,
+    frictionFt,
+    tdh: totalDynamicHead({
+      staticLiftFeet: LIFT_FT,
+      frictionHeadFeet: frictionFt,
+      pressureHeadFeet: 0,
+      velocityHeadFeet: vh,
+    }),
+    isTypical: n === 1.5,
+  };
+});
+
+const maxTdh = Math.max(...rows.map((r) => r.tdh));
+const BAR_X = 200;
+const BAR_MAX = 314;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 104 + i * 36,
+  w: Math.max(3, (r.tdh / maxTdh) * BAR_MAX),
+  liftW: (LIFT_FT / maxTdh) * BAR_MAX,
+  colour: r.isTypical ? C.primary : C.orange,
+  opacity: r.isTypical ? 0.82 : 0.5,
+  weight: r.isTypical ? 800 : 600,
+}));
+
+const smallest = rows[0];
+const typical = rows.find((r) => r.isTypical)!;
+const ratio = smallest.tdh / typical.tdh;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Total dynamic head against sump discharge pipe size at a fixed flow and lift</title>
+  <desc>
+    Thirty gallons a minute up twelve feet through forty feet of pipe needs 30.7 feet of head in one-inch PVC
+    and 14.4 feet in inch-and-a-half. The lift never changes; only the friction does.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Reducing the discharge is the expensive shortcut</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Same ${fmt(GPM, 0)} gpm, same ${fmt(LIFT_FT, 0)} ft lift, same ${fmt(LENGTH_FT, 0)} ft run of Schedule 40 PVC. The only variable is the bore.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    The pale segment is the static lift, identical in every row. Everything past it is friction the pipe added.
+  </text>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">DISCHARGE SIZE</text>
+  <text x={BAR_X + BAR_MAX + 10} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">TDH · FRICTION</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.weight}>{row.label}</text>
+      <text x="28" y={row.y + 25} fill={C.muted} font-family={FONT} font-size="8">
+        {`bore ${fmt(row.bore, 3)} in · ${fmt(row.v, 2)} ft/s`}
+      </text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="17" rx="4" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="17" rx="4" fill={row.colour} opacity={row.opacity} />
+      <rect x={BAR_X} y={row.y} width={row.liftW} height="17" rx="4" fill={C.white} opacity="0.42" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {`${fmt(row.tdh, 1)} ft · ${fmt(row.frictionFt, 2)} ft`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">
+    {`${smallest.label} needs ${fmt(smallest.tdh, 1)} ft of head against ${fmt(typical.tdh, 1)} ft for ${typical.label} — ${fmt(ratio, 1)}x, and at ${fmt(smallest.v, 1)} ft/s it will erode as well.`}
+  </text>
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="9">
+    Never reduce below the pump's own discharge tapping to suit existing pipe. Upsize the pipe instead.
+  </text>
+</svg>

@@ -1,0 +1,62 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { roofRunoffGpm, fmt } from "@/lib/plumbing";
+
+/**
+ * Runoff is strictly linear in area — unlike almost everything else in
+ * plumbing, doubling the input doubles the answer. That makes it the one place
+ * where a rule of thumb per square foot is actually safe.
+ */
+const RATE = 4;
+const AREAS = [1000, 2000, 3000, 5000];
+
+const rows = AREAS.map((areaSqFt) => {
+  const gpm = roofRunoffGpm(areaSqFt, RATE);
+  return { areaSqFt, gpm, perHour: gpm * 60 };
+});
+
+const perSqFt = rows[0].gpm / rows[0].areaSqFt;
+const maxGpm = Math.max(...rows.map((r) => r.gpm));
+
+const BAR_X = 214;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Roof runoff against catchment area</title>
+  <desc>
+    Runoff scales exactly linearly with area, which makes it the rare plumbing quantity where a per-square-foot
+    rule of thumb is genuinely safe.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Strictly linear — the one place a rule of thumb is safe</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`At ${RATE} in/hr. Double the roof and you exactly double the flow, which is not true of any pipe-sizing quantity.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (row.gpm / maxGpm) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 17} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">
+          {`${fmt(row.areaSqFt)} sq ft`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="20" rx="5" fill={C.blue} opacity="0.7" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 18} fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.gpm, 1)} gpm · ${fmt(row.perHour)} gal/hr`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="216" width="672" height="34" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="36" y="232" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">
+    {`At ${RATE} in/hr every square foot sheds ${fmt(perSqFt * 1000, 2)} gpm per 1,000 sq ft — multiply and you are done.`}
+  </text>
+  <text x="36" y="245" fill={C.dark} font-family={FONT} font-size="9.5">
+    This page publishes the FLOW. The pipe size comes from IPC Tables 1106.2 and 1106.3, which depend on slope and are not reproduced here.
+  </text>
+</svg>

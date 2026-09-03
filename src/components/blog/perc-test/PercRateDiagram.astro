@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { septicSizing, PERC_APPLICATION_RATES, fmt } from "@/lib/plumbing";
+
+/**
+ * The soil ladder, expressed as what it costs in ground. Base copied from
+ * plumbing-septic-tank-calculator/index.astro so the post and the page agree.
+ */
+const BASE = { bedrooms: 3, galPerBedroom: 150, applicationRate: 0.8, trenchWidthFt: 3 };
+
+const rows = PERC_APPLICATION_RATES.map((soil) => {
+  const r = septicSizing({ ...BASE, applicationRate: soil.galPerSqFtPerDay });
+  return {
+    label: soil.label,
+    maxMinPerInch: soil.maxMinPerInch,
+    rate: soil.galPerSqFtPerDay,
+    field: r.leachFieldSqFt,
+    trench: r.trenchFeet,
+    isDefault: soil.galPerSqFtPerDay === BASE.applicationRate,
+  };
+});
+
+const flow = septicSizing(BASE).dailyFlow;
+const fastest = rows[0];
+const slowest = rows[rows.length - 1];
+const maxField = Math.max(...rows.map((r) => r.field));
+
+const BAR_X = 268;
+const BAR_MAX = 216;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Leach field area against percolation rate</title>
+  <desc>
+    The same daily flow across five soil types. The percolation rate alone moves the required field area five-fold
+    on an identical house.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The ground decides, and it decides by a factor of five</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${BASE.bedrooms} bedrooms at ${BASE.galPerBedroom} gal per bedroom per day = ${fmt(flow)} gpd, in trenches ${BASE.trenchWidthFt} ft wide. Only the soil changes.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 34;
+    const w = Math.max(3, (row.field / maxField) * BAR_MAX);
+    const extreme = row.field === maxField || row.field === Math.min(...rows.map((r) => r.field));
+    const tone = extreme ? C.orange : row.isDefault ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.isDefault ? 800 : 700}>
+          {row.label}
+        </text>
+        <text x="28" y={y + 25} fill={C.muted} font-family={FONT} font-size="9">
+          {`up to ${row.maxMinPerInch} min/in · absorbs ${row.rate} gal per sq ft per day`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.field)} sq ft · ${fmt(row.trench)} ft of trench`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="248" width="672" height="30" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="36" y="264" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">
+    {`${fmt(fastest.field)} sq ft on sand against ${fmt(slowest.field)} on slow clay — a ${fmt(slowest.field / fastest.field, 1)}x swing, and the house never changed.`}
+  </text>
+  <text x="36" y="276" fill={C.dark} font-family={FONT} font-size="9.5">
+    Nothing you can see standing on the plot tells you which row you are on. That is the entire reason the test exists.
+  </text>
+</svg>

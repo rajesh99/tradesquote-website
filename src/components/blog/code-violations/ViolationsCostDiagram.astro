@@ -1,0 +1,79 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { estimateJob, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * Why the rough-in inspection is the cheap one. The same defect costs a
+ * different multiple depending on when it is found, and the cost is almost
+ * entirely labour to reach the work again.
+ *
+ * Labour rate copied from plumbing-estimate-calculator/index.astro.
+ */
+const defs = markerDefs("viol-cost");
+const RATE = 110;
+
+const STAGES = [
+  { label: "Caught during rough-in", hours: 1, extra: 0, detail: "the pipe is open and in front of you", tone: C.primary },
+  { label: "Caught at rough-in inspection", hours: 3, extra: 0, detail: "re-work, re-schedule, re-inspect", tone: C.blue },
+  { label: "Caught after drywall", hours: 8, extra: 900, detail: "open the wall, fix, patch, tape, texture, paint", tone: C.orange },
+  { label: "Caught after tile and fixtures", hours: 14, extra: 2400, detail: "finishes come out and rarely go back the same", tone: C.red },
+];
+
+const rows = STAGES.map((s) => {
+  const labour = s.hours * RATE;
+  const r = estimateJob({
+    labourHours: s.hours,
+    labourRate: RATE,
+    fixtureCost: 0,
+    materialCost: s.extra,
+    overheadPercent: 15,
+    marginPercent: 25,
+  });
+  return { ...s, labour, total: r.breakEven };
+});
+
+const baseline = rows[0];
+const maxTotal = Math.max(...rows.map((r) => r.total));
+
+const BAR_X = 268;
+const BAR_MAX = 226;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>What the same defect costs depending on when it is found</title>
+  <desc>
+    A single trap arm that is two feet too long costs an hour during rough-in and a great deal more once finishes
+    are in. The cost is access, not plumbing.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The same defect, four prices</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`One trap arm two feet too long. Labour at ${usd(RATE)} an hour plus what has to be rebuilt to reach it.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 34;
+    const w = Math.max(3, (row.total / maxTotal) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="8.5">{row.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={row.tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={row.tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {i === 0 ? usd(row.total) : `${usd(row.total)} · ${fmt(row.total / baseline.total, 1)}x`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="222" width="672" height="30" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="36" y="238" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+    {`The plumbing is the same repair every time. What changes is what you have to destroy to reach it — up to ${fmt(rows[3].total / baseline.total, 1)}x.`}
+  </text>
+  <text x="36" y="250" fill={C.dark} font-family={FONT} font-size="9.5">
+    Which is why the rough-in inspection is the cheapest hour anyone spends on a job, and why nobody should be rushing it.
+  </text>
+</svg>

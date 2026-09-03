@@ -1,0 +1,89 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { MAX_VELOCITY_COLD, MAX_VELOCITY_HOT, PRV_THRESHOLD_PSI, sizeLabel, MIN_VENT_SIZE, trapArmMaxFeet } from "@/lib/plumbing";
+
+/**
+ * The point of the post: velocity limits are quoted everywhere as if they were
+ * code, and they are not. This figure sets them beside numbers that ARE code so
+ * the difference in provenance is visible rather than asserted.
+ */
+const ROWS = [
+  {
+    claim: `${MAX_VELOCITY_COLD} ft/s maximum, cold water`,
+    source: "ASPE and manufacturer design practice",
+    isCode: false,
+    why: "Erosion, noise and water hammer — no code publishes the figure",
+  },
+  {
+    claim: `${MAX_VELOCITY_HOT} ft/s maximum, hot water`,
+    source: "ASPE and manufacturer design practice",
+    isCode: false,
+    why: "Hot water erodes copper faster, so the practice figure is lower",
+  },
+  {
+    claim: "Copper erosion-corrosion thresholds",
+    source: "Manufacturer and CDA guidance",
+    isCode: false,
+    why: "Material-specific, and it is why the limits differ by pipe type",
+  },
+  {
+    claim: `A pressure reducing valve above ${PRV_THRESHOLD_PSI} psi`,
+    source: "IPC 604.8",
+    isCode: true,
+    why: "An actual requirement with an actual number in the code text",
+  },
+  {
+    claim: `Vents never smaller than ${sizeLabel(MIN_VENT_SIZE)}`,
+    source: "IPC 906.2",
+    isCode: true,
+    why: "Code text, and the reason a vent has a floor at all",
+  },
+  {
+    claim: `A ${sizeLabel(2)} trap arm stops at ${trapArmMaxFeet(2)} ft`,
+    source: "IPC Table 909.1",
+    isCode: true,
+    why: "A published table, enforceable where the IPC is adopted",
+  },
+];
+
+const ROW_H = 34;
+const TOP = 84;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 316" fill="none" aria-hidden="true">
+  <title>Which plumbing numbers are code and which are design practice</title>
+  <desc>
+    The velocity ceilings quoted throughout the trade are design practice rather than code text, set beside three
+    numbers that genuinely are in the code.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="300" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Nobody can cite the velocity limit, because it is not in a code</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Three numbers quoted as if they were code, and three that are. The difference matters when an inspector asks.
+  </text>
+
+  <text x="34" y="74" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">THE NUMBER</text>
+  <text x={318} y="74" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHERE IT ACTUALLY COMES FROM</text>
+
+  {ROWS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const tone = row.isCode ? C.primary : C.orange;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 6} rx="2" fill={tone} opacity="0.9" />
+        <text x="40" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.claim}</text>
+        <text x="40" y={y + 25} fill={C.muted} font-family={FONT} font-size="8.5">{row.why}</text>
+        <text x={318} y={y + 14} fill={tone} font-family={FONT} font-size="10" font-weight="700">{row.source}</text>
+        <text x={318} y={y + 25} fill={tone} font-family={FONT} font-size="8" font-weight="700">
+          {row.isCode ? "CODE — CITEABLE" : "PRACTICE — NOT CODE"}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="300" fill={C.muted} font-family={FONT} font-size="10">
+    Practice is not the same as wrong. It means you follow it because it is sound engineering, not because a section number says so.
+  </text>
+</svg>

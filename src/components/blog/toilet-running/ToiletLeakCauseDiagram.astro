@@ -1,0 +1,120 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { leakCost, fmt, usd } from "@/lib/plumbing";
+
+/**
+ * The three things that actually fail, and the test that tells them apart.
+ * The dye test is the whole diagnostic: it separates a flapper passing water
+ * into the bowl from a fill valve passing water down the overflow tube.
+ *
+ * RATES copied from plumbing-leak-water-waste-calculator/index.astro.
+ */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+const TONES = {
+  red: { colour: C.red, bg: C.redLight },
+  orange: { colour: C.orange, bg: C.orangeLight },
+  muted: { colour: C.muted, bg: C.white },
+};
+
+const CAUSES = [
+  {
+    part: "Flapper seal",
+    share: "Most common by a wide margin",
+    symptomA: "Tank level drops on its own,",
+    symptomB: "then refills every few minutes",
+    testA: "Dye the TANK — colour",
+    testB: "appears in the BOWL",
+    gpd: 200,
+    fixA: "Replace the flapper. A few",
+    fixB: "dollars, no tools, ten minutes.",
+    tone: "red" as const,
+  },
+  {
+    part: "Fill valve set too high",
+    share: "Second most common",
+    symptomA: "Continuous trickle into the",
+    symptomB: "overflow tube, never stops",
+    testA: "Water visibly running",
+    testB: "INTO the overflow tube",
+    gpd: 1000,
+    fixA: "Lower the float so the level",
+    fixB: "sits below the overflow tube.",
+    tone: "orange" as const,
+  },
+  {
+    part: "Fill valve not shutting off",
+    share: "Least common, loudest",
+    symptomA: "Never stops filling; hiss",
+    symptomB: "audible from another room",
+    testA: "Lift the float by hand —",
+    testB: "if it stops, the float is it",
+    gpd: 1500,
+    fixA: "Rebuild or replace the fill",
+    fixB: "valve assembly.",
+    tone: "muted" as const,
+  },
+];
+
+const cards = CAUSES.map((c, i) => {
+  const r = leakCost({ gallonsPerDay: c.gpd, ...RATES, hotFraction: 0 });
+  return {
+    ...c,
+    x: 20 + i * 228,
+    cost: r.totalCost,
+    colour: TONES[c.tone].colour,
+    bg: TONES[c.tone].bg,
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 322" fill="none" aria-hidden="true">
+  <title>The three parts that cause a running toilet and the test that identifies each</title>
+  <desc>
+    A leaking flapper is found by dye in the tank colouring the bowl; a fill valve set too high shows water
+    running into the overflow tube; a fill valve that will not shut off stops when the float is lifted by hand.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="306" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three parts fail, and one test separates them</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Rates as the calculator defaults. The dye test is the only diagnostic that tells a flapper leak from a fill-valve leak.
+  </text>
+
+  {cards.map((c) => (
+    <g>
+      <rect x={c.x} y="68" width="212" height="212" rx="10" fill={c.bg} stroke={c.colour} stroke-width="1.6" />
+      <text x={c.x + 14} y="90" fill={c.colour} font-family={FONT} font-size="11" font-weight="800">{c.part}</text>
+      <text x={c.x + 14} y="105" fill={C.muted} font-family={FONT} font-size="9">{c.share}</text>
+
+      <line x1={c.x + 14} y1="114" x2={c.x + 198} y2="114" stroke={c.colour} stroke-width="1" opacity="0.4" />
+
+      <text x={c.x + 14} y="130" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SYMPTOM</text>
+      <text x={c.x + 14} y="144" fill={C.dark} font-family={FONT} font-size="9">{c.symptomA}</text>
+      <text x={c.x + 14} y="156" fill={C.dark} font-family={FONT} font-size="9">{c.symptomB}</text>
+
+      <text x={c.x + 14} y="180" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOW TO CONFIRM</text>
+      <text x={c.x + 14} y="194" fill={c.colour} font-family={FONT} font-size="9" font-weight="700">{c.testA}</text>
+      <text x={c.x + 14} y="206" fill={c.colour} font-family={FONT} font-size="9" font-weight="700">{c.testB}</text>
+
+      <text x={c.x + 14} y="230" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RATE IF LEFT ALONE</text>
+      <text x={c.x + 14} y="246" fill={c.colour} font-family={FONT} font-size="12" font-weight="800">
+        {`${fmt(c.gpd, 0)} gpd · ${usd(c.cost)}/yr`}
+      </text>
+
+      <text x={c.x + 14} y="264" fill={C.dark} font-family={FONT} font-size="9">{c.fixA}</text>
+      <text x={c.x + 14} y="275" fill={C.dark} font-family={FONT} font-size="9">{c.fixB}</text>
+    </g>
+  ))}
+
+  <text x="24" y="300" fill={C.muted} font-family={FONT} font-size="10">
+    Put food colouring in the tank and do not flush for twenty minutes. Colour in the bowl is the flapper; a clear bowl is the fill valve.
+  </text>
+</svg>

@@ -1,0 +1,90 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { cisternSizing, fmt } from "@/lib/plumbing";
+
+/**
+ * The headline. Roof area barely moves the tank; dry spell moves it almost one
+ * for one. Both sweeps run from the calculator's own DEFAULTS so the post and
+ * the page it funnels to cannot disagree.
+ */
+const DEFAULTS = {
+  areaSqFt: 2000,
+  periodInches: 3.5,
+  periodDays: 30,
+  coefficient: 0.85,
+  demandGpd: 60,
+  drySpellDays: 21,
+  events: 4,
+};
+
+const areaRows = [1000, 2000, 3000, 4000].map((areaSqFt) => {
+  const r = cisternSizing({ ...DEFAULTS, areaSqFt });
+  return { label: `${fmt(areaSqFt)} sq ft roof`, required: r.required, selected: r.selected, governedBy: r.governedBy };
+});
+
+const dryRows = [7, 14, 21, 30, 45, 60].map((drySpellDays) => {
+  const r = cisternSizing({ ...DEFAULTS, drySpellDays });
+  return { label: `${drySpellDays} dry days`, required: r.required, selected: r.selected, governedBy: r.governedBy };
+});
+
+const maxRequired = Math.max(...areaRows.map((r) => r.required), ...dryRows.map((r) => r.required));
+
+const BAR_X = 176;
+const BAR_MAX = 200;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" fill="none" aria-hidden="true">
+  <title>Cistern size against roof area and against dry spell length</title>
+  <desc>
+    Quadrupling the roof leaves the required tank unchanged. Doubling the dry spell more than doubles it. The
+    drought sizes the cistern, not the catchment.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="344" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The roof fills it. The drought sizes it.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${DEFAULTS.demandGpd} gal/day demand, ${DEFAULTS.periodInches} in over ${DEFAULTS.periodDays} days, asphalt shingle at ${DEFAULTS.coefficient}. One variable changes per block.`}
+  </text>
+
+  <text x="28" y="78" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">CHANGING THE ROOF — everything else held</text>
+  {areaRows.map((row, i) => {
+    const y = 86 + i * 26;
+    const w = Math.max(3, (row.required / maxRequired) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="600">{row.label}</text>
+        <rect x={BAR_X} y={y + 1} width={BAR_MAX} height="17" rx="4" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 1} width={w} height="17" rx="4" fill={C.blue} opacity="0.6" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 14} fill={C.blue} font-family={FONT} font-size="10" font-weight="700">
+          {`${fmt(row.required)} gal needed → ${fmt(row.selected ?? 0)} gal tank`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="196" x2="696" y2="196" stroke={C.border} stroke-width="1" />
+
+  <text x="28" y="216" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">CHANGING THE DRY SPELL — everything else held</text>
+  {dryRows.map((row, i) => {
+    const y = 224 + i * 20;
+    const w = Math.max(3, (row.required / maxRequired) * BAR_MAX);
+    const yieldLimited = row.governedBy === "yield";
+    const tone = yieldLimited ? C.red : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="600">{row.label}</text>
+        <rect x={BAR_X} y={y} width={BAR_MAX} height="15" rx="4" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y} width={w} height="15" rx="4" fill={tone} opacity="0.72" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 12} fill={tone} font-family={FONT} font-size="10" font-weight="700">
+          {yieldLimited
+            ? `${fmt(row.required)} gal — capped by what the roof yields`
+            : `${fmt(row.required)} gal needed → ${fmt(row.selected ?? 0)} gal tank`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="344" fill={C.muted} font-family={FONT} font-size="10">
+    Quadrupling the roof changes nothing. Tripling the dry spell more than doubles the tank — until the roof cannot fill it at all.
+  </text>
+</svg>

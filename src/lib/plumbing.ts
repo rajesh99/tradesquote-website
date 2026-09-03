@@ -2687,3 +2687,185 @@ export function irrigableArea(gpd: number, galPerSqFtPerWeek: number): number {
   if (galPerSqFtPerWeek <= 0) return Infinity;
   return (Math.max(0, gpd) * 7) / galPerSqFtPerWeek;
 }
+
+/* ------------------------------------------------------------------ *
+ * Leaks and water waste — DERIVED, on top of two published anchors
+ *
+ * Two things make this calculation worth doing properly rather than by rule
+ * of thumb:
+ *
+ *   1. A drip rate converts to an annual volume through ONE published
+ *      constant, `DRIPS_PER_GALLON`, and everything else is arithmetic.
+ *   2. A HOT leak costs more than a cold one of the same size, because the
+ *      water was paid for twice — once at the meter and once at the burner.
+ *      Most leak calculators ignore the second half entirely.
+ *
+ * Rates (water, sewer, gas, electricity) are ALL editable inputs on the page.
+ * They are the most local numbers in the whole module and none of them is code.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Drips per US gallon. TIER 1 for our purposes — this is the USGS figure used
+ * by their published drip calculator, and it reconciles exactly with a 0.25 mL
+ * drip: 3.785411784 L/gal ÷ 0.25 mL = 15,141.6, which rounds to the 15,140 the
+ * USGS publishes. Both are stated so the page can show the reconciliation.
+ */
+export const DRIPS_PER_GALLON = 15140;
+
+/** The drip volume the constant above implies, millilitres. DERIVED. */
+export const ML_PER_DRIP = 3785.411784 / DRIPS_PER_GALLON;
+
+export const MINUTES_PER_DAY = 1440;
+export const DAYS_PER_YEAR = 365;
+
+/** Fluid ounces per US gallon — for the fill-a-container test. */
+export const OUNCES_PER_GALLON = 128;
+
+/** Energy content of one therm of natural gas, BTU. Definition. */
+export const BTU_PER_THERM = 100000;
+/** BTU per kilowatt-hour. Definition. */
+export const BTU_PER_KWH = 3412.14;
+
+/** Gallons per day from a drip rate. */
+export function dripsToGpd(dripsPerMinute: number): number {
+  return (Math.max(0, dripsPerMinute) * MINUTES_PER_DAY) / DRIPS_PER_GALLON;
+}
+
+/** Gallons per day from a continuous flow. */
+export function gpmToGpd(gpm: number): number {
+  return Math.max(0, gpm) * MINUTES_PER_DAY;
+}
+
+/**
+ * Flow from the container test: catch the leak for a measured time and read
+ * the volume. This is how a running toilet or a weeping valve is actually
+ * quantified on site, because nobody counts drips at that rate.
+ */
+export function fillTestGpm(ounces: number, seconds: number): number {
+  if (seconds <= 0) return 0;
+  return (Math.max(0, ounces) / OUNCES_PER_GALLON) * (60 / seconds);
+}
+
+/**
+ * Flow implied by a water meter that moves with every fixture shut off. The
+ * definitive household leak test, and the only one that catches a leak you
+ * cannot see or hear.
+ */
+export function meterLeakGpm(gallonsRegistered: number, minutes: number): number {
+  if (minutes <= 0) return 0;
+  return Math.max(0, gallonsRegistered) / minutes;
+}
+
+/** How a leak is being measured. */
+export type LeakMethod = "drip" | "fill" | "meter" | "flow";
+
+export type WaterHeatFuel = "gas" | "electric";
+
+export type LeakResult = {
+  gallonsPerDay: number;
+  gallonsPerMonth: number;
+  gallonsPerYear: number;
+  /** Water charge on the wasted volume, per year. */
+  waterCost: number;
+  /** Sewer charge, per year — usually billed on metered water, not on discharge. */
+  sewerCost: number;
+  /** Cost of heating the wasted water, per year. Zero for a cold leak. */
+  energyCost: number;
+  totalCost: number;
+  /** Energy wasted per year, in the fuel's own units. */
+  energyUnits: number;
+  energyUnitLabel: string;
+  /** Share of the total that is energy rather than water. */
+  energyShare: number;
+};
+
+/**
+ * Annual cost of a leak.
+ *
+ * `waterRate` and `sewerRate` are dollars per 1,000 gallons, which is how US
+ * utilities bill. Sewer is charged on metered water at most utilities, so a
+ * leak is normally billed twice before any heating is counted — that is why it
+ * is a separate line here rather than folded into the water rate.
+ */
+export function leakCost(args: {
+  gallonsPerDay: number;
+  waterRatePer1000: number;
+  sewerRatePer1000: number;
+  /** Fraction of the leak that is hot water, 0 to 1. */
+  hotFraction?: number;
+  fuel?: WaterHeatFuel;
+  /** Temperature rise the heater has to supply, °F. */
+  deltaT?: number;
+  /** Heater efficiency, 0 to 1. */
+  efficiency?: number;
+  /** $ per therm (gas) or $ per kWh (electric). */
+  energyRate?: number;
+}): LeakResult {
+  const gpd = Math.max(0, args.gallonsPerDay);
+  const gallonsPerYear = gpd * DAYS_PER_YEAR;
+
+  const waterCost = (gallonsPerYear / 1000) * Math.max(0, args.waterRatePer1000);
+  const sewerCost = (gallonsPerYear / 1000) * Math.max(0, args.sewerRatePer1000);
+
+  const hot = Math.min(1, Math.max(0, args.hotFraction ?? 0));
+  const deltaT = Math.max(0, args.deltaT ?? 0);
+  const efficiency = args.efficiency && args.efficiency > 0 ? args.efficiency : 1;
+  const fuel: WaterHeatFuel = args.fuel ?? "gas";
+
+  /* BTU to heat the hot share of the wasted water, before efficiency. */
+  const btu = gallonsPerYear * hot * LB_PER_GALLON * deltaT;
+  const btuInput = btu / efficiency;
+  const energyUnits =
+    fuel === "gas" ? btuInput / BTU_PER_THERM : btuInput / BTU_PER_KWH;
+  const energyCost = energyUnits * Math.max(0, args.energyRate ?? 0);
+
+  const totalCost = waterCost + sewerCost + energyCost;
+  return {
+    gallonsPerDay: gpd,
+    gallonsPerMonth: gpd * (DAYS_PER_YEAR / 12),
+    gallonsPerYear,
+    waterCost,
+    sewerCost,
+    energyCost,
+    totalCost,
+    energyUnits,
+    energyUnitLabel: fuel === "gas" ? "therms" : "kWh",
+    energyShare: totalCost > 0 ? (energyCost / totalCost) * 100 : 0,
+  };
+}
+
+/**
+ * Typical household leaks, gallons per day. TIER 3 — these are the ranges
+ * published in EPA WaterSense and utility conservation material, not measured
+ * here, and every one of them is an editable starting point on the page rather
+ * than an answer. A real leak is measured, not looked up.
+ */
+export const COMMON_LEAKS: {
+  key: string;
+  label: string;
+  gpd: number;
+  hot: boolean;
+  note: string;
+}[] = [
+  { key: "faucet-drip", label: "Faucet dripping once a second", gpd: 5.7, hot: false, note: "60 drips a minute — audible, and the one people notice" },
+  { key: "faucet-fast", label: "Faucet dripping fast", gpd: 17.1, hot: false, note: "180 drips a minute, close to a thread of water" },
+  { key: "showerhead", label: "Showerhead dripping", gpd: 9.5, hot: true, note: "100 drips a minute, and it is all heated water" },
+  { key: "toilet-silent", label: "Toilet with a silent flapper leak", gpd: 200, hot: false, note: "No sound at all — found by dye in the tank" },
+  { key: "toilet-running", label: "Toilet visibly running", gpd: 1000, hot: false, note: "The single most expensive household leak" },
+  { key: "irrigation", label: "Irrigation head broken off", gpd: 1500, hot: false, note: "Runs only during the zone's schedule, but at full flow" },
+  { key: "service-line", label: "Underground service line seep", gpd: 300, hot: false, note: "Invisible — shows only on the meter or the bill" },
+];
+
+/**
+ * EPA WaterSense's headline household figures. TIER 3 — published estimates,
+ * quoted for scale rather than used in the calculation.
+ */
+export const EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR = 10000;
+export const EPA_LEAKY_HOME_FRACTION = 0.1;
+export const EPA_LEAKY_HOME_GPD = 90;
+
+/** Days for a leak to waste a given volume — for framing an abstract number. */
+export function daysToWaste(gallons: number, gallonsPerDay: number): number {
+  if (gallonsPerDay <= 0) return Infinity;
+  return gallons / gallonsPerDay;
+}

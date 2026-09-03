@@ -1,0 +1,87 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  gallonsPerFoot,
+  insideDiameter,
+  nominalSizes,
+  PIPE_MATERIAL_LABELS,
+  sizeLabel,
+  fmt,
+  type PipeMaterial,
+} from "@/lib/plumbing";
+
+/**
+ * The table people actually want, computed rather than transcribed. The spread
+ * across materials at the same nominal size is the useful part: volume goes as
+ * the square of bore, so the bore differences compound.
+ */
+const MATERIALS: PipeMaterial[] = ["copper-l", "pex", "cpvc-40"];
+const SIZES = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+const rows = SIZES.map((nominal) => ({
+  nominal,
+  cells: MATERIALS.map((m) => {
+    const id = insideDiameter(m, nominal);
+    return id === null ? null : { id, perFoot: gallonsPerFoot(id) };
+  }),
+}));
+
+const pexVsCopper = (() => {
+  const c = insideDiameter("copper-l", 0.75)!;
+  const p = insideDiameter("pex", 0.75)!;
+  return gallonsPerFoot(p) / gallonsPerFoot(c);
+})();
+
+const ROW_H = 32;
+const TOP = 96;
+const COL_X = [300, 442, 584];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Gallons per foot by material and nominal size</title>
+  <desc>
+    Volume per foot for three materials at six nominal sizes. Because volume goes as the square of the bore, the
+    differences between materials are larger than their bore differences suggest.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Same nominal size, very different volumes</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Gallons per foot, computed from each material's own bore. Volume goes as the square of the bore, so bore gaps compound.
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NOMINAL</text>
+  {MATERIALS.map((m, i) => (
+    <text x={COL_X[i]} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">
+      {PIPE_MATERIAL_LABELS[m].toUpperCase()}
+    </text>
+  ))}
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const common = row.nominal === 0.75;
+    return (
+      <g>
+        <rect x="24" y={y - 4} width="672" height={ROW_H - 6} rx="6" fill={common ? C.primary : C.border} opacity={common ? 0.08 : 0.05} />
+        <text x="40" y={y + 11} fill={C.dark} font-family={FONT} font-size="11" font-weight={common ? 800 : 700}>
+          {sizeLabel(row.nominal)}
+        </text>
+        {row.cells.map((v, j) => (
+          <g>
+            <text x={COL_X[j]} y={y + 8} text-anchor="middle" fill={v === null ? C.border : C.dark} font-family={FONT} font-size="10.5" font-weight={common ? 800 : 600}>
+              {v === null ? "—" : fmt(v.perFoot, 4)}
+            </text>
+            <text x={COL_X[j]} y={y + 18} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">
+              {v === null ? "" : `${fmt(v.id, 3)} bore`}
+            </text>
+          </g>
+        ))}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="280" width="672" height="26" rx="7" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="297" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`At nominal ${sizeLabel(0.75)}, PEX holds ${fmt(pexVsCopper * 100)}% of what copper L holds — which is good for wait time and bad for pressure loss.`}
+  </text>
+</svg>

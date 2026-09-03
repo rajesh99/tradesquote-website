@@ -1,0 +1,140 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  meterLeakGpm,
+  fillTestGpm,
+  dripsToGpd,
+  gpmToGpd,
+  leakCost,
+  fmt,
+  usd,
+  DRIPS_PER_GALLON,
+  OUNCES_PER_GALLON,
+} from "@/lib/plumbing";
+
+/**
+ * Three measurement methods, and the point is that they answer different
+ * questions. The meter test finds a leak you cannot see; the fill test measures
+ * one you can; the drip count is for a leak too small for either.
+ *
+ * RATES copied from plumbing-leak-water-waste-calculator/index.astro.
+ */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+const cost = (gpd: number) => leakCost({ gallonsPerDay: gpd, ...RATES, hotFraction: 0 }).totalCost;
+
+const meterGpd = gpmToGpd(meterLeakGpm(1, 30));
+const fillGpd = gpmToGpd(fillTestGpm(8, 30));
+const dripGpd = dripsToGpd(60);
+
+const METHODS = [
+  {
+    name: "Meter test",
+    tone: "orange" as const,
+    forWhat: "A leak you cannot see or hear",
+    how: "Shut everything, read the",
+    how2: "meter, wait 30 min, re-read",
+    unit: "gallons registered / minutes",
+    example: `1 gal in 30 min = ${fmt(meterGpd, 0)} gpd`,
+    exampleCost: cost(meterGpd),
+    catches: "Underground, slab and",
+    catches2: "silent toilet leaks",
+    misses: "Nothing — but it will not",
+    misses2: "tell you WHERE",
+  },
+  {
+    name: "Fill test",
+    tone: "blue" as const,
+    forWhat: "A leak you can put a cup under",
+    how: "Catch it in a measuring jug",
+    how2: "for a timed interval",
+    unit: "fluid ounces / seconds",
+    example: `8 oz in 30 s = ${fmt(fillGpd, 0)} gpd`,
+    exampleCost: cost(fillGpd),
+    catches: "Weeping valves, relief",
+    catches2: "valves, visible seeps",
+    misses: "Anything not running to",
+    misses2: "somewhere you can reach",
+  },
+  {
+    name: "Drip count",
+    tone: "muted" as const,
+    forWhat: "A leak too small for a jug",
+    how: "Count drips for one minute",
+    how2: "against a watch",
+    unit: "drips per minute",
+    example: `60 drips/min = ${fmt(dripGpd, 2)} gpd`,
+    exampleCost: cost(dripGpd),
+    catches: "Taps, showerheads,",
+    catches2: "packing nuts",
+    misses: "Everything concealed, and",
+    misses2: "any leak above a trickle",
+  },
+];
+
+const TONES = {
+  orange: { colour: C.orange, bg: C.orangeLight },
+  blue: { colour: C.blue, bg: C.blueLight },
+  muted: { colour: C.muted, bg: C.white },
+};
+
+const cards = METHODS.map((m, i) => ({
+  ...m,
+  x: 20 + i * 228,
+  colour: TONES[m.tone].colour,
+  bg: TONES[m.tone].bg,
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 344" fill="none" aria-hidden="true">
+  <title>Three ways to measure a leak and what each one is for</title>
+  <desc>
+    The meter test finds concealed leaks by measuring the whole house; the fill test measures a leak you can
+    catch in a jug; the drip count handles a leak too small for either. All three convert to gallons per day.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="328" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three methods, three different questions</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`All three land on gallons per day, which is the only unit that converts to money. ${fmt(DRIPS_PER_GALLON, 0)} drips make a gallon; ${fmt(OUNCES_PER_GALLON, 0)} fluid ounces make a gallon.`}
+  </text>
+
+  {cards.map((m) => (
+    <g>
+      <rect x={m.x} y="70" width="212" height="238" rx="10" fill={m.bg} stroke={m.colour} stroke-width="1.6" />
+      <text x={m.x + 14} y="92" fill={m.colour} font-family={FONT} font-size="12" font-weight="800">{m.name}</text>
+      <text x={m.x + 14} y="108" fill={C.muted} font-family={FONT} font-size="9">{m.forWhat}</text>
+
+      <line x1={m.x + 14} y1="118" x2={m.x + 198} y2="118" stroke={m.colour} stroke-width="1" opacity="0.4" />
+
+      <text x={m.x + 14} y="134" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">METHOD</text>
+      <text x={m.x + 14} y="148" fill={C.dark} font-family={FONT} font-size="9">{m.how}</text>
+      <text x={m.x + 14} y="160" fill={C.dark} font-family={FONT} font-size="9">{m.how2}</text>
+      <text x={m.x + 14} y="174" fill={C.muted} font-family={FONT} font-size="9" font-style="italic">{m.unit}</text>
+
+      <text x={m.x + 14} y="198" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WORKED EXAMPLE</text>
+      <text x={m.x + 14} y="214" fill={m.colour} font-family={FONT} font-size="11" font-weight="800">{m.example}</text>
+      <text x={m.x + 14} y="230" fill={m.colour} font-family={FONT} font-size="11" font-weight="800">
+        {`${usd(m.exampleCost)} a year`}
+      </text>
+
+      <text x={m.x + 14} y="254" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">CATCHES</text>
+      <text x={m.x + 14} y="267" fill={C.dark} font-family={FONT} font-size="9">{m.catches}</text>
+      <text x={m.x + 14} y="278" fill={C.dark} font-family={FONT} font-size="9">{m.catches2}</text>
+
+      <text x={m.x + 14} y="292" fill={C.muted} font-family={FONT} font-size="9">{m.misses}</text>
+      <text x={m.x + 14} y="302" fill={C.muted} font-family={FONT} font-size="9">{m.misses2}</text>
+    </g>
+  ))}
+
+  <text x="24" y="326" fill={C.muted} font-family={FONT} font-size="10">
+    Start with the meter test — it is the only one that proves whether a leak exists at all, and it costs nothing but half an hour of not using water.
+  </text>
+</svg>

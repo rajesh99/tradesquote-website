@@ -1,0 +1,97 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, costBand, fmt, usd, COST_BAND } from "@/lib/plumbing";
+
+/**
+ * Four scopes on one basis, so the comparison is honest. The interesting result
+ * is that trenchless and open-cut land close together at 70 feet: trenchless
+ * trades crew hours for material and equipment cost rather than being cheaper.
+ *
+ * Rate, overhead and margin copied from plumbing-estimate-calculator.
+ */
+const LABOUR_RATE = 110;
+const OVERHEAD_PERCENT = 15;
+const MARGIN_PERCENT = 25;
+
+const SCOPES = [
+  { label: "Spot repair, 10 ft", hours: 16, material: 900, note: "one failed joint or a root intrusion", colour: C.primary },
+  { label: "Open cut, 40 ft", hours: 40, material: 2600, note: "front garden, no hard surface", colour: C.blue },
+  { label: "Open cut, 70 ft", hours: 64, material: 4200, note: "longer run, deeper, more spoil", colour: C.orange },
+  { label: "Trenchless, 70 ft", hours: 40, material: 7500, note: "pipe bursting — fewer hours, far more kit", colour: C.red },
+];
+
+const rows = SCOPES.map((s) => {
+  const r = estimateJob({
+    labourHours: s.hours,
+    labourRate: LABOUR_RATE,
+    fixtureCost: 0,
+    materialCost: s.material,
+    overheadPercent: OVERHEAD_PERCENT,
+    marginPercent: MARGIN_PERCENT,
+  });
+  const band = costBand(r.price);
+  return { ...s, price: r.price, breakEven: r.breakEven, labour: r.labour, low: band.low, high: band.high };
+});
+
+const maxHigh = Math.max(...rows.map((r) => r.high));
+const BAR_X = 178;
+const BAR_MAX = 340;
+const scale = (v: number) => (v / maxHigh) * BAR_MAX;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 106 + i * 40,
+  lowX: BAR_X + scale(r.low),
+  priceX: BAR_X + scale(r.price),
+  highX: BAR_X + scale(r.high),
+  bandW: Math.max(4, scale(r.high) - scale(r.low)),
+  labourW: Math.max(3, scale(r.labour)),
+}));
+
+const openCut70 = rows[2];
+const trenchless = rows[3];
+const gap = ((trenchless.price - openCut70.price) / openCut70.price) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Price ranges for four sewer replacement scopes on a single costing basis</title>
+  <desc>
+    A ten foot spot repair prices around 4,079 dollars and a seventy foot open cut around 17,235. Trenchless
+    pipe bursting over the same seventy feet lands at 18,247 — it trades crew hours for equipment, not cost.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four scopes, one costing basis</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Bars are the ±${fmt(COST_BAND * 100, 0)}% quoting band around each price; the tick is the price itself and the dark segment is labour alone.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    Crew hours and material allowances are illustrative scopes — the point is the shape of the comparison, not a quote for your garden.
+  </text>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">SCOPE</text>
+  <text x={BAR_X + BAR_MAX + 12} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">PRICE</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="28" y={row.y + 25} fill={C.muted} font-family={FONT} font-size="8">{row.note}</text>
+      <rect x={row.lowX} y={row.y + 2} width={row.bandW} height="14" rx="4" fill={row.colour} opacity="0.22" />
+      <rect x={BAR_X} y={row.y + 6} width={row.labourW} height="6" rx="2" fill={row.colour} opacity="0.72" />
+      <rect x={row.priceX - 1} y={row.y} width="2.5" height="18" rx="1" fill={row.colour} />
+      <text x={BAR_X + BAR_MAX + 12} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight="700">
+        {usd(row.price)}
+      </text>
+      <text x={BAR_X + BAR_MAX + 12} y={row.y + 25} fill={C.muted} font-family={FONT} font-size="8">
+        {`${usd(row.low)} to ${usd(row.high)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="292" fill={C.muted} font-family={FONT} font-size="10">
+    {`Trenchless over ${fmt(70, 0)} ft prices ${fmt(gap, 0)}% above the open cut here — it halves the crew hours and more than doubles the material and plant.`}
+  </text>
+  <text x="24" y="306" fill={C.muted} font-family={FONT} font-size="9">
+    Its real advantage is what it does not disturb: a driveway, a mature tree, a paved terrace. That value is not in this chart.
+  </text>
+</svg>

@@ -1,0 +1,153 @@
+---
+title: "Plumbing Unit Conversions: GPM, LPM, PSI, Head — and the Imperial Gallon Trap"
+meta_title: "Plumbing Unit Conversions: GPM, LPM, PSI & Head (2026) | TradesQuote"
+description: "Most plumbing conversions are exact definitions. One is a measurement of water density, and one is a 20% error waiting on a spec sheet that only says 'gallons'."
+image: /images/posts/plumbing-unit-conversions-hero.svg
+date: 2026-09-05T11:30:00Z
+categories: ["plumbing"]
+tags: ["unit conversions","gpm to lpm","psi to head","imperial gallon","plumbing units"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import ConversionTableDiagram from "@/components/blog/unit-conversions/ConversionTableDiagram.astro";
+import ConversionGallonTrapDiagram from "@/components/blog/unit-conversions/ConversionGallonTrapDiagram.astro";
+import ConversionExactnessDiagram from "@/components/blog/unit-conversions/ConversionExactnessDiagram.astro";
+
+Unit conversion is not interesting until it costs you a pipe size. Then it becomes very interesting, and the specific way it does that is almost always the same: a number arrived in units nobody checked.
+
+## The ones that turn up
+
+<BlogInfographic
+  title="The ones that actually turn up on a job"
+  caption="Flow and pressure converted between the units a US plumbing job works in and the units imported equipment and civil drawings arrive in. Every factor is exact except the psi-to-feet pair."
+>
+  <ConversionTableDiagram />
+</BlogInfographic>
+
+**Flow — 10 gpm is:**
+
+- **37.8541** litres per minute
+- 0.6309 litres per second
+- 2.2712 cubic metres per hour
+- 600 gallons per hour
+- 0.02228 cubic feet per second
+
+**Pressure:**
+
+- **60 psi = 138.5 feet** of water
+- 60 psi = 4.137 bar = 413.7 kPa
+- **3 bar = 43.5 psi**
+
+Two of those are worth carrying around as facts rather than conversions.
+
+**A 6 L/min European showerhead is 1.59 gpm** — comfortably *below* US low-flow standards rather than above them. People routinely assume an imported fixture will over-deliver and it usually under-delivers.
+
+**1 cubic foot per second is 448.83 gpm.** That is the unit a civil engineer hands you on storm work, and it is a very large number in plumbing terms. It is exact, because it is just 7.48052 gallons per cubic foot times 60 seconds — the same constant behind **[roof runoff](/blog/how-much-water-comes-off-a-roof)** and **[gallons in a pipe](/blog/how-many-gallons-in-a-pipe)**.
+
+## The gallon trap
+
+<BlogInfographic
+  title="Two gallons, 20.1% apart, one word"
+  caption="Both are exact definitions and neither is a rounding. A data sheet that says only 'gallons' does not tell you which one it means."
+>
+  <ConversionGallonTrapDiagram />
+</BlogInfographic>
+
+**A US gallon is 3.785411784 litres. An imperial gallon is 4.54609.**
+
+**1 imperial gallon = 1.2009 US gallons — a 20.1% error.**
+
+Twenty percent is not a rounding difference. On a fixture flow rate it is more than enough to change a pipe size, and on a tank capacity it is the difference between a heater that suits the house and one that does not.
+
+Where it arrives:
+
+**Imported fixture data.** UK and older Commonwealth catalogues quote imperial, and the conversion is frequently done once, badly, somewhere upstream of you.
+
+**Older tank and cistern capacities**, particularly anything with British heritage.
+
+**Anything that just says "gallons"** with no qualifier. That is not a specification. Go back and ask.
+
+Note this is a *different* problem from metric conversion, and in some ways worse: a metric number is obviously metric and you know to convert it. An imperial gallon looks exactly like a US gallon on the page.
+
+## Exact versus measured
+
+<BlogInfographic
+  title="Four of these are exact. One is a measurement."
+  caption="Most plumbing conversions are definitions and carry no error at all. The psi-to-feet pair comes from the density of water, which is the one that shifts."
+>
+  <ConversionExactnessDiagram />
+</BlogInfographic>
+
+**Definitions — exact, no error:**
+
+- 1 US gallon = **231 cubic inches**
+- 1 US gallon = **3.785411784 litres**
+- 1 cubic foot = **7.48052 gallons**
+- 1 bar = **14.5038 psi** (bar is defined as exactly 100 kPa)
+
+**A measurement — and the one you use most:**
+
+- 1 psi = **2.309 feet of water**, from water at 62.37 lb/ft³ giving **0.4331 psi per foot**
+
+That last one is not a definition. It is a property of water at a particular temperature, and it shifts very slightly as the water warms. The practical consequence is a few tenths of a percent across normal water temperatures — immaterial for sizing, and exactly why two published references can disagree in the last digit and both be right.
+
+Knowing which is which is the useful part. If two sources give you different values for gallons per cubic foot, one of them is wrong. If they differ on feet per psi, they may just have assumed different temperatures.
+
+## Where conversions actually bite
+
+**Pump curves.** European pumps publish head in metres and flow in cubic metres per hour. Reading a metric curve as if it were imperial is a large error in a component that is expensive to get wrong — the four terms are in **[total dynamic head](/blog/how-to-calculate-pump-head)**.
+
+**Fixture inlet pressure.** A European fitting wanting "3 bar" wants **43.5 psi**, which is well above the 8 to 15 psi most US fixtures are specified at. Catch it before you size the supply, not after — the budget arithmetic is in **[low water pressure in a house](/blog/low-water-pressure-in-house)**.
+
+**Storm and civil handoffs.** Site drawings come in cfs; plumbing works in gpm; the factor is 448.83 and it is easy to lose a decade.
+
+**Water heater capacity in litres.** A "200 litre" tank is 52.8 US gallons, not 200 of anything you size with.
+
+Run any of it through the **[Plumbing Unit Converter](/calculators/plumbing/plumbing-unit-converter)**, which covers flow, pressure, volume, length, velocity and temperature.
+
+## Three habits
+
+**Write the unit down every time.** "Flow: 10" is not a note. Most conversion errors start as an unlabelled number in someone's phone.
+
+**Convert once, at the boundary.** Take the imported figure, convert it, record both, and work in one system after that. Converting repeatedly mid-calculation is where signs and factors get inverted.
+
+**Sanity-check the magnitude.** 448.83 gpm per cfs and 1.59 gpm from a 6 L/min head are both memorable enough to catch a factor-of-ten error at a glance, which is the error that actually causes damage.
+
+## Frequently asked questions
+
+### How many litres per minute is 10 gpm?
+
+**37.8541 L/min.** One US gallon is exactly 3.785411784 litres by definition, so the factor carries no error. Going the other way, 100 L/min is 26.42 gpm.
+
+### How do I convert psi to feet of head?
+
+Multiply psi by **2.309**, or feet by 0.4331. So 60 psi is **138.5 feet** of water column. Unlike the metric conversions this one is a measurement rather than a definition — it comes from the density of water at 60 °F and shifts very slightly with temperature.
+
+### Why is an imperial gallon different from a US gallon?
+
+They are separate historical definitions that were never reconciled. An imperial gallon is 4.54609 litres against the US gallon's 3.785411784 — so **1 imperial gallon is 1.2009 US gallons**, a 20.1% difference. On a fixture flow rate that is more than enough to change a pipe size.
+
+### How much is 3 bar in psi?
+
+**43.5 psi.** Bar is defined as exactly 100 kilopascals, so the conversion is exact at 14.5038 psi per bar. It matters because 3 bar of required inlet pressure on a European fitting is well above the 8 to 15 psi most US fixtures are specified at.
+
+### What is 1 cfs in gpm?
+
+**448.83 gpm.** It is exact — 7.48052 gallons per cubic foot times 60 seconds. Cubic feet per second turns up in storm drainage and civil work rather than building plumbing, but it is the unit a site engineer will hand you.
+
+### Is a 6 L/min showerhead low-flow?
+
+Yes, and more so than people expect: **1.59 gpm**, which is below several US low-flow standards rather than above them. Imported fixtures frequently under-deliver relative to the assumption, not over-deliver.
+
+### Which plumbing conversions are exact?
+
+Nearly all of them. Gallons to cubic inches, gallons to litres, cubic feet to gallons and bar to psi are all definitions and carry no error. **The exception is psi to feet of head**, which is a property of water and shifts slightly with temperature — which is why references sometimes disagree in the last digit.
+
+### How do I avoid conversion mistakes?
+
+Write the unit down every time, convert once at the boundary rather than repeatedly mid-calculation, and keep a couple of magnitudes in your head — 448.83 gpm per cfs, 1.59 gpm from 6 L/min — so a factor-of-ten error looks wrong immediately.
+
+---
+
+**Sources & standards:** All conversions here are computed rather than transcribed. **The US gallon (231 cubic inches, 3.785411784 litres), the imperial gallon (4.54609 litres), the cubic foot (7.48052 gallons) and the bar (exactly 100 kPa) are definitions and carry no error.** The psi-to-feet-of-head pair is different: it is derived from the density of water at 62.37 lb/ft³, giving 0.4331 psi per foot, and it shifts slightly with temperature — which is why published values differ in the last digit. Nothing on this page is code; unit conversion does not change between the IPC and the UPC. Fixture inlet pressure requirements are product specifications rather than conversions, and should be read from the manufacturer's data with the units confirmed.

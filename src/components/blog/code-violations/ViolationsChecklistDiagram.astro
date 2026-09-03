@@ -1,0 +1,101 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  trapArmMaxFeet,
+  minSlope,
+  ventSize,
+  minimumAirGap,
+  PRV_THRESHOLD_PSI,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The walk-round before you call for inspection. Deliberately expressed as
+ * things to MEASURE rather than things to know, because the failures are almost
+ * all dimensional.
+ */
+const CHECKS = [
+  {
+    group: "Take a tape to",
+    tone: C.red,
+    bg: C.redLight,
+    items: [
+      `Every trap arm — ${sizeLabel(2)} to ${trapArmMaxFeet(2)} ft, ${sizeLabel(1.5)} to ${trapArmMaxFeet(1.5)} ft`,
+      `Slope on every horizontal — ${minSlope(2)} in/ft at ${sizeLabel(2)} and under`,
+      `Vent developed length — over 40 ft and it upsizes`,
+      `Air gaps — ${fmt(minimumAirGap(0.5), 2)} in minimum on a ${sizeLabel(0.5)} opening`,
+    ],
+  },
+  {
+    group: "Take a gauge to",
+    tone: C.orange,
+    bg: C.orangeLight,
+    items: [
+      `Static pressure — a PRV is required above ${PRV_THRESHOLD_PSI} psi`,
+      "Expansion tank pre-charge, if the system is closed",
+      "The test pressure the AHJ wants held, and for how long",
+      "Water heater delivery temperature at a fixture",
+    ],
+  },
+  {
+    group: "Just look for",
+    tone: C.primary,
+    bg: C.primaryLight,
+    items: [
+      "S-traps — prohibited outright, no arm length saves them",
+      "Cleanouts that are present but not accessible",
+      "Missing nail plates where pipe crosses framing",
+      "Supports at the required spacing, and dielectric unions",
+    ],
+  },
+];
+
+const COL_W = 216;
+const COL_X = [24, 252, 480];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>What to check before calling for a plumbing inspection</title>
+  <desc>
+    A walk-round expressed as things to measure rather than things to know, because nearly every common failure is
+    dimensional rather than conceptual.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The walk-round before you call it in</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Nearly every common failure is dimensional, so most of this list is measuring rather than knowing.
+  </text>
+
+  {CHECKS.map((col, ci) => (
+    <g>
+      <rect x={COL_X[ci]} y="68" width={COL_W} height="146" rx="10" fill={col.bg} stroke={col.tone} stroke-width="2" />
+      <text x={COL_X[ci] + 14} y="88" fill={col.tone} font-family={FONT} font-size="9.5" font-weight="700">{col.group.toUpperCase()}</text>
+      {col.items.map((item, i) => {
+        const y = 106 + i * 28;
+        const wrap = item.length > 32;
+        return (
+          <g>
+            <circle cx={COL_X[ci] + 20} cy={y - 3} r="3" fill={col.tone} opacity="0.8" />
+            <text x={COL_X[ci] + 30} y={y} fill={C.dark} font-family={FONT} font-size="8.5">
+              {wrap ? item.slice(0, 32) : item}
+            </text>
+            {wrap && (
+              <text x={COL_X[ci] + 30} y={y + 11} fill={C.dark} font-family={FONT} font-size="8.5">
+                {item.slice(32)}
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </g>
+  ))}
+
+  <text x="24" y="234" fill={C.muted} font-family={FONT} font-size="10">
+    Ask the inspector what they look at first. Every one of them has a list, most will tell you, and it costs a phone call.
+  </text>
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">
+    And confirm which code and which edition your jurisdiction adopted — the numbers above are IPC, and roughly fifteen states are not.
+  </text>
+</svg>

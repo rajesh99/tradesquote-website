@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { PRV_THRESHOLD_PSI, headToPsi, fmt } from "@/lib/plumbing";
+
+/**
+ * When you need one, when you might want one, and when it is the wrong tool.
+ * The last column exists because a PRV is routinely fitted in response to a
+ * complaint it cannot fix.
+ */
+const ROWS = [
+  {
+    situation: `Static pressure above ${PRV_THRESHOLD_PSI} psi`,
+    verdict: "Required",
+    tone: C.red,
+    detail: "IPC 604.8. Not a judgement call, and it brings expansion control with it.",
+  },
+  {
+    situation: "70 to 80 psi with appliance warranties in mind",
+    verdict: "Worth it",
+    tone: C.orange,
+    detail: "Many appliance and heater warranties cap inlet pressure below the code threshold.",
+  },
+  {
+    situation: "Pressure varies wildly through the day",
+    verdict: "Worth it",
+    tone: C.orange,
+    detail: "A PRV holds a set downstream pressure as the main swings — that is its other job.",
+  },
+  {
+    situation: "Water hammer on quick-closing valves",
+    verdict: "Helps",
+    tone: C.blue,
+    detail: "Lower pressure means lower velocity means a smaller surge. Arrestors still do more.",
+  },
+  {
+    situation: "Weak flow at the top floor",
+    verdict: "Wrong tool",
+    tone: C.primary,
+    detail: "If static is fine and flowing collapses, the fault is friction. A PRV makes it worse.",
+  },
+  {
+    situation: "One fixture is weak",
+    verdict: "Wrong tool",
+    tone: C.primary,
+    detail: "Aerator, cartridge or stop. Nothing at the meter will change one fixture.",
+  },
+];
+
+const ROW_H = 34;
+const TOP = 82;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>When a pressure reducing valve is the right answer</title>
+  <desc>
+    Six situations, from a code requirement through to two complaints a pressure reducing valve cannot fix and
+    can make worse.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Required, useful, or the wrong tool entirely</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Every foot of height already costs ${headToPsi(1)} psi — ${fmt(headToPsi(25), 2)} psi to a second-floor fixture — and a PRV cannot give that back.`}
+  </text>
+
+  {ROWS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={row.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 6} rx="2" fill={row.tone} opacity="0.9" />
+        <text x="40" y={y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.situation}</text>
+        <text x="40" y={y + 24} fill={C.muted} font-family={FONT} font-size="8.5">{row.detail}</text>
+        <rect x={588} y={y + 3} width={96} height="16" rx="4" fill={row.tone} opacity="0.16" />
+        <text x={636} y={y + 15} text-anchor="middle" fill={row.tone} font-family={FONT} font-size="9" font-weight="800">
+          {row.verdict}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">
+    Turning a PRV up to fix a friction problem trades a shower complaint for a burst supply hose. It is the most common misuse of the device.
+  </text>
+</svg>

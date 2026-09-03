@@ -1,0 +1,89 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { expansionTank, selectExpansionTank, PRV_THRESHOLD_PSI, fmt } from "@/lib/plumbing";
+
+/**
+ * The consequence nobody quotes with the PRV. Fitting one closes the system,
+ * and the tank it then requires depends on where you set the PRV — the setting
+ * is not a free choice once you follow it through.
+ *
+ * Base copied from plumbing-expansion-tank-calculator/index.astro.
+ */
+const defs = markerDefs("prv-xt");
+const XT_BASE = { systemGallons: 50, coldF: 40, hotF: 140, supplyPsi: 60, maxPsi: 80 };
+
+const rows = [50, 60, 70].map((supplyPsi) => {
+  const r = expansionTank({ ...XT_BASE, supplyPsi });
+  return {
+    supplyPsi,
+    ratio: r.acceptanceRatio,
+    tankVolume: r.tankVolume,
+    shell: selectExpansionTank(r.tankVolume),
+  };
+});
+
+const lowest = rows[0];
+const highest = rows[rows.length - 1];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>What a pressure reducing valve setting does to the expansion tank</title>
+  <desc>
+    Fitting a pressure reducing valve closes the system, which requires expansion control. Where the valve is set
+    then decides how large that expansion tank has to be.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A PRV never arrives alone</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`IPC 604.8 requires the valve above ${PRV_THRESHOLD_PSI} psi. Fitting it closes the system, so IPC 607.3 then requires expansion control.`}
+  </text>
+
+  <rect x="24" y="70" width="200" height="44" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.8" />
+  <text x="124" y="90" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">Static over 80 psi</text>
+  <text x="124" y="105" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9">IPC 604.8 — fit a PRV</text>
+
+  <line x1="232" y1="92" x2="266" y2="92" stroke={C.muted} stroke-width="2" marker-end="url(#prv-xt-arrow-muted)" />
+
+  <rect x="274" y="70" width="200" height="44" rx="9" fill={C.redLight} stroke={C.red} stroke-width="1.8" />
+  <text x="374" y="90" text-anchor="middle" fill={C.red} font-family={FONT} font-size="10" font-weight="700">The system is now closed</text>
+  <text x="374" y="105" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9">expansion has nowhere to go</text>
+
+  <line x1="482" y1="92" x2="516" y2="92" stroke={C.muted} stroke-width="2" marker-end="url(#prv-xt-arrow-muted)" />
+
+  <rect x="524" y="70" width="172" height="44" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="1.8" />
+  <text x="610" y="90" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">IPC 607.3</text>
+  <text x="610" y="105" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9">an expansion tank is required</text>
+
+  <text x="28" y="142" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">
+    {`AND THE SETTING YOU CHOOSE DECIDES THE TANK — ${XT_BASE.systemGallons} GAL SYSTEM, ${XT_BASE.coldF}→${XT_BASE.hotF} °F, ${XT_BASE.maxPsi} PSI CEILING`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 154 + i * 34;
+    const high = row.supplyPsi >= 70;
+    const tone = high ? C.red : C.primary;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height="28" rx="7" fill={tone} opacity="0.07" />
+        <text x="40" y={y + 18} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">
+          {`PRV set to ${row.supplyPsi} psi`}
+        </text>
+        <text x={214} y={y + 18} fill={C.muted} font-family={FONT} font-size="10">
+          {`${fmt(row.ratio * 100, 1)}% of the shell usable`}
+        </text>
+        <text x={404} y={y + 18} fill={C.dark} font-family={FONT} font-size="10">
+          {`needs ${fmt(row.tankVolume, 2)} gal`}
+        </text>
+        <text x={556} y={y + 18} fill={tone} font-family={FONT} font-size="11" font-weight="800">
+          {`→ ${row.shell} gallon tank`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="262" fill={C.muted} font-family={FONT} font-size="10">
+    {`Setting the valve at ${highest.supplyPsi} instead of ${lowest.supplyPsi} psi triples the required tank, from ${fmt(lowest.tankVolume, 2)} to ${fmt(highest.tankVolume, 2)} gallons — the window it works in has narrowed.`}
+  </text>
+</svg>

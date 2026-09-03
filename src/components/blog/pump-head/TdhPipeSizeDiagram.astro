@@ -1,0 +1,95 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  totalDynamicHead,
+  frictionLossPsiPerFoot,
+  psiToHead,
+  velocity,
+  velocityHead,
+  insideDiameter,
+  HAZEN_WILLIAMS_C,
+  nominalSizes,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The discharge pipe is a design decision that lands on the pump. Same lift,
+ * same flow, and the head more than doubles across two nominal sizes — which is
+ * the cheapest thing on the job to get right.
+ *
+ * Scenario copied verbatim from plumbing-pump-head-calculator/index.astro.
+ */
+const GPM = 30;
+const LENGTH_FT = 40;
+const LIFT_FT = 12;
+const MATERIAL = "pvc-40" as const;
+
+const SIZES = nominalSizes(MATERIAL).filter((n) => n >= 1 && n <= 3);
+
+const rows = SIZES.map((nominal) => {
+  const id = insideDiameter(MATERIAL, nominal)!;
+  const frictionFt = psiToHead(frictionLossPsiPerFoot(GPM, id, HAZEN_WILLIAMS_C[MATERIAL]) * LENGTH_FT);
+  const v = velocity(GPM, id);
+  const vHead = velocityHead(v);
+  const tdh = totalDynamicHead({
+    staticLiftFeet: LIFT_FT,
+    frictionHeadFeet: frictionFt,
+    pressureHeadFeet: 0,
+    velocityHeadFeet: vHead,
+  });
+  return { nominal, v, frictionFt, vHead, tdh };
+});
+
+const smallest = rows[0];
+const largest = rows[rows.length - 1];
+const maxTdh = Math.max(...rows.map((r) => r.tdh));
+
+const BAR_X = 208;
+const BAR_MAX = 246;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Total dynamic head against discharge pipe size</title>
+  <desc>
+    The same lift and the same flow through six discharge pipe sizes. The lift never changes; the head the pump has
+    to produce more than doubles across the range.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The pipe you chose is most of the head</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${GPM} gpm, ${LENGTH_FT} ft of Schedule 40 PVC, ${LIFT_FT} ft of static lift in every row. Only the size changes.`}
+  </text>
+
+  <line x1={BAR_X + (LIFT_FT / maxTdh) * BAR_MAX} y1="68" x2={BAR_X + (LIFT_FT / maxTdh) * BAR_MAX} y2="248" stroke={C.dark} stroke-width="1.6" stroke-dasharray="5 4" />
+  <text x={BAR_X + (LIFT_FT / maxTdh) * BAR_MAX} y="64" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="8.5" font-weight="700">
+    {`LIFT ALONE ${LIFT_FT} ft`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 29;
+    const w = Math.max(3, (row.tdh / maxTdh) * BAR_MAX);
+    const tight = row.v > 8;
+    const tone = tight ? C.red : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{sizeLabel(row.nominal)}</text>
+        <text x="80" y={y + 16} fill={tone} font-family={FONT} font-size="9">{`${fmt(row.v, 2)} ft/s`}</text>
+        <text x={196} y={y + 16} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.frictionFt, 1)} ft friction`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={tone} opacity="0.72" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`TDH ${fmt(row.tdh, 1)} ft`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="252" width="672" height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="36" y="268" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">
+    {`${sizeLabel(smallest.nominal)} needs ${fmt(smallest.tdh, 1)} ft against ${sizeLabel(largest.nominal)}'s ${fmt(largest.tdh, 1)} — ${fmt(smallest.tdh / largest.tdh, 1)}x the head, from a choice made before the pump was picked.`}
+  </text>
+</svg>

@@ -26,13 +26,17 @@ than they are.
 
 | Surface | State |
 | --- | --- |
-| Calculators | **25**, in 6 hub groups. Four-edit registration is structurally guarded by `ungroupedPlumbingCalculators`. |
+| Calculators | **26**, in 7 hub groups. Four-edit registration is structurally guarded by `ungroupedPlumbingCalculators`. |
 | Reference pages | **3** — `formulas` (25 blocks), `glossary` (85 terms), `backflow-prevention`. Parity with electrical, ahead of HVAC's 2. |
-| Blog posts | **14** — 8 in wave 4, 6 in wave 5a. Against HVAC's 64 and electrical's 75. |
+| Blog posts | **55** — all 9 clusters shipped. Against HVAC's 64 and electrical's 75. |
 | Taxonomy | `categorySeo.plumbing` present in `blogTaxonomy.ts`. `/blog/categories/plumbing` live; the hub's "From the Blog" strip live. |
-| Keyword data | **None.** |
+| Keyword data | **None.** Every one of the 55 titles is reasoned, not measured. |
 
-**This is the whole gap: the tools are done and the writing has barely started.**
+**The gap this doc was written to describe is closed** — it originally read "the tools are done and
+the writing has barely started" at 14 posts. Both surfaces are now complete against the plan, and
+the remaining weaknesses are different ones: **no keyword data behind any title**, and the wave-1
+Appendix E constants (`WSFU_FIXTURES`, `HUNTER_DEMAND`) still unverified while several posts lean
+on them. Re-read this table at the end of every wave; it has drifted twice.
 
 ### Competitive landscape
 
@@ -60,11 +64,17 @@ all worth repeating:
 
 ---
 
-## 2. Blog posts — 47 titles in 8 clusters
+## 2. Blog posts — 55 titles in 9 clusters
 
 Format matches the HVAC and electrical strategy docs: filename · title · target keyword ·
 calculator it funnels into · tier. **Tier 1 = build first** (highest intent × weakest incumbent
-content × has a calculator that already exists). ✅ marks the 25 shipped so far — all of tier 1.
+content × has a calculator that already exists). ✅ marks all 55 — the plan is complete.
+
+**Cluster 9 was added after the original 47 shipped.** The first eight clusters are engineering and
+business content aimed at people who already know the vocabulary. Cluster 9 is the demand the
+category was not addressing at all: **homeowner symptoms and service prices**, which is where the
+non-technical search volume actually sits. Every one still funnels to a calculator and every figure
+is still computed from `src/lib/plumbing.ts` — the audience changed, the standard did not.
 
 Every tier-1 and tier-2 funnel target below **already exists** — there is no calculator blocking
 any of them. Verify before writing with
@@ -77,9 +87,9 @@ any of them. Verify before writing with
 | `water-pipe-size-chart.mdx` ✅ | Water Pipe Size Chart: GPM and Fixture Units to Nominal Size | water pipe size chart | pipe-size | 1 |
 | `plumbing-fixture-units-explained.mdx` ✅ | Fixture Units Explained: WSFU, DFU, and Why They Are Different Numbers | plumbing fixture units | wsfu + dfu | 1 |
 | `pex-vs-copper-vs-cpvc.mdx` ✅ | PEX vs Copper vs CPVC: Bore, Cost, and Why PEX Needs a Size Up | pex vs copper | pipe-size | 1 |
-| `water-velocity-in-pipes.mdx` | Water Velocity in Pipes: The 8 and 5 ft/s Limits Nobody Can Cite | water velocity in pipes | pipe-velocity | 2 |
-| `friction-loss-in-pipes.mdx` | Friction Loss in Water Pipes: Hazen-Williams Without the Nomograph | pipe friction loss | friction-loss | 2 |
-| `how-many-fixtures-on-a-3-4-inch-line.mdx` | How Many Fixtures Can a 3/4 Inch Line Serve? | fixtures per pipe size | wsfu | 2 |
+| `water-velocity-in-pipes.mdx` ✅ | Water Velocity in Pipes: The 8 and 5 ft/s Limits Nobody Can Cite | water velocity in pipes | pipe-velocity | 2 |
+| `friction-loss-in-pipes.mdx` ✅ | Friction Loss in Water Pipes: Hazen-Williams Without the Nomograph | pipe friction loss | friction-loss | 2 |
+| `how-many-fixtures-on-a-3-4-inch-line.mdx` ✅ | How Many Fixtures Can a 3/4 Inch Line Serve? | fixtures per pipe size | wsfu | 2 |
 
 ### Cluster 2 — Drainage, waste & vent (9)
 | File | Title | Keyword | Calculator | Tier |
@@ -89,20 +99,20 @@ any of them. Verify before writing with
 | `how-far-can-a-vent-be-from-a-trap.mdx` ✅ | How Far Can a Vent Be From a Trap? Trap Arm Limits Explained | how far can a vent be from a trap | vent-size | 1 |
 | `drainage-fixture-unit-chart.mdx` ✅ | Drainage Fixture Unit Chart: Table 709.1 With the Trap Sizes | drainage fixture unit chart | dfu | 1 |
 | `wet-venting-explained.mdx` ✅ | Wet Venting Explained: When One Drain Legally Vents Another | wet vent | vent-size | 1 |
-| `why-is-my-drain-gurgling.mdx` | Why Is My Drain Gurgling? It Is Almost Always the Vent | drain gurgling | vent-size | 2 |
-| `air-admittance-valve-vs-vent.mdx` | Air Admittance Valves: Where They Are Legal and Where They Are Not | air admittance valve | vent-size | 2 |
-| `stack-vent-vs-vent-stack.mdx` | Stack Vent vs Vent Stack: Two Different Things With One Name | stack vent vs vent stack | vent-size | 3 |
-| `building-drain-vs-building-sewer.mdx` | Building Drain vs Building Sewer: Where One Ends and the Other Starts | building drain vs sewer | drain-pipe-size | 3 |
+| `why-is-my-drain-gurgling.mdx` ✅ | Why Is My Drain Gurgling? It Is Almost Always the Vent | drain gurgling | vent-size | 2 |
+| `air-admittance-valve-vs-vent.mdx` ✅ | Air Admittance Valves: Where They Are Legal and Where They Are Not | air admittance valve | vent-size | 2 |
+| `stack-vent-vs-vent-stack.mdx` ✅ | Stack Vent vs Vent Stack: Two Different Things With One Name | stack vent vs vent stack | vent-size | 3 |
+| `building-drain-vs-building-sewer.mdx` ✅ | Building Drain vs Building Sewer: Where One Ends and the Other Starts | building drain vs sewer | drain-pipe-size | 3 |
 
 ### Cluster 3 — Site, storm & special waste (6)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `what-size-septic-tank-do-i-need.mdx` ✅ | What Size Septic Tank Do I Need? Bedrooms, Soil, and Why Both Matter | what size septic tank | septic-tank | 1 |
 | `what-size-grease-trap-do-i-need.mdx` ✅ | What Size Grease Trap Do I Need? Two Devices, Two Methods | what size grease trap | grease-trap | 1 |
-| `how-much-water-comes-off-a-roof.mdx` | Roof Runoff: How Much Water a Storm Actually Delivers | roof runoff calculation | storm-drainage | 2 |
-| `rainwater-harvesting-system-sizing.mdx` | Sizing a Rainwater Harvesting System: The Dry Spell, Not the Roof | rainwater harvesting sizing | rainwater | 2 |
-| `perc-test-and-leach-field-sizing.mdx` | Perc Tests and Leach Field Sizing: A 5x Swing From the Ground Alone | perc test leach field | septic-tank | 3 |
-| `greywater-system-basics.mdx` | Grey Water Systems: The 24-Hour Rule That Shapes Everything | greywater system | rainwater | 3 |
+| `how-much-water-comes-off-a-roof.mdx` ✅ | Roof Runoff: How Much Water a Storm Actually Delivers | roof runoff calculation | storm-drainage | 2 |
+| `rainwater-harvesting-system-sizing.mdx` ✅ | Sizing a Rainwater Harvesting System: The Dry Spell, Not the Roof | rainwater harvesting sizing | rainwater | 2 |
+| `perc-test-and-leach-field-sizing.mdx` ✅ | Perc Tests and Leach Field Sizing: A 5x Swing From the Ground Alone | perc test leach field | septic-tank | 3 |
+| `greywater-system-basics.mdx` ✅ | Grey Water Systems: The 24-Hour Rule That Shapes Everything | greywater system | rainwater | 3 |
 
 ### Cluster 4 — Pressure, pumps & wells (6)
 | File | Title | Keyword | Calculator | Tier |
@@ -110,9 +120,9 @@ any of them. Verify before writing with
 | `normal-water-pressure-for-a-house.mdx` ✅ | Normal Water Pressure for a House: 40 to 60 psi, and Why Height Costs 4.33 | normal water pressure for a house | water-pressure | 1 |
 | `low-water-pressure-in-house.mdx` ✅ | Low Water Pressure in a House: Static vs Flowing, and What Each Tells You | low water pressure in house | water-pressure | 1 |
 | `what-size-pressure-tank-do-i-need.mdx` ✅ | What Size Well Pressure Tank? Drawdown Is a Ratio, Not a Difference | what size pressure tank | well-pressure-tank | 1 |
-| `do-i-need-a-pressure-reducing-valve.mdx` | Do I Need a PRV? IPC 604.8 and the Expansion Tank It Drags With It | pressure reducing valve | water-pressure | 2 |
-| `well-pump-short-cycling.mdx` | Well Pump Short Cycling: An Over-Charged Tank Looks Exactly Like a Dead One | well pump short cycling | well-pressure-tank | 2 |
-| `how-to-calculate-pump-head.mdx` | Total Dynamic Head: Static Lift, Friction, Pressure, and the Term Everyone Drops | total dynamic head | pump-head | 2 |
+| `do-i-need-a-pressure-reducing-valve.mdx` ✅ | Do I Need a PRV? IPC 604.8 and the Expansion Tank It Drags With It | pressure reducing valve | water-pressure | 2 |
+| `well-pump-short-cycling.mdx` ✅ | Well Pump Short Cycling: An Over-Charged Tank Looks Exactly Like a Dead One | well pump short cycling | well-pressure-tank | 2 |
+| `how-to-calculate-pump-head.mdx` ✅ | Total Dynamic Head: Static Lift, Friction, Pressure, and the Term Everyone Drops | total dynamic head | pump-head | 2 |
 
 ### Cluster 5 — Water heating (8)
 | File | Title | Keyword | Calculator | Tier |
@@ -122,16 +132,16 @@ any of them. Verify before writing with
 | `how-much-does-a-water-heater-cost-to-replace.mdx` ✅ | Water Heater Replacement Cost: The Upgrades Turn a Swap Into a Project | water heater replacement cost | wh-replacement-cost | 1 |
 | `tankless-vs-tank-water-heater.mdx` ✅ | Tankless vs Tank: Simultaneity, Not Capacity, Is the Real Difference | tankless vs tank water heater | tankless | 1 |
 | `thermal-expansion-tank-sizing.mdx` ✅ | Thermal Expansion Tank Sizing: The Pre-Charge Matters More Than the Tank | expansion tank sizing | expansion-tank | 1 |
-| `water-heater-temperature-setting.mdx` | Water Heater Temperature: Store at 140, Deliver at 120, and Why | water heater temperature | mixing-valve | 2 |
-| `heat-pump-water-heater-sizing.mdx` | Heat Pump Water Heaters: Great Efficiency, Slow Recovery | heat pump water heater sizing | water-heater-size | 2 |
-| `mixing-valve-explained.mdx` | Thermostatic Mixing Valves: How Storing Hot Stretches a Tank | thermostatic mixing valve | mixing-valve | 3 |
+| `water-heater-temperature-setting.mdx` ✅ | Water Heater Temperature: Store at 140, Deliver at 120, and Why | water heater temperature | mixing-valve | 2 |
+| `heat-pump-water-heater-sizing.mdx` ✅ | Heat Pump Water Heaters: Great Efficiency, Slow Recovery | heat pump water heater sizing | water-heater-size | 2 |
+| `mixing-valve-explained.mdx` ✅ | Thermostatic Mixing Valves: How Storing Hot Stretches a Tank | thermostatic mixing valve | mixing-valve | 3 |
 
 ### Cluster 6 — Volume, wait time & conversions (3)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `how-long-does-it-take-hot-water-to-reach-the-tap.mdx` ✅ | Why Hot Water Takes So Long — and Why a Bigger Pipe Makes It Worse | hot water takes too long | pipe-volume | 1 |
-| `how-many-gallons-in-a-pipe.mdx` | How Many Gallons Are in a Pipe? 0.0408 x Diameter Squared | gallons in a pipe | pipe-volume | 2 |
-| `plumbing-unit-conversions.mdx` | Plumbing Unit Conversions: GPM, LPM, PSI, Head — and the Imperial Gallon Trap | gpm to lpm | unit-converter | 3 |
+| `how-many-gallons-in-a-pipe.mdx` ✅ | How Many Gallons Are in a Pipe? 0.0408 x Diameter Squared | gallons in a pipe | pipe-volume | 2 |
+| `plumbing-unit-conversions.mdx` ✅ | Plumbing Unit Conversions: GPM, LPM, PSI, Head — and the Imperial Gallon Trap | gpm to lpm | unit-converter | 3 |
 
 ### Cluster 7 — Cost & business (4) — highest commercial value
 | File | Title | Keyword | Calculator | Tier |
@@ -139,24 +149,43 @@ any of them. Verify before writing with
 | `how-much-does-it-cost-to-repipe-a-house.mdx` ✅ | How Much Does It Cost to Repipe a House? The Variable Nobody Quotes | cost to repipe a house | repipe-cost | 1 |
 | `how-to-estimate-plumbing-jobs.mdx` ✅ | How to Estimate Plumbing Jobs: Markup Is Not Margin | how to estimate plumbing jobs | estimate | 1 |
 | `plumber-hourly-rate.mdx` ✅ | Plumber Hourly Rate: Utilisation Moves It More Than Wage Does | plumber hourly rate | labor-rate | 1 |
-| `plumbing-markup-vs-margin.mdx` | Markup vs Margin for Plumbers: 25% Markup Is a 20% Margin | markup vs margin | estimate | 2 |
+| `plumbing-markup-vs-margin.mdx` ✅ | Markup vs Margin for Plumbers: 25% Markup Is a 20% Margin | markup vs margin | estimate | 2 |
 
 ### Cluster 8 — Code & compliance evergreen (4)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `ipc-vs-upc-differences.mdx` ✅ | IPC vs UPC: Which Code Applies, and Where They Actually Diverge | ipc vs upc | formulas | 1 |
 | `backflow-prevention-explained.mdx` ✅ | Backflow Prevention: No Vacuum Breaker Stops Backpressure | backflow preventer types | backflow-prevention | 1 |
-| `common-plumbing-code-violations.mdx` | Common Plumbing Code Violations and Why Inspectors Catch Them | plumbing code violations | glossary | 2 |
-| `plumbing-permits-and-inspections.mdx` | Plumbing Permits and Inspections: What Needs One and What It Costs | plumbing permit cost | estimate | 3 |
+| `common-plumbing-code-violations.mdx` ✅ | Common Plumbing Code Violations and Why Inspectors Catch Them | plumbing code violations | glossary | 2 |
+| `plumbing-permits-and-inspections.mdx` ✅ | Plumbing Permits and Inspections: What Needs One and What It Costs | plumbing permit cost | estimate | 3 |
+
+### Cluster 9 — Homeowner symptoms & service costs (8) — added after the original 47
+
+Symptom-first and price-first queries. These target the searches a homeowner actually types, which
+clusters 1–8 never covered: the earlier posts answer "what size" and "which code", these answer
+"why is this happening" and "what should this cost".
+
+| File | Title | Keyword | Calculator | Tier |
+|---|---|---|---|---|
+| `toilet-keeps-running.mdx` ✅ | Toilet Keeps Running? What It Costs and How to Find the Cause | toilet keeps running | leak-water-waste | 1 |
+| `how-to-find-a-water-leak.mdx` ✅ | How to Find a Water Leak: The Meter Test, Step by Step | how to find a water leak | leak-water-waste | 1 |
+| `sewer-smell-in-house.mdx` ✅ | Sewer Smell in the House: Where It Comes From, In Order | sewer smell in house | vent-size | 1 |
+| `drain-cleaning-cost.mdx` ✅ | Drain Cleaning Cost: What You Are Actually Paying For | drain cleaning cost | estimate | 1 |
+| `sewer-line-replacement-cost.mdx` ✅ | Sewer Line Replacement Cost: How the Number Is Built | sewer line replacement cost | estimate | 1 |
+| `water-hammer-causes-and-fixes.mdx` ✅ | Water Hammer: Why Pipes Bang, and What Actually Fixes It | water hammer | pipe-velocity | 2 |
+| `what-size-sump-pump-do-i-need.mdx` ✅ | What Size Sump Pump Do I Need? Head First, Horsepower Second | what size sump pump | pump-head | 2 |
+| `how-many-gpm-does-a-shower-use.mdx` ✅ | How Many GPM Does a Shower Use? And How Much of It Is Hot | how many gpm does a shower use | water-heater-size | 2 |
 
 ### Tier totals
 
 | Tier | Count | Shipped | Remaining |
 |---|---|---|---|
-| 1 | 25 | **25** | **0 — tier 1 complete** |
-| 2 | 15 | 0 | 15 |
-| 3 | 7 | 0 | 7 |
-| **Total** | **47** | **25** | **22** |
+| 1 | 30 | **30** | **0** |
+| 2 | 18 | **18** | **0** |
+| 3 | 7 | **7** | **0** |
+| **Total** | **55** | **55** | **0 — the plan is complete** |
+
+Clusters 1–8 are the original 47 (25 / 15 / 7 by tier). Cluster 9 added 5 tier-1 and 3 tier-2.
 
 Verify these totals against the tables with:
 `grep -oE '^\| \`[a-z0-9-]+\.mdx\`.*\| [123] \|$' docs/notebooklm/plumbing-content-strategy.md | grep -oE '\| [123] \|$' | sort | uniq -c`
@@ -186,8 +215,9 @@ two mirror electrical's `$67`-bid estimating cluster.
 
 ### Also outstanding, not blog work
 
-- **A leak and water-waste calculator** — what the hub's coming-soon card currently promises.
-  Drip rate to gallons per year, running-toilet cost, and flow-rate-based leak detection.
+- ~~A leak and water-waste calculator~~ — **SHIPPED.** `plumbing-leak-water-waste-calculator`,
+  with four measurement modes (drip count, container fill test, water meter, known flow) and the
+  hot-water energy term most leak calculators omit. Plumbing is now **26 calculators**.
 - **The Appendix E verification.** `WSFU_FIXTURES` and `HUNTER_DEMAND` are the category's only
   unverified tier-3 exports. **This is the highest-value non-content fix left in plumbing** —
   it underpins two calculators and Cluster 1 leans on both.

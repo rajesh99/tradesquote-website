@@ -1,0 +1,117 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { fmt } from "@/lib/plumbing";
+
+/**
+ * The trap seal is the whole defence, and it is two inches of water. This is
+ * the four ways it gets lost, with the evaporation timeline computed rather
+ * than asserted — an unused guest bathroom is on a clock.
+ *
+ * Minimum and maximum seal depths are IPC 1002.4 values.
+ */
+const MIN_SEAL_IN = 2;
+const MAX_SEAL_IN = 4;
+
+const EVAPORATION_RATES = [
+  { rate: 0.02, label: "cool, humid, closed room" },
+  { rate: 0.04, label: "typical conditioned space" },
+  { rate: 0.08, label: "warm, dry, air moving" },
+];
+
+const timeline = EVAPORATION_RATES.map((e) => ({
+  ...e,
+  days: MIN_SEAL_IN / e.rate,
+}));
+
+const LOSSES = [
+  {
+    name: "Evaporation",
+    detail: "Nothing uses the fixture, so the seal dries out",
+    where: "Guest baths, floor drains, basement laundry",
+    colour: C.orange,
+  },
+  {
+    name: "Self-siphonage",
+    detail: "The fixture's own discharge pulls its seal out",
+    where: "Trap arm too long, or no vent within reach",
+    colour: C.blue,
+  },
+  {
+    name: "Induced siphonage",
+    detail: "Another fixture discharging past it drags it out",
+    where: "Traps connected to a stack with poor venting",
+    colour: C.red,
+  },
+  {
+    name: "Back-pressure",
+    detail: "A surge in the stack blows the seal into the room",
+    where: "Lower floors of tall stacks, blocked vent terminal",
+    colour: C.muted,
+  },
+];
+
+const maxDays = Math.max(...timeline.map((t) => t.days));
+const BAR_X = 236;
+const BAR_MAX = 200;
+
+const bars = timeline.map((t, i) => ({
+  ...t,
+  y: 96 + i * 26,
+  w: Math.max(3, (t.days / maxDays) * BAR_MAX),
+}));
+
+const cards = LOSSES.map((l, i) => ({
+  ...l,
+  y: 196 + i * 30,
+}));
+
+const typical = timeline[1];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" fill="none" aria-hidden="true">
+  <title>How long a trap seal survives evaporation, and the four ways a seal is lost</title>
+  <desc>
+    A two-inch trap seal evaporates away in roughly fifty days in a typical conditioned space, and faster in
+    warm dry air. Evaporation, self-siphonage, induced siphonage and back-pressure are the four loss mechanisms.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="324" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two inches of water is the entire defence</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`The IPC requires a seal of ${fmt(MIN_SEAL_IN, 0)} to ${fmt(MAX_SEAL_IN, 0)} inches. Lose it and the drain becomes an open pipe to the sewer — nothing else is holding the gas back.`}
+  </text>
+
+  <text x="28" y="86" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">
+    {`HOW LONG A ${fmt(MIN_SEAL_IN, 0)} INCH SEAL LASTS UNUSED`}
+  </text>
+
+  {bars.map((row) => (
+    <g>
+      <text x="28" y={row.y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.rate, 2)} in/day`}
+      </text>
+      <text x="102" y={row.y + 12} fill={C.muted} font-family={FONT} font-size="9">{row.label}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="15" rx="3" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="15" rx="3" fill={C.orange} opacity="0.68" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 12} fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.days, 0)} days`}
+      </text>
+    </g>
+  ))}
+
+  <line x1="24" y1="182" x2="696" y2="182" stroke={C.border} stroke-width="1" />
+  <text x="28" y="176" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">THE FOUR WAYS A SEAL IS LOST</text>
+
+  {cards.map((l) => (
+    <g>
+      <rect x="24" y={l.y} width="4" height="22" rx="2" fill={l.colour} />
+      <text x="38" y={l.y + 15} fill={l.colour} font-family={FONT} font-size="10" font-weight="800">{l.name}</text>
+      <text x="146" y={l.y + 15} fill={C.dark} font-family={FONT} font-size="9">{l.detail}</text>
+      <text x="424" y={l.y + 15} fill={C.muted} font-family={FONT} font-size="9">{l.where}</text>
+    </g>
+  ))}
+
+  <text x="24" y="330" fill={C.muted} font-family={FONT} font-size="10">
+    {`An unused guest bathroom is on a clock: about ${fmt(typical.days, 0)} days in ordinary conditions, which is why the smell appears after a holiday and not before.`}
+  </text>
+</svg>

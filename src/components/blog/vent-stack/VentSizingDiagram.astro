@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { ventSize, sizeLabel, MIN_VENT_SIZE, VENT_LENGTH_UPSIZE_FEET, fmt } from "@/lib/plumbing";
+
+/**
+ * The half-diameter rule and where its floor actually binds. The interesting
+ * result: for 3 inch and up the halving IS the answer, and the 1-1/4 inch floor
+ * only ever governs at 2 inch and below.
+ */
+const DRAINS = [1.5, 2, 3, 4, 6];
+
+const rows = DRAINS.map((drain) => {
+  const half = drain / 2;
+  const short = ventSize(drain, 30);
+  const long = ventSize(drain, VENT_LENGTH_UPSIZE_FEET + 20);
+  return {
+    drain,
+    half,
+    short: short.size,
+    long: long.size,
+    flooredByMinimum: half < MIN_VENT_SIZE,
+    upsized: long.size !== short.size,
+  };
+});
+
+const ROW_H = 32;
+const TOP = 96;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>Vent size from drain size, and where the minimum actually binds</title>
+  <desc>
+    Half the drain diameter with a one and a quarter inch floor. The floor only governs at two inch and below; at
+    three inch and above the halving is the answer.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Half the drain — and the floor only bites at the small end</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`IPC 906.2: never less than half the drain, never under ${sizeLabel(MIN_VENT_SIZE)}, upsized past ${VENT_LENGTH_UPSIZE_FEET} ft of developed length.`}
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DRAIN</text>
+  <text x={186} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HALF OF IT</text>
+  <text x={340} y="80" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">VENT AT 30 FT</text>
+  <text x={494} y="80" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="8" font-weight="700">VENT AT 60 FT</text>
+  <text x={632} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT GOVERNED</text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const tone = row.flooredByMinimum ? C.orange : C.primary;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={tone} opacity="0.06" />
+        <text x="40" y={y + 17} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{sizeLabel(row.drain)}</text>
+        <text x={186} y={y + 17} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10.5">
+          {sizeLabel(row.half)}
+        </text>
+        <text x={340} y={y + 17} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="11" font-weight="800">
+          {sizeLabel(row.short)}
+        </text>
+        <text x={494} y={y + 17} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="11" font-weight="800">
+          {sizeLabel(row.long)}
+        </text>
+        <text x={632} y={y + 17} text-anchor="middle" fill={tone} font-family={FONT} font-size="9" font-weight="700">
+          {row.flooredByMinimum ? "the floor" : "the halving"}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="252" width="672" height="24" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="268" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`Every row upsizes past ${VENT_LENGTH_UPSIZE_FEET} ft — length is a second, independent constraint, and it is the one people forget to measure.`}
+  </text>
+</svg>

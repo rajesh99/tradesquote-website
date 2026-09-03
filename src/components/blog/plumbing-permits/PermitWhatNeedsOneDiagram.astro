@@ -1,0 +1,95 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { MIN_BUILDING_DRAIN_WITH_WC, PRV_THRESHOLD_PSI, sizeLabel } from "@/lib/plumbing";
+
+/**
+ * The threshold, expressed as the pattern rather than a rule — because the rule
+ * is genuinely local. Mostly qualitative by design, but the two code numbers an
+ * inspection actually turns on are read from the lib rather than typed.
+ */
+const CLEAR = [
+  "Adding, moving or removing a fixture",
+  "New or altered water supply, drain, waste or vent piping",
+  "Replacing a water heater",
+  "Repiping any part of a house",
+  `A new or replaced building sewer — and it is never under ${sizeLabel(MIN_BUILDING_DRAIN_WITH_WC)} with a WC`,
+  "Converting fuel type on an appliance",
+];
+
+const USUALLY_NOT = [
+  "Clearing a blockage",
+  "Replacing a faucet, valve or trap in the same place",
+  "Swapping a fixture for the same fixture, same connections",
+  "Replacing a washer, cartridge or flapper",
+];
+
+const GREY = [
+  "Water heater like-for-like — permitted in most places, not all",
+  "Moving a fixture a short distance within a room",
+  "Water treatment equipment on the service",
+  "Anything that changes a vent",
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>What needs a plumbing permit</title>
+  <desc>
+    The pattern most jurisdictions apply: new or altered piping needs a permit, like-for-like repair generally does
+    not, and a grey area in between where the answer is genuinely local.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The test is usually "new or altered piping"</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A pattern, not a rule — the threshold is local. What the inspection checks is code: the ${sizeLabel(MIN_BUILDING_DRAIN_WITH_WC)} drain floor, the ${PRV_THRESHOLD_PSI} psi PRV trigger.`}
+  </text>
+
+  <rect x="24" y="68" width="216" height="176" rx="10" fill={C.redLight} stroke={C.red} stroke-width="2" />
+  <text x="38" y="88" fill={C.red} font-family={FONT} font-size="9" font-weight="700">ALMOST ALWAYS NEEDS ONE</text>
+  {CLEAR.map((item, i) => {
+    const y = 106 + i * 22;
+    const wrap = item.length > 30;
+    return (
+      <g>
+        <circle cx={44} cy={y - 3} r="2.6" fill={C.red} opacity="0.85" />
+        <text x={54} y={y} fill={C.dark} font-family={FONT} font-size="8.5">{wrap ? item.slice(0, 30) : item}</text>
+        {wrap && <text x={54} y={y + 10} fill={C.dark} font-family={FONT} font-size="8.5">{item.slice(30)}</text>}
+      </g>
+    );
+  })}
+
+  <rect x="252" y="68" width="216" height="176" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="266" y="88" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">GENUINELY VARIES — ASK</text>
+  {GREY.map((item, i) => {
+    const y = 106 + i * 32;
+    const wrap = item.length > 30;
+    return (
+      <g>
+        <circle cx={272} cy={y - 3} r="2.6" fill={C.orange} opacity="0.85" />
+        <text x={282} y={y} fill={C.dark} font-family={FONT} font-size="8.5">{wrap ? item.slice(0, 30) : item}</text>
+        {wrap && <text x={282} y={y + 10} fill={C.dark} font-family={FONT} font-size="8.5">{item.slice(30)}</text>}
+      </g>
+    );
+  })}
+
+  <rect x="480" y="68" width="216" height="176" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="494" y="88" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">USUALLY DOES NOT</text>
+  {USUALLY_NOT.map((item, i) => {
+    const y = 106 + i * 32;
+    const wrap = item.length > 30;
+    return (
+      <g>
+        <circle cx={500} cy={y - 3} r="2.6" fill={C.primary} opacity="0.85" />
+        <text x={510} y={y} fill={C.dark} font-family={FONT} font-size="8.5">{wrap ? item.slice(0, 30) : item}</text>
+        {wrap && <text x={510} y={y + 10} fill={C.dark} font-family={FONT} font-size="8.5">{item.slice(30)}</text>}
+      </g>
+    );
+  })}
+
+  <text x="24" y="264" fill={C.muted} font-family={FONT} font-size="10">
+    The building sewer is frequently permitted separately from the plumbing inside — different application, sometimes a different department.
+  </text>
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    One phone call to the building department settles any row in the middle column, and it is free.
+  </text>
+</svg>

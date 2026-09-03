@@ -1,0 +1,103 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter,
+  velocity,
+  frictionLossPsiPer100Ft,
+  psiToHead,
+  velocityHead,
+  totalDynamicHead,
+  sizeLabel,
+  HAZEN_WILLIAMS_C,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * What a sump pump is actually working against. The lift dominates and the
+ * friction is small — which is the opposite of a well pump, where the pressure
+ * head usually dominates everything.
+ *
+ * Base copied from plumbing-pump-head-calculator: 30 gpm, 40 ft of PVC-40,
+ * 12 ft of static lift.
+ */
+const MATERIAL = "pvc-40";
+const GPM = 30;
+const LENGTH_FT = 40;
+const LIFT_FT = 12;
+const NOMINAL = 1.5;
+
+const bore = insideDiameter(MATERIAL, NOMINAL)!;
+const v = velocity(GPM, bore);
+const per100 = frictionLossPsiPer100Ft(GPM, bore, HAZEN_WILLIAMS_C[MATERIAL]);
+const frictionFt = psiToHead((per100 / 100) * LENGTH_FT);
+const vHead = velocityHead(v);
+const pressureFt = 0;
+
+const tdh = totalDynamicHead({
+  staticLiftFeet: LIFT_FT,
+  frictionHeadFeet: frictionFt,
+  pressureHeadFeet: pressureFt,
+  velocityHeadFeet: vHead,
+});
+
+const COMPONENTS = [
+  { label: "Static lift", detail: "pit floor to the discharge point", feet: LIFT_FT, colour: C.orange },
+  { label: "Friction", detail: `${LENGTH_FT} ft of ${sizeLabel(NOMINAL)} PVC plus the check valve`, feet: frictionFt, colour: C.blue },
+  { label: "Pressure head", detail: "zero — a sump discharges to open air", feet: pressureFt, colour: C.muted },
+  { label: "Velocity head", detail: "the energy left in the moving water", feet: vHead, colour: C.primary },
+];
+
+const BAR_X = 208;
+const BAR_MAX = 360;
+
+const rows = COMPONENTS.map((c, i) => ({
+  ...c,
+  y: 104 + i * 30,
+  w: Math.max(2, (c.feet / tdh) * BAR_MAX),
+  share: (c.feet / tdh) * 100,
+}));
+
+const liftShare = (LIFT_FT / tdh) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>The four components of total dynamic head for a sump pump</title>
+  <desc>
+    At 30 gallons a minute through 40 feet of inch-and-a-half PVC with 12 feet of lift, total dynamic head is
+    14.4 feet, of which the static lift alone is 12 feet — friction and velocity head are almost incidental.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">For a sump, the lift is nearly the whole answer</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${fmt(GPM, 0)} gpm through ${fmt(LENGTH_FT, 0)} ft of ${sizeLabel(NOMINAL)} Schedule 40 PVC, ${fmt(LIFT_FT, 0)} ft of static lift — the pump head calculator defaults.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    Sump discharge is to open air, so the pressure-head term is zero. On a well pump that term usually dominates instead.
+  </text>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">COMPONENT</text>
+  <text x={BAR_X + BAR_MAX + 10} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">FEET · SHARE</text>
+
+  {rows.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="28" y={row.y + 25} fill={C.muted} font-family={FONT} font-size="8">{row.detail}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="16" rx="4" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="16" rx="4" fill={row.colour} opacity="0.72" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.feet, 2)} ft · ${fmt(row.share, 1)}%`}
+      </text>
+    </g>
+  ))}
+
+  <line x1="24" y1="232" x2="696" y2="232" stroke={C.border} stroke-width="1" />
+  <text x="28" y="252" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">Total dynamic head</text>
+  <text x={BAR_X + BAR_MAX + 10} y="252" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+    {`${fmt(tdh, 1)} ft`}
+  </text>
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">
+    {`Static lift is ${fmt(liftShare, 0)}% of the total. Measure the lift accurately and you have essentially sized the pump; guess it and nothing else helps.`}
+  </text>
+</svg>

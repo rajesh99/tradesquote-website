@@ -1,0 +1,129 @@
+---
+title: "Roof Runoff: How Much Water a Storm Actually Delivers"
+meta_title: "Roof Runoff Calculation: GPM From Area and Rainfall (2026) | TradesQuote"
+description: "A 2,000 sq ft roof in a 4 in/hr storm sheds 83.1 gpm — about twenty-one times what the house uses at peak. The whole calculation is one divisor, and that divisor is three unit conversions."
+image: /images/posts/how-much-water-comes-off-a-roof-hero.svg
+date: 2026-09-04T11:30:00Z
+categories: ["plumbing"]
+tags: ["roof runoff","storm drainage","gutter sizing","rainfall rate","ipc chapter 11"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import RunoffScaleDiagram from "@/components/blog/roof-runoff/RunoffScaleDiagram.astro";
+import RunoffDerivationDiagram from "@/components/blog/roof-runoff/RunoffDerivationDiagram.astro";
+import RunoffAreaDiagram from "@/components/blog/roof-runoff/RunoffAreaDiagram.astro";
+
+The flow coming off an ordinary roof in a serious storm is much larger than people expect, and the gutter hanging off the edge of it does nothing to suggest otherwise.
+
+**A 2,000 square foot roof at 4 inches an hour sheds 83.1 gallons per minute** — 4,987 gallons in an hour, and about twenty-one times what the same house draws at peak with a shower and a kitchen tap running.
+
+## The scale of it
+
+<BlogInfographic
+  title="A storm outflows the whole house, several times over"
+  caption="A 2,000 square foot roof at four design rainfall intensities. These are hourly intensities used for storm design, not annual rainfall totals — the difference matters enormously."
+>
+  <RunoffScaleDiagram />
+</BlogInfographic>
+
+- **2 in/hr** — 41.6 gpm
+- **3 in/hr** — 62.3 gpm
+- **4 in/hr** — 83.1 gpm
+- **5 in/hr** — 103.9 gpm
+
+The critical distinction is that these are **intensities, not totals**. A region that gets 40 inches of rain a year is not shedding water slowly all year; it is shedding nothing most days and 80 gpm for twenty minutes in July. Storm drainage is sized for the twenty minutes.
+
+Unlike household demand, runoff does not taper either. Every square foot contributes for as long as the rain falls, and there is no diversity factor to save you — which is precisely the opposite of how supply is sized, where the whole method rests on fixtures not running together.
+
+## Where the number comes from
+
+<BlogInfographic
+  title="The 96.25 is three unit conversions, not a magic number"
+  caption="Gallons per cubic foot, an inch expressed as a twelfth of a foot, and an hour expressed as sixty minutes. Derived rather than quoted, which is why it can be cross-checked and agrees with itself."
+>
+  <RunoffDerivationDiagram />
+</BlogInfographic>
+
+The formula circulates as a bare fact:
+
+    gpm = roof area × rainfall rate ÷ 96.25
+
+The 96.25 is not arbitrary. It is a cubic foot of water — **7.48052 gallons** — spread one inch deep, which is a twelfth of a foot, over an hour, which is sixty minutes. Three conversions, and nothing else.
+
+Doing it in the other order gives the useful intermediate: **0.6234 gallons per square foot per inch of rain**. That is the familiar "0.62 gallons" rule of thumb, unrounded — and it is the number rainwater harvesting is built on.
+
+## It scales linearly, which is unusual
+
+<BlogInfographic
+  title="Strictly linear — the one place a rule of thumb is safe"
+  caption="Runoff at 4 in/hr against catchment area. Double the roof and you exactly double the flow, which is not true of any pipe-sizing quantity on this site."
+>
+  <RunoffAreaDiagram />
+</BlogInfographic>
+
+Almost nothing else in plumbing behaves this well. Friction goes as diameter to the −4.87. Fixture demand flattens on a curve. Drain capacity jumps in steps.
+
+Runoff is just **41.56 gpm per 1,000 square feet at 4 in/hr**. Multiply and you are finished. That linearity is why per-square-foot rules of thumb are genuinely safe here and genuinely dangerous nearly everywhere else.
+
+## Two things people get wrong
+
+**Horizontal projected area, not sloped area.** A pitched roof catches the rain falling on its shadow on the ground, not on its actual surface. A 12/12 pitch has about 1.41 times the surface area of its footprint and catches exactly the footprint's worth of rain. Measuring the slope overstates the flow by 41%.
+
+**Adjacent vertical walls count.** A wall rising above a roof throws water onto it, and the IPC has you add a share of that wall area to the catchment. On a house with a two-storey section over a single-storey roof this is not a small correction.
+
+## From flow to pipe
+
+This is where the page stops, deliberately. **This site publishes the flow, not the code size.**
+
+Storm drainage pipe sizes come from IPC Tables 1106.2 and 1106.3, which depend on slope as well as flow, and gutter sizing comes from Table 1106.6. Those are tables to read in the adopted code rather than reproduce from a secondary source — the same call made for vent stacks. The **[Storm & Roof Drainage Calculator](/calculators/plumbing/plumbing-storm-drainage-calculator)** gives you the gpm and hands the sizing back to the code.
+
+What the flow figure is immediately good for:
+
+**Checking a downspout count.** A single 3 inch downspout does not carry 83 gpm. Dividing the roof into areas per downspout tells you how many you need before anything else.
+
+**Sizing a sump or a drywell.** Both are volume problems, and the flow figure times the storm duration is the volume.
+
+**Sanity-checking a gutter.** If the calculated flow is well past what a 5 inch K-style gutter carries, no amount of correct pitch will save it.
+
+## And if you want to keep it
+
+Everything above is about getting water away. The same 0.6234 gallons per square foot per inch is the supply side of rainwater harvesting — a 2,000 sq ft asphalt-shingle roof yields about 1,060 gallons per inch of rain after runoff losses. What that does and does not size is in **[sizing a rainwater harvesting system](/blog/rainwater-harvesting-system-sizing)**, and the short version is that the roof is rarely the constraint.
+
+## Frequently asked questions
+
+### How much water comes off a roof in a storm?
+
+A **2,000 square foot roof at 4 inches per hour sheds 83.1 gpm** — nearly 5,000 gallons in an hour. That is roughly twenty-one times the peak draw of the house underneath it. Runoff scales linearly with area, so a 4,000 sq ft roof sheds twice that.
+
+### How do you calculate roof runoff?
+
+**gpm = roof area × rainfall rate ÷ 96.25**, using horizontal projected area in square feet and rainfall intensity in inches per hour. The 96.25 is three unit conversions: 7.48052 gallons per cubic foot, divided by 12 for an inch of depth, divided by 60 for an hour.
+
+### What rainfall rate should I use?
+
+The design **intensity** for your location, not the annual total — typically a 100-year, one-hour rainfall from the local jurisdiction or the IPC's rainfall maps. Common design values run from about 2 in/hr in the Pacific Northwest to 5 in/hr on the Gulf coast. Your building department publishes the figure to use.
+
+### Do I use the sloped roof area or the footprint?
+
+The **horizontal projected area** — the roof's shadow on the ground. Rain falls vertically, so a pitched roof catches only what falls on its footprint. Using the sloped surface area overstates the flow substantially: a 12/12 pitch has about 1.41 times the surface area of its footprint.
+
+### How many gallons per inch of rain does a roof collect?
+
+**0.6234 gallons per square foot per inch**, before any losses — the unrounded version of the familiar 0.62 rule. A 2,000 sq ft roof therefore sees about 1,247 gallons per inch of rain, of which a harvesting system captures rather less after runoff coefficient and first-flush losses.
+
+### What size storm drain do I need?
+
+That comes from **IPC Tables 1106.2 and 1106.3**, which depend on both the flow and the pipe slope, and this site deliberately does not reproduce them. Calculate the flow, then read the size out of the code your jurisdiction has adopted. Gutters are Table 1106.6.
+
+### Do walls above a roof add to the runoff?
+
+Yes. A vertical wall rising above a roof throws water onto it, and the IPC has you add a proportion of that wall's area to the catchment. On a house where a two-storey section overlooks a single-storey roof, this is a meaningful addition rather than a rounding.
+
+### Why is runoff sized so differently from water supply?
+
+Because there is no diversity. Water supply sizing rests entirely on fixtures not running simultaneously, which is what flattens the demand curve. Every square foot of a roof receives rain at the same moment, so runoff is the full load every time and scales strictly linearly.
+
+---
+
+**Sources & standards:** The runoff formula is **derived here rather than quoted** — the 96.25 divisor is 7.48052 gallons per cubic foot divided by 12 inches per foot and 60 minutes per hour, and it reconciles exactly with the 0.6234 gallons per square foot per inch figure used elsewhere on this site. IPC 2021 Chapter 11 governs storm drainage. **Pipe and gutter sizes come from Tables 1106.2, 1106.3 and 1106.6, which depend on slope and are deliberately not reproduced here** — read them in the code your jurisdiction has adopted. Design rainfall intensities are set locally; the regional examples shown are illustrative starting points, not design values for any specific site. Catchment must be measured as horizontal projected area, with an allowance added for adjacent vertical walls per the code. The IPC is a model code; confirm the edition your jurisdiction adopts.

@@ -1,0 +1,118 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  WSFU_FIXTURES,
+  wsfuToGpm,
+  insideDiameter,
+  flowAtVelocity,
+  mixedFlow,
+  recoveryGph,
+  sizeLabel,
+  fmt,
+  MAX_VELOCITY_COLD,
+} from "@/lib/plumbing";
+
+/**
+ * Two showers at once, and what actually runs out first. The pipe copes long
+ * after the water heater has stopped keeping up — the tank's stored volume is
+ * doing the work, not its burner.
+ *
+ * The Hunter column is shown deliberately alongside the raw sum: Hunter's curve
+ * is built for whole systems and runs HIGH at small fixture counts, so it is
+ * the wrong tool for "how many showers", and worth showing as such.
+ */
+const GPM_PER_HEAD = 2.5;
+const NOMINAL = 0.75;
+
+const shower = WSFU_FIXTURES.find((w) => w.key === "shower-private")!;
+const bore = insideDiameter("copper-l", NOMINAL)!;
+const coldCapacity = flowAtVelocity(MAX_VELOCITY_COLD, bore);
+
+const mix = mixedFlow({ hotF: 140, coldF: 50, mixF: 105, mixedGpm: GPM_PER_HEAD });
+
+/** Base copied from plumbing-water-heater-size-calculator: 40,000 BTU, 0.8, dT 90. */
+const RECOVERY_BTU = 40000;
+const RECOVERY_EFF = 0.8;
+const RECOVERY_DT = 90;
+const recoveryHourly = recoveryGph(RECOVERY_BTU, RECOVERY_EFF, RECOVERY_DT);
+const recoveryGpm = recoveryHourly / 60;
+
+const rows = [1, 2, 3, 4].map((n) => ({
+  n,
+  wsfu: n * shower.total,
+  raw: n * GPM_PER_HEAD,
+  hunter: wsfuToGpm(n * shower.total, "tank"),
+  hotRaw: n * mix.hotGpm,
+  overPipe: n * GPM_PER_HEAD > coldCapacity,
+  overBurner: n * mix.hotGpm > recoveryGpm,
+}));
+
+const maxGpm = Math.max(coldCapacity, ...rows.map((r) => Math.max(r.raw, r.hunter)));
+
+const BAR_X = 152;
+const BAR_MAX = 380;
+const scale = (g: number) => Math.max(2, (g / maxGpm) * BAR_MAX);
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 118 + i * 40,
+  rawW: scale(r.raw),
+  hunterW: scale(r.hunter),
+  hotW: scale(r.hotRaw),
+}));
+
+const capX = BAR_X + scale(coldCapacity);
+const recX = BAR_X + scale(recoveryGpm);
+const one = rows[0];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 344" fill="none" aria-hidden="true">
+  <title>Flow demanded by simultaneous showers against pipe capacity and water heater recovery</title>
+  <desc>
+    Three-quarter inch copper carries 12.07 gallons a minute, so it supplies four showers at once. A 40,000 BTU
+    water heater only recovers 0.711 gallons a minute of hot water, which one shower already exceeds twice over.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="328" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The pipe is fine. The burner is not.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${fmt(GPM_PER_HEAD, 1)} gpm heads. Dark bar is the raw simultaneous flow, pale bar is what Hunter's curve predicts, thin bar is the hot share only.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    {`Vertical lines: ${sizeLabel(NOMINAL)} Type L copper at ${fmt(MAX_VELOCITY_COLD, 0)} ft/s, and the ${fmt(recoveryHourly, 1)} gallons an hour a ${fmt(RECOVERY_BTU, 0)} BTU heater actually makes.`}
+  </text>
+
+  <line x1={capX} y1="88" x2={capX} y2="290" stroke={C.blue} stroke-width="1.6" stroke-dasharray="4 3" />
+  <text x={capX + 6} y="100" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">
+    {`pipe ${fmt(coldCapacity, 2)} gpm`}
+  </text>
+
+  <line x1={recX} y1="88" x2={recX} y2="290" stroke={C.red} stroke-width="1.6" stroke-dasharray="4 3" />
+  <text x={recX + 6} y="112" fill={C.red} font-family={FONT} font-size="9" font-weight="700">
+    {`recovery ${fmt(recoveryGpm, 3)} gpm`}
+  </text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.n, 0)} shower`}
+      </text>
+      <text x="28" y={row.y + 27} fill={C.muted} font-family={FONT} font-size="8">
+        {`${fmt(row.wsfu, 1)} WSFU`}
+      </text>
+      <rect x={BAR_X} y={row.y} width={row.hunterW} height="9" rx="2" fill={C.muted} opacity="0.32" />
+      <rect x={BAR_X} y={row.y + 11} width={row.rawW} height="9" rx="2" fill={C.blue} opacity="0.72" />
+      <rect x={BAR_X} y={row.y + 22} width={row.hotW} height="7" rx="2" fill={C.orange} opacity="0.8" />
+      <text x={BAR_X + BAR_MAX + 8} y={row.y + 18} fill={C.dark} font-family={FONT} font-size="9" font-weight="700">
+        {`${fmt(row.raw, 1)} gpm`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="308" fill={C.muted} font-family={FONT} font-size="10">
+    {`One ${fmt(GPM_PER_HEAD, 1)} gpm shower draws ${fmt(one.hotRaw, 3)} gpm of hot water — ${fmt(one.hotRaw / recoveryGpm, 1)}x what the burner makes, so stored volume covers the gap.`}
+  </text>
+  <text x="24" y="326" fill={C.muted} font-family={FONT} font-size="9">
+    {`Hunter's curve reads ${fmt(one.hunter, 2)} gpm for a single shower against a true ${fmt(one.raw, 1)} — it is built for whole systems and runs high at small counts. Size branches on the raw sum.`}
+  </text>
+</svg>

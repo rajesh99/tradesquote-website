@@ -1,0 +1,136 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { gpmToGpd, meterLeakGpm, leakCost, fmt, usd, EPA_LEAKY_HOME_GPD } from "@/lib/plumbing";
+
+/**
+ * The isolation sequence. The meter test says a leak exists; closing the main
+ * shutoff at the house splits the answer into "before the house" and "inside
+ * the house", which is the fork that decides who pays for the repair.
+ *
+ * RATES copied from plumbing-leak-water-waste-calculator/index.astro.
+ */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+const epaCost = leakCost({ gallonsPerDay: EPA_LEAKY_HOME_GPD, ...RATES, hotFraction: 0 }).totalCost;
+
+const STEPS = [
+  {
+    n: "1",
+    title: "Shut every fixture",
+    body: "No taps, no ice maker, no",
+    body2: "irrigation timer, no laundry.",
+    tone: "muted" as const,
+  },
+  {
+    n: "2",
+    title: "Read the meter twice",
+    body: "Note the dial, wait 30 min,",
+    body2: "note it again. Movement = leak.",
+    tone: "orange" as const,
+  },
+  {
+    n: "3",
+    title: "Close the main at the house",
+    body: "Then repeat the reading. This",
+    body2: "is the fork in the diagnosis.",
+    tone: "blue" as const,
+  },
+];
+
+const FORKS = [
+  {
+    label: "Meter STILL moves",
+    meaning: "The leak is between the meter and the house",
+    detail: "Service line — underground, and usually the homeowner's side of the meter to fix. Look for a green patch, a soft spot, or winter steam.",
+    tone: "red" as const,
+    x: 20,
+  },
+  {
+    label: "Meter STOPS",
+    meaning: "The leak is inside the building",
+    detail: "Work through toilets first with the dye test, then water heater relief valves, then washing-machine and dishwasher fittings.",
+    tone: "green" as const,
+    x: 366,
+  },
+];
+
+const FORK_TONES = {
+  red: { colour: C.red, bg: C.redLight },
+  green: { colour: C.green, bg: C.greenLight },
+};
+
+const STEP_TONES = {
+  muted: { colour: C.muted, bg: C.white },
+  orange: { colour: C.orange, bg: C.orangeLight },
+  blue: { colour: C.blue, bg: C.blueLight },
+};
+
+const steps = STEPS.map((s, i) => ({
+  ...s,
+  x: 20 + i * 228,
+  colour: STEP_TONES[s.tone].colour,
+  bg: STEP_TONES[s.tone].bg,
+}));
+
+const forks = FORKS.map((f) => ({
+  ...f,
+  colour: FORK_TONES[f.tone].colour,
+  bg: FORK_TONES[f.tone].bg,
+}));
+
+const thresholdGpd = gpmToGpd(meterLeakGpm(0.1, 30));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 352" fill="none" aria-hidden="true">
+  <title>Isolation sequence for finding a water leak, and the two outcomes it produces</title>
+  <desc>
+    Shut every fixture, read the meter twice thirty minutes apart, then close the main shutoff and repeat. If
+    the meter still moves the leak is in the buried service line; if it stops the leak is inside the building.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="336" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three steps, then a fork that decides everything</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`EPA reckons around a tenth of homes leak ${fmt(EPA_LEAKY_HOME_GPD, 0)} gallons a day or more — ${usd(epaCost)} a year — so the test is worth running even with no symptom.`}
+  </text>
+
+  {steps.map((s) => (
+    <g>
+      <rect x={s.x} y="70" width="212" height="76" rx="10" fill={s.bg} stroke={s.colour} stroke-width="1.6" />
+      <circle cx={s.x + 26} cy="94" r="12" fill={s.colour} opacity="0.16" />
+      <text x={s.x + 26} y="98" text-anchor="middle" fill={s.colour} font-family={FONT} font-size="12" font-weight="800">{s.n}</text>
+      <text x={s.x + 46} y="98" fill={s.colour} font-family={FONT} font-size="11" font-weight="800">{s.title}</text>
+      <text x={s.x + 14} y="120" fill={C.dark} font-family={FONT} font-size="9">{s.body}</text>
+      <text x={s.x + 14} y="132" fill={C.dark} font-family={FONT} font-size="9">{s.body2}</text>
+    </g>
+  ))}
+
+  <line x1="360" y1="152" x2="360" y2="172" stroke={C.border} stroke-width="1.5" />
+  <line x1="126" y1="172" x2="594" y2="172" stroke={C.border} stroke-width="1.5" />
+  <line x1="126" y1="172" x2="126" y2="190" stroke={C.border} stroke-width="1.5" />
+  <line x1="594" y1="172" x2="594" y2="190" stroke={C.border} stroke-width="1.5" />
+
+  {forks.map((f) => (
+    <g>
+      <rect x={f.x} y="190" width="334" height="112" rx="10" fill={f.bg} stroke={f.colour} stroke-width="2" />
+      <text x={f.x + 16} y="214" fill={f.colour} font-family={FONT} font-size="12" font-weight="800">{f.label}</text>
+      <text x={f.x + 16} y="232" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{f.meaning}</text>
+      <text x={f.x + 16} y="254" fill={C.muted} font-family={FONT} font-size="9">
+        <tspan x={f.x + 16} dy="0">{f.detail.slice(0, 52)}</tspan>
+        <tspan x={f.x + 16} dy="13">{f.detail.slice(52, 104)}</tspan>
+        <tspan x={f.x + 16} dy="13">{f.detail.slice(104)}</tspan>
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="326" fill={C.muted} font-family={FONT} font-size="10">
+    {`Read the smallest dial on the meter, not the odometer — it resolves a leak of ${fmt(thresholdGpd, 1)} gallons a day, which the whole-number digits never show.`}
+  </text>
+</svg>

@@ -1,0 +1,110 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, fmt, usd } from "@/lib/plumbing";
+
+/**
+ * Where a sewer replacement quote actually comes from. Labour dominates, and
+ * the margin is the smallest line — which is the opposite of what most people
+ * assume when they see a five-figure number.
+ *
+ * Rate, overhead and margin copied from plumbing-estimate-calculator:
+ * labourRate 110, overheadPercent 15, marginPercent 25.
+ */
+const LABOUR_RATE = 110;
+const OVERHEAD_PERCENT = 15;
+const MARGIN_PERCENT = 25;
+
+const HOURS = 40;
+const MATERIAL = 2600;
+const RUN_FEET = 40;
+
+const r = estimateJob({
+  labourHours: HOURS,
+  labourRate: LABOUR_RATE,
+  fixtureCost: 0,
+  materialCost: MATERIAL,
+  overheadPercent: OVERHEAD_PERCENT,
+  marginPercent: MARGIN_PERCENT,
+});
+
+const COMPONENTS = [
+  {
+    label: "Labour",
+    detail: `${fmt(HOURS, 0)} crew hours at ${usd(LABOUR_RATE)} — excavation, cut-in, backfill`,
+    value: r.labour,
+    colour: C.orange,
+  },
+  {
+    label: "Materials and plant",
+    detail: "Pipe, fittings, bedding, spoil disposal, excavator hire",
+    value: MATERIAL,
+    colour: C.blue,
+  },
+  {
+    label: "Overhead",
+    detail: `${fmt(OVERHEAD_PERCENT, 0)}% of direct cost — insurance, licensing, vehicles, office`,
+    value: r.overhead,
+    colour: C.muted,
+  },
+  {
+    label: "Margin",
+    detail: `${fmt(MARGIN_PERCENT, 0)}% margin, which is a ${fmt(MARGIN_PERCENT / (100 - MARGIN_PERCENT) * 100, 1)}% markup`,
+    value: r.profit,
+    colour: C.primary,
+  },
+];
+
+const BAR_X = 292;
+const BAR_MAX = 240;
+
+const rows = COMPONENTS.map((c, i) => ({
+  ...c,
+  y: 96 + i * 32,
+  w: Math.max(3, (c.value / r.price) * BAR_MAX),
+  share: (c.value / r.price) * 100,
+}));
+
+const labourShare = (r.labour / r.price) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Cost build-up for a forty foot open-cut sewer line replacement</title>
+  <desc>
+    Forty crew hours at 110 dollars plus 2,600 dollars of materials and plant gives a break-even of 8,050
+    dollars and a price of 10,733 at a 25 percent margin, of which labour alone is 41 percent.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`Where a ${fmt(RUN_FEET, 0)} foot open-cut replacement price comes from`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Built on this site's estimate calculator basis — ${usd(LABOUR_RATE)} an hour, ${fmt(OVERHEAD_PERCENT, 0)}% overhead, ${fmt(MARGIN_PERCENT, 0)}% margin. Bars are shares of the final price.`}
+  </text>
+
+  <text x="28" y="88" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">COMPONENT</text>
+  <text x={BAR_X + BAR_MAX + 10} y="88" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">AMOUNT · SHARE</text>
+
+  {rows.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="28" y={row.y + 25} fill={C.muted} font-family={FONT} font-size="8">{row.detail}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="16" rx="4" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="16" rx="4" fill={row.colour} opacity="0.72" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight="700">
+        {`${usd(row.value)} · ${fmt(row.share, 1)}%`}
+      </text>
+    </g>
+  ))}
+
+  <line x1="24" y1="228" x2="696" y2="228" stroke={C.border} stroke-width="1" />
+  <text x="28" y="246" fill={C.muted} font-family={FONT} font-size="10">
+    {`Break-even ${usd(r.breakEven)} — the number below which the contractor loses money`}
+  </text>
+  <text x="28" y="264" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+    {`Price ${usd(r.price)}`}
+  </text>
+  <text x="180" y="264" fill={C.muted} font-family={FONT} font-size="10">
+    {`— labour is ${fmt(labourShare, 0)}% of it, and margin only ${fmt(rows[3].share, 1)}%.`}
+  </text>
+</svg>

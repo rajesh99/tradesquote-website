@@ -1,0 +1,62 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { roofRunoffGpm, RAINFALL_EXAMPLES, fmt } from "@/lib/plumbing";
+
+/**
+ * The number that surprises people. A storm on an ordinary roof delivers more
+ * flow than the whole house consumes, and it arrives in minutes rather than
+ * spread across a day.
+ */
+const AREA = 2000;
+
+const rows = RAINFALL_EXAMPLES.map((r) => {
+  const gpm = roofRunoffGpm(AREA, r.inPerHr);
+  return { label: r.label, inPerHr: r.inPerHr, gpm, perHour: gpm * 60 };
+});
+
+const maxGpm = Math.max(...rows.map((r) => r.gpm));
+
+/* Household comparison: a shower plus a kitchen sink is about 4 gpm. */
+const HOUSEHOLD_GPM = 4;
+
+const BAR_X = 250;
+const BAR_MAX = 230;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>Roof runoff flow by rainfall rate</title>
+  <desc>
+    The flow a two thousand square foot roof delivers at four rainfall intensities. Every one of them is many
+    times what the house itself consumes at peak.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A storm outflows the whole house, several times over</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A ${fmt(AREA)} sq ft roof. Rainfall rates are the hourly intensities used for storm design, not annual totals.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (row.gpm / maxGpm) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="9">{`${row.inPerHr} in per hour`}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={C.blue} opacity="0.72" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.gpm, 1)} gpm · ${fmt(row.perHour)} gal/hr`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="228" width="672" height="34" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y="244" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`At ${rows[2].inPerHr} in/hr that roof sheds ${fmt(rows[2].gpm, 1)} gpm — about ${fmt(rows[2].gpm / HOUSEHOLD_GPM)} times a shower and a kitchen tap running together.`}
+  </text>
+  <text x="36" y="257" fill={C.dark} font-family={FONT} font-size="9.5">
+    And unlike household demand it does not taper — the whole roof contributes for as long as the rain falls.
+  </text>
+</svg>

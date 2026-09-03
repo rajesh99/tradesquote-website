@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { WATER_HEATER_UNITS, WATER_HEATER_UPGRADES, waterHeaterCost, usd } from "@/lib/plumbing";
+
+/**
+ * The install constraints, and what they cost. A heat pump water heater is the
+ * appliance most likely to be ruled out by the room it has to go in, and the
+ * upgrade lines are computed from the same cost model as the calculator.
+ */
+const hpwh = WATER_HEATER_UNITS.find((u) => u.key === "tank-hpwh-50")!;
+const gas = WATER_HEATER_UNITS.find((u) => u.key === "tank-gas-50")!;
+
+const BASE = { labourRate: 125, permit: 150, haulAway: 75, regionKey: "average" };
+const hpwhCost = waterHeaterCost({
+  ...BASE,
+  unitKey: "tank-hpwh-50",
+  upgrades: ["expansionTank", "pan", "electricalCircuit", "condensateDrain"],
+});
+const gasCost = waterHeaterCost({ ...BASE, unitKey: "tank-gas-50", upgrades: ["expansionTank", "pan"] });
+
+const circuit = WATER_HEATER_UPGRADES.find((u) => u.key === "electricalCircuit")!;
+const condensate = WATER_HEATER_UPGRADES.find((u) => u.key === "condensateDrain")!;
+
+const CONSTRAINTS = [
+  { label: "Air volume", detail: "It extracts heat from room air — a sealed closet starves it", cost: null, tone: C.orange },
+  { label: "A dedicated circuit", detail: circuit.note, cost: circuit.cost, tone: C.blue },
+  { label: "A condensate path", detail: condensate.note, cost: condensate.cost, tone: C.blue },
+  { label: "It cools the space", detail: "Welcome in a garage in Texas, unwelcome in a basement in Maine", cost: null, tone: C.orange },
+  { label: "It makes noise", detail: "A compressor and a fan — not a silent appliance like a tank", cost: null, tone: C.orange },
+  { label: "Headroom", detail: "Taller than the tank it replaces, because the unit sits on top", cost: null, tone: C.orange },
+];
+
+const ROW_H = 30;
+const TOP = 96;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Installation constraints on a heat pump water heater</title>
+  <desc>
+    Six constraints that decide whether a heat pump water heater is installable in a given space, with the two
+    that carry a direct cost priced from the same model as the replacement cost calculator.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The room decides this more than the household does</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    A heat pump water heater is the appliance most often ruled out by where it has to go rather than by what it has to do.
+  </text>
+
+  <rect x="24" y="66" width="672" height="24" rx="7" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="38" y="82" fill={C.primary} font-family={FONT} font-size="10" font-weight="800">
+    {`Fully installed: ${usd(hpwhCost.total)} against ${usd(gasCost.total)} for a 50 gallon gas swap — unit ${usd(hpwh.unit)} vs ${usd(gas.unit)}, and ${hpwh.hours} h labour vs ${gas.hours}.`}
+  </text>
+
+  {CONSTRAINTS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 5} rx="6" fill={row.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 5} rx="2" fill={row.tone} opacity="0.9" />
+        <text x="40" y={y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+        <text x="40" y={y + 22} fill={C.muted} font-family={FONT} font-size="8.5">{row.detail}</text>
+        {row.cost !== null && (
+          <text x={676} y={y + 17} text-anchor="end" fill={row.tone} font-family={FONT} font-size="10.5" font-weight="800">
+            {usd(row.cost)}
+          </text>
+        )}
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">
+    {`The two priced lines are why the installed gap (${usd(hpwhCost.total - gasCost.total)}) is wider than the appliance gap (${usd(hpwh.unit - gas.unit)}).`}
+  </text>
+</svg>

@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { recoveryGph, firstHourRating, fmt } from "@/lib/plumbing";
+
+/**
+ * The trade in one figure. Recovery is delivered heat divided by 8.33 x deltaT,
+ * and a heat pump's delivered heat is a small compressor input multiplied by
+ * COP — which is still far less than 4,500 W of resistance.
+ *
+ * deltaT 90 matches plumbing-water-heater-size-calculator/index.astro.
+ */
+const DELTA_T = 90;
+const W_TO_BTU = 3.412;
+
+const SOURCES = [
+  { label: "Heat pump only, COP 3.0", btu: 500 * W_TO_BTU * 3.0, detail: "500 W compressor", tone: C.red },
+  { label: "Heat pump only, COP 3.5", btu: 500 * W_TO_BTU * 3.5, detail: "500 W compressor", tone: C.orange },
+  { label: "Electric resistance", btu: 4500 * W_TO_BTU, detail: "4,500 W element", tone: C.blue },
+  { label: "Gas at 80% efficiency", btu: 40000 * 0.8, detail: "40,000 BTU burner", tone: C.primary },
+];
+
+const rows = SOURCES.map((s) => {
+  const recovery = recoveryGph(s.btu, 1, DELTA_T);
+  return {
+    ...s,
+    recovery,
+    minutesFor40: recovery > 0 ? (40 / recovery) * 60 : Infinity,
+    fhr50: firstHourRating(50, recovery),
+  };
+});
+
+const hp = rows[1];
+const resistance = rows[2];
+const maxRecovery = Math.max(...rows.map((r) => r.recovery));
+
+const BAR_X = 232;
+const BAR_MAX = 234;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>Recovery rate by heat source</title>
+  <desc>
+    A heat pump compressor delivers far less heat per hour than a resistance element or a gas burner, so it
+    recovers a tank far more slowly despite using much less energy to do it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The compressor is small — that is the whole trade</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Delivered heat ÷ (8.33 lb/gal × ${DELTA_T} °F rise). Efficiency is about the energy BOUGHT, not the heat delivered per hour.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 34;
+    const w = Math.max(3, (row.recovery / maxRecovery) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="9">
+          {`${row.detail} · ${fmt(row.btu)} BTU/hr delivered`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={row.tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={row.tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.recovery, 1)} gph · ${fmt(row.minutesFor40)} min for 40 gal`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="230" width="672" height="30" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="36" y="246" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">
+    {`Resistance recovers ${fmt(resistance.recovery / hp.recovery, 1)}x as fast as the heat pump — ${fmt(resistance.minutesFor40)} minutes to reheat 40 gallons against ${fmt(hp.minutesFor40)}.`}
+  </text>
+  <text x="36" y="258" fill={C.dark} font-family={FONT} font-size="9.5">
+    That is not a flaw. It is what a small compressor moving heat instead of making it buys you, and it is why these units ship with an element too.
+  </text>
+</svg>

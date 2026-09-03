@@ -1,0 +1,107 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  COMMON_LEAKS,
+  leakCost,
+  daysToWaste,
+  fmt,
+  usd,
+  usd2,
+  EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR,
+} from "@/lib/plumbing";
+
+/**
+ * Where a running toilet sits against every other household leak. The point of
+ * the post: it is not "a bit of water", it is the top of the domestic ladder.
+ *
+ * RATES copied from plumbing-leak-water-waste-calculator/index.astro.
+ */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+/** Short labels keyed by key, never by label substring. */
+const SHORT: Record<string, string> = {
+  "faucet-drip": "Faucet, one drip a second",
+  "faucet-fast": "Faucet, dripping fast",
+  showerhead: "Showerhead dripping (hot)",
+  "toilet-silent": "Toilet, silent flapper leak",
+  "toilet-running": "Toilet, visibly running",
+  "service-line": "Service line seep, underground",
+};
+const TOILETS = ["toilet-running", "toilet-silent"];
+
+const rows = COMMON_LEAKS.filter((l) => SHORT[l.key]).map((l) => {
+  const r = leakCost({ gallonsPerDay: l.gpd, ...RATES, hotFraction: l.hot ? 1 : 0 });
+  return {
+    key: l.key,
+    short: SHORT[l.key],
+    gpd: l.gpd,
+    cost: r.totalCost,
+    isToilet: TOILETS.includes(l.key),
+  };
+});
+
+const maxCost = Math.max(...rows.map((r) => r.cost));
+const faucet = rows.find((r) => r.key === "faucet-drip")!;
+const running = rows.find((r) => r.key === "toilet-running")!;
+const ratio = running.cost / faucet.cost;
+
+/* How long each end of the ladder takes to waste EPA's annual household figure. */
+const runningDays = daysToWaste(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, running.gpd);
+const faucetDays = daysToWaste(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, faucet.gpd);
+
+const BAR_X = 246;
+const BAR_MAX = 258;
+const ROW_H = 30;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 92 + i * ROW_H,
+  w: Math.max(3, (r.cost / maxCost) * BAR_MAX),
+  weight: r.isToilet ? 800 : 600,
+  fill: r.isToilet ? C.red : C.border,
+  opacity: r.isToilet ? 0.85 : 0.55,
+  colour: r.isToilet ? C.red : C.muted,
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>Annual cost of common household leaks, with the two toilet failures highlighted</title>
+  <desc>
+    A visibly running toilet wastes 1,000 gallons a day and a silent flapper leak 200, putting both far above
+    every dripping tap on the same water and sewer rates.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="292" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The two toilet failures own the top of the ladder</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Annual cost at ${usd2(RATES.waterRatePer1000)} water and ${usd2(RATES.sewerRatePer1000)} sewer per 1,000 gallons. The showerhead is the only hot leak here.`}
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">LEAK</text>
+  <text x={BAR_X + BAR_MAX + 10} y="80" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">GAL/DAY · $/YEAR</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.weight}>{row.short}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="18" rx="4" fill={C.border} opacity="0.28" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="18" rx="4" fill={row.fill} opacity={row.opacity} />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 14} fill={row.colour} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {`${fmt(row.gpd, 1)} · ${usd(row.cost)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    {`A running toilet costs ${fmt(ratio, 0)}x the dripping tap everybody worries about — ${usd2(running.cost / 365)} a day until the flapper is changed.`}
+  </text>
+  <text x="24" y="294" fill={C.muted} font-family={FONT} font-size="9">
+    {`Days to waste EPA's ${fmt(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, 0)} gallon annual household figure: running toilet ${fmt(runningDays, 0)} · dripping tap ${fmt(faucetDays, 0)}.`}
+  </text>
+</svg>

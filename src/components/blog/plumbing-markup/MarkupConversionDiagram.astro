@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { fmt } from "@/lib/plumbing";
+
+/**
+ * The conversion table, both directions. This is the reference the post exists
+ * to be — computed from the identities rather than transcribed, so the two
+ * columns cannot drift apart.
+ *
+ *   markup = margin / (1 - margin)
+ *   margin = markup / (1 + markup)
+ */
+const MARGINS = [10, 15, 20, 25, 30, 40, 50];
+
+const rows = MARGINS.map((margin) => {
+  const m = margin / 100;
+  const markupNeeded = (m / (1 - m)) * 100;
+  /* And what applying the margin figure AS a markup actually delivers. */
+  const delivered = (m / (1 + m)) * 100;
+  return { margin, markupNeeded, delivered, shortfall: margin - delivered };
+});
+
+const maxMarkup = Math.max(...rows.map((r) => r.markupNeeded));
+const ROW_H = 28;
+const TOP = 96;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Converting between markup and margin in both directions</title>
+  <desc>
+    The markup needed to achieve each target margin, and what applying that same number as a markup actually
+    delivers instead. Both columns computed from the identities.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The conversion, both ways</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    markup = margin ÷ (1 − margin) · margin = markup ÷ (1 + markup). Scale-free — it holds on any job of any size.
+  </text>
+
+  <text x="40" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TARGET MARGIN</text>
+  <text x={278} y="80" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">MARK UP BY THIS</text>
+  <text x={472} y="80" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="8" font-weight="700">USE IT AS A MARKUP AND YOU GET</text>
+  <text x={648} y="80" text-anchor="middle" fill={C.red} font-family={FONT} font-size="8" font-weight="700">POINTS LOST</text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const common = row.margin === 25;
+    return (
+      <g>
+        <rect x="24" y={y - 4} width="672" height={ROW_H - 6} rx="6" fill={common ? C.primary : C.border} opacity={common ? 0.09 : 0.05} />
+        <text x="40" y={y + 11} fill={C.dark} font-family={FONT} font-size="11" font-weight={common ? 800 : 700}>
+          {`${row.margin}%`}
+        </text>
+        <rect x={198} y={y - 2} width={160} height="19" rx="5" fill={C.primary} opacity="0.12" />
+        <text x={278} y={y + 11} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.markupNeeded, 1)}%`}
+        </text>
+        <rect x={392} y={y - 2} width={160} height="19" rx="5" fill={C.orange} opacity="0.12" />
+        <text x={472} y={y + 11} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="700">
+          {`${fmt(row.delivered, 1)}% margin`}
+        </text>
+        <text x={648} y={y + 11} text-anchor="middle" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.shortfall, 1)}`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">
+    Read the right-hand column downward: the shortfall grows with ambition, so the shops aiming highest lose the most to the confusion.
+  </text>
+</svg>

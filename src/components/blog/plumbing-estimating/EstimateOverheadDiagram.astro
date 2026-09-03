@@ -7,15 +7,17 @@ import { estimateJob, usd, fmt } from "@/lib/plumbing";
  * it one for one, and a shop that prices at "cost plus 25%" while carrying 30%
  * overhead is selling below its own break-even.
  */
+/* Copied verbatim from plumbing-estimate-calculator/index.astro so the post and
+   the calculator it funnels to cannot disagree. */
 const BASE = {
-  labourHours: 6,
-  labourRate: 125,
-  fixtureCost: 400,
-  materialCost: 250,
+  labourHours: 10,
+  labourRate: 110,
+  fixtureCost: 850,
+  materialCost: 450,
   marginPercent: 25,
 };
 
-const OVERHEADS = [0, 10, 20, 30, 40];
+const OVERHEADS = [0, 10, 15, 20, 30];
 const rows = OVERHEADS.map((overheadPercent) => {
   const r = estimateJob({ ...BASE, overheadPercent });
   return {
@@ -27,7 +29,7 @@ const rows = OVERHEADS.map((overheadPercent) => {
 });
 
 const ignored = rows[0];
-const realistic = rows[2];
+const realistic = rows[2]; /* the 15% row — the calculator's own overhead */
 /* What the "overhead ignored" price actually delivers once the real overhead is
    accounted for. Computed rather than asserted. */
 const realProfit = ignored.price - realistic.breakEven;

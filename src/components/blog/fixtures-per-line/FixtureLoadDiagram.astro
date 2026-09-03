@@ -1,0 +1,86 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { WSFU_FIXTURES, totalWsfu, wsfuToGpm, fmt } from "@/lib/plumbing";
+
+/**
+ * What ordinary combinations actually weigh. The point is how quickly a normal
+ * group of fixtures reaches the six-unit mark — and that the hose bibb, which
+ * nobody counts, is the single heaviest residential fixture on the list.
+ */
+const COMBOS = [
+  { label: "One full bathroom group", counts: { "bathroom-group-tank": 1 } },
+  { label: "Bathroom group + kitchen sink", counts: { "bathroom-group-tank": 1, "kitchen-sink-private": 1 } },
+  { label: "+ clothes washer", counts: { "bathroom-group-tank": 1, "kitchen-sink-private": 1, "clothes-washer-private": 1 } },
+  { label: "+ a hose bibb", counts: { "bathroom-group-tank": 1, "kitchen-sink-private": 1, "clothes-washer-private": 1, "hose-bibb": 1 } },
+];
+
+/* Resolve labels against the lib so a renamed key fails loudly rather than
+   silently contributing zero. */
+const KEYS = new Set(WSFU_FIXTURES.map((f) => f.key));
+const rows = COMBOS.map((c) => {
+  const missing = Object.keys(c.counts).filter((k) => !KEYS.has(k));
+  const fu = totalWsfu(c.counts as Record<string, number>, "total");
+  return { label: c.label, fu, gpm: wsfuToGpm(fu, "tank"), missing };
+});
+
+/* The heaviest fixture in an ORDINARY flush-tank house. Explicit allow-list
+   rather than a label filter: an earlier version excluded on "public" and
+   surfaced a commercial urinal. Flushometer variants are excluded because a
+   private flushometer water closet is not a residential fixture. */
+const RESIDENTIAL_KEYS = [
+  "wc-private-tank",
+  "lavatory-private",
+  "bathtub-private",
+  "shower-private",
+  "kitchen-sink-private",
+  "dishwasher-private",
+  "clothes-washer-private",
+  "laundry-tray-private",
+  "bidet-private",
+  "hose-bibb",
+];
+const heaviest = WSFU_FIXTURES.filter((f) => RESIDENTIAL_KEYS.includes(f.key)).sort(
+  (a, b) => b.total - a.total,
+)[0];
+
+const maxFu = Math.max(...rows.map((r) => r.fu));
+const BAR_X = 268;
+const BAR_MAX = 230;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>How quickly ordinary fixtures add up in supply fixture units</title>
+  <desc>
+    A bathroom group with a kitchen sink already reaches five supply fixture units. The hose bibb, which almost
+    nobody counts, is the heaviest single residential fixture on the list.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Ordinary fixtures reach the limit quickly</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Total water supply fixture units, and the probable demand each load produces on the flush-tank curve.
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 32;
+    const w = Math.max(3, (row.fu / maxFu) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={C.primary} opacity="0.7" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+          {row.missing.length > 0 ? "key not found in lib" : `${fmt(row.fu, 1)} WSFU · ${fmt(row.gpm, 2)} gpm`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="212" width="672" height="34" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="36" y="228" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">
+    {`The heaviest single residential fixture is the ${heaviest.label.toLowerCase()} at ${heaviest.total} WSFU.`}
+  </text>
+  <text x="36" y="241" fill={C.dark} font-family={FONT} font-size="9.5">
+    It outweighs a whole bathroom group's cold demand, it is entirely cold, and it is the one nobody puts on the drawing.
+  </text>
+</svg>

@@ -1,0 +1,83 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { selectTank, peakHourDemand, PEAK_HOUR_USES, fmt } from "@/lib/plumbing";
+
+/**
+ * The consequence: with slow recovery you buy storage instead of burner. The
+ * same peak hour needs a very different tank depending on the heat source.
+ */
+const DELTA_T = 90;
+const W_TO_BTU = 3.412;
+
+const USES = { shower: 3, "hands-face": 2, dishwasher: 1, "clothes-washer": 1 };
+const DEMAND = peakHourDemand(USES);
+
+const useLines = PEAK_HOUR_USES.filter((u) => (USES as Record<string, number>)[u.key])
+  .map((u) => `${(USES as Record<string, number>)[u.key]} × ${u.label.toLowerCase()}`)
+  .join(", ");
+
+const SOURCES = [
+  { label: "Gas, 40,000 BTU at 80%", btu: 40000 * 0.8, tone: C.primary },
+  { label: "Electric resistance, 4,500 W", btu: 4500 * W_TO_BTU, tone: C.blue },
+  { label: "Heat pump only, COP 3.5", btu: 500 * W_TO_BTU * 3.5, tone: C.orange },
+];
+
+const rows = SOURCES.map((s) => {
+  const r = selectTank(DEMAND, s.btu, 1, DELTA_T);
+  return { ...s, tank: r.tank, fhr: r.fhr, recovery: r.recovery };
+});
+
+const ROW_H = 40;
+const TOP = 108;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Tank size needed for the same peak hour by heat source</title>
+  <desc>
+    The same household peak hour demands very different tank sizes depending on how fast the heat source can
+    recover. Slow recovery has to be paid for in storage.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Slow recovery is paid for in storage</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Same peak hour throughout: ${useLines}.`}
+  </text>
+
+  <rect x="24" y="66" width="672" height="32" rx="8" fill={C.dark} opacity="0.06" />
+  <text x="40" y="86" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">
+    {`Peak-hour demand: ${DEMAND} gallons`}
+  </text>
+  <text x={640} y="86" text-anchor="end" fill={C.muted} font-family={FONT} font-size="9.5">
+    {`first-hour rating must cover it, at a ${DELTA_T} °F rise`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={row.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 6} rx="2" fill={row.tone} opacity="0.9" />
+        <text x="40" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="40" y={y + 27} fill={C.muted} font-family={FONT} font-size="9">
+          {`recovers ${fmt(row.recovery, 1)} gph`}
+        </text>
+        <text x={430} y={y + 21} text-anchor="end" fill={C.muted} font-family={FONT} font-size="10">
+          {`first-hour rating ${fmt(row.fhr, 1)} gal`}
+        </text>
+        <rect x={470} y={y + 3} width={200} height="22" rx="6" fill={row.tone} opacity="0.14" />
+        <rect x={470} y={y + 3} width={200} height="22" rx="6" fill="none" stroke={row.tone} stroke-width="1.5" />
+        <text x={570} y={y + 19} text-anchor="middle" fill={row.tone} font-family={FONT} font-size="11" font-weight="800">
+          {row.tank === null ? "past the stocked range" : `${row.tank} gallon tank`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">
+    {`The same household needs a ${rows[0].tank} gallon gas tank, a ${rows[1].tank} gallon resistance tank, or a ${rows[2].tank} gallon heat pump tank in heat-pump-only mode.`}
+  </text>
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">
+    Which is exactly why real heat pump water heaters ship with a resistance element and a hybrid mode that uses it.
+  </text>
+</svg>

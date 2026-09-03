@@ -1,0 +1,88 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, waterHeaterCost, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * The non-obvious cost point: a permit is not a pass-through. It sits in the
+ * job's cost base, so overhead and margin apply on top of it and the customer
+ * pays more than the fee.
+ *
+ * Base copied from plumbing-estimate-calculator/index.astro.
+ */
+const BASE = {
+  labourHours: 10,
+  labourRate: 110,
+  fixtureCost: 850,
+  materialCost: 450,
+  overheadPercent: 15,
+};
+const MARGIN = 25;
+
+const noPermit = estimateJob({ ...BASE, marginPercent: MARGIN });
+
+const rows = [75, 150, 300, 600].map((fee) => {
+  const r = estimateJob({ ...BASE, materialCost: BASE.materialCost + fee, marginPercent: MARGIN });
+  return {
+    fee,
+    price: r.price,
+    added: r.price - noPermit.price,
+    multiple: r.price - noPermit.price > 0 ? (r.price - noPermit.price) / fee : 0,
+  };
+});
+
+/* The water heater model already carries a permit line. */
+const wh = waterHeaterCost({ unitKey: "tank-gas-50", labourRate: 125, permit: 150, haulAway: 75, upgrades: [], regionKey: "average" });
+const whNo = waterHeaterCost({ unitKey: "tank-gas-50", labourRate: 125, permit: 0, haulAway: 75, upgrades: [], regionKey: "average" });
+
+const maxAdded = Math.max(...rows.map((r) => r.added));
+const BAR_X = 232;
+const BAR_MAX = 214;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>What a permit fee actually adds to a quoted price</title>
+  <desc>
+    A permit sits in the job's cost base, so overhead and margin apply on top of it. The customer pays more than
+    the fee — about a third more at ordinary overhead and margin.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A permit is not a pass-through</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A ${usd(noPermit.breakEven)} break-even job at ${BASE.overheadPercent}% overhead and a ${MARGIN}% margin. The fee enters the cost base like any other cost.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (row.added / maxAdded) * BAR_MAX);
+    const common = row.fee === 150;
+    const tone = common ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={common ? 800 : 700}>
+          {`${usd(row.fee)} permit fee`}
+        </text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`quoted price becomes ${usd(row.price)}`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`adds ${usd(row.added)} — ${fmt(row.multiple, 2)}x the fee`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="222" width="672" height="34" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y="238" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`On a like-for-like water heater swap the ${usd(150)} permit is ${fmt(((wh.total - whNo.total) / wh.total) * 100, 1)}% of the ${usd(wh.total)} total.`}
+  </text>
+  <text x="36" y="251" fill={C.dark} font-family={FONT} font-size="9.5">
+    Small against the job, and the reason it is the first line people try to remove — which is where the trouble starts.
+  </text>
+
+  <text x="24" y="274" fill={C.muted} font-family={FONT} font-size="10">
+    Fee amounts are illustrative: real schedules are per-fixture, per-valuation or flat, and differ by an order of magnitude between jurisdictions.
+  </text>
+</svg>

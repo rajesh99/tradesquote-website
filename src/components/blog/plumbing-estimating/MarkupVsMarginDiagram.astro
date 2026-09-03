@@ -7,15 +7,17 @@ import { estimateJob, usd, fmt } from "@/lib/plumbing";
  * operations, and the gap between them widens as p grows — so the shops with
  * the most ambitious percentages are losing the most to it.
  */
+/* Copied verbatim from plumbing-estimate-calculator/index.astro so the post and
+   the calculator it funnels to cannot disagree. */
 const BASE = {
-  labourHours: 6,
-  labourRate: 125,
-  fixtureCost: 400,
-  materialCost: 250,
-  overheadPercent: 20,
+  labourHours: 10,
+  labourRate: 110,
+  fixtureCost: 850,
+  materialCost: 450,
+  overheadPercent: 15,
 };
 
-const PERCENTS = [10, 20, 25, 30, 40, 50];
+const PERCENTS = [15, 20, 25, 30, 35, 40];
 const rows = PERCENTS.map((p) => {
   const r = estimateJob({ ...BASE, marginPercent: p });
   return {

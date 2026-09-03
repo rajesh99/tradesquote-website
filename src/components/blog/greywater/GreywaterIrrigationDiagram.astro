@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { greywaterYield, irrigableArea, IRRIGATION_DEMAND, fmt } from "@/lib/plumbing";
+
+/**
+ * What the yield can actually water. The planting choice moves the answer four
+ * times over, which is the lever a homeowner actually controls — the household's
+ * water use is not really adjustable.
+ */
+const GREY = {
+  occupants: 3,
+  sources: { shower: true, lavatory: true, washer: true },
+  loadsPerWeek: 5,
+  irrigationRate: 0.6,
+};
+const g = greywaterYield(GREY as any);
+
+const rows = IRRIGATION_DEMAND.map((d) => ({
+  label: d.label,
+  rate: d.galPerSqFtPerWeek,
+  area: irrigableArea(g.dailyYield, d.galPerSqFtPerWeek),
+  isDefault: d.galPerSqFtPerWeek === GREY.irrigationRate,
+}));
+
+const thirstiest = rows[rows.length - 1];
+const leanest = rows[0];
+const maxArea = Math.max(...rows.map((r) => r.area));
+
+const BAR_X = 288;
+const BAR_MAX = 206;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Landscape a household's grey water can irrigate</title>
+  <desc>
+    The same daily yield waters four times as much drought-tolerant planting as it does cool-season lawn. The
+    planting choice is the lever, not the household's water use.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What you plant moves the answer four-fold</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${fmt(g.dailyYield, 1)} gpd from a ${GREY.occupants}-person household. The yield is fixed; what it waters is not.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 32;
+    const w = Math.max(3, (row.area / maxArea) * BAR_MAX);
+    const tone = row.isDefault ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={row.isDefault ? 800 : 600}>
+          {row.label}
+        </text>
+        <text x={276} y={y + 16} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9">
+          {`${row.rate} gal/sq ft/wk`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={tone} opacity={row.isDefault ? 0.85 : 0.6} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.area)} sq ft`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="214" width="672" height="32" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="36" y="230" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">
+    {`${fmt(leanest.area)} sq ft of drought-tolerant planting against ${fmt(thirstiest.area)} of cool-season lawn — ${fmt(leanest.area / thirstiest.area, 1)}x, from the planting alone.`}
+  </text>
+  <text x="36" y="243" fill={C.dark} font-family={FONT} font-size="9.5">
+    Grey water suits established trees and shrubs far better than lawn: subsurface delivery, deeper roots, and no surface contact.
+  </text>
+</svg>

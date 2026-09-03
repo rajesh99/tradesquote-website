@@ -1,0 +1,93 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  frictionLossPsiPer100Ft,
+  insideDiameter,
+  HAZEN_WILLIAMS_C,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The two exponents, made concrete. Hazen-Williams puts flow at about 1.85 and
+ * diameter at about -4.87, so doubling the flow is a modest penalty and doubling
+ * the diameter is a collapse. Every surprise in pipe sizing comes from that
+ * asymmetry.
+ */
+const MATERIAL = "copper-l" as const;
+const CF = HAZEN_WILLIAMS_C[MATERIAL];
+const id34 = insideDiameter(MATERIAL, 0.75)!;
+const id15 = insideDiameter(MATERIAL, 1.5)!;
+
+const baseline = frictionLossPsiPer100Ft(10, id34, CF);
+const doubleFlow = frictionLossPsiPer100Ft(20, id34, CF);
+const doubleDia = frictionLossPsiPer100Ft(10, id15, CF);
+
+const CASES = [
+  {
+    label: "Baseline",
+    detail: `10 gpm through ${sizeLabel(0.75)}`,
+    loss: baseline,
+    tone: C.dark,
+    note: "the reference",
+  },
+  {
+    label: "Double the flow",
+    detail: `20 gpm through ${sizeLabel(0.75)}`,
+    loss: doubleFlow,
+    tone: C.orange,
+    note: `${fmt(doubleFlow / baseline, 2)}x the loss`,
+  },
+  {
+    label: "Double the diameter",
+    detail: `10 gpm through ${sizeLabel(1.5)}`,
+    loss: doubleDia,
+    tone: C.primary,
+    note: `${fmt(baseline / doubleDia, 1)}x LESS loss`,
+  },
+];
+
+const maxLoss = Math.max(...CASES.map((c) => c.loss));
+
+/* Two decimals once the value is at least 1, three below it. A flat 3 decimals
+   printed 39.998 against prose reading 40.00, which is exactly the kind of
+   prose-vs-figure drift the verification exists to catch. */
+const lossLabel = (v: number) => fmt(v, v >= 1 ? 2 : 3);
+const BAR_X = 246;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>What doubling the flow and doubling the diameter each do to friction</title>
+  <desc>
+    Friction rises a little under four-fold when the flow doubles, and falls more than twenty-fold when the
+    diameter doubles. The asymmetry between the two exponents is the whole subject.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two exponents, and they are nothing like each other</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Type L copper at C = ${CF}. Hazen-Williams puts flow at about the 1.85 power and diameter at about the −4.87.`}
+  </text>
+
+  {CASES.map((c, i) => {
+    const y = 82 + i * 42;
+    const w = Math.max(3, (c.loss / maxLoss) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{c.label}</text>
+        <text x="28" y={y + 29} fill={C.muted} font-family={FONT} font-size="9.5">{c.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="22" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="22" rx="5" fill={c.tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 18} fill={c.tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${lossLabel(c.loss)} psi / 100 ft`}
+        </text>
+        <text x={BAR_X + 8} y={y + 18} fill={C.white} font-family={FONT} font-size="9.5" font-weight="800">{c.note}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="240" fill={C.muted} font-family={FONT} font-size="10">
+    This is why a size up fixes a pressure complaint that no valve adjustment can, and why adding one fixture rarely does much harm.
+  </text>
+</svg>

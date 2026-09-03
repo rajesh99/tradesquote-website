@@ -1,0 +1,90 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  wsfuToGpm,
+  flowAtVelocity,
+  insideDiameter,
+  MAX_VELOCITY_COLD,
+  MAX_VELOCITY_HOT,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * Where a 3/4 inch line actually runs out. The demand curve is steep at the
+ * bottom, so the answer is far fewer fixture units than people expect — and the
+ * hot ceiling makes it fewer still.
+ */
+const NOMINAL = 0.75;
+const MATERIAL = "copper-l" as const;
+const id = insideDiameter(MATERIAL, NOMINAL)!;
+const capCold = flowAtVelocity(MAX_VELOCITY_COLD, id);
+const capHot = flowAtVelocity(MAX_VELOCITY_HOT, id);
+
+const LOADS = [2, 4, 6, 8, 10, 12];
+const rows = LOADS.map((fu) => {
+  const gpm = wsfuToGpm(fu, "tank");
+  return {
+    fu,
+    gpm,
+    overCold: gpm > capCold,
+    overHot: gpm > capHot,
+  };
+});
+
+const maxGpm = Math.max(...rows.map((r) => r.gpm), capCold);
+const BAR_X = 106;
+const BAR_MAX = 380;
+const toX = (v: number) => BAR_X + (v / maxGpm) * BAR_MAX;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Where a three quarter inch line runs out of velocity capacity</title>
+  <desc>
+    Probable demand against fixture unit load, with the cold and hot velocity ceilings for a three quarter inch
+    copper line marked. The line runs out far sooner than most people expect.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`A ${sizeLabel(NOMINAL)} line runs out sooner than anyone guesses`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Type L copper, ${fmt(id, 3)} in bore. Demand from the flush-tank column of the fixture unit curve.`}
+  </text>
+
+  <line x1={toX(capCold)} y1="70" x2={toX(capCold)} y2="252" stroke={C.blue} stroke-width="1.8" stroke-dasharray="5 4" />
+  <text x={toX(capCold)} y="66" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">
+    {`COLD CAP ${fmt(capCold, 1)}`}
+  </text>
+  <line x1={toX(capHot)} y1="70" x2={toX(capHot)} y2="252" stroke={C.orange} stroke-width="1.8" stroke-dasharray="5 4" />
+  <text x={toX(capHot)} y="66" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="8.5" font-weight="700">
+    {`HOT CAP ${fmt(capHot, 1)}`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 80 + i * 29;
+    const w = Math.max(3, (row.gpm / maxGpm) * BAR_MAX);
+    const tone = row.overCold ? C.red : row.overHot ? C.orange : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${row.fu} WSFU`}</text>
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={tone} opacity="0.72" />
+        <text x={BAR_X + w + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight={row.overCold ? 800 : 600}>
+          {row.overCold
+            ? `${fmt(row.gpm, 2)} gpm — past the cold cap`
+            : row.overHot
+              ? `${fmt(row.gpm, 2)} gpm — over on the hot side`
+              : `${fmt(row.gpm, 2)} gpm`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">
+    {`Six fixture units already asks for ${fmt(wsfuToGpm(6, "tank"), 2)} gpm. That is a bathroom group plus a kitchen sink, and it is nearly the whole pipe.`}
+  </text>
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="9.5">
+    And this is the velocity limit only — over any real distance, friction stops you before velocity does.
+  </text>
+</svg>

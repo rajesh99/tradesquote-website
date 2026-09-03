@@ -1,0 +1,117 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter,
+  velocity,
+  headToPsi,
+  sizeLabel,
+  fmt,
+  PRV_THRESHOLD_PSI,
+  MAX_VELOCITY_COLD,
+} from "@/lib/plumbing";
+
+/**
+ * The four fixes, and which of them addresses the surge rather than the noise.
+ * Strapping a pipe stops the banging and leaves the pressure spike intact —
+ * that distinction is the point of the diagram.
+ *
+ * Wave speed 4,000 ft/s is a published value for water in rigid metal pipe.
+ */
+const GRAVITY = 32.174;
+const WAVE_SPEED = 4000;
+const GPM = 10;
+
+const surgeAt = (nominal: number) => {
+  const bore = insideDiameter("copper-l", nominal)!;
+  const v = velocity(GPM, bore);
+  return { label: sizeLabel(nominal), v, psi: headToPsi((WAVE_SPEED * v) / GRAVITY) };
+};
+
+const half = surgeAt(0.5);
+const threeQuarter = surgeAt(0.75);
+const one = surgeAt(1);
+const reduction = ((half.psi - threeQuarter.psi) / half.psi) * 100;
+
+const FIXES = [
+  {
+    title: "Arrestor at the offending valve",
+    tag: "FIXES THE SURGE",
+    tone: "green" as const,
+    body: "A sealed piston-and-gas chamber listed to ASSE 1010, fitted within a few feet of the fast-closing valve. It gives the column somewhere to go.",
+    note: "The only fix that works on a solenoid valve you cannot slow down.",
+  },
+  {
+    title: "Upsize the pipe",
+    tag: "FIXES THE SURGE",
+    tone: "blue" as const,
+    body: `Surge is proportional to velocity. At ${GPM} gpm, ${half.label} runs at ${fmt(half.v, 2)} ft/s for ${fmt(half.psi, 0)} psi; ${threeQuarter.label} runs at ${fmt(threeQuarter.v, 2)} ft/s for ${fmt(threeQuarter.psi, 0)} psi.`,
+    note: `A ${fmt(reduction, 0)}% reduction from one size up, and ${one.label} takes it to ${fmt(one.psi, 0)} psi.`,
+  },
+  {
+    title: "Fit a PRV if static pressure is high",
+    tag: "REDUCES THE BASELINE",
+    tone: "orange" as const,
+    body: `The spike adds to whatever the system already sits at. Over ${fmt(PRV_THRESHOLD_PSI, 0)} psi static the code wants a pressure-reducing valve anyway.`,
+    note: "Lower static pressure also lowers velocity for the same fixture opening.",
+  },
+  {
+    title: "Strap and cushion the pipe",
+    tag: "FIXES ONLY THE NOISE",
+    tone: "muted" as const,
+    body: "Securing a loose run stops it striking the framing. The pressure wave is unchanged — you have silenced the symptom, not removed the load.",
+    note: "Worth doing, never sufficient on its own.",
+  },
+];
+
+const TONES = {
+  green: { colour: C.green, bg: C.greenLight },
+  blue: { colour: C.blue, bg: C.blueLight },
+  orange: { colour: C.orange, bg: C.orangeLight },
+  muted: { colour: C.muted, bg: C.white },
+};
+
+const cards = FIXES.map((f, i) => ({
+  ...f,
+  x: 20 + (i % 2) * 342,
+  y: 88 + Math.floor(i / 2) * 120,
+  colour: TONES[f.tone].colour,
+  bg: TONES[f.tone].bg,
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 356" fill="none" aria-hidden="true">
+  <title>Four responses to water hammer and which of them address the pressure surge</title>
+  <desc>
+    An arrestor and a larger pipe reduce the surge itself; a pressure-reducing valve lowers the baseline the
+    spike adds to; strapping the pipe silences the noise without changing the pressure at all.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="340" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three of these fix the surge. One only fixes the noise.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Velocities and surges computed at ${GPM} gpm through Type L copper, wave speed ${fmt(WAVE_SPEED, 0)} ft/s. Design limit for cold water is ${fmt(MAX_VELOCITY_COLD, 0)} ft/s.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    The distinction matters because a strapped pipe stops complaining while the fittings keep taking the hit.
+  </text>
+
+  {cards.map((f) => (
+    <g>
+      <rect x={f.x} y={f.y} width="330" height="108" rx="10" fill={f.bg} stroke={f.colour} stroke-width="1.6" />
+      <text x={f.x + 14} y={f.y + 22} fill={f.colour} font-family={FONT} font-size="11" font-weight="800">{f.title}</text>
+      <text x={f.x + 316} y={f.y + 22} text-anchor="end" fill={f.colour} font-family={FONT} font-size="8" font-weight="800">{f.tag}</text>
+      <text x={f.x + 14} y={f.y + 42} fill={C.dark} font-family={FONT} font-size="9">
+        <tspan x={f.x + 14} dy="0">{f.body.slice(0, 58)}</tspan>
+        <tspan x={f.x + 14} dy="12">{f.body.slice(58, 116)}</tspan>
+        <tspan x={f.x + 14} dy="12">{f.body.slice(116, 174)}</tspan>
+      </text>
+      <text x={f.x + 14} y={f.y + 96} fill={f.colour} font-family={FONT} font-size="9" font-weight="700">
+        {f.note.slice(0, 62)}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="340" fill={C.muted} font-family={FONT} font-size="10">
+    {`Arrestors are consumables — the gas charge leaks away over years, and a dead one looks identical to a live one from outside.`}
+  </text>
+</svg>

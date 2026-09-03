@@ -1,0 +1,61 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { mixedFlow, fmt } from "@/lib/plumbing";
+
+/**
+ * Where the mixed water comes from, at the calculator's own defaults. The point
+ * is that a shower at the tap is mostly cold water even when the "hot" tap is
+ * doing the work.
+ */
+const defs = markerDefs("wh-mix");
+const BASE = { hotF: 140, coldF: 50, mixF: 120, mixedGpm: 2.5 };
+const r = mixedFlow(BASE);
+
+const BAR_X = 60;
+const BAR_W = 600;
+const hotW = BAR_W * r.hotFraction;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>What a mixed draw is actually made of</title>
+  <desc>
+    A shower delivered at a hundred and twenty degrees from a hundred and forty degree tank is roughly three
+    quarters stored hot water and one quarter cold.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="234" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A shower is mostly, but not only, tank water</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${BASE.mixedGpm} gpm delivered at ${BASE.mixF} °F, from a ${BASE.hotF} °F tank and ${BASE.coldF} °F cold.`}
+  </text>
+
+  <rect x={BAR_X} y="82" width={BAR_W} height="44" rx="8" fill={C.blue} opacity="0.28" />
+  <rect x={BAR_X} y="82" width={hotW} height="44" rx="8" fill={C.orange} opacity="0.8" />
+  <text x={BAR_X + hotW / 2} y="110" text-anchor="middle" fill={C.white} font-family={FONT} font-size="12" font-weight="800">
+    {`${fmt(r.hotFraction * 100, 1)}% hot — ${fmt(r.hotGpm, 2)} gpm`}
+  </text>
+  <text x={BAR_X + hotW + (BAR_W - hotW) / 2} y="110" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="11" font-weight="800">
+    {`${fmt(r.coldFraction * 100, 1)}% cold`}
+  </text>
+
+  <text x={BAR_X} y="76" fill={C.orange} font-family={FONT} font-size="8.5" font-weight="700">{`FROM THE TANK AT ${BASE.hotF} °F`}</text>
+  <text x={BAR_X + BAR_W} y="76" text-anchor="end" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">{`COLD AT ${BASE.coldF} °F`}</text>
+
+  <line x1={BAR_X + hotW} y1="130" x2={BAR_X + hotW} y2="150" stroke={C.dark} stroke-width="1.6" stroke-dasharray="4 3" />
+
+  <rect x="60" y="156" width="600" height="40" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="360" y="174" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="12" font-weight="800">
+    {`${fmt(r.hotGpm, 2)} gpm hot + ${fmt(r.coldGpm, 2)} gpm cold = ${BASE.mixedGpm} gpm at ${BASE.mixF} °F`}
+  </text>
+  <text x="360" y="189" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`Every stored gallon buys ${fmt(1 / r.hotFraction, 2)} gallons of delivered water — that is the storage multiplier.`}
+  </text>
+
+  <text x="24" y="216" fill={C.muted} font-family={FONT} font-size="10">
+    Drop the storage to 120 °F and the cold side disappears entirely — the tank has to supply the whole draw, and it empties faster.
+  </text>
+  <text x="24" y="232" fill={C.muted} font-family={FONT} font-size="10">
+    Cold inlet temperature moves this too: colder incoming water needs a larger share of hot for the same delivered temperature.
+  </text>
+</svg>

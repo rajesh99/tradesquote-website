@@ -1,0 +1,144 @@
+---
+title: "How Many Gallons Are in a Pipe? 0.0408 x Diameter Squared"
+meta_title: "How Many Gallons Are in a Pipe? Gallons Per Foot (2026) | TradesQuote"
+description: "The constant is geometry, not a lookup table — π/4 × d² × 12 ÷ 231. Use the bore, never the nominal size, and the same figure gives you wait time, purge volume and the weight on your hangers."
+image: /images/posts/how-many-gallons-in-a-pipe-hero.svg
+date: 2026-09-04T15:00:00Z
+categories: ["plumbing"]
+tags: ["pipe volume","gallons per foot","purge volume","pipe capacity","hot water wait"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import GallonsDerivationDiagram from "@/components/blog/gallons-pipe/GallonsDerivationDiagram.astro";
+import GallonsMaterialDiagram from "@/components/blog/gallons-pipe/GallonsMaterialDiagram.astro";
+import GallonsUsesDiagram from "@/components/blog/gallons-pipe/GallonsUsesDiagram.astro";
+
+There is a table of gallons per foot in every plumbing reference, and there is no reason to look it up. The number falls out of geometry in one line, and deriving it once means you never have to trust a chart whose units you cannot check.
+
+    gallons per foot = 0.0408 × d²
+
+where **d is the inside diameter in inches**. That second part is where every error comes from, and none of them come from the arithmetic.
+
+## Where the constant comes from
+
+<BlogInfographic
+  title="0.0408 × diameter squared — and every part of it is geometry"
+  caption="Area of the bore, times twelve inches of length, divided by 231 cubic inches per gallon. Cross-checked against the published figure for 1 inch Schedule 40, which the derivation reproduces exactly."
+>
+  <GallonsDerivationDiagram />
+</BlogInfographic>
+
+Three steps, no lookups:
+
+1. **Area of the bore** — π ÷ 4 × d², in square inches
+2. **Times a foot of length** — × 12, giving cubic inches per foot
+3. **Into gallons** — ÷ 231, the definition of a US gallon
+
+Which leaves **0.0408 gallons per foot per square inch of bore**.
+
+The cross-check that confirms it: 1 inch Schedule 40 has a **1.049 inch bore**, and the derivation gives **0.0449 gal/ft** — exactly what the published tables print. When a derivation reproduces the table, you can stop carrying the table.
+
+## Use the bore, never the nominal size
+
+This is the entire difficulty. A "3/4 inch" pipe is not 0.75 inches across in any material:
+
+- **Copper type L** — 0.785
+- **CPVC Schedule 40** — 0.824
+- **PEX** — **0.681**
+
+Because volume goes as the **square** of the bore, those differences compound.
+
+<BlogInfographic
+  title="Same nominal size, very different volumes"
+  caption="Gallons per foot computed from each material's own bore. PEX at nominal 3/4 inch holds about three quarters of what type L copper holds, because the bore difference is squared."
+>
+  <GallonsMaterialDiagram />
+</BlogInfographic>
+
+At nominal 3/4 inch, **PEX holds 75% of what copper L holds**. That single fact cuts both ways and it is worth holding onto:
+
+**Good for wait time.** Less water in the line means less to clear before hot arrives.
+
+**Bad for pressure loss.** The same small bore that empties quickly also loses far more to friction — the numbers are in **[PEX vs copper vs CPVC](/blog/pex-vs-copper-vs-cpvc)** and **[friction loss in water pipes](/blog/friction-loss-in-pipes)**.
+
+## What the number is actually for
+
+<BlogInfographic
+  title="One number, four jobs"
+  caption="50 ft of 3/4 inch type L copper. Wait time, purge volume, disinfection dose and the load on the hangers are the same figure with different units on the end."
+>
+  <GallonsUsesDiagram />
+</BlogInfographic>
+
+**Hot water wait time.** 50 ft of 3/4 inch copper holds **1.26 gallons**, which at 2 gpm is **38 seconds** of cold water before hot arrives. Every "why does my hot water take so long" question is this figure divided by a flow rate — see **[why hot water takes so long](/blog/how-long-does-it-take-hot-water-to-reach-the-tap)**, where the counter-intuitive result is that a bigger pipe makes it worse.
+
+**Purge and flush volume.** Three line volumes is the usual rule after work on a main — **3.8 gallons** here.
+
+**Disinfection dose.** Chlorination is dosed on volume held, not length. Getting the bore wrong gets the dose wrong.
+
+**Weight when full.** That 50 ft run weighs **10.5 lb** of water on top of the pipe itself. Trivial for a branch; not trivial for a long horizontal run of 2 inch, and it is what the hangers and the joists are carrying.
+
+Run any combination through the **[Pipe Volume Calculator](/calculators/plumbing/plumbing-pipe-volume-calculator)**.
+
+## Handy figures worth remembering
+
+**0.0408 × d²** — the whole formula.
+
+**A gallon is 231 cubic inches**, and a cubic foot is **7.48052 gallons**. Those two are definitions, and nearly every volume conversion in plumbing is built from one or the other.
+
+**3/4 inch copper is about 0.025 gal/ft**, so **40 feet is roughly a gallon**. That is the single most useful mental shortcut on this page.
+
+**Doubling the diameter quadruples the volume.** Same square relationship, opposite direction from friction — which is why a bigger pipe helps pressure and hurts wait time simultaneously.
+
+## Where it goes wrong
+
+**Using nominal size as the diameter.** The error is squared, so a nominal 3/4 assumption on PEX overstates the volume by about a third.
+
+**Using outside diameter.** Copper and CPVC are sized by outside diameter, so the number printed on the pipe is not the bore.
+
+**Forgetting the fittings and the heater.** For purge and disinfection purposes the water in a water heater dwarfs the pipe. For wait time it does not matter, because that water is already hot.
+
+**Measuring the straight run only.** A pipe that goes up, along and down holds all three sections.
+
+## While you are converting things
+
+The 231 and the 7.48052 on this page are definitions, and so are most plumbing conversions — but not all of them, and one of them is a 20% error waiting on any spec sheet that says only "gallons". **[Plumbing unit conversions](/blog/plumbing-unit-conversions)** sorts the exact from the measured.
+
+## Frequently asked questions
+
+### How many gallons are in a foot of pipe?
+
+**0.0408 × the inside diameter squared.** For 3/4 inch type L copper with a 0.785 inch bore, that is **0.0251 gallons per foot** — so roughly 40 feet holds a gallon. For 1 inch Schedule 40 at a 1.049 bore it is 0.0449 gal/ft.
+
+### What is the formula for pipe volume?
+
+Area of the bore times length, converted to gallons: π ÷ 4 × d² × 12 ÷ 231 per foot, which reduces to **0.0408 d²**. The 231 is cubic inches per US gallon and the 12 is inches per foot — both definitions, so nothing here needs looking up.
+
+### Do I use inside or outside diameter?
+
+**Inside diameter, always.** Copper and CPVC are sized by outside diameter, so the number on the pipe is not the bore. Because volume goes as the square, using nominal or outside diameter produces an error much larger than it looks.
+
+### How much water is in 100 feet of 3/4 inch pipe?
+
+About **2.5 gallons** in type L copper, at 0.0251 gal/ft. In PEX of the same nominal size it is only about 1.9 gallons, because the bore is substantially smaller — which is why PEX delivers hot water sooner and loses more pressure doing it.
+
+### Why does my hot water take so long to arrive?
+
+Because you have to clear the cold water sitting in the pipe first. 50 ft of 3/4 inch copper holds 1.26 gallons, which at 2 gpm takes **38 seconds**. It is purely a volume-divided-by-flow problem, and a larger pipe makes it worse rather than better.
+
+### How much does a full pipe weigh?
+
+The volume times 8.33 lb per gallon. 50 ft of 3/4 inch copper holds 10.5 lb of water. Negligible on a branch; worth checking on a long horizontal run of 2 inch, where the water alone is a meaningful load on the hangers.
+
+### How many line volumes should I flush after work?
+
+Three is the common rule for a general flush, so about 3.8 gallons for a 50 ft run of 3/4 inch copper. Disinfection procedures specify their own contact times and volumes, and the water heater's contents dominate the total if it is in the flushed section.
+
+### Does pipe volume differ between materials?
+
+Considerably, at the same nominal size. At nominal 3/4 inch, copper type L holds 0.0251 gal/ft, CPVC Schedule 40 holds 0.0277, and **PEX only 0.0189** — about 75% of copper's. Volume is proportional to the square of the bore, so modest bore differences produce large volume differences.
+
+---
+
+**Sources & standards:** The gallons-per-foot relationship is **derived from geometry rather than transcribed** — π ÷ 4 × d² × 12 ÷ 231 — and cross-checked against the published figure for 1 inch Schedule 40 pipe, which it reproduces exactly. 231 cubic inches per US gallon and 7.48052 gallons per cubic foot are definitions. Bore dimensions come from ASTM B88 for copper, F876 for PEX and D1785 for Schedule 40; nominal sizes are not bore in any of them. Water weight uses 8.33 lb per gallon. **None of this is code** — it is geometry, and it does not change between the IPC and the UPC. Flushing and disinfection volumes and contact times are set by the AHJ and by the applicable standard for the work, not by this page.

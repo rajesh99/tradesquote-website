@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { sizeLabel, trapArmMaxFeet, MIN_VENT_SIZE } from "@/lib/plumbing";
+
+/**
+ * The installation rules, and the one thing an AAV never changes. Everything in
+ * the left column is a condition on the device; the right column is what it
+ * does not excuse — which is the same list a wet vent does not excuse.
+ */
+const ALLOWS = [
+  "Venting an island sink where no wall is available",
+  "Venting a fixture added where no vent can be run",
+  "Reducing the number of roof penetrations on a remodel",
+  "Venting a basement bathroom below the main stack",
+];
+
+const CONDITIONS = [
+  "Accessible — never buried in a sealed wall or ceiling",
+  "In a ventilated space, so it has room air to admit",
+  "Above the trap weir, and above the branch it serves",
+  "Sized for the load, and listed to ASSE 1051 or 1050",
+];
+
+const NEVER = [
+  `Replace the vent that terminates in open air`,
+  `Extend a trap arm past its limit — ${sizeLabel(2)} still stops at ${trapArmMaxFeet(2)} ft`,
+  `Relieve positive pressure anywhere in the system`,
+  `Be used where the jurisdiction has not accepted it`,
+];
+
+const COL = [
+  { x: 24, w: 216, label: "WHAT IT LEGITIMATELY SOLVES", items: ALLOWS, tone: C.primary, bg: C.primaryLight },
+  { x: 252, w: 216, label: "CONDITIONS ON THE INSTALL", items: CONDITIONS, tone: C.blue, bg: C.blueLight },
+  { x: 480, w: 216, label: "WHAT IT NEVER DOES", items: NEVER, tone: C.red, bg: C.redLight },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>What an air admittance valve solves, requires, and never does</title>
+  <desc>
+    Three columns: the problems an air admittance valve legitimately solves, the conditions its installation must
+    meet, and the things it never changes about the rest of the system.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A real device with real limits</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`IPC 918 permits them where the AHJ accepts them. The vent floor of ${sizeLabel(MIN_VENT_SIZE)} and every trap arm limit still apply.`}
+  </text>
+
+  {COL.map((col) => (
+    <g>
+      <rect x={col.x} y="68" width={col.w} height="150" rx="10" fill={col.bg} stroke={col.tone} stroke-width="2" />
+      <text x={col.x + 14} y="88" fill={col.tone} font-family={FONT} font-size="8.5" font-weight="700">{col.label}</text>
+      {col.items.map((item, i) => {
+        const y = 104 + i * 28;
+        return (
+          <g>
+            <circle cx={col.x + 20} cy={y + 4} r="3" fill={col.tone} opacity="0.8" />
+            <text x={col.x + 30} y={y + 3} fill={C.dark} font-family={FONT} font-size="8.5">
+              {item.length > 34 ? item.slice(0, 33) : item}
+            </text>
+            {item.length > 34 && (
+              <text x={col.x + 30} y={y + 14} fill={C.dark} font-family={FONT} font-size="8.5">
+                {item.slice(33)}
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </g>
+  ))}
+
+  <text x="24" y="240" fill={C.muted} font-family={FONT} font-size="10">
+    An AAV buried behind finished drywall is the most common defect — it is a serviceable part with a diaphragm that eventually fails.
+  </text>
+</svg>
