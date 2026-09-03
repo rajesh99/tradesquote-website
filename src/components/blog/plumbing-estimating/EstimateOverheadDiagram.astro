@@ -1,0 +1,79 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * What happens when overhead is left out, or guessed low. The price moves with
+ * it one for one, and a shop that prices at "cost plus 25%" while carrying 30%
+ * overhead is selling below its own break-even.
+ */
+const BASE = {
+  labourHours: 6,
+  labourRate: 125,
+  fixtureCost: 400,
+  materialCost: 250,
+  marginPercent: 25,
+};
+
+const OVERHEADS = [0, 10, 20, 30, 40];
+const rows = OVERHEADS.map((overheadPercent) => {
+  const r = estimateJob({ ...BASE, overheadPercent });
+  return {
+    overheadPercent,
+    breakEven: r.breakEven,
+    price: r.price,
+    profit: r.profit,
+  };
+});
+
+const ignored = rows[0];
+const realistic = rows[2];
+/* What the "overhead ignored" price actually delivers once the real overhead is
+   accounted for. Computed rather than asserted. */
+const realProfit = ignored.price - realistic.breakEven;
+const realMargin = (realProfit / ignored.price) * 100;
+
+const maxPrice = Math.max(...rows.map((r) => r.price));
+
+const BAR_X = 176;
+const BAR_MAX = 284;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>What overhead does to the price of the same job</title>
+  <desc>
+    The same six hour job priced at five different overhead rates. Overhead moves break-even directly, so a shop that
+    guesses it low prices every job below its own cost.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Overhead is not optional and it is not in the labour rate</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`The same job — ${BASE.labourHours} h, ${usd(BASE.fixtureCost)} fixture, ${usd(BASE.materialCost)} materials — at a ${BASE.marginPercent}% margin throughout`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 80 + i * 32;
+    const w = Math.max(3, (row.price / maxPrice) * BAR_MAX);
+    const beW = Math.max(3, (row.breakEven / maxPrice) * BAR_MAX);
+    const ignoresOverhead = row.overheadPercent === 0;
+    const tone = ignoresOverhead ? C.red : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+          {ignoresOverhead ? "overhead ignored" : `${row.overheadPercent}% overhead`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity="0.3" />
+        <rect x={BAR_X} y={y + 2} width={beW} height="20" rx="5" fill={tone} opacity="0.7" />
+        <text x={BAR_X + w + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${usd(row.price)} price · ${usd(row.breakEven)} cost · ${usd(row.profit)} profit`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="242" width="672" height="22" rx="6" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="36" y="257" fill={C.red} font-family={FONT} font-size="10" font-weight="700">
+    {`Quote ${usd(ignored.price)} while actually carrying ${realistic.overheadPercent}% overhead and the ${BASE.marginPercent}% margin you thought you had is ${fmt(realMargin, 1)}% — ${usd(realProfit)}, not ${usd(realistic.profit)}.`}
+  </text>
+</svg>

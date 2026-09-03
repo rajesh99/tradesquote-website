@@ -1,0 +1,90 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import {
+  greaseTrapHydraulic,
+  greaseInterceptorVolume,
+  GREASE_SINK_FILL_FRACTION,
+  GREASE_DRAIN_PERIOD_MIN,
+  GREASE_INTERCEPTOR_MINIMUM_GAL,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The two devices are sized by two completely different methods and answer in
+ * two different units. Putting them side by side is the whole point of the
+ * figure — a gpm rating and a gallon capacity are not comparable numbers.
+ */
+const defs = markerDefs("grease-two");
+
+const hydraulic = greaseTrapHydraulic({
+  lengthIn: 20,
+  widthIn: 20,
+  depthIn: 12,
+  compartments: 3,
+});
+
+const gravity = greaseInterceptorVolume({
+  seats: 60,
+  turnoverPerHour: 2,
+  wasteFlowPerMeal: 6,
+  retentionHours: 2.5,
+  storageFactor: 1,
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The two grease devices and the two methods that size them</title>
+  <desc>
+    A hydromechanical interceptor is rated in gallons per minute and sized from sink volume. A gravity interceptor is
+    rated in gallons and sized from meal counts. The two methods share no inputs and produce different units.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two devices, two methods, two different units</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Neither method converts into the other. Which one you use is decided by which device the authority requires.
+  </text>
+
+  <rect x="24" y="70" width="330" height="184" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="2" />
+  <text x="40" y="90" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">HYDROMECHANICAL — INDOOR, UNDER THE SINK</text>
+  <text x="40" y="110" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Sized from the sink it serves</text>
+  <text x="40" y="130" fill={C.muted} font-family={FONT} font-size="10">3 compartments, 20 × 20 × 12 inches</text>
+  <text x="40" y="148" fill={C.muted} font-family={FONT} font-size="10">
+    {`= ${fmt(hydraulic.gallons, 1)} gal, × ${fmt(GREASE_SINK_FILL_FRACTION * 100)}% filled`}
+  </text>
+  <text x="40" y="166" fill={C.muted} font-family={FONT} font-size="10">
+    {`= ${fmt(hydraulic.drainedGallons, 1)} gal drained in ${GREASE_DRAIN_PERIOD_MIN} minute`}
+  </text>
+  <line x1="40" y1="178" x2="338" y2="178" stroke={C.blue} stroke-width="1" opacity="0.4" />
+  <text x="40" y="200" fill={C.blue} font-family={FONT} font-size="16" font-weight="800">
+    {`${fmt(hydraulic.flowGpm, 1)} gpm required`}
+  </text>
+  <text x="40" y="222" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">
+    {`→ ${hydraulic.ratedGpm} gpm PDI unit, ${hydraulic.capacityLb} lb capacity`}
+  </text>
+  <text x="40" y="242" fill={C.muted} font-family={FONT} font-size="9.5">the answer is a FLOW RATING, not a volume</text>
+
+  <rect x="366" y="70" width="330" height="184" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="382" y="90" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">GRAVITY INTERCEPTOR — OUTDOOR, IN THE GROUND</text>
+  <text x="382" y="110" fill={C.dark} font-family={FONT} font-size="11" font-weight="700">Sized from the meals served</text>
+  <text x="382" y="130" fill={C.muted} font-family={FONT} font-size="10">
+    {`60 seats × 2 turns = ${fmt(gravity.mealsPerPeakHour)} meals per peak hour`}
+  </text>
+  <text x="382" y="148" fill={C.muted} font-family={FONT} font-size="10">× 6 gal per meal × 2.5 h retention × 1</text>
+  <text x="382" y="166" fill={C.muted} font-family={FONT} font-size="10">
+    {`= ${fmt(gravity.calculated)} gal, against a ${fmt(GREASE_INTERCEPTOR_MINIMUM_GAL)} gal floor`}
+  </text>
+  <line x1="382" y1="178" x2="680" y2="178" stroke={C.orange} stroke-width="1" opacity="0.4" />
+  <text x="382" y="200" fill={C.orange} font-family={FONT} font-size="16" font-weight="800">
+    {`${fmt(gravity.required)} gallons required`}
+  </text>
+  <text x="382" y="222" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="700">
+    {`→ ${fmt(gravity.stocked ?? 0)} gallon shell`}
+  </text>
+  <text x="382" y="242" fill={C.muted} font-family={FONT} font-size="9.5">the answer is a VOLUME, not a flow</text>
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    A 50 gpm unit and a 2,000 gallon interceptor are not two sizes of the same thing. They are different devices.
+  </text>
+</svg>

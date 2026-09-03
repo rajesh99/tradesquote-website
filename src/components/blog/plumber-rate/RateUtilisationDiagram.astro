@@ -1,0 +1,83 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { labourRate, HOURS_PER_YEAR, usd2, fmt } from "@/lib/plumbing";
+
+/**
+ * The utilisation curve. Annual cost is fixed, so the rate is a hyperbola in
+ * billable hours — every unsold hour is redistributed across the ones that do
+ * sell, which is why the curve is so steep at the low end.
+ */
+const BASE = {
+  wage: 32,
+  burdenPercent: 30,
+  overheadPerTech: 45000,
+  marginPercent: 20,
+};
+
+const HOURS = [1000, 1200, 1400, 1600, 1800];
+const rows = HOURS.map((billableHours) => {
+  const r = labourRate({ ...BASE, billableHours });
+  return {
+    billableHours,
+    utilisation: r.utilisation,
+    loadedCost: r.loadedCost,
+    billRate: r.billRate,
+    multiple: r.multiple,
+  };
+});
+
+const maxRate = Math.max(...rows.map((r) => r.billRate));
+
+/* The wage sweep, for the footer: the multiple falls as the wage rises, because
+   the fixed overhead is a smaller share of a bigger number. */
+const WAGES = [24, 32, 45];
+const wageRows = WAGES.map((wage) => {
+  const r = labourRate({ ...BASE, wage, billableHours: 1400 });
+  return { wage, billRate: r.billRate, multiple: r.multiple };
+});
+const BAR_X = 250;
+const BAR_MAX = 246;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Bill rate against billable hours</title>
+  <desc>
+    The annual cost of a technician does not change with how many hours are sold, so every unsold hour is redistributed
+    across the ones that are. The rate falls steeply as utilisation rises.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Every unsold hour is paid for by the ones that sell</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Same ${usd2(BASE.wage)} wage, same burden, same overhead, same ${BASE.marginPercent}% margin. Only the hours sold change.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 80 + i * 32;
+    const w = Math.max(3, (row.billRate / maxRate) * BAR_MAX);
+    const typical = row.billableHours === 1400;
+    const tone = typical ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={typical ? 800 : 600}>
+          {`${fmt(row.billableHours)} billable hours`}
+        </text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.utilisation, 1)}% of ${fmt(HOURS_PER_YEAR)} paid hours`}
+        </text>
+        <rect x={BAR_X} y={y} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y} width={w} height="20" rx="5" fill={tone} opacity={typical ? 0.9 : 0.6} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 15} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${usd2(row.billRate)} · ${fmt(row.multiple, 2)}x wage`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="240" fill={C.muted} font-family={FONT} font-size="10">
+    {`From ${fmt(rows[0].utilisation, 0)}% to ${fmt(rows[4].utilisation, 0)}% utilisation the rate falls from ${usd2(rows[0].billRate)} to ${usd2(rows[4].billRate)} — and the technician's pay never changed.`}
+  </text>
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="9.5">
+    {`Wage moves the multiple the other way, and less: at 1,400 hours, ${wageRows.map((w) => `${usd2(w.wage)} wage → ${fmt(w.multiple, 2)}x`).join(" · ")}.`}
+  </text>
+</svg>

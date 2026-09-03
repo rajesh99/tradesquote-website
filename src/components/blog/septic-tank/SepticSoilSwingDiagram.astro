@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { septicSizing, PERC_APPLICATION_RATES, fmt } from "@/lib/plumbing";
+
+/**
+ * The same three-bedroom house on five different soils. The tank never moves;
+ * the leach field swings five-fold. This is the figure the post is built on.
+ */
+const BEDROOMS = 3;
+const TRENCH_WIDTH = 3;
+
+const rows = PERC_APPLICATION_RATES.map((soil) => {
+  const r = septicSizing({
+    bedrooms: BEDROOMS,
+    galPerBedroom: 150,
+    applicationRate: soil.galPerSqFtPerDay,
+    trenchWidthFt: TRENCH_WIDTH,
+  });
+  return {
+    label: soil.label,
+    rate: soil.galPerSqFtPerDay,
+    field: r.leachFieldSqFt,
+    trench: r.trenchFeet,
+  };
+});
+
+const maxField = Math.max(...rows.map((r) => r.field));
+const minField = Math.min(...rows.map((r) => r.field));
+const swing = maxField / minField;
+
+/* The value label is drawn at BAR_X + width + 10; BAR_MAX is capped so the
+   longest label still lands inside the 720-wide viewBox. */
+const BAR_X = 246;
+const BAR_MAX = 244;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Leach field area for one house across five soils</title>
+  <desc>
+    The same three-bedroom house needs a leach field that varies five-fold with the soil alone. The tank size does not
+    change at all.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One house, five soils, a five-fold swing</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${BEDROOMS}-bedroom house at 450 gallons per day, trenches ${TRENCH_WIDTH} ft wide. The tank stays 1,000 gallons throughout.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 34;
+    const w = Math.max(3, (row.field / maxField) * BAR_MAX);
+    const extreme = row.field === maxField || row.field === minField;
+    return (
+      <g>
+        <text x="28" y={y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 25} fill={C.muted} font-family={FONT} font-size="9">{`${row.rate} gal per sq ft per day`}</text>
+        <rect x={BAR_X} y={y + 4} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 4} width={w} height="18" rx="5" fill={extreme ? C.orange : C.primary} opacity={extreme ? 0.9 : 0.55} />
+        <text x={BAR_X + w + 10} y={y + 17} fill={extreme ? C.orange : C.dark} font-family={FONT} font-size="10" font-weight={extreme ? 800 : 600}>
+          {`${fmt(row.field)} sq ft · ${fmt(row.trench)} ft of trench`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="248" width="672" height="22" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="263" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`Sand to slow clay is a ${fmt(swing, 1)}x difference in field area for an identical house. Only a perc test tells you which row you are on.`}
+  </text>
+</svg>

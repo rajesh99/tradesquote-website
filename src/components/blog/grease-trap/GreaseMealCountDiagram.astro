@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { greaseInterceptorVolume, GREASE_INTERCEPTOR_MINIMUM_GAL, fmt } from "@/lib/plumbing";
+
+/**
+ * Meal-count sizing across four operations. Two things the figure has to show:
+ * the small operator is governed by the FLOOR rather than the calculation, and
+ * a busy kitchen runs straight off the end of the stocked ladder.
+ */
+const CASES = [
+  { label: "Coffee shop", detail: "40 seats · 1.5 turns · single-service · 8 h", seats: 40, turnoverPerHour: 1.5, wasteFlowPerMeal: 2, retentionHours: 1.5, storageFactor: 1.5 },
+  { label: "Neighbourhood diner", detail: "60 seats · 2 turns · full kitchen · 8 h", seats: 60, turnoverPerHour: 2, wasteFlowPerMeal: 6, retentionHours: 2.5, storageFactor: 1 },
+  { label: "24-hour diner", detail: "80 seats · 2 turns · full kitchen · 24 h", seats: 80, turnoverPerHour: 2, wasteFlowPerMeal: 6, retentionHours: 2.5, storageFactor: 3 },
+  { label: "Full-service restaurant", detail: "120 seats · 2 turns · full kitchen · 16 h", seats: 120, turnoverPerHour: 2, wasteFlowPerMeal: 6, retentionHours: 2.5, storageFactor: 2 },
+];
+
+const rows = CASES.map((c) => {
+  const r = greaseInterceptorVolume(c);
+  return {
+    label: c.label,
+    detail: c.detail,
+    meals: r.mealsPerPeakHour,
+    calculated: r.calculated,
+    required: r.required,
+    stocked: r.stocked,
+    governedBy: r.governedBy,
+  };
+});
+
+const maxVal = Math.max(...rows.map((r) => r.required));
+const BAR_X = 258;
+const BAR_MAX = 210;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Gravity interceptor volume across four kitchens</title>
+  <desc>
+    Meal-count sizing for four operations. The coffee shop calculates to well under the one thousand gallon floor, so
+    the floor governs. The busiest kitchen runs past the largest commonly stocked shell.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Meal count sizes the gravity interceptor — until the floor takes over</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`meals per peak hour × gallons per meal × retention hours × storage factor, against a ${fmt(GREASE_INTERCEPTOR_MINIMUM_GAL)} gallon minimum`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 42;
+    const w = Math.max(3, (row.required / maxVal) * BAR_MAX);
+    const floorGoverns = row.governedBy === "minimum";
+    const offLadder = row.stocked === null;
+    const tone = floorGoverns ? C.orange : offLadder ? C.red : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 25} fill={C.muted} font-family={FONT} font-size="9">{row.detail}</text>
+        <text x="28" y={y + 37} fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.meals)} meals/hr → calculates to ${fmt(row.calculated)} gal`}
+        </text>
+        <rect x={BAR_X} y={y + 6} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 6} width={w} height="20" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 12} y={y + 20} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {offLadder
+            ? `${fmt(row.required)} gal — past the stock ladder`
+            : `${fmt(row.required)} gal → ${fmt(row.stocked ?? 0)} gal shell`}
+        </text>
+        {floorGoverns && (
+          <text x={BAR_X + 8} y={y + 20} fill={C.white} font-family={FONT} font-size="9" font-weight="800">floor governs</text>
+        )}
+      </g>
+    );
+  })}
+
+  <text x="24" y="266" fill={C.muted} font-family={FONT} font-size="10">
+    For a small operator the formula decides nothing — the authority's minimum does. Past 4,000 gallons you are specifying a shell, not selecting one.
+  </text>
+</svg>

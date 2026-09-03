@@ -1,0 +1,159 @@
+---
+title: "Thermal Expansion Tank Sizing: The Pre-Charge Matters More Than the Tank"
+meta_title: "Thermal Expansion Tank Sizing: Pre-Charge & Volume (2026) | TradesQuote"
+description: "A 50 gallon heater makes 0.86 gallons of expansion. Whether that needs a 2 gallon tank or an 8 gallon one is decided by your supply pressure, not your heater — a 4x swing from one number nobody checks."
+image: /images/posts/thermal-expansion-tank-sizing-hero.svg
+date: 2026-09-03T11:00:00Z
+categories: ["plumbing"]
+tags: ["expansion tank","thermal expansion","closed system","water heater","ipc 607"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import ExpansionFractionDiagram from "@/components/blog/expansion-tank/ExpansionFractionDiagram.astro";
+import ExpansionAcceptanceDiagram from "@/components/blog/expansion-tank/ExpansionAcceptanceDiagram.astro";
+import ExpansionSizeLadderDiagram from "@/components/blog/expansion-tank/ExpansionSizeLadderDiagram.astro";
+
+Ask what size expansion tank a water heater needs and the honest answer starts with a question back: what is your supply pressure? Because the heater barely matters and the pressure decides almost everything.
+
+**A 50 gallon heater produces 0.86 gallons of expansion whatever your house is doing.** Whether that 0.86 gallons needs a 2.02 gallon tank or an 8.10 gallon one — **a 4.0x swing** — depends entirely on how close your supply pressure already sits to the ceiling you are trying to stay under.
+
+## Why the tank exists at all
+
+Water expands when it is heated and it does not compress. In an open system that is fine: the expansion pushes back into the street main. Put a pressure reducing valve, a backflow preventer, or a check valve at the meter, and the house becomes a **closed system**. Now the expansion has nowhere to go.
+
+<BlogInfographic
+  title="The expansion is small — the pressure it makes is not"
+  caption="Volume ratio equals density ratio, because mass is conserved when water is heated. A 50 gallon system heated from 40 °F to 140 °F produces 0.86 gallons of expansion."
+>
+  <ExpansionFractionDiagram />
+</BlogInfographic>
+
+Heating water from 40 °F to 140 °F expands it by **1.71%** — **0.86 gallons** in a 50 gallon system. That sounds trivial. It is not, because water is effectively incompressible: forcing 0.86 gallons into a rigid, already-full system raises the pressure until something gives.
+
+What usually gives is the temperature and pressure relief valve, which is why the classic symptom is a T&P valve that weeps after every heating cycle and then stops. Homeowners replace the valve. The new one weeps too, because the valve was doing its job.
+
+The quieter damage is worse. Repeated pressure spikes work every joint, every supply hose, every appliance inlet valve and the heater's own glass lining. A house on a closed system without expansion control does not fail dramatically — it develops a habit of leaking.
+
+**IPC 607.3 requires expansion control on any closed system.** So does the manufacturer's warranty on most water heaters, which is often what actually enforces it.
+
+## The window, not the tank
+
+An expansion tank is an air spring with a rubber diaphragm. The water side takes expansion; the air side compresses to make room. The catch is that only part of the shell is usable, because the air can only be squeezed from its pre-charge pressure up to the ceiling you are designing to:
+
+    tank volume = expansion ÷ (1 − pre-charge absolute ÷ ceiling absolute)
+
+<BlogInfographic
+  title="The window closes fast as supply pressure rises"
+  caption="A 50 gallon system produces 0.86 gallons of expansion in every row. What changes is the acceptance ratio — the fraction of the shell the air can be squeezed through — which collapses as supply pressure approaches the ceiling."
+>
+  <ExpansionAcceptanceDiagram />
+</BlogInfographic>
+
+Designing to an **80 psi ceiling** — the pressure at which IPC 604.8 requires a reducing valve, and a sensible place to stop — the numbers run like this:
+
+- **40 psi supply**: 40 psi of headroom, **42.2% usable**, tank **2.02 gal**
+- **50 psi supply**: 30 psi of headroom, 31.7% usable, tank 2.70 gal
+- **60 psi supply**: 20 psi of headroom, 21.1% usable, tank **4.05 gal**
+- **70 psi supply**: 10 psi of headroom, **10.6% usable**, tank **8.10 gal**
+
+The expansion is identical in all four rows. **Supply pressure alone moves the required tank four-fold**, because what you are buying is not volume — it is room to compress into, and a house already at 70 psi has almost none left below 80.
+
+This is the practical version of the rule everyone quotes as "pre-charge to your supply pressure". It is correct, and this is *why* it matters: the pre-charge sets one end of the window and the ceiling sets the other, and at ordinary residential pressures that window is only about 20 psi wide.
+
+## What that means for selection
+
+<BlogInfographic
+  title="System volume sets the expansion — pressure sets the shell"
+  caption="Seven system volumes at the calculator's default 60 psi supply and 80 psi ceiling. The stocked ladder is coarse, so several system sizes collapse onto the same product."
+>
+  <ExpansionSizeLadderDiagram />
+</BlogInfographic>
+
+At a typical 60 psi supply:
+
+- **30, 40 and 50 gallon** systems all need the **4.4 gallon** shell
+- **75, 80 and 100 gallon** systems all need the **8.6 gallon** shell
+- **120 gallons** needs 9.72 and moves up to **14**
+
+Doubling the heater from 50 to 100 gallons moves you exactly one rung. Raising the supply pressure from 60 to 70 psi moves you the same rung on the *same* heater. That is the whole point: **the pressure is the more powerful input, and it is the one nobody measures before ordering.**
+
+Work your own combination through the **[Thermal Expansion Tank Calculator](/calculators/plumbing/plumbing-expansion-tank-calculator)**, which uses this same 60 → 80 psi window as its default and lets you move both ends of it.
+
+Note that "system volume" is more than the heater — it is the heater plus the water standing in the hot piping, which on a long horizontal run is not nothing. The arithmetic for that is in **[why hot water takes so long](/blog/how-long-does-it-take-hot-water-to-reach-the-tap)**. In practice most sizing uses the heater capacity and lets the coarseness of the stocked ladder absorb the piping.
+
+## Setting the pre-charge
+
+**The pre-charge must equal the static supply pressure of the house.** Not the factory setting, which is typically 40 psi and is right only for a house that happens to run at 40 psi.
+
+The reason is mechanical. If the pre-charge is *below* supply pressure, system pressure pushes water into the tank the moment it is connected, so part of the acceptance volume is consumed before any heating happens. If the pre-charge is *above* supply pressure, the diaphragm sits hard against the shell and cannot move until system pressure climbs past it, so the tank does nothing during the first part of the cycle.
+
+The correct setting leaves the diaphragm just at the point of accepting water — full stroke available, nothing wasted.
+
+**Check it before installation, with the tank disconnected**, using a tyre gauge on the schrader valve. Adjusting it takes a bicycle pump or a few seconds of released air, and it is the difference between a working device and an ornament.
+
+And measure the house first. A supply pressure you assumed was 50 psi and is actually 70 is the difference between a 2.70 gallon requirement and an 8.10 gallon one. The static-versus-flowing test is in **[low water pressure in a house](/blog/low-water-pressure-in-house)**.
+
+This is the same physics as a well pressure tank, where the pre-charge rule differs but the failure mode is identical — **[what size well pressure tank you need](/blog/what-size-pressure-tank-do-i-need)** has the drawdown version of the same argument.
+
+## Installation details that matter
+
+**Location.** On the cold inlet to the heater, downstream of the shutoff, is the normal position. Cold side because it is a potable-rated bladder that lasts longer out of 140 °F water.
+
+**Support it.** Most residential tanks are rated for any orientation, but hanging a water-filled shell from a threaded connection alone puts its whole weight on that joint.
+
+**Do not use a hydronic expansion tank.** Heating tanks look identical and are not potable-rated. Different bladder material, not approved for drinking water.
+
+**It is a serviceable item.** Bladders fail and pre-charge drifts, typically over five to ten years. Tap it: hollow above the water line, solid below. Solid throughout means waterlogged and finished.
+
+## Do I actually have a closed system?
+
+Not every house needs one, and the test is simple. You are closed if anything at the meter stops water flowing backwards:
+
+- **A pressure reducing valve** — required by IPC 604.8 above 80 psi, and fitted in plenty of houses below it
+- **A backflow preventer or dual check** — increasingly standard on new services, and the reason **[backflow prevention](/blog/backflow-prevention-explained)** and expansion control keep appearing together
+- **A check valve** in the meter assembly, which many utilities now fit as routine
+
+If you have any of them, you are closed. Utilities have been adding meter check valves for years, which is why a great many older houses became closed systems without anyone telling the owner — and why a T&P valve suddenly started weeping on a heater that had been fine for a decade.
+
+## Frequently asked questions
+
+### What size thermal expansion tank do I need for a 50 gallon water heater?
+
+It depends on your supply pressure more than on the heater. A 50 gallon system heated from 40 °F to 140 °F produces **0.86 gallons** of expansion, but against an 80 psi ceiling that needs a **2.02 gallon** tank at 40 psi supply and an **8.10 gallon** tank at 70 psi. At a typical 60 psi it is 4.05 gallons, so a **4.4 gallon** shell.
+
+### What should an expansion tank be pre-charged to?
+
+**The static supply pressure of the house**, measured at a hose bibb with nothing running — not the factory setting, which is typically 40 psi. Check and adjust it with the tank disconnected, before installation. A tank pre-charged above supply pressure cannot move until system pressure passes it.
+
+### Why does supply pressure change the tank size so much?
+
+Because the usable fraction of the shell is the window between the pre-charge and the ceiling, and at residential pressures that window is narrow. Against an 80 psi ceiling, 40 psi supply leaves **42.2%** of the shell usable and 70 psi leaves **10.6%** — so the same 0.86 gallons of expansion needs four times the tank.
+
+### Do I need an expansion tank?
+
+If the house is a closed system, yes, and IPC 607.3 requires it. You are closed if there is a pressure reducing valve, a backflow preventer, or a check valve at the meter — and many utilities now fit meter check valves as routine, which quietly turned a lot of open systems closed.
+
+### Why does my T&P valve keep leaking?
+
+Usually thermal expansion, not a faulty valve. In a closed system, heating the water raises pressure with nowhere to go, and the relief valve opens exactly as designed. Replacing the valve does not help; adding or correcting an expansion tank does. If the pressure is verified fine and it still weeps, then suspect the valve.
+
+### How much does water expand when heated?
+
+**1.71% going from 40 °F to 140 °F.** It comes straight from the density change — water is 62.43 lb/ft³ at 40 °F and 61.38 at 140 °F — and mass is conserved, so the volume ratio is the density ratio. Store at 160 °F and it is 2.33%; at 180 °F, 3.07%.
+
+### Where does the expansion tank go?
+
+On the cold water inlet to the heater, downstream of the shutoff valve. Cold side, because the bladder lasts longer out of the hot water. Support the tank's weight rather than hanging it from the threaded connection.
+
+### Can I use a hydronic expansion tank on potable water?
+
+No. Heating expansion tanks look nearly identical but their bladders are not rated for potable water. Use a potable-rated tank and check the label rather than the shape.
+
+### How long does an expansion tank last?
+
+Typically five to ten years — a serviceable item, not a permanent fixture. The bladder eventually fails or the pre-charge drifts. Tap it: hollow above the water line, solid below. Solid all the way through means it is waterlogged and doing nothing at all.
+
+---
+
+**Sources & standards:** IPC 2021 Section 607.3 requires thermal expansion control on closed systems; Section 604.8 requires a pressure reducing valve above 80 psi, which is both one of the things that creates a closed system and the ceiling this page designs to. Expansion fractions are derived from a water density table rather than quoted, so the volume ratio equals the density ratio exactly. Tank sizing uses Boyle's law with all pressures converted to absolute at 14.7 psi atmospheric. **The rule that pre-charge should equal static supply pressure is manufacturer practice rather than code text**, as is the choice of design ceiling — 80 psi is used here and on the calculator because it keeps the system under the code threshold, but a designer working to the 150 psi relief setting instead will get smaller tanks. Stocked shell sizes vary by brand. The IPC is a model code — confirm the edition your jurisdiction adopts, and have a licensed plumber verify both the installation and the pre-charge.

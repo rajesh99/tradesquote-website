@@ -1,0 +1,73 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { pressureTankSizing, minRunMinutes, fmt } from "@/lib/plumbing";
+
+/**
+ * Sizing from the pump rather than the house. The required drawdown is pump
+ * output times minimum run time, and both terms grow with pump size — so tank
+ * requirement grows faster than pump output does.
+ */
+const CUT_IN = 30;
+const CUT_OUT = 50;
+const PUMPS = [5, 8, 10, 15, 20, 25];
+
+const rows = PUMPS.map((pumpGpm) => {
+  const r = pressureTankSizing({ pumpGpm, cutInPsi: CUT_IN, cutOutPsi: CUT_OUT });
+  return {
+    pumpGpm,
+    runMinutes: minRunMinutes(pumpGpm),
+    requiredDrawdown: r.requiredDrawdown,
+    requiredTank: r.requiredTank,
+    stockedTank: r.stockedTank,
+  };
+});
+
+const ROW_H = 30;
+const TOP = 92;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 302" fill="none" aria-hidden="true">
+  <title>Tank size required by pump output</title>
+  <desc>
+    The pump sets the tank, not the house. Required drawdown is pump output multiplied by the minimum run time, and
+    both of those rise with pump size, so the tank requirement climbs faster than the pump does.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="286" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The pump sizes the tank — the house never enters it</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${CUT_IN}/${CUT_OUT} switch with the pre-charge set correctly. Minimum run time is pump-industry convention, not code.`}
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PUMP</text>
+  <text x={192} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MIN RUN</text>
+  <text x={318} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DRAWDOWN NEEDED</text>
+  <text x={462} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SHELL REQUIRED</text>
+  <text x={612} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">STOCKED SIZE</text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const offLadder = row.stockedTank === null;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${row.pumpGpm} gpm`}</text>
+        <text x={192} y={y + 16} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10.5">{`${row.runMinutes} min`}</text>
+        <text x={318} y={y + 16} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="600">
+          {`${fmt(row.requiredDrawdown, 1)} gal`}
+        </text>
+        <text x={462} y={y + 16} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10.5">
+          {`${fmt(row.requiredTank, 1)} gal`}
+        </text>
+        <rect x={552} y={y} width={120} height="24" rx="6" fill={offLadder ? C.red : C.primary} opacity={offLadder ? 0.18 : 0.12} />
+        <rect x={552} y={y} width={120} height="24" rx="6" fill="none" stroke={offLadder ? C.red : C.primary} stroke-width={offLadder ? 2 : 1.3} />
+        <text x={612} y={y + 16} text-anchor="middle" fill={offLadder ? C.red : C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+          {offLadder ? "two in parallel" : `${row.stockedTank} gal`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="282" fill={C.muted} font-family={FONT} font-size="10">
+    {`A 20 gpm pump needs ${fmt(rows[4].requiredTank / rows[0].requiredTank, 1)}x the shell of a 5 gpm pump — the longer minimum run multiplies the larger output.`}
+  </text>
+</svg>

@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { BACKFLOW_ASSEMBLIES } from "@/lib/plumbing";
+
+/**
+ * The whole subject in one table. Every device stops backsiphonage; the
+ * backpressure column is what actually separates them, and the intersection of
+ * backpressure and high hazard is where the list collapses to three.
+ */
+const rows = BACKFLOW_ASSEMBLIES.map((a) => ({
+  abbr: a.abbr,
+  standard: a.standard.split(" · ")[0],
+  backsiphonage: a.backsiphonage,
+  backpressure: a.backpressure,
+  continuous: a.continuousPressure,
+  high: a.hazard === "high",
+}));
+
+const backpressureCount = rows.filter((r) => r.backpressure).length;
+const highAndBackpressure = rows.filter((r) => r.backpressure && r.high);
+
+const ROW_H = 21;
+const TOP = 96;
+const COLS = [
+  { x: 356, label: "BACKSIPHONAGE", key: "backsiphonage" as const },
+  { x: 452, label: "BACKPRESSURE", key: "backpressure" as const },
+  { x: 548, label: "CONTINUOUS", key: "continuous" as const },
+  { x: 644, label: "HIGH HAZARD", key: "high" as const },
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 348" fill="none" aria-hidden="true">
+  <title>The backflow assembly protection matrix</title>
+  <desc>
+    Ten assemblies against four questions. Every one stops backsiphonage, so that column decides nothing. The
+    backpressure column is what separates them, and only three devices combine it with high hazard protection.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="332" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Every device stops backsiphonage. That column decides nothing.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`All ${rows.length} assemblies against four questions. Only ${backpressureCount} stop backpressure, and only ${highAndBackpressure.length} of those are rated for high hazard.`}
+  </text>
+
+  <rect x={344} y="66" width="96" height={TOP - 66 + rows.length * ROW_H} rx="6" fill={C.border} opacity="0.16" />
+  <rect x={440} y="66" width="96" height={TOP - 66 + rows.length * ROW_H} rx="6" fill={C.primary} opacity="0.06" />
+
+  {COLS.map((col) => (
+    <text x={col.x} y="88" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5" font-weight="700">{col.label}</text>
+  ))}
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.abbr}</text>
+        <text x="130" y={y + 12} fill={C.muted} font-family={FONT} font-size="8.5">{row.standard}</text>
+        {COLS.map((col) => {
+          const on = row[col.key];
+          const emphasise = col.key === "backpressure" || col.key === "high";
+          return (
+            <g>
+              <circle cx={col.x} cy={y + 8} r="7" fill={on ? (emphasise ? C.primary : C.border) : C.redLight} opacity={on ? (emphasise ? 0.85 : 0.5) : 1} />
+              <text x={col.x} y={y + 12} text-anchor="middle" fill={on ? C.white : C.red} font-family={FONT} font-size="9" font-weight="800">
+                {on ? "✓" : "✕"}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  })}
+
+  <rect x="24" y={TOP + rows.length * ROW_H + 8} width="672" height="28" rx="7" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y={TOP + rows.length * ROW_H + 26} fill={C.primary} font-family={FONT} font-size="10" font-weight="700">
+    {`Backpressure AND high hazard leaves exactly ${highAndBackpressure.length}: ${highAndBackpressure.map((a) => a.abbr).join(", ")}. Nothing with "vacuum breaker" in its name is among them.`}
+  </text>
+</svg>

@@ -1,0 +1,72 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { labourRate, HOURS_PER_YEAR, usd, usd2, fmt } from "@/lib/plumbing";
+
+/**
+ * Wage to bill rate, in the order the money is actually incurred. The step
+ * everyone skips is the division: a tech is PAID 2,080 hours and SELLS far
+ * fewer, and the gap has to come out of the rate.
+ */
+const INPUT = {
+  wage: 32,
+  burdenPercent: 30,
+  overheadPerTech: 45000,
+  billableHours: 1400,
+  marginPercent: 20,
+};
+
+const r = labourRate(INPUT);
+
+const STACK = [
+  { label: "Base wage", detail: `${usd(INPUT.wage)}/hr × ${fmt(HOURS_PER_YEAR)} paid hours`, value: r.baseWage, tone: C.blue },
+  { label: "Labour burden", detail: `${INPUT.burdenPercent}% — tax, insurance, comp, benefits`, value: r.burden, tone: C.orange },
+  { label: "Overhead share", detail: "van, tools, phone, software, admin", value: INPUT.overheadPerTech, tone: C.orange },
+];
+
+const maxVal = Math.max(...STACK.map((s) => s.value), r.totalCost);
+const BAR_X = 250;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>From an hourly wage to a billable rate</title>
+  <desc>
+    Annual cost of employing a technician, divided by the hours actually sold rather than the hours paid, then marked
+    to a target margin.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`What a ${usd(INPUT.wage)} an hour plumber actually costs`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Annual cost of employing one technician, before a single hour is sold`}
+  </text>
+
+  {STACK.map((step, i) => {
+    const y = 76 + i * 30;
+    const w = Math.max(3, (step.value / maxVal) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{step.label}</text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="9">{step.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={w} height="18" rx="4" fill={step.tone} opacity="0.6" />
+        <text x={BAR_X + w + 10} y={y + 15} fill={step.tone} font-family={FONT} font-size="10.5" font-weight="700">{usd(step.value)}</text>
+      </g>
+    );
+  })}
+
+  <line x1={BAR_X} y1="170" x2={696} y2="170" stroke={C.border} stroke-width="1" />
+  <text x="28" y="188" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">Total annual cost</text>
+  <rect x={BAR_X} y="175" width={Math.max(3, (r.totalCost / maxVal) * BAR_MAX)} height="18" rx="4" fill={C.dark} opacity="0.75" />
+  <text x={BAR_X + (r.totalCost / maxVal) * BAR_MAX + 10} y="188" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{usd(r.totalCost)}</text>
+
+  <rect x="24" y="204" width="672" height="64" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="40" y="224" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">THE STEP EVERYONE SKIPS — DIVIDE BY HOURS SOLD, NOT HOURS PAID</text>
+  <text x="40" y="244" fill={C.dark} font-family={FONT} font-size="11">
+    {`${usd(r.totalCost)} ÷ ${fmt(INPUT.billableHours)} billable hours = ${usd2(r.loadedCost)} of cost per sold hour`}
+  </text>
+  <text x="40" y="261" fill={C.primary} font-family={FONT} font-size="12.5" font-weight="800">
+    {`÷ (1 − ${fmt(INPUT.marginPercent / 100, 2)}) = ${usd2(r.billRate)} bill rate — ${fmt(r.multiple, 2)}x the wage`}
+  </text>
+</svg>

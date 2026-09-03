@@ -1,0 +1,71 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { BACKFLOW_APPLICATIONS } from "@/lib/plumbing";
+
+/**
+ * Selection is two questions in a fixed order. Direction narrows the list;
+ * hazard class then picks from what is left. Real applications are grouped by
+ * the direction they face so the ordering is visible rather than asserted.
+ *
+ * Both label columns are truncated in the frontmatter: the boxes are 224 wide
+ * and the longest untruncated assembly string overflows them.
+ */
+const defs = markerDefs("backflow-select");
+
+const clip = (s: string, max: number) => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
+
+const group = (direction: string) =>
+  BACKFLOW_APPLICATIONS.filter((a) => a.direction === direction).map((a) => ({
+    application: clip(a.application, 36),
+    assembly: clip(a.assembly, 30),
+    high: a.hazard === "high",
+  }));
+
+const GROUPS = [
+  { label: "BACKSIPHONAGE ONLY", note: "vacuum breakers are allowed", tone: C.blue, bg: C.blueLight, items: group("Backsiphonage"), x: 24 },
+  { label: "BACKPRESSURE POSSIBLE", note: "every vacuum breaker is ruled out", tone: C.orange, bg: C.orangeLight, items: group("Backpressure"), x: 248 },
+  { label: "BOTH DIRECTIONS", note: "an air gap or an RPZ, nothing else", tone: C.red, bg: C.redLight, items: group("Both"), x: 472 },
+];
+
+const BOX_TOP = 70;
+const ITEM_H = 32;
+const HEAD_H = 48;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 356" fill="none" aria-hidden="true">
+  <title>Selecting a backflow assembly by direction, then by hazard</title>
+  <desc>
+    Direction of possible backflow narrows the assembly list first; hazard class then chooses from what is left. Real
+    connections grouped by the direction they face.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="340" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Direction first, hazard second — always in that order</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Direction eliminates devices outright. Hazard class then chooses among the survivors. Reversing the order is how a PVB ends up on a boiler.
+  </text>
+
+  {GROUPS.map((g) => (
+    <g>
+      <rect x={g.x} y={BOX_TOP} width="224" height={HEAD_H + g.items.length * ITEM_H} rx="10" fill={g.bg} stroke={g.tone} stroke-width="1.8" />
+      <text x={g.x + 14} y={BOX_TOP + 18} fill={g.tone} font-family={FONT} font-size="8.5" font-weight="700">{g.label}</text>
+      <text x={g.x + 14} y={BOX_TOP + 33} fill={C.dark} font-family={FONT} font-size="9" font-weight="700">{g.note}</text>
+      {g.items.map((item, i) => {
+        const y = BOX_TOP + HEAD_H + i * ITEM_H;
+        return (
+          <g>
+            <text x={g.x + 14} y={y + 4} fill={C.dark} font-family={FONT} font-size="8.5" font-weight="600">{item.application}</text>
+            <text x={g.x + 14} y={y + 16} fill={item.high ? C.red : C.muted} font-family={FONT} font-size="8.5" font-weight="700">
+              {`${item.high ? "HIGH" : "low"} → ${item.assembly}`}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  ))}
+
+  <text x="24" y="338" fill={C.muted} font-family={FONT} font-size="10">
+    A hose bibb and a boiler are both high hazard connections. They take completely different devices, because backflow reaches them from different directions.
+  </text>
+</svg>

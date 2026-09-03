@@ -64,7 +64,7 @@ all worth repeating:
 
 Format matches the HVAC and electrical strategy docs: filename · title · target keyword ·
 calculator it funnels into · tier. **Tier 1 = build first** (highest intent × weakest incumbent
-content × has a calculator that already exists). ✅ marks the 14 shipped so far.
+content × has a calculator that already exists). ✅ marks the 25 shipped so far — all of tier 1.
 
 Every tier-1 and tier-2 funnel target below **already exists** — there is no calculator blocking
 any of them. Verify before writing with
@@ -97,8 +97,8 @@ any of them. Verify before writing with
 ### Cluster 3 — Site, storm & special waste (6)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
-| `what-size-septic-tank-do-i-need.mdx` | What Size Septic Tank Do I Need? Bedrooms, Soil, and Why Both Matter | what size septic tank | septic-tank | 1 |
-| `what-size-grease-trap-do-i-need.mdx` | What Size Grease Trap Do I Need? Two Devices, Two Methods | what size grease trap | grease-trap | 1 |
+| `what-size-septic-tank-do-i-need.mdx` ✅ | What Size Septic Tank Do I Need? Bedrooms, Soil, and Why Both Matter | what size septic tank | septic-tank | 1 |
+| `what-size-grease-trap-do-i-need.mdx` ✅ | What Size Grease Trap Do I Need? Two Devices, Two Methods | what size grease trap | grease-trap | 1 |
 | `how-much-water-comes-off-a-roof.mdx` | Roof Runoff: How Much Water a Storm Actually Delivers | roof runoff calculation | storm-drainage | 2 |
 | `rainwater-harvesting-system-sizing.mdx` | Sizing a Rainwater Harvesting System: The Dry Spell, Not the Roof | rainwater harvesting sizing | rainwater | 2 |
 | `perc-test-and-leach-field-sizing.mdx` | Perc Tests and Leach Field Sizing: A 5x Swing From the Ground Alone | perc test leach field | septic-tank | 3 |
@@ -108,8 +108,8 @@ any of them. Verify before writing with
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `normal-water-pressure-for-a-house.mdx` ✅ | Normal Water Pressure for a House: 40 to 60 psi, and Why Height Costs 4.33 | normal water pressure for a house | water-pressure | 1 |
-| `low-water-pressure-in-house.mdx` | Low Water Pressure in a House: Static vs Flowing, and What Each Tells You | low water pressure in house | water-pressure | 1 |
-| `what-size-pressure-tank-do-i-need.mdx` | What Size Well Pressure Tank? Drawdown Is a Ratio, Not a Difference | what size pressure tank | well-pressure-tank | 1 |
+| `low-water-pressure-in-house.mdx` ✅ | Low Water Pressure in a House: Static vs Flowing, and What Each Tells You | low water pressure in house | water-pressure | 1 |
+| `what-size-pressure-tank-do-i-need.mdx` ✅ | What Size Well Pressure Tank? Drawdown Is a Ratio, Not a Difference | what size pressure tank | well-pressure-tank | 1 |
 | `do-i-need-a-pressure-reducing-valve.mdx` | Do I Need a PRV? IPC 604.8 and the Expansion Tank It Drags With It | pressure reducing valve | water-pressure | 2 |
 | `well-pump-short-cycling.mdx` | Well Pump Short Cycling: An Over-Charged Tank Looks Exactly Like a Dead One | well pump short cycling | well-pressure-tank | 2 |
 | `how-to-calculate-pump-head.mdx` | Total Dynamic Head: Static Lift, Friction, Pressure, and the Term Everyone Drops | total dynamic head | pump-head | 2 |
@@ -119,9 +119,9 @@ any of them. Verify before writing with
 |---|---|---|---|---|
 | `what-size-water-heater-do-i-need.mdx` ✅ | What Size Water Heater Do I Need? First-Hour Rating, Not Gallons | what size water heater | water-heater-size | 1 |
 | `tankless-water-heater-sizing.mdx` ✅ | Tankless Water Heater Sizing: Temperature Rise Decides Everything | tankless water heater sizing | tankless | 1 |
-| `how-much-does-a-water-heater-cost-to-replace.mdx` | Water Heater Replacement Cost: The Upgrades Turn a Swap Into a Project | water heater replacement cost | wh-replacement-cost | 1 |
-| `tankless-vs-tank-water-heater.mdx` | Tankless vs Tank: Simultaneity, Not Capacity, Is the Real Difference | tankless vs tank water heater | tankless | 1 |
-| `thermal-expansion-tank-sizing.mdx` | Thermal Expansion Tank Sizing: The Pre-Charge Matters More Than the Tank | expansion tank sizing | expansion-tank | 1 |
+| `how-much-does-a-water-heater-cost-to-replace.mdx` ✅ | Water Heater Replacement Cost: The Upgrades Turn a Swap Into a Project | water heater replacement cost | wh-replacement-cost | 1 |
+| `tankless-vs-tank-water-heater.mdx` ✅ | Tankless vs Tank: Simultaneity, Not Capacity, Is the Real Difference | tankless vs tank water heater | tankless | 1 |
+| `thermal-expansion-tank-sizing.mdx` ✅ | Thermal Expansion Tank Sizing: The Pre-Charge Matters More Than the Tank | expansion tank sizing | expansion-tank | 1 |
 | `water-heater-temperature-setting.mdx` | Water Heater Temperature: Store at 140, Deliver at 120, and Why | water heater temperature | mixing-valve | 2 |
 | `heat-pump-water-heater-sizing.mdx` | Heat Pump Water Heaters: Great Efficiency, Slow Recovery | heat pump water heater sizing | water-heater-size | 2 |
 | `mixing-valve-explained.mdx` | Thermostatic Mixing Valves: How Storing Hot Stretches a Tank | thermostatic mixing valve | mixing-valve | 3 |
@@ -137,15 +137,15 @@ any of them. Verify before writing with
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `how-much-does-it-cost-to-repipe-a-house.mdx` ✅ | How Much Does It Cost to Repipe a House? The Variable Nobody Quotes | cost to repipe a house | repipe-cost | 1 |
-| `how-to-estimate-plumbing-jobs.mdx` | How to Estimate Plumbing Jobs: Markup Is Not Margin | how to estimate plumbing jobs | estimate | 1 |
-| `plumber-hourly-rate.mdx` | Plumber Hourly Rate: Utilisation Moves It More Than Wage Does | plumber hourly rate | labor-rate | 1 |
+| `how-to-estimate-plumbing-jobs.mdx` ✅ | How to Estimate Plumbing Jobs: Markup Is Not Margin | how to estimate plumbing jobs | estimate | 1 |
+| `plumber-hourly-rate.mdx` ✅ | Plumber Hourly Rate: Utilisation Moves It More Than Wage Does | plumber hourly rate | labor-rate | 1 |
 | `plumbing-markup-vs-margin.mdx` | Markup vs Margin for Plumbers: 25% Markup Is a 20% Margin | markup vs margin | estimate | 2 |
 
 ### Cluster 8 — Code & compliance evergreen (4)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
-| `ipc-vs-upc-differences.mdx` | IPC vs UPC: Which Code Applies, and Where They Actually Diverge | ipc vs upc | formulas | 1 |
-| `backflow-prevention-explained.mdx` | Backflow Prevention: No Vacuum Breaker Stops Backpressure | backflow preventer types | backflow-prevention | 1 |
+| `ipc-vs-upc-differences.mdx` ✅ | IPC vs UPC: Which Code Applies, and Where They Actually Diverge | ipc vs upc | formulas | 1 |
+| `backflow-prevention-explained.mdx` ✅ | Backflow Prevention: No Vacuum Breaker Stops Backpressure | backflow preventer types | backflow-prevention | 1 |
 | `common-plumbing-code-violations.mdx` | Common Plumbing Code Violations and Why Inspectors Catch Them | plumbing code violations | glossary | 2 |
 | `plumbing-permits-and-inspections.mdx` | Plumbing Permits and Inspections: What Needs One and What It Costs | plumbing permit cost | estimate | 3 |
 
@@ -153,10 +153,10 @@ any of them. Verify before writing with
 
 | Tier | Count | Shipped | Remaining |
 |---|---|---|---|
-| 1 | 25 | 14 | **11** |
+| 1 | 25 | **25** | **0 — tier 1 complete** |
 | 2 | 15 | 0 | 15 |
 | 3 | 7 | 0 | 7 |
-| **Total** | **47** | **14** | **33** |
+| **Total** | **47** | **25** | **22** |
 
 Verify these totals against the tables with:
 `grep -oE '^\| \`[a-z0-9-]+\.mdx\`.*\| [123] \|$' docs/notebooklm/plumbing-content-strategy.md | grep -oE '\| [123] \|$' | sort | uniq -c`
@@ -167,7 +167,7 @@ Verify these totals against the tables with:
 ## 3. Wave 5 — the recommended next batch
 
 **The 17 tier-1 posts remaining after wave 4**, in three sub-waves so each is reviewable.
-**5a is DONE** — the 11 below are what is left:
+**All three sub-waves are now SHIPPED and tier 1 is complete.** The next batch is tier 2.
 
 **5a — the sizing anchors that pair with wave 4 (6 posts). SHIPPED.**
 `water-pipe-size-chart`, `plumbing-fixture-units-explained`, `drainage-fixture-unit-chart`,
@@ -175,12 +175,12 @@ Verify these totals against the tables with:
 `how-long-does-it-take-hot-water-to-reach-the-tap`. These finished the supply/drainage spine and
 filled the Volume & Conversions gap wave 4 deliberately left.
 
-**5b — site, pressure and water heating (7 posts).** `what-size-septic-tank-do-i-need`,
+**5b — site, pressure and water heating (7 posts). SHIPPED.** `what-size-septic-tank-do-i-need`,
 `what-size-grease-trap-do-i-need`, `low-water-pressure-in-house`,
 `what-size-pressure-tank-do-i-need`, `thermal-expansion-tank-sizing`,
 `tankless-vs-tank-water-heater`, `how-much-does-a-water-heater-cost-to-replace`.
 
-**5c — business and code (4 posts).** `how-to-estimate-plumbing-jobs`, `plumber-hourly-rate`,
+**5c — business and code (4 posts). SHIPPED.** `how-to-estimate-plumbing-jobs`, `plumber-hourly-rate`,
 `ipc-vs-upc-differences`, `backflow-prevention-explained`. Highest commercial value; the first
 two mirror electrical's `$67`-bid estimating cluster.
 

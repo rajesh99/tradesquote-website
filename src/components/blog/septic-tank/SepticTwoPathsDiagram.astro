@@ -1,0 +1,73 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { septicSizing, DEFAULT_GAL_PER_BEDROOM, SEPTIC_RETENTION_DAYS, fmt } from "@/lib/plumbing";
+
+/**
+ * One design flow, two independent sizing paths. The tank comes from the house;
+ * the field comes from the ground. Neither number constrains the other, which is
+ * why a perc test cannot be skipped by counting bedrooms.
+ */
+const defs = markerDefs("septic");
+const BEDROOMS = 3;
+const RATE = 0.8;
+const r = septicSizing({
+  bedrooms: BEDROOMS,
+  galPerBedroom: DEFAULT_GAL_PER_BEDROOM,
+  applicationRate: RATE,
+  trenchWidthFt: 3,
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The two independent sizing paths in a septic system</title>
+  <desc>
+    One design flow splits into two calculations that never meet: the tank comes from bedroom count and retention time,
+    the leach field comes from the soil application rate.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One flow figure, two calculations that never meet</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A ${BEDROOMS}-bedroom house. Bedrooms set the flow; the flow then goes two separate ways.`}
+  </text>
+
+  <rect x="252" y="72" width="216" height="44" rx="9" fill={C.white} stroke={C.dark} stroke-width="2" />
+  <text x="360" y="90" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+    {`${BEDROOMS} bedrooms × ${DEFAULT_GAL_PER_BEDROOM} gal per day`}
+  </text>
+  <text x="360" y="107" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="13" font-weight="800">
+    {`${fmt(r.dailyFlow)} gallons per day`}
+  </text>
+
+  <line x1="300" y1="118" x2="188" y2="146" stroke={C.primary} stroke-width="2" marker-end="url(#septic-arrow-primary)" />
+  <line x1="420" y1="118" x2="532" y2="146" stroke={C.orange} stroke-width="2" marker-end="url(#septic-arrow-orange)" />
+
+  <rect x="36" y="152" width="300" height="82" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="52" y="172" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">PATH 1 — THE TANK, FROM THE HOUSE</text>
+  <text x="52" y="190" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`${fmt(r.dailyFlow)} gpd × ${SEPTIC_RETENTION_DAYS} days = ${fmt(r.retentionTank)} gal`}
+  </text>
+  <text x="52" y="206" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`minimum for ${BEDROOMS} bedrooms = ${fmt(r.minimumTank)} gal`}
+  </text>
+  <text x="52" y="225" fill={C.primary} font-family={FONT} font-size="12" font-weight="800">
+    {`take the larger → ${fmt(r.tank)} gallon tank`}
+  </text>
+
+  <rect x="384" y="152" width="300" height="82" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="400" y="172" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">PATH 2 — THE FIELD, FROM THE GROUND</text>
+  <text x="400" y="190" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`perc test → ${RATE} gal per sq ft per day`}
+  </text>
+  <text x="400" y="206" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`${fmt(r.dailyFlow)} gpd ÷ ${RATE} = ${fmt(r.leachFieldSqFt)} sq ft`}
+  </text>
+  <text x="400" y="225" fill={C.orange} font-family={FONT} font-size="12" font-weight="800">
+    {`${fmt(r.leachFieldSqFt)} sq ft → ${fmt(r.trenchFeet)} ft of trench`}
+  </text>
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">
+    Nothing you do to the tank changes the field, and nothing about the soil changes the tank. Both have to be right.
+  </text>
+</svg>

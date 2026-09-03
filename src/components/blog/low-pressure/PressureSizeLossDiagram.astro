@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter,
+  velocity,
+  frictionLossPsiPer100Ft,
+  HAZEN_WILLIAMS_C,
+  sizeLabel,
+  MAX_VELOCITY_COLD,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The same 10 gpm through four sizes of copper L. Friction is roughly a fifth
+ * power of diameter, so one size down is not a small penalty — it is the
+ * difference between a working house and a complaint.
+ */
+const GPM = 10;
+const MATERIAL = "copper-l" as const;
+const C_FACTOR = HAZEN_WILLIAMS_C[MATERIAL];
+const SIZES = [0.5, 0.75, 1, 1.25];
+
+const rows = SIZES.map((nominal) => {
+  const id = insideDiameter(MATERIAL, nominal)!;
+  const v = velocity(GPM, id);
+  const loss = frictionLossPsiPer100Ft(GPM, id, C_FACTOR);
+  return {
+    label: sizeLabel(nominal),
+    id,
+    velocity: v,
+    loss,
+    overVelocity: v > MAX_VELOCITY_COLD,
+  };
+});
+
+const maxLoss = Math.max(...rows.map((r) => r.loss));
+
+/* Value label sits at BAR_X + width + 10, so BAR_MAX leaves room for the
+   longest string inside the 720-wide viewBox. */
+const BAR_X = 210;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Friction loss at ten gallons per minute across four pipe sizes</title>
+  <desc>
+    The same flow through four sizes of type L copper. Friction falls steeply with diameter, so dropping one size
+    multiplies the loss rather than adding to it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One size down is not a small penalty</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${GPM} gpm through type L copper. Hazen-Williams at C = ${C_FACTOR}, loss per 100 ft of developed length.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 38;
+    const w = Math.max(3, (row.loss / maxLoss) * BAR_MAX);
+    const tone = row.overVelocity ? C.red : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{row.label}</text>
+        <text x="28" y={y + 28} fill={C.muted} font-family={FONT} font-size="9">{`${fmt(row.id, 3)} in bore`}</text>
+        <text x={190} y={y + 14} text-anchor="end" fill={tone} font-family={FONT} font-size="10.5" font-weight={row.overVelocity ? 800 : 600}>
+          {`${fmt(row.velocity, 2)} ft/s`}
+        </text>
+        {row.overVelocity && (
+          <text x={190} y={y + 28} text-anchor="end" fill={C.red} font-family={FONT} font-size="9" font-weight="700">
+            {`over the ${MAX_VELOCITY_COLD} ft/s limit`}
+          </text>
+        )}
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity={row.overVelocity ? 0.85 : 0.6} />
+        <text x={BAR_X + w + 10} y={y + 17} fill={tone} font-family={FONT} font-size="11" font-weight="800">
+          {`${fmt(row.loss, 2)} psi per 100 ft`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="240" fill={C.muted} font-family={FONT} font-size="10">
+    Half inch to three quarter inch cuts the loss almost six-fold at the same flow. This is why the run matters more than the fixture.
+  </text>
+</svg>

@@ -1,0 +1,79 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { estimateJob, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * The build-up, in the order it has to happen. The two steps people skip are
+ * overhead — which is not in the labour rate — and the division that turns a
+ * break-even into a price.
+ */
+const defs = markerDefs("estimate-build");
+
+const INPUT = {
+  labourHours: 6,
+  labourRate: 125,
+  fixtureCost: 400,
+  materialCost: 250,
+  overheadPercent: 20,
+  marginPercent: 25,
+};
+
+const r = estimateJob(INPUT);
+
+const STEPS = [
+  { label: "Labour", detail: `${INPUT.labourHours} h × ${usd(INPUT.labourRate)}`, value: r.labour, tone: C.blue },
+  { label: "Fixtures", detail: "what the customer keeps", value: INPUT.fixtureCost, tone: C.blue },
+  { label: "Materials", detail: "pipe, fittings, consumables", value: INPUT.materialCost, tone: C.blue },
+  { label: "Overhead", detail: `${INPUT.overheadPercent}% of direct cost`, value: r.overhead, tone: C.orange },
+];
+
+const maxVal = Math.max(...STEPS.map((s) => s.value), r.breakEven, r.price);
+const BAR_X = 214;
+const BAR_MAX = 300;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>How a plumbing job price is built up</title>
+  <desc>
+    Labour, fixtures and materials make the direct cost. Overhead is applied on top to reach break-even. Only then does
+    a margin turn break-even into a price, by division rather than multiplication.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Every layer, in the order it has to be added</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`A ${INPUT.labourHours} hour job with a ${usd(INPUT.fixtureCost)} fixture, at ${INPUT.overheadPercent}% overhead and a ${INPUT.marginPercent}% target margin`}
+  </text>
+
+  {STEPS.map((step, i) => {
+    const y = 76 + i * 28;
+    const w = Math.max(3, (step.value / maxVal) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{step.label}</text>
+        <text x="96" y={y + 15} fill={C.muted} font-family={FONT} font-size="9">{step.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={w} height="18" rx="4" fill={step.tone} opacity="0.6" />
+        <text x={BAR_X + w + 10} y={y + 15} fill={step.tone} font-family={FONT} font-size="10.5" font-weight="700">{usd(step.value)}</text>
+      </g>
+    );
+  })}
+
+  <line x1={BAR_X} y1="192" x2={696} y2="192" stroke={C.border} stroke-width="1" />
+
+  <text x="28" y="212" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">Break-even</text>
+  <text x="110" y="212" fill={C.muted} font-family={FONT} font-size="9">what the job costs you</text>
+  <rect x={BAR_X} y="199" width={Math.max(3, (r.breakEven / maxVal) * BAR_MAX)} height="18" rx="4" fill={C.dark} opacity="0.75" />
+  <text x={BAR_X + (r.breakEven / maxVal) * BAR_MAX + 10} y="212" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{usd(r.breakEven)}</text>
+
+  <text x="28" y="242" fill={C.primary} font-family={FONT} font-size="11" font-weight="800">Price</text>
+  <text x="110" y="242" fill={C.muted} font-family={FONT} font-size="9">
+    {`break-even ÷ (1 − ${fmt(INPUT.marginPercent / 100, 2)})`}
+  </text>
+  <rect x={BAR_X} y="229" width={Math.max(3, (r.price / maxVal) * BAR_MAX)} height="18" rx="4" fill={C.primary} opacity="0.85" />
+  <text x={BAR_X + (r.price / maxVal) * BAR_MAX + 10} y="242" fill={C.primary} font-family={FONT} font-size="11" font-weight="800">{usd(r.price)}</text>
+
+  <text x="24" y="272" fill={C.muted} font-family={FONT} font-size="10">
+    {`${usd(r.profit)} of profit on ${usd(r.breakEven)} of cost — a true ${INPUT.marginPercent}% margin. Overhead is a separate line, not something hidden in the labour rate.`}
+  </text>
+</svg>

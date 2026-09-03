@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { expansionTank, selectExpansionTank, ATMOSPHERIC_PSI, fmt } from "@/lib/plumbing";
+
+/**
+ * The Boyle's-law denominator, and the headline of the whole post. The usable
+ * fraction is the window between pre-charge and ceiling, and that window is only
+ * 20 psi wide at the code threshold — so it collapses fast as supply pressure
+ * climbs toward the ceiling.
+ *
+ * Base matches the calculator EXACTLY, including the 80 psi ceiling.
+ */
+const BASE = { systemGallons: 50, coldF: 40, hotF: 140, supplyPsi: 60, maxPsi: 80 };
+const SUPPLIES = [40, 50, 60, 70];
+
+const rows = SUPPLIES.map((supplyPsi) => {
+  const r = expansionTank({ ...BASE, supplyPsi });
+  return {
+    supplyPsi,
+    acceptance: r.acceptance,
+    ratio: r.acceptanceRatio,
+    tankVolume: r.tankVolume,
+    shell: selectExpansionTank(r.tankVolume),
+    isDefault: supplyPsi === BASE.supplyPsi,
+    tight: supplyPsi >= 70,
+  };
+});
+
+const lowest = rows[0];
+const highest = rows[rows.length - 1];
+const maxRatio = Math.max(...rows.map((r) => r.ratio));
+
+const BAR_X = 172;
+const BAR_MAX = 190;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Usable fraction of an expansion tank against supply pressure</title>
+  <desc>
+    Only the part of the shell the air can be squeezed through is usable, and that window closes as supply pressure
+    approaches the ceiling. The same expansion needs four times the tank at seventy psi that it needs at forty.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The window closes fast as supply pressure rises</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${BASE.systemGallons} gal system, ${BASE.coldF} → ${BASE.hotF} °F, ${BASE.maxPsi} psi ceiling. Pre-charge is set to supply pressure; all pressures absolute at ${ATMOSPHERIC_PSI} psi.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 80 + i * 34;
+    const w = Math.max(3, (row.ratio / maxRatio) * BAR_MAX);
+    const tone = row.tight ? C.red : row.isDefault ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight={row.isDefault ? 800 : 700}>
+          {`${row.supplyPsi} psi supply`}
+        </text>
+        <text x="28" y={y + 28} fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${BASE.maxPsi - row.supplyPsi} psi of headroom`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="20" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + 8} y={y + 18} fill={C.white} font-family={FONT} font-size="9.5" font-weight="800">
+          {`${fmt(row.ratio * 100, 1)}% usable`}
+        </text>
+        <text x={BAR_X + BAR_MAX + 12} y={y + 18} fill={tone} font-family={FONT} font-size="10.5" font-weight="700">
+          {`${fmt(row.acceptance, 2)} gal ÷ ratio = ${fmt(row.tankVolume, 2)} gal → ${row.shell} gal shell`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="226" width="672" height="24" rx="6" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="36" y="242" fill={C.red} font-family={FONT} font-size="10" font-weight="700">
+    {`The expansion never changes down this column — ${fmt(lowest.acceptance, 2)} gallons every row. Supply pressure alone moves the tank ${fmt(highest.tankVolume / lowest.tankVolume, 1)}x, from ${fmt(lowest.tankVolume, 2)} to ${fmt(highest.tankVolume, 2)} gallons.`}
+  </text>
+</svg>

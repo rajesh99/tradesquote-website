@@ -1,0 +1,82 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter,
+  velocity,
+  frictionLossPsiPer100Ft,
+  HAZEN_WILLIAMS_C,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * Why a house that was fine for twenty years is not fine now. Scale narrows the
+ * bore, and friction goes as roughly the fifth power of diameter, so a modest
+ * loss of bore produces a wildly disproportionate loss of pressure.
+ */
+const GPM = 10;
+const NOMINAL = 0.75;
+const CLEAN_ID = insideDiameter("copper-l", NOMINAL)!;
+const C_FACTOR = HAZEN_WILLIAMS_C["copper-l"];
+
+const SHRINK = [0, 0.05, 0.1, 0.15, 0.2];
+const rows = SHRINK.map((s) => {
+  const id = CLEAN_ID * (1 - s);
+  return {
+    shrink: s,
+    id,
+    velocity: velocity(GPM, id),
+    loss: frictionLossPsiPer100Ft(GPM, id, C_FACTOR),
+  };
+});
+
+const clean = rows[0];
+const worst = rows[rows.length - 1];
+const maxLoss = worst.loss;
+
+const BAR_X = 232;
+const BAR_MAX = 236;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 286" fill="none" aria-hidden="true">
+  <title>How a narrowing bore multiplies friction loss</title>
+  <desc>
+    Scale and corrosion narrowing a three quarter inch copper line. A twenty percent loss of bore triples the friction
+    loss at the same flow, which is why an old house loses pressure without anything visibly failing.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="270" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A little scale is not a little problem</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${GPM} gpm through ${sizeLabel(NOMINAL)} type L copper, ${fmt(CLEAN_ID, 3)} in when new, as deposits close the bore`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 34;
+    const w = Math.max(3, (row.loss / maxLoss) * BAR_MAX);
+    const isClean = row.shrink === 0;
+    const tone = isClean ? C.primary : row.shrink >= 0.15 ? C.red : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+          {isClean ? "as installed" : `${fmt(row.shrink * 100)}% of the bore gone`}
+        </text>
+        <text x="28" y={y + 27} fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.id, 3)} in bore · ${fmt(row.velocity, 2)} ft/s`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity={isClean ? 0.55 : 0.8} />
+        <text x={BAR_X + w + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {isClean
+            ? `${fmt(row.loss, 2)} psi per 100 ft`
+            : `${fmt(row.loss, 2)} psi per 100 ft · ${fmt(row.loss / clean.loss, 1)}x`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="246" width="672" height="22" rx="6" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="36" y="261" fill={C.red} font-family={FONT} font-size="10" font-weight="700">
+    {`Losing a fifth of the bore multiplies the friction loss ${fmt(worst.loss / clean.loss, 1)}x — from ${fmt(clean.loss, 2)} to ${fmt(worst.loss, 2)} psi per 100 ft. Nothing has broken.`}
+  </text>
+</svg>

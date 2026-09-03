@@ -1,0 +1,69 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { availableFrictionPsi, headToPsi, PSI_PER_FOOT_HEAD, fmt } from "@/lib/plumbing";
+
+/**
+ * The diagnostic split. Static pressure is what the street gives you; flowing
+ * pressure is what survives the house. Two gauge readings separate a supply
+ * problem from a restriction problem, and nothing else does.
+ */
+const defs = markerDefs("static-flowing");
+
+const SUPPLY = 60;
+const LIFT_FT = 10;
+const FIXTURE_PSI = 15;
+const METER_PSI = 8;
+
+const liftPsi = headToPsi(LIFT_FT);
+const budget = availableFrictionPsi({
+  supplyPsi: SUPPLY,
+  highestFixtureFeet: LIFT_FT,
+  fixtureRequiredPsi: FIXTURE_PSI,
+  meterLossPsi: METER_PSI,
+  otherLossPsi: 0,
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Static pressure against flowing pressure as a diagnostic</title>
+  <desc>
+    Two gauge readings taken at the same hose bibb separate a supply problem from a restriction inside the house. Only
+    the pair of readings tells you which one you have.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One gauge, two readings, two different faults</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Take both at the same hose bibb: nothing running, then with the two largest fixtures wide open.
+  </text>
+
+  <rect x="24" y="72" width="330" height="92" rx="10" fill={C.white} stroke={C.dark} stroke-width="1.8" />
+  <text x="40" y="92" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">READING 1 — STATIC, NOTHING RUNNING</text>
+  <text x="40" y="116" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{`${SUPPLY} psi at the bibb`}</text>
+  <text x="40" y="136" fill={C.muted} font-family={FONT} font-size="10">This is what the street and the PRV give you.</text>
+  <text x="40" y="152" fill={C.muted} font-family={FONT} font-size="10">It says nothing at all about pipe size.</text>
+
+  <rect x="366" y="72" width="330" height="92" rx="10" fill={C.white} stroke={C.dark} stroke-width="1.8" />
+  <text x="382" y="92" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">READING 2 — FLOWING, TWO FIXTURES OPEN</text>
+  <text x="382" y="116" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">whatever survives the house</text>
+  <text x="382" y="136" fill={C.muted} font-family={FONT} font-size="10">Everything lost between the two readings</text>
+  <text x="382" y="152" fill={C.muted} font-family={FONT} font-size="10">is friction, height, or a restriction.</text>
+
+  <line x1="189" y1="164" x2="189" y2="190" stroke={C.border} stroke-width="2" marker-end="url(#static-flowing-arrow-muted)" />
+  <line x1="531" y1="164" x2="531" y2="190" stroke={C.border} stroke-width="2" marker-end="url(#static-flowing-arrow-muted)" />
+
+  <rect x="24" y="196" width="330" height="62" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="40" y="216" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">STATIC LOW TOO → a supply problem</text>
+  <text x="40" y="234" fill={C.dark} font-family={FONT} font-size="10">Failed PRV, partly shut main valve, a</text>
+  <text x="40" y="249" fill={C.dark} font-family={FONT} font-size="10">weak street main, or a well that cannot keep up.</text>
+
+  <rect x="366" y="196" width="330" height="62" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="2" />
+  <text x="382" y="216" fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">STATIC FINE, FLOWING COLLAPSES → a restriction</text>
+  <text x="382" y="234" fill={C.dark} font-family={FONT} font-size="10">Undersized or scaled pipe, a clogged</text>
+  <text x="382" y="249" fill={C.dark} font-family={FONT} font-size="10">aerator or cartridge, or a long run of small line.</text>
+
+  <text x="24" y="276" fill={C.muted} font-family={FONT} font-size="10">
+    {`Height is fixed at ${PSI_PER_FOOT_HEAD} psi per foot: at ${SUPPLY} psi with ${LIFT_FT} ft of lift (${fmt(liftPsi, 2)} psi), ${METER_PSI} psi of meter and ${FIXTURE_PSI} psi at the fixture, only ${fmt(budget, 2)} psi is left for friction.`}
+  </text>
+</svg>

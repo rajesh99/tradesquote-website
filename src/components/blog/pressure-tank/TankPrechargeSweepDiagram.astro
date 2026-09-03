@@ -1,0 +1,68 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { drawdownFraction, PRECHARGE_BELOW_CUTIN_PSI, fmt } from "@/lib/plumbing";
+
+/**
+ * The pre-charge is the cheapest adjustment in the whole system and the one
+ * nobody checks. The curve is sharply peaked at two psi below cut-in and falls
+ * off a cliff above it — an over-charged tank looks exactly like a dead one.
+ */
+const SHELL = 44;
+const CUT_IN = 30;
+const CUT_OUT = 50;
+const CORRECT = CUT_IN - PRECHARGE_BELOW_CUTIN_PSI;
+
+const PRECHARGES = [20, 25, 28, 30, 35, 40, 48];
+const rows = PRECHARGES.map((p) => {
+  const f = drawdownFraction(CUT_IN, CUT_OUT, p);
+  return { precharge: p, fraction: f, gallons: SHELL * f, correct: p === CORRECT };
+});
+
+const maxFraction = Math.max(...rows.map((r) => r.fraction));
+
+const BAR_X = 190;
+const BAR_MAX = 300;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Drawdown against pre-charge pressure</title>
+  <desc>
+    The same forty-four gallon shell on the same pressure switch at seven different pre-charge pressures. Two psi below
+    cut-in is the peak; well above cut-in the tank delivers almost nothing.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The pre-charge decides more than the tank size does</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`One ${SHELL} gallon shell, one ${CUT_IN}/${CUT_OUT} switch. Only the pre-charge changes down this column.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 28;
+    const w = Math.max(2, (row.fraction / maxFraction) * BAR_MAX);
+    const overCharged = row.precharge >= CUT_IN;
+    const tone = row.correct ? C.primary : overCharged ? C.red : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={row.correct ? 800 : 600}>
+          {`${row.precharge} psi pre-charge`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="19" rx="5" fill={tone} opacity={row.correct ? 0.95 : 0.7} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={tone} font-family={FONT} font-size="10.5" font-weight={row.correct ? 800 : 600}>
+          {`${fmt(row.fraction * 100, 1)}% · ${fmt(row.gallons, 1)} gal`}
+        </text>
+        {row.correct && (
+          <text x={BAR_X + 8} y={y + 16} fill={C.white} font-family={FONT} font-size="9" font-weight="800">
+            {`correct — ${PRECHARGE_BELOW_CUTIN_PSI} psi below cut-in`}
+          </text>
+        )}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="262" width="672" height="22" rx="6" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="36" y="277" fill={C.red} font-family={FONT} font-size="10" font-weight="700">
+    {`At 48 psi the shell is already empty of water before the pump starts: ${fmt(rows[rows.length - 1].gallons, 1)} gallons from a ${SHELL} gallon tank.`}
+  </text>
+</svg>

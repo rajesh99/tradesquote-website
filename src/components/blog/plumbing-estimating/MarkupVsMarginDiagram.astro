@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * The trap. Multiplying by (1 + p) and dividing by (1 − p) are different
+ * operations, and the gap between them widens as p grows — so the shops with
+ * the most ambitious percentages are losing the most to it.
+ */
+const BASE = {
+  labourHours: 6,
+  labourRate: 125,
+  fixtureCost: 400,
+  materialCost: 250,
+  overheadPercent: 20,
+};
+
+const PERCENTS = [10, 20, 25, 30, 40, 50];
+const rows = PERCENTS.map((p) => {
+  const r = estimateJob({ ...BASE, marginPercent: p });
+  return {
+    percent: p,
+    marginPrice: r.price,
+    markupPrice: r.markupPrice,
+    gap: r.price - r.markupPrice,
+    delivered: r.effectiveMargin,
+    breakEven: r.breakEven,
+  };
+});
+
+const maxPrice = Math.max(...rows.map((r) => r.marginPrice));
+const BAR_X = 96;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Markup against margin at the same percentage</title>
+  <desc>
+    Applying a percentage as a markup and applying it as a margin produce different prices, and the gap widens as the
+    percentage rises. A fifty percent markup delivers only a third margin.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The same percentage, two different prices</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Break-even ${usd(rows[0].breakEven)}. Margin divides by (1 − p); markup multiplies by (1 + p). They are not the same operation.`}
+  </text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">RATE</text>
+  <text x={BAR_X} y="76" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">AS A MARGIN (upper) · AS A MARKUP (lower)</text>
+  <text x={BAR_X + BAR_MAX + 60} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LEFT ON THE TABLE</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 33;
+    const marginW = Math.max(3, (row.marginPrice / maxPrice) * BAR_MAX);
+    const markupW = Math.max(3, (row.markupPrice / maxPrice) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`${row.percent}%`}</text>
+        <rect x={BAR_X} y={y} width={marginW} height="12" rx="3" fill={C.primary} opacity="0.8" />
+        <text x={BAR_X + marginW + 8} y={y + 10} fill={C.primary} font-family={FONT} font-size="9" font-weight="700">{usd(row.marginPrice)}</text>
+        <rect x={BAR_X} y={y + 15} width={markupW} height="12" rx="3" fill={C.orange} opacity="0.8" />
+        <text x={BAR_X + markupW + 8} y={y + 25} fill={C.orange} font-family={FONT} font-size="9" font-weight="700">
+          {`${usd(row.markupPrice)} — really ${fmt(row.delivered, 1)}%`}
+        </text>
+        <text x={696} y={y + 18} text-anchor="end" fill={row.gap > 200 ? C.red : C.dark} font-family={FONT} font-size="11" font-weight="800">
+          {usd(row.gap)}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="10">
+    {`A ${rows[2].percent}% markup delivers a ${fmt(rows[2].delivered, 1)}% margin. At ${rows[5].percent}% the shortfall on one job is ${usd(rows[5].gap)}.`}
+  </text>
+</svg>
