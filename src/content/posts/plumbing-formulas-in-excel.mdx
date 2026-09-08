@@ -130,7 +130,7 @@ this, which returns psi per 100 ft:
 
 ### Can I use these formulas in Google Sheets?
 
-Yes. Everything except the named-range `XLOOKUP` variants is identical, and Google Sheets supports `XLOOKUP` too. If your locale uses a comma as the decimal separator, replace the argument commas with semicolons.
+Yes — the formulas are identical, `XLOOKUP` included. What differs is the setup, not the arithmetic: Sheets has no *Formulas → Create from Selection*, so named ranges go in one at a time under *Data → Named ranges*. And in a locale that uses a comma as the decimal separator, the argument separator becomes a semicolon and the comma inside `{ }` array literals becomes a backslash. The bigger point is what you would build *instead* once you are in Sheets — **[plumbing formulas in Google Sheets](/blog/plumbing-formulas-in-google-sheets)** covers one `ARRAYFORMULA` sizing a whole fixture schedule, `QUERY` in place of a pivot table, and named functions that collapse the Hunter's-curve monster to `=WSFU_TO_GPM(B2)`.
 
 ### Will a spreadsheet answer match your calculators?
 

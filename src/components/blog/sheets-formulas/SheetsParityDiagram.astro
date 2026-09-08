@@ -1,0 +1,156 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { parity } from "@/config/plumbingSheetsFormulas";
+
+/**
+ * The function-availability matrix, mapped straight off the exported `parity`
+ * array so the picture and the reference page cannot disagree — the same class
+ * of drift the derived `toolCount` on the calculator cards was introduced to
+ * kill.
+ *
+ * Every row of that array was checked against Google's published function list
+ * rather than reasoned about. Positions resolved here, never in the template:
+ * a bare `<` there breaks the build.
+ */
+
+const SHEETS_ONLY = parity.filter((r) => r.sheets && !r.excel);
+const EXCEL_ONLY = parity.filter((r) => !r.sheets && r.excel);
+const BOTH = parity.filter((r) => r.sheets && r.excel);
+
+/** Long names need shortening to fit the panel width. */
+const short = (fn: string) =>
+  fn
+    .replace("REGEXEXTRACT / REGEXMATCH / REGEXREPLACE", "REGEXEXTRACT and family")
+    .replace("MAP / REDUCE / SCAN / BYROW / BYCOL / MAKEARRAY", "MAP, REDUCE, BYROW and family")
+    .replace("TEXTBEFORE / TEXTAFTER", "TEXTBEFORE, TEXTAFTER")
+    .replace("GROUPBY / PIVOTBY", "GROUPBY, PIVOTBY")
+    .replace("CHOOSECOLS / CHOOSEROWS", "CHOOSECOLS, CHOOSEROWS")
+    .replace("VSTACK / HSTACK", "VSTACK, HSTACK")
+    .replace("TOCOL / TOROW / WRAPROWS", "TOCOL, TOROW, WRAPROWS")
+    .replace("FILTER / SEQUENCE", "FILTER, SEQUENCE");
+
+/* Geometry */
+const PANEL_Y = 78;
+const ROW_H = 21;
+const TALLEST = Math.max(SHEETS_ONLY.length, EXCEL_ONLY.length);
+const PANEL_H = 30 + TALLEST * ROW_H + 12;
+const LEFT_X = 24;
+const RIGHT_X = 372;
+const PANEL_W = 324;
+const BOTH_Y = PANEL_Y + PANEL_H + 22;
+const BOTH_COLS = 2;
+const BOTH_ROWS = Math.ceil(BOTH.length / BOTH_COLS);
+const BOTH_H = 30 + BOTH_ROWS * 19 + 10;
+const VIEW_H = BOTH_Y + BOTH_H + 20;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 720 ${VIEW_H}`} fill="none" aria-hidden="true">
+  <title>Which spreadsheet functions Google Sheets and Excel each actually have</title>
+
+  <rect x="0" y="0" width="720" height={VIEW_H} fill={C.white} />
+
+  <text x={LEFT_X} y="26" font-family={FONT} font-size="15" font-weight="700" fill={C.dark}>
+    What each one actually has
+  </text>
+  <text x={LEFT_X} y="46" font-family={FONT} font-size="11" fill={C.muted}>
+    Checked function by function against Google's published function list, not assumed. Where the same job
+  </text>
+  <text x={LEFT_X} y="61" font-family={FONT} font-size="11" fill={C.muted}>
+    ships under a different name, that is a note on the reference page — this is about the names themselves.
+  </text>
+
+  {/* ---------- Sheets only ---------- */}
+  <rect
+    x={LEFT_X}
+    y={PANEL_Y}
+    width={PANEL_W}
+    height={PANEL_H}
+    rx="10"
+    fill={C.greenLight}
+    stroke={C.green}
+    stroke-width="1.5"
+  />
+  <text x={LEFT_X + 14} y={PANEL_Y + 20} font-family={FONT} font-size="11" font-weight="700" fill={C.green}>
+    ONLY IN GOOGLE SHEETS — {SHEETS_ONLY.length}
+  </text>
+  {
+    SHEETS_ONLY.map((r, i) => (
+      <g>
+        <circle cx={LEFT_X + 20} cy={PANEL_Y + 36 + i * ROW_H} r="3" fill={C.green} />
+        <text
+          x={LEFT_X + 32}
+          y={PANEL_Y + 40 + i * ROW_H}
+          font-family={FONT}
+          font-size="10.5"
+          font-weight="600"
+          fill={C.dark}
+        >
+          {short(r.fn)}
+        </text>
+      </g>
+    ))
+  }
+
+  {/* ---------- Excel only ---------- */}
+  <rect
+    x={RIGHT_X}
+    y={PANEL_Y}
+    width={PANEL_W}
+    height={PANEL_H}
+    rx="10"
+    fill={C.redLight}
+    stroke={C.red}
+    stroke-width="1.5"
+  />
+  <text x={RIGHT_X + 14} y={PANEL_Y + 20} font-family={FONT} font-size="11" font-weight="700" fill={C.red}>
+    MISSING FROM GOOGLE SHEETS — {EXCEL_ONLY.length}
+  </text>
+  {
+    EXCEL_ONLY.map((r, i) => (
+      <g>
+        <circle cx={RIGHT_X + 20} cy={PANEL_Y + 36 + i * ROW_H} r="3" fill={C.red} />
+        <text
+          x={RIGHT_X + 32}
+          y={PANEL_Y + 40 + i * ROW_H}
+          font-family={FONT}
+          font-size="10.5"
+          font-weight="600"
+          fill={C.dark}
+        >
+          {short(r.fn)}
+        </text>
+      </g>
+    ))
+  }
+  <text x={RIGHT_X + 14} y={PANEL_Y + PANEL_H - 14} font-family={FONT} font-size="9.5" fill={C.muted}>
+    Every one has a workable Sheets substitute.
+  </text>
+
+  {/* ---------- Both ---------- */}
+  <rect
+    x={LEFT_X}
+    y={BOTH_Y}
+    width={696}
+    height={BOTH_H}
+    rx="10"
+    fill={C.panelBg}
+    stroke={C.border}
+    stroke-width="1.25"
+  />
+  <text x={LEFT_X + 14} y={BOTH_Y + 20} font-family={FONT} font-size="11" font-weight="700" fill={C.dark}>
+    IN BOTH — {BOTH.length} (Excel needs 365 or 2021 for most of these; Sheets has no old version)
+  </text>
+  {
+    BOTH.map((r, i) => (
+      <text
+        x={LEFT_X + 24 + (i % BOTH_COLS) * 340}
+        y={BOTH_Y + 38 + Math.floor(i / BOTH_COLS) * 19}
+        font-family={FONT}
+        font-size="10"
+        fill={C.muted}
+      >
+        {short(r.fn)}
+      </text>
+    ))
+  }
+</svg>

@@ -27,10 +27,10 @@ than they are.
 | Surface | State |
 | --- | --- |
 | Calculators | **26**, in 7 hub groups. Four-edit registration is structurally guarded by `ungroupedPlumbingCalculators`. |
-| Reference pages | **4** — `formulas` (35 blocks in 6 sections, including Pricing & Business), `excel-formulas` (the same 35 as paste-ready Excel cells: 27 one-liners, 8 needing one of 11 pasted tables), `glossary` (85 terms), `backflow-prevention`. Ahead of electrical's 3 and HVAC's 2. |
-| Blog posts | **56** — all 9 clusters shipped, plus one post added alongside the Excel reference page. Against HVAC's 64 and electrical's 75. |
+| Reference pages | **5** — `formulas` (35 blocks in 6 sections, including Pricing & Business), `excel-formulas` (the same 35 as paste-ready Excel cells: 27 one-liners, 8 needing one of 11 pasted tables), `google-sheets-formulas` (17 Sheets-native builds + 7 named functions + a verified 21-row function-parity table (7 Sheets-only, 4 Excel-only, 10 in both); shares zero formula strings with the Excel page and imports it for the compact all-35 reference), `glossary` (85 terms), `backflow-prevention`. Ahead of electrical's 3 and HVAC's 2. |
+| Blog posts | **57** — all 9 clusters shipped, plus one post each alongside the Excel and Google Sheets reference pages. Against HVAC's 64 and electrical's 75. |
 | Taxonomy | `categorySeo.plumbing` present in `blogTaxonomy.ts`. `/blog/categories/plumbing` live; the hub's "From the Blog" strip live. |
-| Keyword data | **None.** Every one of the 56 titles is reasoned, not measured. |
+| Keyword data | **None.** Every one of the 57 titles is reasoned, not measured. |
 
 **The gap this doc was written to describe is closed** — it originally read "the tools are done and
 the writing has barely started" at 14 posts. Both surfaces are now complete against the plan, and
@@ -143,6 +143,7 @@ any of them. Verify before writing with
 | `how-many-gallons-in-a-pipe.mdx` ✅ | How Many Gallons Are in a Pipe? 0.0408 x Diameter Squared | gallons in a pipe | pipe-volume | 2 |
 | `plumbing-unit-conversions.mdx` ✅ | Plumbing Unit Conversions: GPM, LPM, PSI, Head — and the Imperial Gallon Trap | gpm to lpm | unit-converter | 3 |
 | `plumbing-formulas-in-excel.mdx` ✅ | Plumbing Formulas in Excel: Which Ones Survive a Spreadsheet | plumbing formulas excel | excel-formulas | 2 |
+| `plumbing-formulas-in-google-sheets.mdx` ✅ | Plumbing Formulas in Google Sheets: Stop Filling Down | plumbing formulas google sheets | google-sheets-formulas | 2 |
 
 ### Cluster 7 — Cost & business (4) — highest commercial value
 | File | Title | Keyword | Calculator | Tier |
@@ -182,11 +183,11 @@ clusters 1–8 never covered: the earlier posts answer "what size" and "which co
 | Tier | Count | Shipped | Remaining |
 |---|---|---|---|
 | 1 | 30 | **30** | **0** |
-| 2 | 19 | **19** | **0** |
+| 2 | 20 | **20** | **0** |
 | 3 | 7 | **7** | **0** |
-| **Total** | **56** | **56** | **0 — the plan is complete** |
+| **Total** | **57** | **57** | **0 — the plan is complete** |
 
-Clusters 1–8 are the original 47 (25 / 15 / 7 by tier). Cluster 9 added 5 tier-1 and 3 tier-2. Cluster 6 later gained one tier-2 post written alongside the `excel-formulas` reference page.
+Clusters 1–8 are the original 47 (25 / 15 / 7 by tier). Cluster 9 added 5 tier-1 and 3 tier-2. Cluster 6 later gained two tier-2 posts written alongside the `excel-formulas` and `google-sheets-formulas` reference pages.
 
 Verify these totals against the tables with:
 `grep -oE '^\| \`[a-z0-9-]+\.mdx\`.*\| [123] \|$' docs/notebooklm/plumbing-content-strategy.md | grep -oE '\| [123] \|$' | sort | uniq -c`

@@ -33,6 +33,25 @@ const breadcrumbData = {
 
 const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "")}`;
 
+/**
+ * Notes and table captions carry a light markdown — `**bold**` and backtick
+ * code — which was rendering as literal asterisks. Escape FIRST, then add the
+ * markup: the other order lets a comparison operator inside a code span
+ * swallow the rest of the paragraph as an unclosed tag.
+ *
+ * Display prose only. Every string a copy button hands over stays raw in its
+ * `data-copy` attribute, which is what makes the pasted formula work — an
+ * entity there would paste literally and break it. Shared, deliberately
+ * identically, with the Google Sheets reference page.
+ */
+const richText = (s: string) =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`(.+?)`/g, '<code class="rounded bg-slate-100 px-1 py-0.5">$1</code>');
+
 const sectionTone: Record<string, { chip: string; card: string; rule: string }> = {
   blue: { chip: "bg-blue-100 text-blue-700", card: "border-l-blue-500 border-blue-100", rule: "text-blue-700" },
   emerald: { chip: "bg-emerald-100 text-emerald-700", card: "border-l-emerald-500 border-emerald-100", rule: "text-emerald-700" },
@@ -169,10 +188,12 @@ const sectionTone: Record<string, { chip: string; card: string; rule: string }> 
           </div>
 
           <p class="mt-5 text-slate-700 leading-relaxed">
-            <strong>For the named-range versions:</strong> select A2:B6, then <em>Formulas → Create from
-            Selection → Left column</em>. Excel turns each label in column A into a name for the value beside
-            it, and <code class="rounded bg-white px-1.5 py-0.5 text-sm">=0.4085*Flow/Bore^2</code> starts
-            working. Named ranges are worth the two minutes on any sheet somebody else will have to read.
+            <strong>For the named-range versions, in Excel:</strong> select A2:B6, then <em>Formulas →
+            Create from Selection → Left column</em>. Excel turns each label in column A into a name for the
+            value beside it, and <code class="rounded bg-white px-1.5 py-0.5 text-sm">=0.4085*Flow/Bore^2</code>
+            starts working. Named ranges are worth the two minutes on any sheet somebody else will have to
+            read. <strong>Google Sheets has no equivalent menu</strong> — names go in one at a time under
+            <em>Data → Named ranges</em>, which is slower but the same idea.
           </p>
         </div>
       </section>
@@ -261,7 +282,7 @@ const sectionTone: Record<string, { chip: string; card: string; rule: string }> 
                       <p class="text-sm font-semibold text-slate-800">{f.result}</p>
                     </div>
 
-                    <p class="mt-4 text-sm text-slate-600 leading-relaxed">{f.notes}</p>
+                    <p class="mt-4 text-sm text-slate-600 leading-relaxed" set:html={richText(f.notes)} />
 
                     {f.calc && (
                       <div class="mt-4">
@@ -315,7 +336,7 @@ const sectionTone: Record<string, { chip: string; card: string; rule: string }> 
                       Copy table
                     </button>
                   </div>
-                  <p class="mt-2 text-sm text-slate-600 leading-relaxed">{t.note}</p>
+                  <p class="mt-2 text-sm text-slate-600 leading-relaxed" set:html={richText(t.note)} />
                   <div class="mt-4 max-h-72 overflow-auto rounded-xl border border-slate-200">
                     <table class="w-full text-sm">
                       <thead class="sticky top-0 bg-slate-100">
@@ -359,8 +380,10 @@ const sectionTone: Record<string, { chip: string; card: string; rule: string }> 
                 Excel 2021. Every lookup on this page is given in the
                 <code class="rounded bg-slate-100 px-1.5 py-0.5">INDEX</code> /
                 <code class="rounded bg-slate-100 px-1.5 py-0.5">MATCH</code> form as the pasteable version
-                precisely because that form works in every Excel back to 2007, and in Google Sheets and
-                LibreOffice Calc unchanged. The named-range versions use XLOOKUP where it reads better.
+                precisely because that form works in every Excel back to 2007, and in LibreOffice Calc
+                unchanged. The named-range versions use XLOOKUP where it reads better. In Google Sheets the
+                fallback is a courtesy rather than a necessity — there is no old version of Sheets, so
+                everyone there already has XLOOKUP, LAMBDA, LET and named functions.
               </p>
             </div>
 
@@ -383,6 +406,19 @@ const sectionTone: Record<string, { chip: string; card: string; rule: string }> 
                 23.62 there. Beware the other direction: some languages round a half to even and would give
                 23.61 on the same number. If a figure disagrees with a calculator by one in the last decimal,
                 this is almost always why.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+              <h3 class="font-bold text-slate-900">Working in Google Sheets?</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                Every formula on this page pastes into Sheets unchanged. What changes is the shape of the
+                sheet you build around them: one
+                <code class="rounded bg-white px-1.5 py-0.5">ARRAYFORMULA</code> governing a whole column
+                instead of a formula per cell,
+                <code class="rounded bg-white px-1.5 py-0.5">QUERY</code> instead of a pivot table, and named
+                functions instead of a 189-character interpolation.
+                <a href="/calculators/plumbing/google-sheets-formulas" class="font-semibold text-emerald-700 hover:underline">Open the Google Sheets reference →</a>
               </p>
             </div>
 

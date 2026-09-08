@@ -1,0 +1,215 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { sections } from "@/config/plumbingExcelFormulas";
+import { wsfuToGpm, totalWsfu, fmt } from "@/lib/plumbing";
+
+/**
+ * The Hunter's-curve interpolation collapsing into a named function.
+ *
+ * The Excel formula is read out of the Excel reference's own config and
+ * MEASURED with `.length` at build time rather than counted by hand — the
+ * argument this picture makes rests entirely on that number, so it must not be
+ * something a later edit can falsify. Positions resolved here, never in the
+ * template: a bare `<` there breaks the build.
+ */
+
+const HUNTER = sections[0].formulas[0];
+const EXCEL = HUNTER.excel;
+const EXCEL_LEN = EXCEL.length;
+
+/** The helper cell the Excel version cannot do without. */
+const HELPER = HUNTER.inputs.find((i) => i.example.startsWith("=MATCH"));
+const HELPER_CELL = HELPER ? HELPER.cell : "B3";
+const HELPER_FORMULA = HELPER ? HELPER.example : "=MATCH(B2,$F$2:$F$38,1)";
+
+const SHEETS = '=WSFU_TO_GPM(B2,"tank")';
+const SHEETS_LEN = SHEETS.length;
+
+/** Chunk the long formula into lines that fit the panel. */
+const WRAP = 100;
+const EXCEL_LINES: string[] = [];
+for (let i = 0; i < EXCEL.length; i += WRAP) EXCEL_LINES.push(EXCEL.slice(i, i + WRAP));
+
+/* The same worked load the reference page uses, so the answer is checkable. */
+const COUNTS: Record<string, number> = {
+  "wc-private-tank": 2,
+  "lavatory-private": 3,
+  "bathtub-private": 1,
+  "shower-private": 1,
+  "kitchen-sink-private": 1,
+  "dishwasher-private": 1,
+  "clothes-washer-private": 1,
+  "hose-bibb": 2,
+};
+const LOAD = totalWsfu(COUNTS);
+const GPM = wsfuToGpm(LOAD, "tank");
+
+/** How much shorter, as a plain multiple — the headline of the picture. */
+const FACTOR = EXCEL_LEN / SHEETS_LEN;
+
+/* Geometry */
+const X = 24;
+const W = 672;
+const TOP_Y = 76;
+const LINE_H = 15;
+const TOP_H = 34 + EXCEL_LINES.length * LINE_H + 44;
+const ARROW_Y = TOP_Y + TOP_H + 8;
+const BOT_Y = ARROW_Y + 30;
+const BOT_H = 82;
+const FOOT_Y = BOT_Y + BOT_H + 18;
+const VIEW_H = FOOT_Y + 46;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 720 ${VIEW_H}`} fill="none" aria-hidden="true">
+  <title>The Hunter's curve interpolation collapsing from 189 characters into one named function call</title>
+
+  <rect x="0" y="0" width="720" height={VIEW_H} fill={C.white} />
+
+  <text x={X} y="26" font-family={FONT} font-size="15" font-weight="700" fill={C.dark}>
+    The ugliest formula on the Excel page, defined once
+  </text>
+  <text x={X} y="46" font-family={FONT} font-size="11" fill={C.muted}>
+    Hunter's curve is a table, not an equation, so reading between its anchors takes an interpolation. In Excel
+  </text>
+  <text x={X} y="61" font-family={FONT} font-size="11" fill={C.muted}>
+    that lives in every cell that needs it. In Sheets it lives in one dialog and never appears again.
+  </text>
+
+  {/* ---------- Excel ---------- */}
+  <rect
+    x={X}
+    y={TOP_Y}
+    width={W}
+    height={TOP_H}
+    rx="10"
+    fill={C.orangeLight}
+    stroke={C.orange}
+    stroke-width="1.5"
+  />
+  <text x={X + 14} y={TOP_Y + 20} font-family={FONT} font-size="10.5" font-weight="700" fill={C.orange}>
+    IN EXCEL — pasted into every cell that needs it
+  </text>
+  <rect x={X + W - 108} y={TOP_Y + 8} width="94" height="18" rx="9" fill={C.orange} />
+  <text
+    x={X + W - 61}
+    y={TOP_Y + 21}
+    font-family={FONT}
+    font-size="10"
+    font-weight="700"
+    fill={C.white}
+    text-anchor="middle"
+  >
+    {EXCEL_LEN} characters
+  </text>
+
+  {
+    EXCEL_LINES.map((line, i) => (
+      <text
+        x={X + 14}
+        y={TOP_Y + 42 + i * LINE_H}
+        font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+        font-size="8.5"
+        fill={C.dark}
+      >
+        {line}
+      </text>
+    ))
+  }
+
+  <text
+    x={X + 14}
+    y={TOP_Y + 42 + EXCEL_LINES.length * LINE_H + 12}
+    font-family={FONT}
+    font-size="10"
+    font-weight="700"
+    fill={C.red}
+  >
+    Plus a helper cell it cannot do without:
+  </text>
+  <text
+    x={X + 14}
+    y={TOP_Y + 42 + EXCEL_LINES.length * LINE_H + 27}
+    font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+    font-size="9"
+    fill={C.dark}
+  >
+    {HELPER_CELL}  {HELPER_FORMULA}
+  </text>
+
+  {/* ---------- Arrow ---------- */}
+  <path
+    d={`M ${X + W / 2} ${ARROW_Y} L ${X + W / 2} ${ARROW_Y + 20}`}
+    stroke={C.primary}
+    stroke-width="2.5"
+  />
+  <path
+    d={`M ${X + W / 2 - 7} ${ARROW_Y + 16} L ${X + W / 2} ${ARROW_Y + 25} L ${X + W / 2 + 7} ${ARROW_Y + 16} Z`}
+    fill={C.primary}
+  />
+  <text
+    x={X + W / 2 + 16}
+    y={ARROW_Y + 18}
+    font-family={FONT}
+    font-size="10"
+    font-weight="700"
+    fill={C.primary}
+  >
+    Data, then Named functions
+  </text>
+
+  {/* ---------- Sheets ---------- */}
+  <rect
+    x={X}
+    y={BOT_Y}
+    width={W}
+    height={BOT_H}
+    rx="10"
+    fill={C.greenLight}
+    stroke={C.green}
+    stroke-width="1.5"
+  />
+  <text x={X + 14} y={BOT_Y + 20} font-family={FONT} font-size="10.5" font-weight="700" fill={C.green}>
+    IN GOOGLE SHEETS — after one definition, everywhere in the workbook
+  </text>
+  <rect x={X + W - 108} y={BOT_Y + 8} width="94" height="18" rx="9" fill={C.green} />
+  <text
+    x={X + W - 61}
+    y={BOT_Y + 21}
+    font-family={FONT}
+    font-size="10"
+    font-weight="700"
+    fill={C.white}
+    text-anchor="middle"
+  >
+    {SHEETS_LEN} characters
+  </text>
+
+  <text
+    x={X + 14}
+    y={BOT_Y + 52}
+    font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+    font-size="17"
+    font-weight="700"
+    fill={C.dark}
+  >
+    {SHEETS}
+  </text>
+  <text x={X + 14} y={BOT_Y + 71} font-family={FONT} font-size="9.5" fill={C.muted}>
+    No helper cell. Appears in autocomplete with your own description of each argument.
+  </text>
+
+  {/* ---------- Footer ---------- */}
+  <rect
+    x={X}
+    y={FOOT_Y}
+    width={W}
+    height="36"
+    rx="8"
+    fill={C.primaryLight}
+    stroke={C.primary}
+    stroke-width="1.25"
+  />
+  <text x={X + 14} y={FOOT_Y + 22} font-family={FONT} font-size="11" font-weight="700" fill={C.dark}>
+    {fmt(FACTOR, 1)}× shorter, and both return {fmt(GPM, 2)} gpm for the same {fmt(LOAD, 1)} WSFU load.
+  </text>
+</svg>
