@@ -167,14 +167,15 @@ const sections: Section[] = [
           label: "Drain Pipe Slope Calculator",
         },
         formula:
-          "2-1/2 in and under:  ≥ 1/4 in/ft\n3 in and larger:     ≥ 1/8 in/ft\n                      [IPC 704.1]",
+          "2-1/2 in and under:  ≥ 1/4 in/ft\n3 in to 6 in:        ≥ 1/8 in/ft\n8 in and larger:    ≥ 1/16 in/ft\n                      [IPC 704.1]",
         vars: [
           { sym: "1/4 in/ft", desc: "The residential default — everything 2-1/2 in and under" },
-          { sym: "1/8 in/ft", desc: "Permitted for 3 in and larger, where scouring velocity still holds" },
+          { sym: "1/8 in/ft", desc: "Permitted from 3 in to 6 in, where scouring velocity still holds" },
+          { sym: "1/16 in/ft", desc: "Permitted for 8 in and larger — a size range that almost never appears in a house" },
           { sym: "exception", desc: "Piping upstream of a grease interceptor stays at 1/4 in per ft" },
         ],
         normal:
-          "IPC 2021 has only these two rows — there is no separate 1/16 in per ft allowance for 8 in and larger, which older editions did carry. The UPC generally holds 1/4 in per ft with allowances for larger pipe, so confirm which code your AHJ enforces before flattening a long run",
+          "Only the first two rows appear in residential work, since 8 in drains are a commercial and municipal size. The UPC generally holds 1/4 in per ft with allowances for larger pipe, so confirm which code your AHJ enforces before flattening a long run",
       },
       {
         name: "Slope as Percent & Total Fall",
@@ -275,6 +276,57 @@ const sections: Section[] = [
         normal:
           "Two sources, two sizing rules. A cistern separates supply from demand in time, so it is sized on the gap between storms — but never past what the catchment can refill, or it just sits part-empty. Grey water cannot do that at all: it is a surge vessel that has to empty daily, so the design work moves to the distribution field. These are planning values rather than code, because nonpotable reuse falls to IPC Chapter 13 where adopted and to state and county rules everywhere else",
       },
+      {
+        name: "Storm & Roof Runoff Flow",
+        calc: {
+          href: "/calculators/plumbing/plumbing-storm-drainage-calculator",
+          label: "Storm & Roof Drainage Calculator",
+        },
+        formula:
+          "gpm = area × in/hr × 7.48052\n            ÷ 12 ÷ 60\n\nfull-bore capacity check:\nQ = A × (1.486 ÷ n)\n      × R^(2/3) × S^(1/2)",
+        vars: [
+          { sym: "area", desc: "Horizontal projection of the roof in square feet, not the sloped surface" },
+          { sym: "in/hr", desc: "Design rainfall intensity for the location, from the local 100-year hourly rate" },
+          { sym: "7.48052 ÷ 12 ÷ 60", desc: "Gallons per cubic foot, spread one inch deep, per minute — the derived 96.25 divisor inverted" },
+          { sym: "A, R, S", desc: "Full-bore area, hydraulic radius and slope, as in Manning's equation above" },
+        ],
+        normal:
+          "Runoff is strictly linear in area and rainfall — about 41.6 gpm per 1,000 square feet at 4 inches per hour — which makes this the one place in plumbing where a per-square-foot rule of thumb is safe. A 2,000 square foot roof in a 4 inch per hour storm sheds roughly 83 gpm, more than twenty times a household peak. IPC Tables 1106.2 and 1106.3 govern leader and horizontal storm drain sizing and are not reproduced here; the capacity line is a full-bore Manning check, not a code lookup",
+      },
+      {
+        name: "Septic Tank & Leach Field",
+        calc: {
+          href: "/calculators/plumbing/plumbing-septic-tank-calculator",
+          label: "Septic Tank Size Calculator",
+        },
+        formula:
+          "daily flow = bedrooms × gal/bed\ntank = the LARGER of\n  daily flow × 2 days\n  the published minimum\nfield ft² = daily flow\n            ÷ application rate",
+        vars: [
+          { sym: "gal/bed", desc: "Design flow per bedroom per day — commonly 150, but set locally" },
+          { sym: "2 days", desc: "Retention time; the tank has to hold two days of flow" },
+          { sym: "minimum", desc: "The published floor by bedroom count, commonly 1,000 gal to three bedrooms" },
+          { sym: "application rate", desc: "Gallons per square foot per day the soil will accept, from a perc test" },
+        ],
+        normal:
+          "The minimum governs up to about four bedrooms and retention only takes over at five, so sizing on retention alone undersizes almost every house. Soil is the real variable: the same three-bedroom house needs about 375 square feet of field in sand and 1,875 in slow clay, a five-fold swing, while the tank does not change at all. None of this is IPC — septic falls to the IPSDC where adopted and to state and county health departments everywhere else, and it varies more than anything else in plumbing",
+      },
+      {
+        name: "Grey Water Yield & Irrigable Area",
+        calc: {
+          href: "/calculators/plumbing/plumbing-rainwater-harvesting-calculator",
+          label: "Rainwater Harvesting & Grey Water Calculator",
+        },
+        formula:
+          "gpd = people × (shower + lav)\n      + washer gal × loads ÷ 7\nmax storage = gpd × 24 hr\nirrigable ft² = gpd × 7\n                ÷ demand rate",
+        vars: [
+          { sym: "shower / lav", desc: "Gallons per person per day from each fixture — about 25 and 5" },
+          { sym: "washer", desc: "Gallons per load, divided over the week to reach a daily figure" },
+          { sym: "24 hr", desc: "The hold limit: untreated grey water goes septic past a day" },
+          { sym: "demand rate", desc: "Irrigation demand in gallons per square foot per week for the planting" },
+        ],
+        normal:
+          "Maximum storage always equals exactly one day of yield, which is the whole difference from a rainwater cistern — grey water is a surge vessel that must empty daily rather than a store that bridges between events, so the design work moves to the distribution field. A three-person household with a washer yields roughly 104 gallons a day, about 72% of it from the shower alone. Kitchen sink and dishwasher are excluded because they are black water in most jurisdictions. Nonpotable reuse is the least code-governed subject in plumbing",
+      },
     ],
   },
   {
@@ -346,10 +398,10 @@ const sections: Section[] = [
         formula: "ΔV ≈ V_system × expansion factor",
         vars: [
           { sym: "V_system", desc: "Water heater plus piping volume, in gallons" },
-          { sym: "expansion factor", desc: "About 0.02 for a rise from 40 °F to 140 °F" },
+          { sym: "expansion factor", desc: "About 0.017 for a rise from 40 °F to 140 °F — the ratio of the two densities, minus one" },
         ],
         normal:
-          "IPC 607.3 requires thermal expansion control wherever a storage water heater's cold feed passes a check valve, PRV, or backflow preventer — which is to say almost every system with a PRV. Water gains roughly 2% in volume over that rise, and in a closed system with nowhere to go it shows up as pressure on the T&P valve",
+          "IPC 607.3 requires thermal expansion control wherever a storage water heater's cold feed passes a check valve, PRV, or backflow preventer — which is to say almost every system with a PRV. Water gains roughly 1.7% in volume over that rise, and in a closed system with nowhere to go it shows up as pressure on the T&P valve",
       },
       {
         name: "Pressure Tank Drawdown",
@@ -389,7 +441,7 @@ const sections: Section[] = [
           { sym: "3412", desc: "BTU per hour per kilowatt" },
         ],
         normal:
-          "A 40,000 BTU/hr gas heater at 80% recovers about 46 GPH through a 90 °F rise. The same duty on a 4.5 kW electric element gives about 20 GPH — the gap that decides which one keeps up with back-to-back showers",
+          "A 40,000 BTU/hr gas heater at 80% recovers about 43 GPH through a 90 °F rise. The same duty on a 4.5 kW electric element gives about 20 GPH — the gap that decides which one keeps up with back-to-back showers",
       },
       {
         name: "Tankless Flow Capacity",
@@ -424,8 +476,8 @@ const sections: Section[] = [
       {
         name: "Mixing Valve / Tempered Water Ratio",
         calc: {
-          href: "/calculators/plumbing/plumbing-water-heater-size-calculator",
-          label: "Water Heater Size Calculator",
+          href: "/calculators/plumbing/plumbing-mixing-valve-calculator",
+          label: "Mixing Valve Calculator",
         },
         formula: "hot fraction = (T_mix − T_cold)\n               ÷ (T_hot − T_cold)",
         vars: [
@@ -454,9 +506,148 @@ const sections: Section[] = [
       },
     ],
   },
+  {
+    title: "Volume, Conversions & Waste",
+    color: "amber",
+    formulas: [
+      {
+        name: "Pipe Volume & Gallons per Foot",
+        calc: {
+          href: "/calculators/plumbing/plumbing-pipe-volume-calculator",
+          label: "Pipe Volume Calculator",
+        },
+        formula:
+          "gal/ft = 0.0408 × d²\ngallons = gal/ft × length\nweight lb = gallons × 8.33\npurge sec = gallons ÷ gpm × 60",
+        vars: [
+          { sym: "d", desc: "Inside diameter in inches — bore, not nominal size" },
+          { sym: "0.0408", desc: "π ÷ 4 × 12 in/ft ÷ 231 in³ per gallon, all folded into one constant" },
+          { sym: "purge sec", desc: "Time to clear the standing volume at a given flow" },
+        ],
+        normal:
+          "About 40 feet of 3/4 inch copper holds a gallon — the shortcut worth memorising for a purge or a chlorination charge. Because volume goes as the square of the bore, upsizing a hot line makes the wait for hot water worse: 50 feet of 3/4 inch copper is 38 seconds at 2 gpm, and the same run in 1 inch is 64",
+      },
+      {
+        name: "Unit Conversion",
+        calc: {
+          href: "/calculators/plumbing/plumbing-unit-converter",
+          label: "Plumbing Unit Converter",
+        },
+        formula:
+          "value × from-factor ÷ to-factor\n\ntemperature is NOT a ratio:\n°F = °C × 9/5 + 32\na RISE converts by ratio\n  alone: 90 °F rise = 50 °C",
+        vars: [
+          { sym: "from / to factor", desc: "Each unit's factor to its category's base — gpm, psi, gallons, inches, ft/s" },
+          { sym: "1 imperial gal", desc: "1.2009 US gallons — a 20% error on any spec sheet that just says gallons" },
+          { sym: "1 bar", desc: "14.5038 psi exactly, because a bar is defined as 100 kPa" },
+        ],
+        normal:
+          "Multiply into the base unit and divide out of it, and one formula converts any pair inside a category. Most of these factors are exact definitions and carry no error: the US gallon is 231 cubic inches, the cubic foot is 7.48052 gallons, the litre and the bar are defined. The exception is psi to feet of head, which is a measurement of water density and shifts slightly with temperature — the only conversion on this page that moves",
+      },
+      {
+        name: "Leak & Water Waste Cost",
+        calc: {
+          href: "/calculators/plumbing/plumbing-leak-water-waste-calculator",
+          label: "Leak & Water Waste Calculator",
+        },
+        formula:
+          "gpd = drips/min × 1440 ÷ 15140\ngal/yr = gpd × 365\nwater = gal/yr ÷ 1000\n        × (water + sewer rate)\nenergy = gal/yr × hot × 8.33\n         × ΔT ÷ eff ÷ 100000\n         × $/therm",
+        vars: [
+          { sym: "15,140", desc: "USGS drips per gallon; reconciles with a 0.25 mL drop" },
+          { sym: "÷ 1000", desc: "Utility rates are quoted per 1,000 gallons — the term most often dropped" },
+          { sym: "hot", desc: "Fraction of the leak that was heated, 0 to 1" },
+          { sym: "100,000", desc: "BTU per therm; use 3,412.14 per kWh for an electric heater" },
+        ],
+        normal:
+          "One drip a second is about 5.7 gallons a day and $26 a year on cold water — but $47 if it is hot on gas, because you paid to heat it before it escaped, and energy is then roughly 45% of the bill. The scale is what surprises people: a visibly running toilet at 1,000 gallons a day runs to about $4,563 a year, some 175 times the dripping tap, and gets through the EPA's whole-household 10,000 gallon figure in ten days",
+      },
+    ],
+  },
+  {
+    title: "Pricing & Business",
+    color: "violet",
+    formulas: [
+      {
+        name: "Job Price — Margin, not Markup",
+        calc: {
+          href: "/calculators/plumbing/plumbing-estimate-calculator",
+          label: "Plumbing Job Estimate Calculator",
+        },
+        formula:
+          "direct = hours × rate\n         + fixtures + material\nbreak-even = direct\n             × (1 + overhead)\nprice = break-even\n        ÷ (1 − margin)   ← margin\nprice = break-even\n        × (1 + markup)   ← markup",
+        vars: [
+          { sym: "overhead", desc: "Business cost carried by the job, as a fraction of direct cost" },
+          { sym: "margin", desc: "Applied by DIVIDING by (1 − margin) — the profit share OF THE PRICE" },
+          { sym: "markup", desc: "Applied by MULTIPLYING — the addition ON TOP OF cost, a different number" },
+        ],
+        normal:
+          "A 25% markup is exactly a 20% margin, and on a $2,760 break-even that is $230 of profit that never arrives. The markup needed to hit a target margin is margin ÷ (1 − margin): 25% margin needs a 33.3% markup, 40% needs 66.7%. Pricing at the zero-overhead figure while actually carrying 15% overhead turns an intended 25% margin into about 10%",
+      },
+      {
+        name: "Loaded Labor Rate",
+        calc: {
+          href: "/calculators/plumbing/plumbing-labor-rate-calculator",
+          label: "Plumbing Labor Rate Calculator",
+        },
+        formula:
+          "annual = wage × 2080\n         × (1 + burden)\n         + overhead per tech\nloaded = annual ÷ billable hrs\nbill rate = loaded ÷ (1 − margin)",
+        vars: [
+          { sym: "2,080", desc: "Paid hours in a year — NOT the hours you can invoice" },
+          { sym: "burden", desc: "Payroll tax, insurance, workers' comp, benefits — commonly 30–35%" },
+          { sym: "billable hrs", desc: "Hours actually invoiced; 1,560 is 75% utilisation" },
+        ],
+        normal:
+          "A $38 wage carrying 32% burden and $11,000 of overhead needs about $123 an hour at 40% margin — roughly 3.2 times the wage, which is the multiple that surprises people. Utilisation moves it further than pay does and in the more useful direction: at the same wage, 1,000 billable hours needs $164 an hour and 1,800 needs $91. Raising the wage 20% only moves the rate about 13%",
+      },
+      {
+        name: "Whole-House Repipe Cost",
+        calc: {
+          href: "/calculators/plumbing/plumbing-repipe-cost-calculator",
+          label: "Repipe Cost Calculator",
+        },
+        formula:
+          "sub = ft² × $/ft² × access\n      × (1 + 0.15 × extra storeys)\ntotal = (sub + extra baths × 750\n         + permit + drywall)\n        × region\nband = total × 0.85 … 1.15",
+        vars: [
+          { sym: "access", desc: "0.8 open walls, 1.0 drywall and fishing, 1.6 plaster, tile or slab" },
+          { sym: "$/ft²", desc: "Roughly 5 for PEX, 6 for CPVC, 9 for copper, before access" },
+          { sym: "region", desc: "0.85 rural to 1.5 major coastal metro" },
+        ],
+        normal:
+          "Access is a multiplier, not an addition, so the levers compound: PEX through open walls against copper through plaster is about $9,150 against $27,900 on the same 1,800 square foot house — roughly three times. Cost per square foot falls as the house grows, because permit and drywall repair are fixed, so quoting a flat rate per square foot loses money on small jobs",
+      },
+      {
+        name: "Water Heater Replacement Cost",
+        calc: {
+          href: "/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator",
+          label: "Water Heater Replacement Cost Calculator",
+        },
+        formula:
+          "labor = hours × rate\ntotal = (equipment + labor\n         + upgrades + permit\n         + haul away) × region\nband = total × 0.82 … 1.18",
+        vars: [
+          { sym: "upgrades", desc: "Expansion tank, pan, seismic strapping, vent, gas line, condensate drain" },
+          { sym: "hours", desc: "About 4 for a tank swap, 6 to 8 for a heat pump or tankless conversion" },
+          { sym: "±18%", desc: "A wider band than the ±15% used elsewhere — what is behind the old unit is unknown" },
+        ],
+        normal:
+          "A like-for-like 50 gallon gas swap with an expansion tank and a pan runs about $2,070, of which the appliance is only around 53% — usually the opposite of what a customer expects. IPC 607.3 requires thermal expansion control on any closed system, so the expansion tank is rarely optional. A gas tankless conversion typically adds a vent upgrade, a gas line upsize and a condensate drain, taking a swap into project territory",
+      },
+    ],
+  },
 ];
 
 const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "")}`;
+
+/**
+ * One entry per section colour. This replaced a pair of repeated ternary chains
+ * that each had to grow a line per colour — the electrical formula reference
+ * still carries that pattern at six colours and twelve lines.
+ */
+const sectionTone: Record<string, { chip: string; card: string }> = {
+  blue: { chip: "bg-blue-100 text-blue-700", card: "border-l-blue-500 border-blue-100" },
+  emerald: { chip: "bg-emerald-100 text-emerald-700", card: "border-l-emerald-500 border-emerald-100" },
+  cyan: { chip: "bg-cyan-100 text-cyan-700", card: "border-l-cyan-500 border-cyan-100" },
+  rose: { chip: "bg-rose-100 text-rose-700", card: "border-l-rose-500 border-rose-100" },
+  amber: { chip: "bg-amber-100 text-amber-800", card: "border-l-amber-500 border-amber-100" },
+  violet: { chip: "bg-violet-100 text-violet-700", card: "border-l-violet-500 border-violet-100" },
+};
 ---
 
 <Layout {title} {description}>
@@ -503,6 +694,31 @@ const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, 
             </p>
           </div>
 
+          <a
+            href="/calculators/plumbing/excel-formulas"
+            class="group mt-8 flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-5 hover:border-orange-400 transition-all"
+          >
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </span>
+            <span class="min-w-0">
+              <span class="block font-bold text-slate-900 group-hover:text-orange-700">
+                Working in a spreadsheet? Every formula here, written for Excel
+              </span>
+              <span class="mt-1 block text-sm text-slate-600 leading-relaxed">
+                Paste-ready cells, the IPC lookup tables as tab-separated blocks, and the fuller constants
+                our calculators run on — so what your sheet returns matches what the tool returns.
+                <span class="font-semibold text-orange-600 group-hover:underline">Open it →</span>
+              </span>
+            </span>
+          </a>
+
           <div class="mt-8 flex flex-wrap gap-3">
             {
               sections.map((s) => (
@@ -522,27 +738,13 @@ const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, 
         {
           sections.map((section) => (
             <div id={sectionId(section.title)}>
-              <div
-                class={`inline-block rounded-lg px-4 py-1.5 text-sm font-bold mb-4
-                ${section.color === "blue" ? "bg-blue-100 text-blue-700" : ""}
-                ${section.color === "emerald" ? "bg-emerald-100 text-emerald-700" : ""}
-                ${section.color === "cyan" ? "bg-cyan-100 text-cyan-700" : ""}
-                ${section.color === "rose" ? "bg-rose-100 text-rose-700" : ""}
-              `}
-              >
+              <div class={`inline-block rounded-lg px-4 py-1.5 text-sm font-bold mb-4 ${sectionTone[section.color].chip}`}>
                 {section.title}
               </div>
 
               <div class="space-y-8">
                 {section.formulas.map((f) => (
-                  <div
-                    class={`rounded-2xl border-l-4 border bg-white p-6 shadow-sm
-                    ${section.color === "blue" ? "border-l-blue-500 border-blue-100" : ""}
-                    ${section.color === "emerald" ? "border-l-emerald-500 border-emerald-100" : ""}
-                    ${section.color === "cyan" ? "border-l-cyan-500 border-cyan-100" : ""}
-                    ${section.color === "rose" ? "border-l-rose-500 border-rose-100" : ""}
-                  `}
-                  >
+                  <div class={`rounded-2xl border-l-4 border bg-white p-6 shadow-sm ${sectionTone[section.color].card}`}>
                     <h3 class="text-lg font-bold text-slate-900">{f.name}</h3>
 
                     {/*

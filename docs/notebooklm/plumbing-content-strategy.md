@@ -27,10 +27,10 @@ than they are.
 | Surface | State |
 | --- | --- |
 | Calculators | **26**, in 7 hub groups. Four-edit registration is structurally guarded by `ungroupedPlumbingCalculators`. |
-| Reference pages | **3** — `formulas` (25 blocks), `glossary` (85 terms), `backflow-prevention`. Parity with electrical, ahead of HVAC's 2. |
-| Blog posts | **55** — all 9 clusters shipped. Against HVAC's 64 and electrical's 75. |
+| Reference pages | **4** — `formulas` (35 blocks in 6 sections, including Pricing & Business), `excel-formulas` (the same 35 as paste-ready Excel cells: 27 one-liners, 8 needing one of 11 pasted tables), `glossary` (85 terms), `backflow-prevention`. Ahead of electrical's 3 and HVAC's 2. |
+| Blog posts | **56** — all 9 clusters shipped, plus one post added alongside the Excel reference page. Against HVAC's 64 and electrical's 75. |
 | Taxonomy | `categorySeo.plumbing` present in `blogTaxonomy.ts`. `/blog/categories/plumbing` live; the hub's "From the Blog" strip live. |
-| Keyword data | **None.** Every one of the 55 titles is reasoned, not measured. |
+| Keyword data | **None.** Every one of the 56 titles is reasoned, not measured. |
 
 **The gap this doc was written to describe is closed** — it originally read "the tools are done and
 the writing has barely started" at 14 posts. Both surfaces are now complete against the plan, and
@@ -64,7 +64,7 @@ all worth repeating:
 
 ---
 
-## 2. Blog posts — 55 titles in 9 clusters
+## 2. Blog posts — 56 titles in 9 clusters
 
 Format matches the HVAC and electrical strategy docs: filename · title · target keyword ·
 calculator it funnels into · tier. **Tier 1 = build first** (highest intent × weakest incumbent
@@ -136,12 +136,13 @@ any of them. Verify before writing with
 | `heat-pump-water-heater-sizing.mdx` ✅ | Heat Pump Water Heaters: Great Efficiency, Slow Recovery | heat pump water heater sizing | water-heater-size | 2 |
 | `mixing-valve-explained.mdx` ✅ | Thermostatic Mixing Valves: How Storing Hot Stretches a Tank | thermostatic mixing valve | mixing-valve | 3 |
 
-### Cluster 6 — Volume, wait time & conversions (3)
+### Cluster 6 — Volume, wait time, conversions & working the numbers (4)
 | File | Title | Keyword | Calculator | Tier |
 |---|---|---|---|---|
 | `how-long-does-it-take-hot-water-to-reach-the-tap.mdx` ✅ | Why Hot Water Takes So Long — and Why a Bigger Pipe Makes It Worse | hot water takes too long | pipe-volume | 1 |
 | `how-many-gallons-in-a-pipe.mdx` ✅ | How Many Gallons Are in a Pipe? 0.0408 x Diameter Squared | gallons in a pipe | pipe-volume | 2 |
 | `plumbing-unit-conversions.mdx` ✅ | Plumbing Unit Conversions: GPM, LPM, PSI, Head — and the Imperial Gallon Trap | gpm to lpm | unit-converter | 3 |
+| `plumbing-formulas-in-excel.mdx` ✅ | Plumbing Formulas in Excel: Which Ones Survive a Spreadsheet | plumbing formulas excel | excel-formulas | 2 |
 
 ### Cluster 7 — Cost & business (4) — highest commercial value
 | File | Title | Keyword | Calculator | Tier |
@@ -181,11 +182,11 @@ clusters 1–8 never covered: the earlier posts answer "what size" and "which co
 | Tier | Count | Shipped | Remaining |
 |---|---|---|---|
 | 1 | 30 | **30** | **0** |
-| 2 | 18 | **18** | **0** |
+| 2 | 19 | **19** | **0** |
 | 3 | 7 | **7** | **0** |
-| **Total** | **55** | **55** | **0 — the plan is complete** |
+| **Total** | **56** | **56** | **0 — the plan is complete** |
 
-Clusters 1–8 are the original 47 (25 / 15 / 7 by tier). Cluster 9 added 5 tier-1 and 3 tier-2.
+Clusters 1–8 are the original 47 (25 / 15 / 7 by tier). Cluster 9 added 5 tier-1 and 3 tier-2. Cluster 6 later gained one tier-2 post written alongside the `excel-formulas` reference page.
 
 Verify these totals against the tables with:
 `grep -oE '^\| \`[a-z0-9-]+\.mdx\`.*\| [123] \|$' docs/notebooklm/plumbing-content-strategy.md | grep -oE '\| [123] \|$' | sort | uniq -c`

@@ -1,0 +1,513 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import { plumbingCalculators } from "@/config/plumbingCalculators";
+import {
+  sections,
+  tables,
+  tsv,
+  directCount,
+  lookupCount,
+  totalCount,
+} from "@/config/plumbingExcelFormulas";
+import { VELOCITY_CONSTANT, PSI_PER_FOOT_HEAD, BTU_PER_GPM_PER_DEGF } from "@/lib/plumbing";
+
+const title = "Plumbing Formulas for Excel — Paste-Ready Spreadsheet Formulas | TradesQuote";
+const description =
+  "Every plumbing formula written as a Microsoft Excel formula you can paste straight into a cell: pipe velocity, Hazen-Williams friction loss, available pressure, drain slope and fall, Manning's equation, vent and trap arm sizing, pump head, thermal expansion, pressure tank drawdown, recovery rate, first-hour rating, tankless flow and gas load. With the IPC lookup tables to paste, XLOOKUP and INDEX/MATCH versions, and the worked answer each one returns.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/excel-formulas";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Excel Formulas", item: pageUrl },
+  ],
+};
+
+const sectionId = (t: string) => `section-${t.toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "")}`;
+
+const sectionTone: Record<string, { chip: string; card: string; rule: string }> = {
+  blue: { chip: "bg-blue-100 text-blue-700", card: "border-l-blue-500 border-blue-100", rule: "text-blue-700" },
+  emerald: { chip: "bg-emerald-100 text-emerald-700", card: "border-l-emerald-500 border-emerald-100", rule: "text-emerald-700" },
+  cyan: { chip: "bg-cyan-100 text-cyan-700", card: "border-l-cyan-500 border-cyan-100", rule: "text-cyan-700" },
+  rose: { chip: "bg-rose-100 text-rose-700", card: "border-l-rose-500 border-rose-100", rule: "text-rose-700" },
+  amber: { chip: "bg-amber-100 text-amber-800", card: "border-l-amber-500 border-amber-100", rule: "text-amber-800" },
+  violet: { chip: "bg-violet-100 text-violet-700", card: "border-l-violet-500 border-violet-100", rule: "text-violet-700" },
+};
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Plumbing Formulas for Excel — Paste-Ready Spreadsheet Formulas" />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Plumbing Formulas for Excel | TradesQuote" />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Excel Formulas"
+          />
+
+          <div class="max-w-3xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
+              Plumbing Reference · Free
+            </span>
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Plumbing Formulas for Excel
+            </h1>
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              All {totalCount} formulas from the plumbing formula reference, rewritten as Microsoft Excel
+              formulas you can paste straight into a cell. Each one comes with the input cells it expects,
+              a named-range version that reads like English, and the answer it returns for a worked example.
+              The IPC lookup tables are here too, ready to paste.
+            </p>
+            <p class="mt-4 text-slate-600 leading-relaxed">
+              Every constant below is pulled from the same code that runs our calculators, so a formula you
+              paste into a sheet returns the number the calculator returns. {directCount} of the {totalCount} are
+              a single expression; the other {lookupCount} need one of the tables pasted in, because the IPC is
+              a book of tables and no amount of algebra changes that.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            {
+              sections.map((s) => (
+                <a
+                  href={`#${sectionId(s.title)}`}
+                  class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-orange-500 hover:text-orange-600 transition"
+                >
+                  {s.title}
+                </a>
+              ))
+            }
+            <a
+              href="#tables"
+              class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-orange-500 hover:text-orange-600 transition"
+            >
+              Tables to paste
+            </a>
+            <a
+              href="#compatibility"
+              class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-orange-500 hover:text-orange-600 transition"
+            >
+              Compatibility &amp; rounding
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== SET UP YOUR SHEET ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+        <div class="rounded-2xl border border-orange-200 bg-orange-50 p-6 sm:p-8">
+          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Set up your sheet first</h2>
+          <p class="mt-3 text-slate-700 leading-relaxed">
+            Every formula on this page assumes the same simple layout: labels down column A, values down
+            column B starting at row 2, and the answer in column E. Build that once and you can paste any
+            formula here without editing a cell reference.
+          </p>
+
+          <div class="mt-5 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-500">
+                  <th class="py-2 pr-4 font-semibold">Cell</th>
+                  <th class="py-2 pr-4 font-semibold">Holds</th>
+                  <th class="py-2 font-semibold">Example</th>
+                </tr>
+              </thead>
+              <tbody class="font-mono text-slate-700">
+                <tr class="border-t border-orange-200">
+                  <td class="py-2 pr-4">A2</td>
+                  <td class="py-2 pr-4 font-sans">The input's name</td>
+                  <td class="py-2">Flow</td>
+                </tr>
+                <tr class="border-t border-orange-200">
+                  <td class="py-2 pr-4">B2</td>
+                  <td class="py-2 pr-4 font-sans">The first input value</td>
+                  <td class="py-2">10</td>
+                </tr>
+                <tr class="border-t border-orange-200">
+                  <td class="py-2 pr-4">B3, B4 …</td>
+                  <td class="py-2 pr-4 font-sans">Further inputs, in the order listed on each card</td>
+                  <td class="py-2">0.785</td>
+                </tr>
+                <tr class="border-t border-orange-200">
+                  <td class="py-2 pr-4">E2</td>
+                  <td class="py-2 pr-4 font-sans">The formula, and any second formula in E3</td>
+                  <td class="py-2">=0.4085*B2/B3^2</td>
+                </tr>
+                <tr class="border-t border-orange-200">
+                  <td class="py-2 pr-4">F, G, H …</td>
+                  <td class="py-2 pr-4 font-sans">Any pasted lookup table</td>
+                  <td class="py-2">Table 909.1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-5 text-slate-700 leading-relaxed">
+            <strong>For the named-range versions:</strong> select A2:B6, then <em>Formulas → Create from
+            Selection → Left column</em>. Excel turns each label in column A into a name for the value beside
+            it, and <code class="rounded bg-white px-1.5 py-0.5 text-sm">=0.4085*Flow/Bore^2</code> starts
+            working. Named ranges are worth the two minutes on any sheet somebody else will have to read.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== FORMULAS ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14 space-y-20">
+        {
+          sections.map((section) => (
+            <div id={sectionId(section.title)}>
+              <div class={`inline-block rounded-lg px-4 py-1.5 text-sm font-bold mb-4 ${sectionTone[section.color].chip}`}>
+                {section.title}
+              </div>
+              <p class="mb-8 max-w-3xl text-slate-600 leading-relaxed">{section.blurb}</p>
+
+              <div class="space-y-8">
+                {section.formulas.map((f) => (
+                  <div class={`rounded-2xl border-l-4 border bg-white p-6 shadow-sm ${sectionTone[section.color].card}`}>
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                      <h3 class="text-lg font-bold text-slate-900">{f.name}</h3>
+                      <span
+                        class={`min-w-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                          f.kind === "direct" ? "bg-slate-100 text-slate-600" : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {f.kind === "direct" ? "One formula" : `Needs a table: ${f.usesTable}`}
+                      </span>
+                    </div>
+
+                    <div class="mt-4">
+                      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Input cells</p>
+                      <dl class="space-y-1">
+                        {f.inputs.map((i) => (
+                          <div class="flex flex-wrap gap-2 text-sm">
+                            <dt class="font-mono font-bold text-slate-700 shrink-0">{i.cell}</dt>
+                            <dd class="text-slate-600">
+                              — {i.label}
+                              <span class="text-slate-400"> · example {i.example}</span>
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+
+                    {/*
+                      The formula strings live in the frontmatter above, never here:
+                      a bare `<` in this half of the file is read as a tag opener and
+                      breaks the build. `whitespace-pre` keeps multi-line formulas
+                      aligned; `overflow-x-auto` keeps long ones off the mobile edge.
+                    */}
+                    <div class="mt-4">
+                      <div class="flex items-center justify-between gap-3 mb-1.5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Paste into Excel
+                        </p>
+                        <button
+                          type="button"
+                          data-copy={f.excel}
+                          class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 hover:border-orange-400 hover:text-orange-600 transition"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      <div class="rounded-xl bg-slate-900 px-5 py-4 font-mono text-xs sm:text-sm text-emerald-200 whitespace-pre overflow-x-auto">{f.excel}</div>
+                    </div>
+
+                    <div class="mt-3">
+                      <div class="flex items-center justify-between gap-3 mb-1.5">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Named-range version
+                        </p>
+                        <button
+                          type="button"
+                          data-copy={f.named}
+                          class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 hover:border-orange-400 hover:text-orange-600 transition"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      <div class="rounded-xl bg-slate-800 px-5 py-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre overflow-x-auto">{f.named}</div>
+                    </div>
+
+                    <div class="mt-4 rounded-lg bg-slate-50 px-4 py-3">
+                      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                        The example returns
+                      </p>
+                      <p class="text-sm font-semibold text-slate-800">{f.result}</p>
+                    </div>
+
+                    <p class="mt-4 text-sm text-slate-600 leading-relaxed">{f.notes}</p>
+
+                    {f.calc && (
+                      <div class="mt-4">
+                        <a
+                          href={f.calc.href}
+                          class="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-600 hover:text-orange-700 transition"
+                        >
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                          </svg>
+                          Check it against the {f.calc.label} →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+
+        <!-- ==== TABLES TO PASTE ==== -->
+        <div id="tables">
+          <div class="inline-block rounded-lg bg-amber-100 px-4 py-1.5 text-sm font-bold text-amber-700 mb-4">
+            Tables to paste
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The {lookupCount} formulas above that need data
+          </h2>
+          <p class="mt-4 max-w-3xl text-slate-600 leading-relaxed">
+            These are tab-separated. Copy one, click the cell you want it to start in, and paste — Excel,
+            Google Sheets and LibreOffice all split it into columns automatically. Each is generated from the
+            same code our calculators read, so it matches the tool exactly.
+          </p>
+
+          <div class="mt-8 space-y-8">
+            {
+              tables.map((t) => (
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="text-lg font-bold text-slate-900">{t.name}</h3>
+                    <button
+                      type="button"
+                      data-copy={tsv(t)}
+                      class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 hover:border-orange-400 hover:text-orange-600 transition"
+                    >
+                      Copy table
+                    </button>
+                  </div>
+                  <p class="mt-2 text-sm text-slate-600 leading-relaxed">{t.note}</p>
+                  <div class="mt-4 max-h-72 overflow-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-sm">
+                      <thead class="sticky top-0 bg-slate-100">
+                        <tr class="text-left text-slate-600">
+                          {t.headers.map((h) => (
+                            <th class="px-4 py-2 font-semibold whitespace-nowrap">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody class="font-mono text-slate-700">
+                        {t.rows.map((r) => (
+                          <tr class="border-t border-slate-100">
+                            {r.map((c) => (
+                              <td class="px-4 py-1.5 whitespace-nowrap">{c}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- ==== COMPATIBILITY & ROUNDING ==== -->
+        <div id="compatibility">
+          <div class="inline-block rounded-lg bg-slate-200 px-4 py-1.5 text-sm font-bold text-slate-700 mb-4">
+            Compatibility &amp; rounding
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Which Excel, and will the numbers match?
+          </h2>
+
+          <div class="mt-6 grid md:grid-cols-2 gap-5">
+            <div class="rounded-2xl border border-slate-200 bg-white p-6">
+              <h3 class="font-bold text-slate-900">XLOOKUP needs a recent Excel</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                <code class="rounded bg-slate-100 px-1.5 py-0.5">XLOOKUP</code> arrived in Microsoft 365 and
+                Excel 2021. Every lookup on this page is given in the
+                <code class="rounded bg-slate-100 px-1.5 py-0.5">INDEX</code> /
+                <code class="rounded bg-slate-100 px-1.5 py-0.5">MATCH</code> form as the pasteable version
+                precisely because that form works in every Excel back to 2007, and in Google Sheets and
+                LibreOffice Calc unchanged. The named-range versions use XLOOKUP where it reads better.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6">
+              <h3 class="font-bold text-slate-900">Exact match or approximate</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                The third argument of <code class="rounded bg-slate-100 px-1.5 py-0.5">MATCH</code> is not a
+                detail. Use <strong>0</strong> for a listed size — a trap arm is 1-1/2 in or it is not.
+                Use <strong>1</strong> for a curve you are reading between anchors, like Hunter's, and note
+                that a 1 requires the lookup column to be sorted ascending, which every table here already is.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6">
+              <h3 class="font-bold text-slate-900">Rounding agrees with our calculators</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                Excel's <code class="rounded bg-slate-100 px-1.5 py-0.5">ROUND</code> rounds a half away from
+                zero, which is the same rule our calculators display with. So
+                <code class="rounded bg-slate-100 px-1.5 py-0.5">=ROUND(23.615,2)</code> gives 23.62 here and
+                23.62 there. Beware the other direction: some languages round a half to even and would give
+                23.61 on the same number. If a figure disagrees with a calculator by one in the last decimal,
+                this is almost always why.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6">
+              <h3 class="font-bold text-slate-900">Constants here run to more digits</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                A few constants appear on the formula reference page in their familiar rounded form —
+                0.408 for velocity, 0.433 for head, 500 for the water-heating denominator. The formulas here
+                use the fuller values our code actually runs on, {VELOCITY_CONSTANT}, {PSI_PER_FOOT_HEAD} and
+                {" "}{BTU_PER_GPM_PER_DEGF}, so your sheet lands on the calculator's answer rather than near it.
+                The difference is under a tenth of a percent in each case, and never changes a pipe size.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==== SOURCES ==== -->
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <p class="text-sm text-slate-600 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> International Plumbing Code (IPC) 2021 — 604.1,
+            Table 604.3, 604.8, 607.1.2, 607.3, 704.1, Table 709.1, Tables 710.1(1) and 710.1(2), 906.2,
+            Table 909.1, 916.2, and Appendix E Tables E103.3(2) and E103.3(3). Grease interceptor ratings
+            follow PDI-G101. Gas figures come from the International Fuel Gas Code (IFGC) 402.4 and NFPA 54,
+            which are a separate code from the IPC. Velocity limits, fitting equivalent lengths, and
+            Hazen-Williams and Manning coefficients are ASPE and manufacturer design practice, not code
+            requirements.
+          </p>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Plumbing code adoption is split: much of the country is on the IPC, while other states use the
+            Uniform Plumbing Code (UPC), which differs on fixture-unit tables, drain slope allowances, and
+            velocity limits. Confirm which code your jurisdiction has adopted, and which edition. Local
+            amendments override the model code, and a licensed plumber plus the AHJ have final say on
+            anything installed.
+          </p>
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            A spreadsheet is only as current as the day it was built. If you save a copy of these formulas
+            and a table changes in a later code cycle, nothing in your file will tell you. That is the one
+            real argument for working an answer here as well — the
+            <a href="/calculators/plumbing" class="font-semibold text-orange-600 hover:underline">
+              {" "}calculators{" "}
+            </a>
+            are maintained against the code, and your copy is not.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== CTA ==== -->
+      <section class="bg-slate-50 border-t border-slate-200 py-14">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-2xl font-extrabold text-slate-900">Model it in a sheet. Quote it somewhere better.</h2>
+          <p class="mt-3 text-slate-600">
+            A spreadsheet is the right tool for everything on this page — iterate a pipe size, sweep a
+            temperature rise, work out what your bill rate has to be, or see what a 25% markup really
+            delivers as margin. That is modelling, and a sheet is where it belongs. Producing the document
+            a customer signs is a different job: it needs line items, versions and a record of what was
+            agreed, and a workbook holding your price book starts going stale the day you save it. Model
+            the numbers here, then let TradesQuote turn the scope into a line-item estimate your client
+            can accept online.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href="/calculators/plumbing/formulas"
+              class="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-6 py-3 text-sm font-bold text-white hover:bg-orange-700 transition"
+            >
+              The formulas explained →
+            </a>
+            <a
+              href="/calculators/plumbing"
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:border-orange-300 transition"
+            >
+              All {plumbingCalculators.length} plumbing calculators
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>
+
+{/*
+  The only script on any of the plumbing reference pages, and deliberately so:
+  a page of formulas you cannot copy defeats its own purpose. One delegated
+  listener, no imports. `navigator.clipboard` needs a secure context, so there
+  is an execCommand fallback; if both fail the text is still selectable.
+*/}
+<script is:inline>
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-copy]");
+    if (!button) return;
+
+    var text = button.getAttribute("data-copy") || "";
+    var original = button.getAttribute("data-label") || button.textContent;
+    button.setAttribute("data-label", original);
+
+    var done = function (ok) {
+      button.textContent = ok ? "Copied" : "Press Ctrl+C";
+      window.setTimeout(function () {
+        button.textContent = button.getAttribute("data-label");
+      }, 1600);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(
+        function () { done(true); },
+        function () { done(false); }
+      );
+      return;
+    }
+
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    document.body.appendChild(area);
+    area.select();
+    var ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch (error) {
+      ok = false;
+    }
+    document.body.removeChild(area);
+    done(ok);
+  });
+</script>

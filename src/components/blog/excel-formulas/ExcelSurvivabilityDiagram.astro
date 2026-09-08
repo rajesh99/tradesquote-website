@@ -1,0 +1,169 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { sections, tables, directCount, lookupCount, totalCount } from "@/config/plumbingExcelFormulas";
+
+/**
+ * The split that the whole post turns on: which plumbing formulas are algebra
+ * (and so port to a cell unchanged) and which are code tables wearing a formula
+ * as a hat.
+ *
+ * Both lists and every count are DERIVED from the same array the Excel
+ * reference page renders, so this picture cannot go stale when a formula is
+ * added — which is exactly what happened when the lists were hand-written here.
+ */
+const all = sections.flatMap((s) => s.formulas);
+const DIRECT = all.filter((f) => f.kind === "direct").map((f) => f.name);
+const LOOKUP = all.filter((f) => f.kind === "lookup").map((f) => ({
+  name: f.name,
+  table: f.usesTable ?? "code table",
+}));
+const TABLE_ROWS = tables.reduce((sum, t) => sum + t.rows.length, 0);
+
+/** Long entry names need trimming to fit two columns inside the panel. */
+const short = (name: string) =>
+  name
+    .replace(" — ", " ")
+    .replace("Water Supply Fixture Units → Peak Demand (GPM)", "WSFU to peak demand")
+    .replace("Drainage Fixture Units & Drain Size", "Drainage fixture units")
+    .replace("Developed Length & Fitting Equivalents", "Developed length")
+    .replace("Trap Arm Maximum Length", "Trap arm max length")
+    .replace("Thermal Expansion Volume", "Thermal expansion")
+    .replace("Grey Water Yield & Irrigable Area", "Grey water yield")
+    .replace("Water Heater Replacement Cost", "Water heater cost")
+    .replace("Job Price Margin, not Markup", "Job price and margin")
+    .replace("Pipe Volume & Gallons per Foot", "Pipe volume")
+    .replace("Storm & Roof Runoff Flow", "Storm runoff")
+    .replace("Septic Tank & Leach Field", "Septic and leach field")
+    .replace("Leak & Water Waste Cost", "Leak and water waste")
+    .replace("Mixing Valve / Tempered Water Ratio", "Mixing valve ratio")
+    .replace("Temperature Rise & Recovery Rate", "Recovery rate")
+    .replace("Pressure ↔ Head of Water", "Pressure to head")
+    .replace("Static Pressure Loss from Elevation", "Elevation loss")
+    .replace("Pressure-Reducing Valve Threshold", "PRV threshold")
+    .replace("Allowable Friction Loss per 100 ft", "Allowable psi/100 ft")
+    .replace("Available Pressure for Friction", "Available pressure")
+    .replace("Hazen-Williams Friction Loss", "Hazen-Williams loss")
+    .replace("Manning's Equation Drain Capacity", "Manning's equation")
+    .replace("Rainwater Yield & Cistern Storage", "Rainwater and cistern")
+    .replace("Whole-House Repipe Cost", "Repipe cost")
+    .replace("Loaded Labour Rate", "Loaded labour rate")
+    .replace("Gas Load → CFH", "Gas load to CFH")
+    .replace("Slope as Percent & Total Fall", "Slope percent and fall")
+    .replace("Tankless Flow Capacity", "Tankless flow");
+
+const COL_L = 24;
+const COL_R = 380;
+const TOP = 88;
+const ROW_H = 17;
+const LOOK_TOP = 88;
+const LOOK_H = 27;
+
+const DIRECT_SPLIT = Math.ceil(DIRECT.length / 2);
+/** Positions resolved here, never in the template: a bare `<` there breaks the build. */
+const DIRECT_POS = DIRECT.map((name, i) => {
+  const second = i >= DIRECT_SPLIT;
+  return {
+    label: short(name),
+    x: second ? COL_L + 172 : COL_L + 14,
+    y: TOP + 14 + (second ? i - DIRECT_SPLIT : i) * ROW_H,
+  };
+});
+
+const PANEL_H = Math.max(DIRECT_SPLIT, LOOKUP.length + 2) * ROW_H + 72;
+const VIEW_H = TOP + PANEL_H + 62;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 720 ${VIEW_H}`} fill="none" aria-hidden="true">
+  <title>Which plumbing formulas port to a spreadsheet and which need a code table</title>
+
+  <rect x="0" y="0" width="720" height={VIEW_H} fill={C.white} />
+
+  <text x={COL_L} y="26" font-family={FONT} font-size="15" font-weight="700" fill={C.dark}>
+    All {totalCount} plumbing formulas, sorted by what a spreadsheet needs
+  </text>
+  <text x={COL_L} y="46" font-family={FONT} font-size="11" fill={C.muted}>
+    The algebra is the easy half. {lookupCount} formulas are really code tables, and those are the ones that go stale.
+  </text>
+
+  {/* Left panel — direct */}
+  <rect x={COL_L} y={TOP - 24} width="332" height={PANEL_H} rx="8" fill={C.greenLight} stroke={C.green} stroke-width="1" />
+  <text x={COL_L + 14} y={TOP - 6} font-family={FONT} font-size="12" font-weight="700" fill={C.green}>
+    {directCount} port unchanged — pure algebra
+  </text>
+  {
+    DIRECT_POS.map((d) => (
+      <text x={d.x} y={d.y} font-family={FONT} font-size="9.5" fill={C.dark}>
+        {d.label}
+      </text>
+    ))
+  }
+
+  {/* Right panel — lookup */}
+  <rect x={COL_R} y={TOP - 24} width="316" height={PANEL_H} rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1" />
+  <text x={COL_R + 14} y={TOP - 6} font-family={FONT} font-size="12" font-weight="700" fill={C.orange}>
+    {lookupCount} need a code table pasted in
+  </text>
+  {
+    LOOKUP.map((l, i) => (
+      <g>
+        <text
+          x={COL_R + 14}
+          y={LOOK_TOP + 14 + i * LOOK_H}
+          font-family={FONT}
+          font-size="10.5"
+          font-weight="600"
+          fill={C.dark}
+        >
+          {short(l.name)}
+        </text>
+        <text
+          x={COL_R + 14}
+          y={LOOK_TOP + 26 + i * LOOK_H}
+          font-family={FONT}
+          font-size="9"
+          fill={C.muted}
+        >
+          {l.table}
+        </text>
+      </g>
+    ))
+  }
+
+  <rect
+    x={COL_R + 14}
+    y={LOOK_TOP + LOOKUP.length * LOOK_H + 8}
+    width="288"
+    height="50"
+    rx="6"
+    fill={C.white}
+    stroke={C.orange}
+    stroke-width="1"
+  />
+  <text
+    x={COL_R + 26}
+    y={LOOK_TOP + LOOKUP.length * LOOK_H + 28}
+    font-family={FONT}
+    font-size="10.5"
+    font-weight="700"
+    fill={C.orange}
+  >
+    {TABLE_ROWS} rows of table in total
+  </text>
+  <text
+    x={COL_R + 26}
+    y={LOOK_TOP + LOOKUP.length * LOOK_H + 43}
+    font-family={FONT}
+    font-size="9"
+    fill={C.muted}
+  >
+    Every one can change in a code cycle.
+  </text>
+
+  {/* Footer */}
+  <text x={COL_L} y={VIEW_H - 26} font-family={FONT} font-size="10" fill={C.muted}>
+    A formula is right until the physics changes. A pasted table is right until the code changes,
+  </text>
+  <text x={COL_L} y={VIEW_H - 12} font-family={FONT} font-size="10" fill={C.muted}>
+    and nothing in your file will tell you when that happens.
+  </text>
+</svg>
