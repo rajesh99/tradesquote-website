@@ -1,0 +1,87 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { TABLE_909_1, sizeLabel, ventSize, MIN_VENT_SIZE, fmt } from "@/lib/plumbing";
+
+/**
+ * Diagnosis by what gurgles and when. Each row narrows the fault to something
+ * you can actually go and look at, which is what the reader needs rather than
+ * a list of possible causes.
+ */
+const armFor = (size: number) => TABLE_909_1.find((r) => r.size === size)?.maxFeet ?? 0;
+
+const ROWS = [
+  {
+    symptom: "One fixture gurgles when IT drains",
+    cause: "Its own trap arm is too long, or its vent is blocked",
+    check: `A ${sizeLabel(2)} arm stops at ${armFor(2)} ft, a ${sizeLabel(1.5)} at ${armFor(1.5)} ft — measure weir to vent fitting`,
+    tone: C.orange,
+  },
+  {
+    symptom: "One fixture gurgles when ANOTHER drains",
+    cause: "They share a vent that cannot supply both",
+    check: "Usually a fixture added to an existing branch without re-venting",
+    tone: C.orange,
+  },
+  {
+    symptom: "Toilet bubbles when the washer discharges",
+    cause: "A big fast discharge outrunning the vent",
+    check: "Washer pumps hard — the vent has to supply air at that rate",
+    tone: C.red,
+  },
+  {
+    symptom: "Everything gurgles, drains are slow",
+    cause: "A partial blockage in the main, not a vent fault",
+    check: "The blockage restricts the airway as well as the waterway",
+    tone: C.red,
+  },
+  {
+    symptom: "Gurgling started after a roof job",
+    cause: "The vent terminal is covered or crushed",
+    check: "Frost closure and bird nests do the same thing seasonally",
+    tone: C.blue,
+  },
+  {
+    symptom: "Gurgling on windy days only",
+    cause: "Wind across the terminal pulling the system down",
+    check: "Points at a marginal vent that is only just adequate",
+    tone: C.blue,
+  },
+];
+
+const ROW_H = 36;
+const TOP = 84;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Diagnosing a gurgling drain by what gurgles and when</title>
+  <desc>
+    Six patterns, each narrowing the fault to something specific enough to go and inspect rather than a general
+    list of possible causes.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What gurgles, and when, names the fault</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Vent sizing floor is ${sizeLabel(MIN_VENT_SIZE)} and never less than half the drain — but length is what usually fails, not size.`}
+  </text>
+
+  <text x="34" y="74" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT YOU HEAR</text>
+  <text x={276} y="74" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT IT USUALLY IS</text>
+
+  {ROWS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={row.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 6} rx="2" fill={row.tone} opacity="0.9" />
+        <text x="40" y={y + 14} fill={C.dark} font-family={FONT} font-size="9.5" font-weight="700">{row.symptom}</text>
+        <text x={276} y={y + 14} fill={row.tone} font-family={FONT} font-size="9.5" font-weight="700">{row.cause}</text>
+        <text x={276} y={y + 25} fill={C.muted} font-family={FONT} font-size="8.5">{row.check}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="304" fill={C.muted} font-family={FONT} font-size="10">
+    {`A vent serving a ${sizeLabel(2)} drain is ${sizeLabel(ventSize(2, 30).size)} at 30 ft of developed length and ${sizeLabel(ventSize(2, 50).size)} at 50 — length upsizes vents as well as capping trap arms.`}
+  </text>
+</svg>

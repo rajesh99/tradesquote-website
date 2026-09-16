@@ -1,0 +1,106 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import {
+  totalDynamicHead,
+  frictionLossPsiPerFoot,
+  psiToHead,
+  velocity,
+  velocityHead,
+  insideDiameter,
+  HAZEN_WILLIAMS_C,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The four terms, stacked. Note the argument name — `frictionHeadFeet`, not
+ * `frictionFeet`; the wrong key produces NaN silently rather than throwing.
+ *
+ * Scenario copied from plumbing-pump-head-calculator/index.astro.
+ */
+const defs = markerDefs("tdh");
+const GPM = 30;
+const LENGTH_FT = 40;
+const LIFT_FT = 12;
+const NOMINAL = 1.5;
+const MATERIAL = "pvc-40" as const;
+
+const id = insideDiameter(MATERIAL, NOMINAL)!;
+const frictionPsi = frictionLossPsiPerFoot(GPM, id, HAZEN_WILLIAMS_C[MATERIAL]) * LENGTH_FT;
+const frictionFt = psiToHead(frictionPsi);
+const v = velocity(GPM, id);
+const vHead = velocityHead(v);
+const DISCHARGE_PSI = 40;
+const pressureFt = psiToHead(DISCHARGE_PSI);
+
+const withoutPressure = totalDynamicHead({
+  staticLiftFeet: LIFT_FT,
+  frictionHeadFeet: frictionFt,
+  pressureHeadFeet: 0,
+  velocityHeadFeet: vHead,
+});
+const withPressure = totalDynamicHead({
+  staticLiftFeet: LIFT_FT,
+  frictionHeadFeet: frictionFt,
+  pressureHeadFeet: pressureFt,
+  velocityHeadFeet: vHead,
+});
+
+const TERMS = [
+  { label: "Static lift", value: LIFT_FT, detail: "vertical rise, water level to discharge", tone: C.blue },
+  { label: "Friction head", value: frictionFt, detail: `${LENGTH_FT} ft of ${sizeLabel(NOMINAL)} PVC at ${GPM} gpm`, tone: C.orange },
+  { label: "Velocity head", value: vHead, detail: `V² ÷ 2g at ${fmt(v, 2)} ft/s — the term everyone drops`, tone: C.primary },
+];
+
+const maxVal = Math.max(...TERMS.map((t) => t.value), pressureFt);
+const BAR_X = 216;
+const BAR_MAX = 260;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>The four components of total dynamic head</title>
+  <desc>
+    Static lift, friction head, velocity head and pressure head. The fourth is optional and dominates whenever the
+    discharge has to arrive at a working pressure.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Four terms, and the small one is the one people drop</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${GPM} gpm through ${LENGTH_FT} ft of ${sizeLabel(NOMINAL)} Schedule 40 PVC, lifting ${LIFT_FT} ft. All four terms in feet of head.`}
+  </text>
+
+  {TERMS.map((t, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (t.value / maxVal) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{t.label}</text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="8.5">{t.detail}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={t.tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={t.tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(t.value, 2)} ft`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="188" x2="696" y2="188" stroke={C.border} stroke-width="1" />
+  <text x="28" y="206" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">Sump or transfer duty — no pressure needed</text>
+  <text x={BAR_X + BAR_MAX + 10} y="206" fill={C.dark} font-family={FONT} font-size="11" font-weight="800">
+    {`TDH ${fmt(withoutPressure, 1)} ft`}
+  </text>
+
+  <rect x="24" y="216" width="672" height="52" rx="10" fill={C.redLight} stroke={C.red} stroke-width="1.8" />
+  <text x="38" y="234" fill={C.red} font-family={FONT} font-size="10" font-weight="800">
+    {`Add a ${DISCHARGE_PSI} psi discharge requirement — pressure head ${fmt(pressureFt, 1)} ft`}
+  </text>
+  <text x="38" y="250" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+    {`TDH becomes ${fmt(withPressure, 1)} ft — ${fmt(withPressure / withoutPressure, 1)}x, and the pressure term is ${fmt((pressureFt / withPressure) * 100)}% of it.`}
+  </text>
+  <text x="38" y="263" fill={C.muted} font-family={FONT} font-size="9">
+    A booster and a sump pump doing the same lift at the same flow are not remotely the same pump.
+  </text>
+</svg>

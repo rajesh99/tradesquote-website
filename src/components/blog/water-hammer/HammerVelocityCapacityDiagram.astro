@@ -1,0 +1,91 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  nominalSizes,
+  insideDiameter,
+  flowAtVelocity,
+  sizeLabel,
+  fmt,
+  MAX_VELOCITY_COLD,
+  MAX_VELOCITY_HOT,
+} from "@/lib/plumbing";
+
+/**
+ * The design-side fix. Water hammer is a velocity problem, and the velocity
+ * limits the trade already designs to are the same limits that keep surge
+ * survivable. This is the table that says how much flow each size can carry
+ * before it is running too fast.
+ *
+ * Base matches plumbing-pipe-velocity-calculator: Type L copper.
+ */
+const MATERIAL = "copper-l";
+
+const rows = nominalSizes(MATERIAL)
+  .filter((n) => n <= 2)
+  .map((n) => {
+    const id = insideDiameter(MATERIAL, n)!;
+    return {
+      label: sizeLabel(n),
+      id,
+      cold: flowAtVelocity(MAX_VELOCITY_COLD, id),
+      hot: flowAtVelocity(MAX_VELOCITY_HOT, id),
+    };
+  });
+
+const maxCold = Math.max(...rows.map((r) => r.cold));
+
+const BAR_X = 196;
+const BAR_MAX = 336;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 104 + i * 30,
+  coldW: Math.max(3, (r.cold / maxCold) * BAR_MAX),
+  hotW: Math.max(3, (r.hot / maxCold) * BAR_MAX),
+  isCommon: r.label === '3/4"',
+}));
+
+const common = rows.find((r) => r.label === '3/4"')!;
+const hotShare = (common.hot / common.cold) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Maximum flow per pipe size at the cold and hot water velocity limits</title>
+  <desc>
+    Type L copper at the 8 feet per second cold limit and the 5 feet per second hot limit. Three-quarter inch
+    carries 12.07 gallons a minute cold but only 7.54 hot, and the hot figure is 62.5 percent of the cold at
+    every size.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Hammer is a velocity problem, so the fix is a sizing table</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Maximum flow in Type L copper at the ${fmt(MAX_VELOCITY_COLD, 0)} ft/s cold limit and the ${fmt(MAX_VELOCITY_HOT, 0)} ft/s hot limit. Exceed these and you are designing the bang in.`}
+  </text>
+
+  <g font-family={FONT} font-size="9" font-weight="700">
+    <rect x="404" y="72" width="9" height="9" rx="2" fill={C.blue} opacity="0.7" />
+    <text x="418" y="80" fill={C.muted}>{`cold, ${fmt(MAX_VELOCITY_COLD, 0)} ft/s`}</text>
+    <rect x="516" y="72" width="9" height="9" rx="2" fill={C.red} opacity="0.7" />
+    <text x="530" y="80" fill={C.muted}>{`hot, ${fmt(MAX_VELOCITY_HOT, 0)} ft/s`}</text>
+  </g>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">SIZE · BORE</text>
+  <text x={BAR_X + BAR_MAX + 10} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">MAX GPM</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.isCommon ? 800 : 600}>{row.label}</text>
+      <text x="86" y={row.y + 14} fill={C.muted} font-family={FONT} font-size="9">{`${fmt(row.id, 3)} in`}</text>
+      <rect x={BAR_X} y={row.y} width={row.coldW} height="9" rx="2" fill={C.blue} opacity={row.isCommon ? 0.8 : 0.5} />
+      <rect x={BAR_X} y={row.y + 11} width={row.hotW} height="9" rx="2" fill={C.red} opacity={row.isCommon ? 0.8 : 0.5} />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 14} fill={row.isCommon ? C.dark : C.muted} font-family={FONT} font-size="10" font-weight={row.isCommon ? 800 : 600}>
+        {`${fmt(row.cold, 2)} / ${fmt(row.hot, 2)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">
+    {`The hot limit is ${fmt(hotShare, 1)}% of the cold one at every size — hot water erodes copper faster, so ${common.label} carries ${fmt(common.hot, 2)} gpm hot against ${fmt(common.cold, 2)} cold.`}
+  </text>
+</svg>

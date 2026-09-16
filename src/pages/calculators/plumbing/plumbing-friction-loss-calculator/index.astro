@@ -1,0 +1,737 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  FITTING_LABELS,
+  FITTING_LD,
+  HAZEN_WILLIAMS_C,
+  PIPE_MATERIAL_LABELS,
+  fittingEquivalentFeet,
+  fmt,
+  frictionLossPsiPer100Ft,
+  insideDiameter,
+  nominalSizes,
+  sizeLabel,
+  type FittingKey,
+  type PipeMaterial,
+} from "@/lib/plumbing";
+
+const title = "Pipe Friction Loss Calculator — Hazen-Williams | TradesQuote";
+const description =
+  "Free pipe friction loss calculator using Hazen-Williams. Enter flow, pipe size and material to get pressure loss per 100 ft, plus the equivalent length every elbow, tee and valve adds to the run. Copper, PEX, CPVC, PVC and steel.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-friction-loss-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Pipe Friction Loss Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Pipe Friction Loss Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online pipe friction loss calculator using the Hazen-Williams equation, reporting pressure loss per 100 feet and over the whole developed length including fitting equivalent lengths.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much pressure do I lose over 100 feet of pipe?",
+    answer:
+      "It depends far more on bore than on length. At 10 gpm, 100 feet of 3/4-inch Type L copper costs <strong>11.08 psi</strong>; the same flow in 1-inch copper costs 3.02 psi — a 73% cut for one size up. There is no single answer to quote, which is why a calculator beats a rule of thumb here.",
+  },
+  {
+    question: "What is Hazen-Williams and why this formula?",
+    answer:
+      "It is the standard empirical equation for water in full pipes at ordinary temperatures, and it is what plumbing design has used for a century because it needs only one roughness number, <strong>C</strong>. Darcy-Weisbach is more physically complete and handles other fluids and temperatures, but it needs an iterative friction factor. For cold water in a building, the two agree closely enough that Hazen-Williams is the sensible choice.",
+  },
+  {
+    question: "What is developed length?",
+    answer:
+      "The measured pipe <em>plus</em> the equivalent length of every fitting and valve, because an elbow costs pressure exactly the way a length of pipe does. On 3/4-inch copper a 90° elbow is worth about <strong>1.96 feet</strong> of pipe, a tee taken through the branch about <strong>3.93 feet</strong>, and a ball valve about 0.52 feet. Add them up and the defaults here turn a 100-foot run into a 120.7-foot one.",
+  },
+  {
+    question: "Does PEX lose less pressure than copper?",
+    answer:
+      "No — usually more, at the same nominal size, and this surprises people. PEX has the <em>better</em> roughness coefficient (150 against copper's 140) but a much smaller bore: 0.681 in against 0.785 in at 3/4 inch. At 10 gpm that is <strong>19.55 psi per 100 ft in PEX against 11.08 in copper</strong> — nearly double. Bore beats smoothness, because the friction term goes as diameter to the power of 4.87.",
+  },
+  {
+    question: "What C value should I use for old galvanized pipe?",
+    answer:
+      "New galvanized steel is taken at C = 120, and it degrades toward <strong>C = 100 or lower</strong> as it scales internally. That is roughly a 40% increase in friction loss for the same pipe, and it is why an old galvanized house loses pressure long before anything visibly fails. The calculator uses 120 for galvanized; assume worse on anything more than a few decades old.",
+  },
+  {
+    question: "How do I convert psi of loss into feet of head?",
+    answer:
+      "Multiply by 2.309, since one psi is 2.309 feet of water column. The default 13.37 psi of total loss here is <strong>30.9 feet of head</strong>. Pumps are specified in feet, supply pressure in psi, so you will convert constantly — the breakdown panel above shows both.",
+  },
+  {
+    question: "Should I add a safety factor?",
+    answer:
+      'Rather than pad the number, size against a real pressure budget. The <a href="/calculators/plumbing/plumbing-pipe-size-calculator" class="font-semibold text-teal-700 underline decoration-teal-300 hover:decoration-teal-600">Water Pipe Size Calculator</a> subtracts elevation, fixture requirement and meter loss from the supply pressure and spends what is genuinely left, which is more honest than a blanket margin. If you want conservatism, put it in the C value or the fitting count.',
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Losses worked out? Quote the whole job in seconds.";
+const ctaDescription =
+  "Pipe and fittings are line items, and there are dozens of them. TradesQuote turns the whole job into a detailed, line-item estimate with quantities, unit prices, and totals — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Spend that loss against a real pressure budget.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-velocity-calculator",
+    title: "Pipe Velocity Calculator",
+    description: "The other rule that limits pipe size.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "Convert psi and head, and check for a PRV.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "Friction head is one term of total dynamic head.",
+  },
+];
+
+const MATERIALS: PipeMaterial[] = ["copper-l", "copper-m", "pex", "cpvc-40", "pvc-40", "steel-40"];
+const COPPER_SIZES = nominalSizes("copper-l");
+const FITTINGS = Object.keys(FITTING_LD) as FittingKey[];
+
+const DEFAULT_FITTINGS: Partial<Record<FittingKey, number>> = {
+  elbow90: 6,
+  teeBranch: 2,
+  ballValve: 2,
+};
+
+const id34 = insideDiameter("copper-l", 0.75) ?? 0;
+
+/** Both tables computed from the lib. */
+const sizeTable = COPPER_SIZES.map((n) => {
+  const id = insideDiameter("copper-l", n) ?? 0;
+  return { nominal: n, id, loss: frictionLossPsiPer100Ft(10, id, HAZEN_WILLIAMS_C["copper-l"]) };
+});
+
+const materialTable = MATERIALS.map((m) => {
+  const id = insideDiameter(m, 0.75) ?? 0;
+  return { material: m, id, c: HAZEN_WILLIAMS_C[m], loss: frictionLossPsiPer100Ft(10, id, HAZEN_WILLIAMS_C[m]) };
+});
+
+const fittingTable = FITTINGS.map((k) => ({
+  key: k,
+  ld: FITTING_LD[k],
+  feet: fittingEquivalentFeet(k, id34),
+}));
+
+const styles = plumbingAccentStyles.teal;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pipe Friction Loss Calculator — Hazen-Williams" />
+    <meta
+      property="og:description"
+      content="Pressure loss per 100 ft for copper, PEX, CPVC, PVC and steel, plus what every elbow, tee and valve adds to the run. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pipe Friction Loss Calculator — Hazen-Williams" />
+    <meta
+      name="twitter:description"
+      content="Hazen-Williams pressure loss per 100 ft, with fitting equivalent lengths. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Pipe Friction Loss Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+              </svg>
+              Plumbing Tools · Hazen-Williams · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Pipe Friction Loss Calculator <span class="text-teal-600">— Hazen-Williams</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every foot of pipe and every fitting takes a cut of your supply pressure. This calculator runs the
+              <strong>Hazen-Williams</strong> equation for the loss per 100 feet, then adds the
+              <strong>equivalent length</strong> of your elbows, tees and valves so you get the loss over the
+              run you are actually installing — not the run you measured.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+            </svg>
+            Work out the loss
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="fl-gpm" class="text-sm font-semibold text-slate-800">Flow rate</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="fl-gpm"
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="0.1"
+                      value="10"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">gpm</span>
+                  </div>
+                </div>
+                <input
+                  id="fl-gpm-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="10"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-teal-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>100 gpm</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                  <label for="fl-material" class="text-sm font-semibold text-slate-800">Pipe material</label>
+                  <select
+                    id="fl-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    {
+                      MATERIALS.map((m) => (
+                        <option value={m} selected={m === "copper-l"}>
+                          {PIPE_MATERIAL_LABELS[m]} — C {HAZEN_WILLIAMS_C[m]}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="fl-size" class="text-sm font-semibold text-slate-800">Nominal size</label>
+                  <select
+                    id="fl-size"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                  >
+                    {
+                      COPPER_SIZES.map((n) => (
+                        <option value={n} selected={n === 0.75}>
+                          {sizeLabel(n)}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="fl-measured" class="text-sm font-semibold text-slate-800">Measured pipe run</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="fl-measured"
+                      type="number"
+                      min="0"
+                      max="5000"
+                      value="100"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Fittings and valves on the run</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Each is converted to an equivalent length of straight pipe at this bore.
+                </p>
+                <div class="mt-3 space-y-2">
+                  {
+                    fittingTable.map((f) => (
+                      <div class="flex items-center justify-between gap-3">
+                        <label for={`fl-fx-${f.key}`} class="text-sm text-slate-600 leading-snug">
+                          {FITTING_LABELS[f.key]}
+                          <span class="ml-1.5 text-xs text-slate-400">{fmt(f.feet, 2)} ft each at 3/4"</span>
+                        </label>
+                        <input
+                          id={`fl-fx-${f.key}`}
+                          data-fl-fitting={f.key}
+                          type="number"
+                          min="0"
+                          max="99"
+                          value={DEFAULT_FITTINGS[f.key] ?? 0}
+                          class="w-16 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none"
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <button
+                id="fl-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-teal-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-teal-100 bg-teal-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Loss per 100 ft</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="fl-per-100" class="text-5xl font-extrabold tracking-tight text-teal-600">
+                  11.08 psi
+                </span>
+              </div>
+              <p id="fl-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Fittings add 20.7 ft of equivalent pipe on top of the 100 ft measured.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Loss over the run</p>
+                  <p id="fl-total" class="mt-1 text-2xl font-bold text-slate-900">13.37 psi</p>
+                </div>
+                <div class="rounded-xl border border-teal-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Developed length</p>
+                  <p id="fl-developed" class="mt-1 text-2xl font-bold text-slate-900">120.7 ft</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-teal-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Actual bore</span><span id="fl-bd-id" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Roughness C</span><span id="fl-bd-c" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Velocity</span><span id="fl-bd-velocity" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Fitting equivalents</span><span id="fl-bd-fitting-feet" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Loss as head</span><span id="fl-bd-head" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>One size up</span><span id="fl-bd-next-size" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Hazen-Williams assumes water at ordinary temperature in a full pipe; scale,
+                partial blockage and unusual fittings are not modelled. A licensed plumber and your AHJ have
+                final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One empirical equation, one roughness number, and a trick for turning fittings into pipe.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-teal-300"># Hazen-Williams, psi per foot</div>
+            <div>
+              psi/ft&nbsp;=&nbsp;<span class="text-amber-300">4.52</span> × Q^<span class="text-amber-300"
+                >1.852</span
+              > ÷ (C^<span class="text-amber-300">1.852</span> × d^<span class="text-amber-300">4.8704</span>)
+            </div>
+            <div>Q in gpm&nbsp;·&nbsp;d = inside diameter in inches&nbsp;·&nbsp;C = roughness</div>
+            <div class="mt-4 text-teal-300"># Roughness values used here</div>
+            <div>
+              PEX / CPVC / PVC&nbsp;<span class="text-amber-300">150</span>&nbsp;·&nbsp;copper&nbsp;<span
+                class="text-amber-300">140</span
+              >&nbsp;·&nbsp;galvanised steel&nbsp;<span class="text-amber-300">120</span> new, ~100 scaled
+            </div>
+            <div class="mt-4 text-teal-300"># Fittings become pipe (equivalent length in diameters)</div>
+            <div>equivalent ft&nbsp;=&nbsp;(L/D) × d ÷ <span class="text-amber-300">12</span></div>
+            <div>
+              90° ell&nbsp;<span class="text-amber-300">30</span>&nbsp;·&nbsp;45° ell&nbsp;<span
+                class="text-amber-300">16</span
+              >&nbsp;·&nbsp;tee run&nbsp;<span class="text-amber-300">20</span>&nbsp;·&nbsp;tee branch&nbsp;<span
+                class="text-amber-300">60</span
+              >&nbsp;·&nbsp;globe valve&nbsp;<span class="text-amber-300">340</span>
+            </div>
+            <div class="mt-4 text-teal-300"># Then the two combine</div>
+            <div>developed length&nbsp;=&nbsp;measured ft + Σ fitting equivalents</div>
+            <div>total loss&nbsp;=&nbsp;psi/ft × developed length</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why d^4.87 dominates everything</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Bore is by far the most powerful term. Going up one nominal size in copper widens the bore about
+                31% and cuts the loss roughly 73%. No change of material or fitting count comes close to that.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Flow is not linear either</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The 1.852 exponent means doubling the flow multiplies the loss by about 3.6, not 2. This is why
+                a pipe that behaves perfectly with one shower running can fall over with two.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Equivalent length in diameters</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Computing fittings as a multiple of the bore rather than reading a per-size table means it stays
+                valid at any diameter — and it reproduces the published figures: a 90° ell on 3/4-inch copper
+                comes out at 1.96 ft against a published 2.0.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A tee is not a tee</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Straight through, a tee costs about the same as a 90° elbow. Taken through the branch it costs
+                <strong>three times</strong> as much — 60 diameters against 20. Which port the water takes
+                matters more than the fitting count.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, one size up, and the case where the fittings cost more than the pipe.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">10 gpm, 3/4 inch copper, 100 ft plus fittings</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Six 90° elbows, two tees through the branch, two ball valves. The calculator's defaults.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              6 × 90° ell @ 1.96 ft = 11.78 ft<br />
+              2 × tee branch @ 3.93 ft = 7.85 ft<br />
+              2 × ball valve @ 0.52 ft = 1.05 ft<br />
+              developed = 100 + 20.67 = <span class="font-bold text-teal-700">120.67 ft</span><br />
+              loss = 11.08 psi/100 ft × 1.2067 = <span class="font-bold text-teal-700">13.37 psi</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 13.37 psi, of which
+              <strong>2.29 psi is the fittings</strong> — 17% of the total from ten components you could easily
+              have ignored. That is 30.9 feet of head.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">One size up — 1 inch copper</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              bore 0.785 → 1.025 in (+31%)<br />
+              loss 11.08 → <span class="font-bold text-teal-700">3.02 psi/100 ft</span><br />
+              = <span class="font-bold text-teal-700">73% less friction</span> for one size
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 31% wider bore cuts the loss by nearly
+              three quarters, because the diameter term is raised to 4.87. Upsizing one step is almost always
+              cheaper than any other way of recovering pressure.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">A short, fitting-heavy run — where they dominate</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              A 15-foot mechanical-room manifold at 10 gpm in 3/4-inch copper: eight 90° elbows, four tees
+              through the branch, one globe valve.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              8 × 1.96 = 15.70 ft&nbsp;·&nbsp;4 × 3.93 = 15.70 ft&nbsp;·&nbsp;1 globe @ 22.24 ft<br />
+              fittings = 53.64 ft against 15 ft of pipe<br />
+              developed = <span class="font-bold text-teal-700">68.64 ft</span> — the fittings are
+              <span class="font-bold text-teal-700">78% of it</span><br />
+              loss = 11.08 × 0.6864 = 7.61 psi
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the pipe contributes 1.66 psi and the
+              fittings 5.94 psi. A single globe valve is worth 22 feet of 3/4-inch pipe on its own — 340
+              diameters — which is why ball valves replaced them almost everywhere.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Loss by size at 10 gpm</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Type L copper, computed from the same code the calculator runs above.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Nominal size</th>
+                  <th class="py-3 px-5 font-semibold">Actual bore</th>
+                  <th class="py-3 px-5 font-semibold">Loss per 100 ft</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  sizeTable.map((row, index) => (
+                    <tr class={index === sizeTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.nominal)}</td>
+                      <td class="py-3 px-5">{fmt(row.id, 3)} in</td>
+                      <td class="py-3 px-5">{fmt(row.loss, 2)} psi</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            10 gpm in 3/4 inch — every material
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The counter-intuitive result: <strong>PEX has the best roughness coefficient and the worst loss</strong>,
+            because its bore is the smallest. Schedule 40 wins on both counts at this size.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Material</th>
+                  <th class="py-3 px-5 font-semibold">Bore</th>
+                  <th class="py-3 px-5 font-semibold">C</th>
+                  <th class="py-3 px-5 font-semibold">Loss per 100 ft</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  materialTable.map((row, index) => (
+                    <tr class={index === materialTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">
+                        {PIPE_MATERIAL_LABELS[row.material]}
+                      </td>
+                      <td class="py-3 px-5">{fmt(row.id, 3)} in</td>
+                      <td class="py-3 px-5">{row.c}</td>
+                      <td class="py-3 px-5">{fmt(row.loss, 2)} psi</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Fitting equivalent lengths
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Expressed in pipe diameters, so they hold at any size, with the value for 3/4-inch Type L copper
+            worked out alongside.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Fitting</th>
+                  <th class="py-3 px-5 font-semibold">Equivalent diameters (L/D)</th>
+                  <th class="py-3 px-5 font-semibold">Feet at 3/4" copper</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  fittingTable.map((row, index) => (
+                    <tr class={index === fittingTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{FITTING_LABELS[row.key]}</td>
+                      <td class="py-3 px-5">{row.ld}</td>
+                      <td class="py-3 px-5">{fmt(row.feet, 2)} ft</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: the Hazen-Williams equation as applied in <a
+              class="underline hover:text-teal-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > Appendix E and <a class="underline hover:text-teal-600" href="https://www.aspe.org/" target="_blank" rel="noopener"
+              >ASPE</a
+            > design guidance, cross-checked here against the independent head-loss form (the two agree within
+            1.3%). Pipe dimensions from <a class="underline hover:text-teal-600" href="https://www.astm.org/" target="_blank" rel="noopener"
+              >ASTM</a
+            > B88, F876 and D1785, with every bore computed from outside diameter and wall thickness. Fitting
+            equivalents are the classic L/D ratios, validated against published per-size tables. Local
+            amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="teal"
+        subtitle="Common questions about friction loss, Hazen-Williams, and fitting equivalent lengths."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingFrictionLossCalculator } from "@/scripts/calculators/plumbing-friction-loss-calculator";
+    initPlumbingFrictionLossCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0d9488;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

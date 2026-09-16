@@ -1,0 +1,110 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  totalDfu,
+  drainCapacity,
+  minDrainSizeApplied,
+  ventSize,
+  trapArmMaxFeet,
+  PSI_PER_FOOT_HEAD,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * Which of this site's own published numbers are code-specific and which are
+ * physics. Reading them straight out of the lib is the point: a reader in a UPC
+ * jurisdiction needs to know exactly which figures to re-check.
+ */
+const groupDfu = totalDfu({ "bathroom-group-16": 1 });
+const branch = minDrainSizeApplied(groupDfu, "horizontal-branch", 0.25, true);
+const vent = ventSize(branch.size, 30);
+const trapArm2 = trapArmMaxFeet(2);
+const drain4 = drainCapacity(4, "building-drain", 0.25);
+
+const ROWS = [
+  {
+    label: `Bathroom group = ${groupDfu} DFU`,
+    source: "IPC Table 709.1",
+    codeSpecific: true,
+    note: "the UPC assigns its own fixture unit values",
+  },
+  {
+    label: `${sizeLabel(4)} building drain at 1/4 in/ft = ${fmt(drain4)} DFU`,
+    source: "IPC Table 710.1(1)",
+    codeSpecific: true,
+    note: "capacity tables differ between the codes",
+  },
+  {
+    label: `${sizeLabel(2)} trap arm = ${trapArm2} ft maximum`,
+    source: "IPC Table 909.1",
+    codeSpecific: true,
+    note: "the UPC also measures the length differently",
+  },
+  {
+    label: `Vent for that branch = ${sizeLabel(vent.size)}`,
+    source: "IPC 906.2 — half the drain, floor at 1-1/4 in",
+    codeSpecific: true,
+    note: "the principle is shared; the table is not",
+  },
+  {
+    label: `${PSI_PER_FOOT_HEAD} psi per foot of head`,
+    source: "water at 62.37 lb/ft³ ÷ 144",
+    codeSpecific: false,
+    note: "physics — no code changes this",
+  },
+  {
+    label: "8 ft/s cold, 5 ft/s hot velocity ceiling",
+    source: "ASPE and manufacturer practice",
+    codeSpecific: false,
+    note: "not an IPC number either — it is design practice",
+  },
+  {
+    label: "0.0408 × diameter² gallons per foot",
+    source: "geometry",
+    codeSpecific: false,
+    note: "physics — no code changes this",
+  },
+];
+
+const ROW_H = 32;
+const TOP = 82;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 348" fill="none" aria-hidden="true">
+  <title>Which published numbers change with the code and which do not</title>
+  <desc>
+    Table values are code-specific and must be re-checked in a UPC jurisdiction. Derived physical quantities and design
+    practice figures are not code at all and do not change.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="332" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Which of these numbers changes if you are under the UPC?</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Table values do. Derived physical quantities do not, and neither do the design-practice figures that were never code to begin with.
+  </text>
+
+  <text x="34" y="74" fill={C.orange} font-family={FONT} font-size="8" font-weight="700">FROM A TABLE — RE-CHECK IT</text>
+  <text x={476} y="74" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">SOURCE</text>
+
+  {ROWS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const tone = row.codeSpecific ? C.orange : C.primary;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 5} rx="7" fill={tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 5} rx="2" fill={tone} opacity="0.9" />
+        <text x="40" y={y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+        <text x="40" y={y + 24} fill={C.muted} font-family={FONT} font-size="8.5">{row.note}</text>
+        <text x={476} y={y + 13} fill={tone} font-family={FONT} font-size="9" font-weight="700">{row.source}</text>
+        <text x={476} y={y + 24} fill={tone} font-family={FONT} font-size="8" font-weight="700">
+          {row.codeSpecific ? "CODE-SPECIFIC" : "NOT CODE — DOES NOT CHANGE"}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="332" fill={C.muted} font-family={FONT} font-size="10">
+    {`The bathroom group's ${groupDfu} DFU is a table entry. The ${PSI_PER_FOOT_HEAD} psi per foot is water. Only one of those is a jurisdictional question.`}
+  </text>
+</svg>

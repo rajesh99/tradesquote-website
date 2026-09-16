@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  headToPsi, availableFrictionPsi, allowableLossPer100Ft, fmt,
+} from "@/lib/plumbing";
+/** Where 60 psi actually goes on an ordinary house. What is left after the
+ * fixed claims is the entire budget the pipe has to run on. */
+const SUPPLY = 60;
+const LIFT_FT = 20;
+const FIXTURE_PSI = 15;
+const METER_PSI = 8;
+const DEVELOPED = 120;
+
+const elevation = headToPsi(LIFT_FT);
+const available = availableFrictionPsi({
+  supplyPsi: SUPPLY,
+  highestFixtureFeet: LIFT_FT,
+  fixtureRequiredPsi: FIXTURE_PSI,
+  meterLossPsi: METER_PSI,
+  otherLossPsi: 0,
+});
+const allowable = allowableLossPer100Ft(available, DEVELOPED);
+
+const claims = [
+  { label: "Street supply", psi: SUPPLY, note: "what you start with", highlight: false },
+  { label: "Water meter", psi: -METER_PSI, note: "lost crossing the meter", highlight: false },
+  { label: `Lift to ${LIFT_FT} ft`, psi: -elevation, note: "pure height, flow-independent", highlight: false },
+  { label: "Needed at the fixture", psi: -FIXTURE_PSI, note: "the fixture will not work below this", highlight: false },
+  { label: "LEFT FOR FRICTION", psi: available, note: `= ${fmt(allowable, 2)} psi per 100 ft`, highlight: true },
+];
+const maxPsi = SUPPLY;
+
+const rows = claims.map((c) => ({
+  label: c.label,
+  value: c.psi,
+  frac: Math.abs(c.psi) / maxPsi,
+  display: `${c.psi > 0 ? "" : "-"}${Math.abs(c.psi).toFixed(2)} psi  ·  ${c.note}`,
+  highlight: c.highlight,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 176;
+const BAR_MAX = 252;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 278" fill="none" aria-hidden="true">
+  <title>Where 60 psi goes before the pipe gets any</title>
+  <desc>120 ft developed run to a fixture 20 ft up, through a meter, on an ordinary house</desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where 60 psi goes before the pipe gets any</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">120 ft developed run to a fixture 20 ft up, through a meter, on an ordinary house</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">Only what survives all four claims is available to spend on friction — and that remainder is what sets the pipe size.</text>
+</svg>

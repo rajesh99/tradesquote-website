@@ -1,0 +1,160 @@
+---
+title: "Friction Loss in Water Pipes: Hazen-Williams Without the Nomograph"
+meta_title: "Friction Loss in Water Pipes: Hazen-Williams Explained (2026) | TradesQuote"
+description: "Two exponents explain every surprise in pipe sizing. Double the flow and friction goes up 3.6x; double the diameter and it falls 23.8x. Plus the fittings a tape measure never sees."
+image: /images/posts/friction-loss-in-pipes-hero.svg
+date: 2026-09-04T09:30:00Z
+categories: ["plumbing"]
+tags: ["friction loss","hazen williams","pipe sizing","developed length","pressure loss"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import FrictionExponentDiagram from "@/components/blog/friction-loss/FrictionExponentDiagram.astro";
+import FrictionMaterialDiagram from "@/components/blog/friction-loss/FrictionMaterialDiagram.astro";
+import FrictionFittingsDiagram from "@/components/blog/friction-loss/FrictionFittingsDiagram.astro";
+
+Friction loss is the reason a house with perfectly good pressure at the meter delivers a disappointing shower upstairs. It has a reputation for being fiddly, and it does not deserve it — the whole subject is **two exponents that behave nothing like each other**.
+
+## The two exponents
+
+Hazen-Williams is the empirical equation the trade sizes water pipe with. Stripped to what matters:
+
+    loss ∝ flow^1.85 ÷ diameter^4.87
+
+Flow is raised to roughly 1.85. Diameter is raised to roughly **negative 4.87**. Those two numbers explain every counter-intuitive result in pipe sizing.
+
+<BlogInfographic
+  title="Two exponents, and they are nothing like each other"
+  caption="Type L copper at C = 140. Doubling the flow through the same pipe multiplies friction by 3.6. Doubling the diameter at the same flow divides it by 23.8."
+>
+  <FrictionExponentDiagram />
+</BlogInfographic>
+
+Start at 10 gpm through 3/4 inch copper: **11.08 psi per 100 ft**.
+
+**Double the flow to 20 gpm** and it becomes **40.00 psi per 100 ft** — 3.6 times worse. Painful, but proportionate.
+
+**Double the diameter to 1-1/2 inch** at the original 10 gpm and it becomes **0.465 psi per 100 ft** — **23.8 times better**. Not proportionate at all.
+
+That asymmetry is worth internalising, because it makes two practical predictions:
+
+**Adding a fixture rarely breaks anything.** Flow only has to survive a 1.85 exponent, and adding one fixture to a branch is nowhere near doubling the flow anyway — the demand curve in **[fixture units explained](/blog/plumbing-fixture-units-explained)** flattens hard as fixtures are added.
+
+**Going one size up fixes almost anything.** Because the diameter exponent is brutal, one nominal size is usually worth more than every other intervention combined. It is why upsizing is the reliable fix for a pressure complaint and why turning a PRV up is not.
+
+## The C factor matters less than you think
+
+<BlogInfographic
+  title="Best C factor, worst loss"
+  caption="Ten gallons per minute through four materials at the same nominal size. PEX has the best smoothness factor in this set and the worst loss by a wide margin, because bore beats smoothness."
+>
+  <FrictionMaterialDiagram />
+</BlogInfographic>
+
+The **C factor** is the roughness term — higher is smoother. Copper is 140; PEX, CPVC and PVC are all 150; old steel is 120.
+
+Now look at what happens at nominal 3/4 inch and 10 gpm:
+
+- **CPVC Schedule 40** — bore 0.824, C 150 — **7.70 psi per 100 ft**
+- **Copper Type M** — bore 0.811, C 140 — 9.45
+- **Copper Type L** — bore 0.785, C 140 — 11.08
+- **PEX** — bore 0.681, C 150 — **19.55 psi per 100 ft**
+
+**PEX has the best C factor in that list and loses 2.5 times what CPVC does.** It is running at 8.82 ft/s, already past the cold velocity ceiling, purely because its bore is so much smaller at the same nominal size.
+
+The lesson is that smoothness is a second-order effect and bore is a first-order one. When someone tells you a material is "smoother so you can go a size down", check the bore table — the full comparison is in **[PEX vs copper vs CPVC](/blog/pex-vs-copper-vs-cpvc)**.
+
+Note also that **C degrades with age** in some materials and not others. Steel and galvanised pipe lose smoothness *and* bore as they corrode; plastics essentially do not. That is why an old galvanised house gets worse and a PEX house does not — the mechanism is in **[low water pressure in a house](/blog/low-water-pressure-in-house)**.
+
+## Developed length, not measured length
+
+<BlogInfographic
+  title="Fittings are pipe you forgot to measure"
+  caption="Equivalent length on 3/4 inch type L copper. Each fitting is worth a length of straight pipe — the globe valve is worth 22 feet of it, which is why it never belongs in a supply run."
+>
+  <FrictionFittingsDiagram />
+</BlogInfographic>
+
+Friction happens at every change of direction, not only along the pipe. The standard treatment converts each fitting into an **equivalent length** of straight pipe using an L/D ratio: multiply by the bore and you get feet.
+
+On 3/4 inch copper:
+
+- **90° elbow** — 2.0 ft
+- **45° elbow** — 1.0 ft
+- **Tee, straight through** — 1.3 ft
+- **Tee, through the branch** — 3.9 ft
+- **Ball valve, full open** — 0.5 ft
+- **Globe valve** — **22.2 ft**
+
+A realistic run — 60 ft measured, six elbows, two branch tees and a ball valve — comes to **80.1 ft developed**. The fittings add **20.1 ft, a third more pipe**, and 2.23 psi at 10 gpm that no tape measure will ever show you.
+
+Two things fall out of that table:
+
+**Branch tees cost three times what a straight-through tee does.** Routing so the main flow goes straight through and the small branch turns is free performance.
+
+**A globe valve is a catastrophe in a supply line.** At 22.2 feet of equivalent pipe, one of them costs more than a third of that whole 60 ft run. Ball valves and gate valves are 0.5 ft. This is the single easiest specification win in plumbing.
+
+Run your own numbers through the **[Pipe Friction Loss Calculator](/calculators/plumbing/plumbing-friction-loss-calculator)**, which totals the fittings for you.
+
+## Turning it into a pipe size
+
+Friction loss on its own is not an answer — it becomes one when you compare it to the pressure you actually have to spend.
+
+1. **Start from static pressure**, measured at a hose bibb.
+2. **Subtract the meter loss**, the height to the highest fixture at 0.4331 psi per foot, and the pressure the fixture itself needs.
+3. **What is left is your friction budget.**
+4. **Divide it by the developed length** and you have an allowable loss per 100 ft.
+5. **Pick the smallest pipe that comes in under it** — then check velocity separately and take the larger of the two answers.
+
+That is the whole method, and it is what **[what size water line do I need](/blog/what-size-water-line-do-i-need)** walks through end to end.
+
+## Where it goes wrong
+
+**Using measured length.** A third more pipe hides in the fittings on a normal run.
+
+**Sizing on the main and forgetting the branch.** The main is usually generous and the branch usually is not. Loss accumulates along the whole path to the fixture.
+
+**Ignoring the meter and the softener.** Both impose real losses, and a neglected filter cartridge can impose a very large one.
+
+**Treating C as the material's headline number.** It is the second-order term. Bore is the first.
+
+**Forgetting the hot side is different.** It has a lower velocity ceiling and usually a longer run.
+
+## Frequently asked questions
+
+### What is friction loss in a pipe?
+
+The pressure water gives up to move through pipe, fittings and valves. It rises with flow and falls steeply with diameter — in Hazen-Williams terms, roughly as **flow to the 1.85 power divided by diameter to the 4.87**. It is why pressure at the meter and pressure at the fixture are different numbers.
+
+### How do you calculate friction loss in a water pipe?
+
+With the Hazen-Williams equation, using the **inside** diameter, the flow, and a C factor for the material. At 10 gpm through 3/4 inch type L copper at C = 140 the answer is **11.08 psi per 100 ft**. Then multiply by the developed length — measured pipe plus the equivalent length of every fitting — rather than the measured length alone.
+
+### What is the C factor in Hazen-Williams?
+
+The smoothness coefficient: higher is smoother. Copper is 140, PEX and CPVC and PVC are 150, older steel is 120. It matters less than people expect — **PEX has a higher C factor than copper and still loses far more at the same nominal size**, because its bore is smaller.
+
+### How much friction does a fitting add?
+
+On 3/4 inch copper, a 90° elbow is worth **2.0 ft** of straight pipe, a branch tee **3.9 ft**, a ball valve **0.5 ft**, and a globe valve **22.2 ft**. A typical 60 ft run with six elbows, two branch tees and a ball valve comes to **80.1 ft developed** — a third more pipe than you measured.
+
+### What is developed length?
+
+Measured pipe length plus the equivalent length of every fitting and valve on the path. It is the number friction calculations actually want. Using measured length instead understates the loss by roughly a third on a normal residential run.
+
+### Does going up one pipe size really help that much?
+
+Yes, more than any other single change. Because loss scales as diameter to about the negative 4.87 power, doubling the diameter at the same flow cuts friction **23.8 times**. Even one nominal step is usually worth more than every other intervention combined.
+
+### Is friction loss the same for hot and cold water?
+
+The equation does not change, but two things around it do. Hot water is slightly less viscous, which Hazen-Williams does not model at all, and — more importantly in practice — the hot side carries a **lower velocity ceiling**, 5 ft/s against 8. So the hot line is usually the one that governs the size.
+
+### Why does my old house have such bad pressure?
+
+Usually a closing bore rather than a failing valve. Galvanised steel corrodes inward, so both the diameter and the C factor get worse over decades. Because diameter carries that 4.87 exponent, losing even a fifth of the bore roughly triples the loss — nothing has broken, and the shower is now unusable.
+
+---
+
+**Sources & standards:** Friction losses are computed with the Hazen-Williams equation over published bore dimensions — ASTM B88 for copper, F876 for PEX, D1785 for Schedule 40 — rather than read off a chart, so the material comparison reflects actual inside diameters rather than nominal sizes. C factors are the conventional values for each material. Fitting equivalent lengths use L/D ratios, which are a widely used engineering convention rather than code text and vary somewhat between published sources; treat them as a sound design method, not a citation. **Hazen-Williams itself is an empirical fit valid for water near room temperature at ordinary velocities** — it is the method the trade uses and it is not exact physics. The velocity ceilings referenced here are ASPE and manufacturer design practice, not IPC requirements. The IPC is a model code; confirm the edition your jurisdiction adopts.

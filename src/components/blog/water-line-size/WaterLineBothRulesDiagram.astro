@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter, velocity, frictionLossPsiPer100Ft, HAZEN_WILLIAMS_C, sizeLabel,
+} from "@/lib/plumbing";
+/** A pipe has to pass the velocity ceiling AND the friction budget. At 18 gpm
+ * over 120 ft of copper L, 3/4 inch misses both at once and 1 inch clears both. */
+const GPM = 18;
+const C_COPPER = HAZEN_WILLIAMS_C["copper-l"];
+const VELOCITY_CAP = 8;
+const ALLOWABLE_PER_100 = 23.62;
+
+const rows = [0.75, 1, 1.25].map((nominal) => {
+  const id = insideDiameter("copper-l", nominal)!;
+  const v = velocity(GPM, id);
+  const loss = frictionLossPsiPer100Ft(GPM, id, C_COPPER);
+  const vOk = v <= VELOCITY_CAP;
+  const lossOk = loss <= ALLOWABLE_PER_100;
+  return {
+    label: sizeLabel(nominal),
+    cells: [`${v.toFixed(2)} ft/s`, `${loss.toFixed(2)} psi/100`, vOk && lossOk ? "passes both" : "fails"],
+    tone: [vOk ? "good" : "bad", lossOk ? "good" : "bad", vOk && lossOk ? "good" : "bad"],
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" fill="none" aria-hidden="true">
+  <title>One flow, two rules — a pipe must clear both</title>
+  <desc>18 gpm through copper Type L, 120 ft developed, 28.34 psi of friction budget</desc>
+
+  <rect x="8" y="8" width="704" height="206" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One flow, two rules — a pipe must clear both</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">18 gpm through copper Type L, 120 ft developed, 28.34 psi of friction budget</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">NOMINAL SIZE</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VELOCITY (CAP 8)</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LOSS (BUDGET 23.62)</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VERDICT</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="200" fill={C.muted} font-family={FONT} font-size="10">3/4 inch misses both rules at once. 1 inch is the smallest that clears them, and velocity is what binds first.</text>
+</svg>

@@ -1,0 +1,75 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import {
+  GAL_PER_SQFT_PER_INCH,
+  GALLONS_PER_CUBIC_FOOT,
+  ROOF_RUNOFF_DIVISOR,
+  roofRunoffGpm,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The 96.25 divisor is not a magic number and this figure refuses to present it
+ * as one. It is a cubic foot of water expressed in gallons, spread an inch deep,
+ * over an hour — three unit conversions and nothing else.
+ */
+const defs = markerDefs("runoff-deriv");
+const AREA = 2000;
+const RATE = 4;
+const answer = roofRunoffGpm(AREA, RATE);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where the roof runoff divisor comes from</title>
+  <desc>
+    The ninety-six point two five divisor is three unit conversions: gallons per cubic foot, an inch expressed as
+    a twelfth of a foot, and an hour expressed as sixty minutes.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`The ${fmt(ROOF_RUNOFF_DIVISOR, 2)} is three unit conversions, not a magic number`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Derived here rather than quoted, which is why it can be checked two ways and agrees with itself.
+  </text>
+
+  <rect x="24" y="70" width="200" height="70" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="38" y="88" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">STEP 1 — VOLUME</text>
+  <text x="38" y="108" fill={C.dark} font-family={FONT} font-size="10">1 cubic foot of water</text>
+  <text x="38" y="126" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+    {`= ${GALLONS_PER_CUBIC_FOOT} gallons`}
+  </text>
+
+  <rect x="248" y="70" width="200" height="70" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="262" y="88" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">STEP 2 — DEPTH</text>
+  <text x="262" y="108" fill={C.dark} font-family={FONT} font-size="10">one inch is a twelfth of a foot</text>
+  <text x="262" y="126" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+    {`÷ 12 = ${fmt(GAL_PER_SQFT_PER_INCH, 4)} gal/sq ft`}
+  </text>
+
+  <rect x="472" y="70" width="224" height="70" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="486" y="88" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">STEP 3 — TIME</text>
+  <text x="486" y="108" fill={C.dark} font-family={FONT} font-size="10">an hour is sixty minutes</text>
+  <text x="486" y="126" fill={C.dark} font-family={FONT} font-size="12" font-weight="800">
+    {`÷ 60 → divisor ${fmt(ROOF_RUNOFF_DIVISOR, 2)}`}
+  </text>
+
+  <line x1="360" y1="146" x2="360" y2="168" stroke={C.primary} stroke-width="2" marker-end="url(#runoff-deriv-arrow-primary)" />
+
+  <rect x="24" y="174" width="672" height="46" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2.2" />
+  <text x="360" y="196" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="14" font-weight="800">
+    {`gpm = area × rainfall ÷ ${fmt(ROOF_RUNOFF_DIVISOR, 2)}`}
+  </text>
+  <text x="360" y="213" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11">
+    {`${fmt(AREA)} sq ft × ${RATE} in/hr ÷ ${fmt(ROOF_RUNOFF_DIVISOR, 2)} = ${fmt(answer, 1)} gpm`}
+  </text>
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">
+    {`Cross-check: ${fmt(GAL_PER_SQFT_PER_INCH, 4)} gal per sq ft per inch is the familiar "0.62 gallons" rule of thumb, unrounded.`}
+  </text>
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">
+    Horizontal projected area, not sloped area — a pitched roof catches the rain falling on its shadow, not its surface.
+  </text>
+</svg>

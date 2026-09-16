@@ -1,0 +1,106 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  trapArmMaxFeet,
+  minSlope,
+  slopeToPercent,
+  MIN_BUILDING_DRAIN_WITH_WC,
+  MIN_VENT_SIZE,
+  PRV_THRESHOLD_PSI,
+  minimumAirGap,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The defects inspectors actually write up, each with the number that decides
+ * it read out of the lib. Every figure here is one this site computes
+ * elsewhere, so a change to the data changes the post.
+ */
+const ROWS = [
+  {
+    defect: "Trap arm too long",
+    rule: `${sizeLabel(2)} stops at ${trapArmMaxFeet(2)} ft, ${sizeLabel(1.5)} at ${trapArmMaxFeet(1.5)} ft`,
+    why: "Measured weir to vent fitting. A relocated fixture is how it happens.",
+    invisible: true,
+  },
+  {
+    defect: "Drain slope wrong",
+    rule: `${sizeLabel(2)} and under: ${minSlope(2)} in/ft (${fmt(slopeToPercent(minSlope(2)), 2)}%)`,
+    why: "Too flat and solids sit; too steep and water outruns them.",
+    invisible: true,
+  },
+  {
+    defect: "An S-trap",
+    rule: "Prohibited outright — no length of arm makes it legal",
+    why: "It siphons its own seal. Common in older work and in DIY vanity swaps.",
+    invisible: false,
+  },
+  {
+    defect: "Building drain undersized with a WC",
+    rule: `Never under ${sizeLabel(MIN_BUILDING_DRAIN_WITH_WC)} where a water closet discharges`,
+    why: "A floor that overrides the fixture unit table entirely.",
+    invisible: true,
+  },
+  {
+    defect: "Vent undersized",
+    rule: `Half the drain, never under ${sizeLabel(MIN_VENT_SIZE)}, upsized past 40 ft`,
+    why: "Length upsizes vents, and the length is the part that gets missed.",
+    invisible: true,
+  },
+  {
+    defect: "No air gap on a discharge",
+    rule: `${fmt(minimumAirGap(0.5), 2)} in on a ${sizeLabel(0.5)} opening, ${fmt(minimumAirGap(0.5, true), 2)} near a wall`,
+    why: "Dishwasher and water softener discharges are the usual finds.",
+    invisible: false,
+  },
+  {
+    defect: "No PRV or no expansion tank",
+    rule: `PRV above ${PRV_THRESHOLD_PSI} psi; expansion control on any closed system`,
+    why: "One requirement drags in the other, and the second gets forgotten.",
+    invisible: false,
+  },
+];
+
+const ROW_H = 30;
+const TOP = 90;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>The plumbing defects inspectors most often write up</title>
+  <desc>
+    Seven common failures with the number that decides each one. Most of them look identical to compliant work,
+    which is why they survive until an inspection.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Almost none of these look wrong</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Every figure below is one this site computes elsewhere. A 12 ft trap arm looks exactly like an 8 ft one.
+  </text>
+
+  <text x="40" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DEFECT</text>
+  <text x={246} y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">THE NUMBER THAT DECIDES IT</text>
+  <text x={676} y="80" text-anchor="end" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VISIBLE?</text>
+
+  {ROWS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const tone = row.invisible ? C.red : C.orange;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 5} rx="6" fill={tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 5} rx="2" fill={tone} opacity="0.9" />
+        <text x="40" y={y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.defect}</text>
+        <text x="40" y={y + 22} fill={C.muted} font-family={FONT} font-size="8">{row.why}</text>
+        <text x={246} y={y + 12} fill={tone} font-family={FONT} font-size="9.5" font-weight="700">{row.rule}</text>
+        <text x={676} y={y + 17} text-anchor="end" fill={tone} font-family={FONT} font-size="8.5" font-weight="800">
+          {row.invisible ? "needs a tape" : "can be seen"}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="306" fill={C.muted} font-family={FONT} font-size="10">
+    Five of the seven need a tape measure or a gauge to find. That is why they survive rough-in and surface at the inspection.
+  </text>
+</svg>

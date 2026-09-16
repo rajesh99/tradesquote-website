@@ -1,0 +1,84 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { convertUnit, fmt } from "@/lib/plumbing";
+
+/**
+ * The conversions a plumbing job actually needs, all computed. The 10 gpm
+ * reference matches the unit converter page's own worked example.
+ */
+const GPM = 10;
+
+const FLOW = [
+  { to: "lpm", label: "litres per minute", value: convertUnit("flow", "gpm", "lpm", GPM), dp: 4 },
+  { to: "lps", label: "litres per second", value: convertUnit("flow", "gpm", "lps", GPM), dp: 4 },
+  { to: "m3h", label: "cubic metres per hour", value: convertUnit("flow", "gpm", "m3h", GPM), dp: 4 },
+  { to: "gph", label: "gallons per hour", value: convertUnit("flow", "gpm", "gph", GPM), dp: 0 },
+  { to: "cfs", label: "cubic feet per second", value: convertUnit("flow", "gpm", "cfs", GPM), dp: 5 },
+];
+
+const PRESSURE = [
+  { from: 60, unit: "psi", to: "ftH2O", label: "feet of water", value: convertUnit("pressure", "psi", "ftH2O", 60), dp: 1 },
+  { from: 60, unit: "psi", to: "bar", label: "bar", value: convertUnit("pressure", "psi", "bar", 60), dp: 3 },
+  { from: 60, unit: "psi", to: "kpa", label: "kilopascals", value: convertUnit("pressure", "psi", "kpa", 60), dp: 1 },
+  { from: 3, unit: "bar", to: "psi", label: "psi", value: convertUnit("pressure", "bar", "psi", 3), dp: 1 },
+];
+
+const ROW_H = 22;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>The conversions a plumbing job actually needs</title>
+  <desc>
+    Flow and pressure converted from the units a US plumbing job works in to the units imported equipment and
+    civil drawings arrive in.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The ones that actually turn up on a job</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Every factor below is exact by definition except the psi-to-feet pair, which comes from the density of water.
+  </text>
+
+  <rect x="24" y="68" width="330" height="140" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="40" y="88" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">{`FLOW — ${GPM} GPM IS...`}</text>
+  {FLOW.map((f, i) => {
+    const y = 104 + i * ROW_H;
+    return (
+      <g>
+        <text x="40" y={y} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+          {fmt(f.value, f.dp)}
+        </text>
+        <text x="126" y={y} fill={C.muted} font-family={FONT} font-size="9.5">{f.label}</text>
+      </g>
+    );
+  })}
+
+  <rect x="366" y="68" width="330" height="140" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="1.8" />
+  <text x="382" y="88" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">PRESSURE — BOTH DIRECTIONS</text>
+  {PRESSURE.map((p, i) => {
+    const y = 104 + i * ROW_H;
+    return (
+      <g>
+        <text x="382" y={y} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+          {`${p.from} ${p.unit} = ${fmt(p.value, p.dp)}`}
+        </text>
+        <text x="536" y={y} fill={C.muted} font-family={FONT} font-size="9.5">{p.label}</text>
+      </g>
+    );
+  })}
+  <text x="382" y="196" fill={C.muted} font-family={FONT} font-size="8.5">
+    3 bar on a European data sheet is well above what a US fixture expects.
+  </text>
+
+  <rect x="24" y="220" width="672" height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="36" y="236" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">
+    {`A 6 L/min European showerhead is ${fmt(convertUnit("flow", "lpm", "gpm", 6), 2)} gpm — below several US low-flow standards, not above them.`}
+  </text>
+
+  <text x="24" y="262" fill={C.muted} font-family={FONT} font-size="10">
+    {`And 1 cubic foot per second — the unit a civil engineer hands you for storm work — is ${fmt(convertUnit("flow", "cfs", "gpm", 1), 2)} gpm.`}
+  </text>
+  <text x="24" y="276" fill={C.muted} font-family={FONT} font-size="10">
+    That is just 7.48052 gallons per cubic foot times 60 seconds, which is why it is exact.
+  </text>
+</svg>

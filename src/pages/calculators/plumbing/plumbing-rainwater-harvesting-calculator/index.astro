@@ -1,0 +1,1095 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  COLLECTION_EFFICIENCY,
+  FIRST_FLUSH_PER_SQFT,
+  GALLONS_PER_CUBIC_FOOT,
+  GAL_PER_SQFT_PER_INCH,
+  GREYWATER_MAX_STORAGE_HOURS,
+  GREYWATER_SOURCE_YIELD,
+  IRRIGATION_DEMAND,
+  ROOF_RUNOFF_COEFFICIENTS,
+  ROOF_RUNOFF_DIVISOR,
+  cisternSizing,
+  fmt,
+  greywaterYield,
+  irrigableArea,
+  rainwaterYieldGallons,
+} from "@/lib/plumbing";
+
+const title = "Rainwater Harvesting & Grey Water Calculator | TradesQuote";
+const description =
+  "Free rainwater harvesting and grey water calculator. Cistern size from roof area, rainfall and dry-spell length, and grey water yield from occupants and fixtures — with the rule that governed each answer named.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-rainwater-harvesting-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Rainwater Harvesting & Grey Water Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Rainwater Harvesting & Grey Water Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online rainwater harvesting and grey water calculator returning cistern storage from catchment area, rainfall and dry-spell length, plus daily grey water yield and the landscape area it irrigates.",
+};
+
+/* ---- Everything below is computed from src/lib/plumbing.ts ---- */
+
+const DEFAULTS = {
+  areaSqFt: 2000,
+  periodInches: 3.5,
+  periodDays: 30,
+  coefficient: 0.85,
+  demandGpd: 60,
+  drySpellDays: 21,
+  events: 4,
+};
+
+const base = cisternSizing(DEFAULTS);
+const galPerInch = DEFAULTS.areaSqFt * GAL_PER_SQFT_PER_INCH * DEFAULTS.coefficient;
+const periodBalance = base.supply - base.periodDemand;
+
+const greyDefaults = {
+  occupants: 3,
+  sources: { shower: true, lavatory: true, washer: true },
+  loadsPerWeek: 5,
+  irrigationRate: 0.6,
+};
+const grey = greywaterYield(greyDefaults);
+
+/* Example 2 — the green roof is the only material that flips the governing rule. */
+const greenRoof = cisternSizing({ ...DEFAULTS, coefficient: 0.3 });
+
+/* Example 3 — grey water against rainwater on the same house. */
+const greyAnnual = grey.dailyYield * 365;
+const rainAnnual = rainwaterYieldGallons({
+  areaSqFt: 2000,
+  inches: 42,
+  coefficient: 0.85,
+  events: 50,
+}).net;
+const rainDriestMonth = rainwaterYieldGallons({
+  areaSqFt: 2000,
+  inches: 0.5,
+  coefficient: 0.85,
+  events: 2,
+}).net;
+const greyThirtyDays = grey.dailyYield * 30;
+const driestRatio = greyThirtyDays / rainDriestMonth;
+
+/* Reference tables. */
+const drySpellTable = [7, 14, 21, 30, 45, 60, 90].map((days) => {
+  const r = cisternSizing({ ...DEFAULTS, drySpellDays: days });
+  return { days, required: r.required, tank: r.selected, governedBy: r.governedBy };
+});
+const materialTable = ROOF_RUNOFF_COEFFICIENTS.map((m) => {
+  const r = cisternSizing({ ...DEFAULTS, coefficient: m.coefficient });
+  return { ...m, supply: r.supply, required: r.required, tank: r.selected, governedBy: r.governedBy };
+});
+const occupantTable = [1, 2, 3, 4, 5, 6].map((n) => {
+  const g = greywaterYield({ ...greyDefaults, occupants: n });
+  return { n, gpd: g.dailyYield, annual: g.dailyYield * 365, irrigable: g.irrigableSqFt };
+});
+const irrigationTable = IRRIGATION_DEMAND.map((r) => ({
+  ...r,
+  sqft: irrigableArea(grey.dailyYield, r.galPerSqFtPerWeek),
+}));
+
+/* Precomputed in frontmatter — an inline `<=` in a template expression is read
+   by the Astro compiler as an opening tag. */
+const demandGoverned = drySpellTable.filter((r) => r.governedBy === "demand");
+const yieldGoverned = drySpellTable.filter((r) => r.governedBy === "yield");
+const firstYieldGoverned = yieldGoverned[0];
+const drySpellSwing =
+  demandGoverned.length > 1
+    ? demandGoverned[demandGoverned.length - 1].required / demandGoverned[0].required
+    : 1;
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size rainwater tank do I need?",
+    answer: `Whichever is <em>smaller</em>: the storage your dry spell asks for, or the storage your roof can actually refill. On the defaults here — a ${fmt(DEFAULTS.areaSqFt, 0)} ft² asphalt roof, ${fmt(DEFAULTS.periodInches, 1)} in in the design month, ${fmt(DEFAULTS.demandGpd, 0)} gpd of demand and a ${fmt(DEFAULTS.drySpellDays, 0)}-day dry spell — the dry spell asks for <strong>${fmt(base.demandStorage, 0)} gallons</strong> while the roof delivers <strong>${fmt(base.supply, 0)}</strong>, so storage governs and a <strong>${fmt(base.selected ?? 0, 0)} gallon</strong> shell is the answer. The calculator names which rule governed, because sizing past your own catchment just buys an empty tank.`,
+  },
+  {
+    question: "How many gallons does an inch of rain give me?",
+    answer: `<strong>${fmt(GAL_PER_SQFT_PER_INCH, 5)} gallons per square foot per inch</strong>, before losses — and that is derived, not quoted. An inch over a square foot is 1/12 of a cubic foot, and a cubic foot is ${GALLONS_PER_CUBIC_FOOT} gallons. The familiar "0.62 gallons" rule of thumb is that number rounded. It is the same basis as the <a href="/calculators/plumbing/plumbing-storm-drainage-calculator" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">Storm &amp; Roof Drainage Calculator</a>'s ${fmt(ROOF_RUNOFF_DIVISOR, 2)} divisor, one step earlier: divide by 60 and you have gpm.`,
+  },
+  {
+    question: "Why can't I store grey water like rainwater?",
+    answer: `Because untreated grey water goes septic. <strong>${GREYWATER_MAX_STORAGE_HOURS} hours is the near-universal ceiling</strong>, which changes the whole sizing question: a cistern is sized on the <em>dry spell</em>, but a grey water tank is a surge vessel sized on <em>one day's flow</em>. Sizing one with the other's method gives a plausible number that means nothing. On the defaults here that is <strong>${fmt(grey.maxStorage, 0)} gallons</strong>, and the real design work moves to the distribution field.`,
+  },
+  {
+    question: "Which actually yields more — rainwater or grey water?",
+    answer: `Over a year they are close: a three-person household produces about <strong>${fmt(greyAnnual, 0)} gallons</strong> of grey water, and a ${fmt(2000, 0)} ft² asphalt roof in a 42-inch year catches about <strong>${fmt(rainAnnual, 0)}</strong>. The difference is <em>when</em>. In the driest month the same roof yields roughly <strong>${fmt(rainDriestMonth, 0)} gallons</strong> against grey water's <strong>${fmt(greyThirtyDays, 0)}</strong> — about <strong>${fmt(driestRatio, 1)}×</strong> more, exactly when irrigation demand peaks. Grey water is a flow you already have; rainwater is a flow you have to wait for.`,
+  },
+  {
+    question: "Does roof material change the tank size much?",
+    answer: `Less than people expect. Across metal, shingle, tile, membrane and gravel the coefficient runs ${fmt(0.7, 2)} to ${fmt(0.95, 2)} and every one of them lands on the same <strong>${fmt(base.selected ?? 0, 0)} gallon</strong> tank on these defaults, because the dry spell governs in all of them. A <strong>green roof is the exception</strong> — at a ${fmt(0.3, 2)} coefficient it only delivers ${fmt(greenRoof.supply, 0)} gallons, which drops below the ${fmt(base.demandStorage, 0)} gallons the dry spell wants, so the roof itself becomes the limit. Dry-spell length is the far bigger lever: ${fmt(demandGoverned[0].days, 0)} days to ${fmt(demandGoverned[demandGoverned.length - 1].days, 0)} days moves the requirement about <strong>${fmt(drySpellSwing, 1)}×</strong>.`,
+  },
+  {
+    question: "Do I need backflow protection on a rainwater system?",
+    answer: `Yes, always, and it is not negotiable. Any nonpotable system connected to or topped up from the potable supply is a <strong>cross connection</strong>, and it needs an approved assembly plus purple-pipe marking and labelled outlets so nobody drinks from it later. The <a href="/calculators/plumbing/backflow-prevention" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">Backflow Prevention reference</a> covers which device each hazard class and flow direction takes — and note that <em>no vacuum breaker of any kind stops backpressure</em>, which rules out four of the ten common assemblies the moment a pump is involved.`,
+  },
+  {
+    question: "What is a first flush diverter and does it matter?",
+    answer: `It dumps the first part of each storm — the part that has washed the roof — before collection starts. This calculator applies <strong>${fmt(FIRST_FLUSH_PER_SQFT, 3)} gallons per ft² per event</strong> by default and lets you set the number of events, because on a month of many small storms the diverter takes a real bite while on one big storm it barely registers. Screen, filter and diverter losses together are handled by the ${fmt(COLLECTION_EFFICIENCY * 100, 0)}% collection efficiency.`,
+  },
+  {
+    question: "Is any of this actually code?",
+    answer: `Mostly not, and that is the honest answer. The IPC covers nonpotable systems in <strong>Chapter 13</strong> where that chapter is adopted; elsewhere it falls to the IAPMO green supplement, the IRC, or — most often — <strong>state and county rules that vary from by-right with no permit to outright prohibited</strong>. So every factor on this page is an editable input and every default is a common value, not a requirement. Confirm what your jurisdiction allows before you design anything, and treat potable reuse as out of scope entirely.`,
+  },
+  {
+    question: "Can I use kitchen sink or dishwasher water?",
+    answer: `Not as grey water in most rules that define the term. Food solids, grease and detergent put kitchen waste closer to black water, which is why it is deliberately absent from the source list here — the sources offered are shower and bath, bathroom sink, and the clothes washer. If a kitchen discharge is in scope for you, it needs interceptor treatment, and the <a href="/calculators/plumbing/plumbing-grease-trap-calculator" class="font-semibold text-cyan-700 underline decoration-cyan-300 hover:decoration-cyan-600">Grease Trap Size Calculator</a> is the right starting point.`,
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Storage sized? Price the whole installation in seconds.";
+const ctaDescription =
+  "Tanks, pumps, filters, diverters, purple pipe and the excavation to bury it all add up fast. TradesQuote turns the scope into a detailed, line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-storm-drainage-calculator",
+    title: "Storm & Roof Drainage Calculator",
+    description: "The same roof, sized to shed water instead of keep it.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "What it takes to lift water back out of a cistern.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-volume-calculator",
+    title: "Pipe Volume Calculator",
+    description: "Gallons held in the distribution run itself.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-septic-tank-calculator",
+    title: "Septic Tank Size Calculator",
+    description: "The other tank sized by local rules, not the IPC.",
+  },
+];
+
+const styles = plumbingAccentStyles.cyan;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Rainwater Harvesting & Grey Water Calculator" />
+    <meta
+      property="og:description"
+      content="Cistern size from roof area, rainfall and dry-spell length, plus grey water yield and the landscape it irrigates — with the rule that governed each answer named."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Rainwater Harvesting & Grey Water Calculator" />
+    <meta
+      name="twitter:description"
+      content="How big a rainwater tank has to be, and why grey water is sized on one day instead. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Rainwater Harvesting & Grey Water Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5 8h14M6 8v9a4 4 0 004 4h4a4 4 0 004-4V8M9 4h6M8 13h8"
+                />
+              </svg>
+              Water Reuse
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Rainwater Harvesting <span class="text-cyan-600">&amp; Grey Water Calculator</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Two sources, two completely different sizing questions. A cistern is sized on the
+              <strong>dry spell</strong> — how long you need to go without rain — and capped by what the
+              roof can actually refill. A grey water tank is sized on <strong>one day's flow</strong>,
+              because untreated grey water may not be held longer than that. Both answers below name the
+              rule that governed them.
+            </p>
+
+            <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm text-amber-900 leading-relaxed">
+                <span class="font-semibold">This is the least code-governed subject in plumbing.</span> The
+                IPC covers nonpotable systems in Chapter 13 <em>where that chapter is adopted</em>; elsewhere
+                it falls to the IAPMO green supplement, the IRC, or state and county rules that range from
+                by-right to outright prohibited. Every factor here is editable and every default is a common
+                value, <strong>not a requirement</strong>. Potable reuse, treatment and disinfection are out
+                of scope. Confirm with your AHJ before designing anything.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 8h14M6 8v9a4 4 0 004 4h4a4 4 0 004-4V8M9 4h6M8 13h8"></path>
+            </svg>
+            Size the storage
+          </h2>
+
+          <div class="mt-6">
+            <label for="rw-method" class="text-sm font-semibold text-slate-800">Which source?</label>
+            <select
+              id="rw-method"
+              class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+            >
+              <option value="rainwater" selected>Rainwater harvesting — sized on the dry spell</option>
+              <option value="greywater">Grey water reuse — sized on one day's flow</option>
+            </select>
+          </div>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <!-- Rainwater inputs -->
+              <div id="rw-inputs-rain" class="space-y-6">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <label for="rw-area" class="text-sm font-semibold text-slate-800">
+                      Catchment area (horizontal projection)
+                    </label>
+                    <div class="flex items-center gap-1">
+                      <input
+                        id="rw-area"
+                        type="number"
+                        min="0"
+                        max="200000"
+                        step="50"
+                        value="2000"
+                        class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500">ft²</span>
+                    </div>
+                  </div>
+                  <input
+                    id="rw-area-range"
+                    type="range"
+                    min="200"
+                    max="20000"
+                    step="100"
+                    value="2000"
+                    class="plumb-range mt-3 w-full bg-slate-200 accent-cyan-600"
+                  />
+                  <div class="flex justify-between text-xs text-slate-400 mt-1">
+                    <span>200</span><span>20,000 ft²</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Plan area, not slope length — rain falls vertically, so a steep roof catches no more
+                    than its footprint.
+                  </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label for="rw-roof" class="text-sm font-semibold text-slate-800">Roof surface</label>
+                    <select
+                      id="rw-roof"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    >
+                      {
+                        ROOF_RUNOFF_COEFFICIENTS.map((m) => (
+                          <option value={m.coefficient} selected={m.coefficient === DEFAULTS.coefficient}>
+                            {m.label} — {fmt(m.coefficient, 2)}
+                          </option>
+                        ))
+                      }
+                    </select>
+                    <p class="mt-1.5 text-xs text-slate-500">Writes into the coefficient beside it.</p>
+                  </div>
+
+                  <div>
+                    <label for="rw-coefficient" class="text-sm font-semibold text-slate-800">
+                      Runoff coefficient
+                    </label>
+                    <input
+                      id="rw-coefficient"
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value="0.85"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <p class="mt-1.5 text-xs text-slate-500">Editable — these are common values, not code.</p>
+                  </div>
+
+                  <div>
+                    <label for="rw-rainfall" class="text-sm font-semibold text-slate-800">
+                      Rainfall in the design month
+                    </label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="rw-rainfall"
+                        type="number"
+                        min="0"
+                        max="60"
+                        step="0.1"
+                        value="3.5"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">in</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">
+                      Use your <em>driest</em> design month, not the annual average.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label for="rw-events" class="text-sm font-semibold text-slate-800">
+                      Storm events that month
+                    </label>
+                    <input
+                      id="rw-events"
+                      type="number"
+                      min="0"
+                      max="60"
+                      step="1"
+                      value="4"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <p class="mt-1.5 text-xs text-slate-500">
+                      First flush is diverted once per event, so many small storms cost more.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label for="rw-demand" class="text-sm font-semibold text-slate-800">Daily demand</label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="rw-demand"
+                        type="number"
+                        min="0"
+                        max="10000"
+                        step="5"
+                        value="60"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">gpd</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">Irrigation, toilet flushing, laundry.</p>
+                  </div>
+
+                  <div>
+                    <label for="rw-dry-spell" class="text-sm font-semibold text-slate-800">
+                      Dry spell to ride out
+                    </label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="rw-dry-spell"
+                        type="number"
+                        min="0"
+                        max="365"
+                        step="1"
+                        value="21"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">days</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">The single biggest lever on this page.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grey water inputs -->
+              <div id="rw-inputs-grey" class="hidden space-y-6">
+                <div class="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label for="rw-occupants" class="text-sm font-semibold text-slate-800">Occupants</label>
+                    <input
+                      id="rw-occupants"
+                      type="number"
+                      min="0"
+                      max="200"
+                      step="1"
+                      value="3"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <p class="mt-1.5 text-xs text-slate-500">Drives the per-person sources.</p>
+                  </div>
+
+                  <div>
+                    <label for="rw-loads" class="text-sm font-semibold text-slate-800">
+                      Laundry loads per week
+                    </label>
+                    <input
+                      id="rw-loads"
+                      type="number"
+                      min="0"
+                      max="200"
+                      step="1"
+                      value="5"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    />
+                    <p class="mt-1.5 text-xs text-slate-500">Averaged across the week.</p>
+                  </div>
+                </div>
+
+                <fieldset>
+                  <legend class="text-sm font-semibold text-slate-800">Sources connected</legend>
+                  <p class="mt-1 text-xs text-slate-500">
+                    Kitchen sink and dishwasher are deliberately absent — food solids and grease put them
+                    outside grey water in most rules that define the term.
+                  </p>
+                  <div class="mt-3 space-y-2.5">
+                    <label class="flex items-center gap-2.5 text-sm text-slate-700">
+                      <input
+                        id="rw-src-shower"
+                        type="checkbox"
+                        checked
+                        class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                      />
+                      Shower and bath — {fmt(GREYWATER_SOURCE_YIELD[0].galPerPersonPerDay, 0)} gal per person per day
+                    </label>
+                    <label class="flex items-center gap-2.5 text-sm text-slate-700">
+                      <input
+                        id="rw-src-lavatory"
+                        type="checkbox"
+                        checked
+                        class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                      />
+                      Bathroom sink — {fmt(GREYWATER_SOURCE_YIELD[1].galPerPersonPerDay, 0)} gal per person per day
+                    </label>
+                    <label class="flex items-center gap-2.5 text-sm text-slate-700">
+                      <input
+                        id="rw-src-washer"
+                        type="checkbox"
+                        checked
+                        class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                      />
+                      Clothes washer — {fmt(GREYWATER_SOURCE_YIELD[2].galPerPersonPerDay, 0)} gal per load
+                    </label>
+                  </div>
+                </fieldset>
+
+                <div class="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label for="rw-planting" class="text-sm font-semibold text-slate-800">Planting type</label>
+                    <select
+                      id="rw-planting"
+                      class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                    >
+                      {
+                        IRRIGATION_DEMAND.map((r) => (
+                          <option
+                            value={r.galPerSqFtPerWeek}
+                            selected={r.galPerSqFtPerWeek === greyDefaults.irrigationRate}
+                          >
+                            {r.label} — {fmt(r.galPerSqFtPerWeek, 1)}
+                          </option>
+                        ))
+                      }
+                    </select>
+                    <p class="mt-1.5 text-xs text-slate-500">Writes into the rate beside it.</p>
+                  </div>
+
+                  <div>
+                    <label for="rw-irrigation" class="text-sm font-semibold text-slate-800">
+                      Irrigation rate
+                    </label>
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        id="rw-irrigation"
+                        type="number"
+                        min="0.05"
+                        max="5"
+                        step="0.05"
+                        value="0.6"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none"
+                      />
+                      <span class="text-sm text-slate-500 shrink-0">gal/ft²/wk</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">Editable — climate moves this a lot.</p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="rw-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-cyan-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 space-y-4">
+              <div id="rw-result-rain" class="rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+                <p class="text-sm font-medium text-slate-600">Cistern size</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span id="rw-tank" class="text-5xl font-extrabold tracking-tight text-cyan-600">
+                    {fmt(base.selected ?? 0, 0)} gallons
+                  </span>
+                </div>
+                <p id="rw-governed" class="mt-2 inline-block rounded-full bg-white px-3 py-1 text-xs font-semibold text-cyan-700 border border-cyan-200">
+                  Governed by the dry spell
+                </p>
+                <p id="rw-note" class="mt-3 text-sm font-semibold text-slate-700">
+                  Riding out {fmt(DEFAULTS.drySpellDays, 0)} dry days at {fmt(DEFAULTS.demandGpd, 0)} gpd takes
+                  {" "}{fmt(base.demandStorage, 0)} gallons, and the roof delivers {fmt(base.supply, 0)} in an
+                  average month — so storage, not catchment, is the limit. A bigger roof buys nothing here; a
+                  longer dry spell costs a bigger tank.
+                </p>
+
+                <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                  <summary
+                    class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                  >
+                    See the breakdown
+                    <svg
+                      class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </summary>
+                  <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                    <div class="flex justify-between gap-3">
+                      <span>Caught per inch</span><span id="rw-bd-per-inch" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Supply this month</span><span id="rw-bd-supply" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Storage the dry spell asks for</span><span id="rw-bd-demand-store" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Storage the roof can refill</span><span id="rw-bd-yield-store" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                      <span>Required — the smaller of the two</span><span id="rw-bd-required" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Chosen shell covers</span><span id="rw-bd-covers" class="font-semibold text-slate-900">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3">
+                      <span>Monthly balance</span><span id="rw-bd-balance" class="font-semibold text-slate-900">—</span>
+                    </div>
+                  </div>
+                </details>
+
+                <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                  The yield arithmetic is derived and exact. The coefficients, efficiency and first-flush
+                  allowance are <strong>common planning values, not code</strong>, and every one of them is
+                  editable above. Any nonpotable system needs backflow protection and purple-pipe marking.
+                </p>
+              </div>
+
+              <div id="rw-result-grey" class="hidden rounded-xl border border-cyan-100 bg-cyan-50 p-5 sm:p-6">
+                <p class="text-sm font-medium text-slate-600">Grey water available</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span id="rw-grey-yield" class="text-5xl font-extrabold tracking-tight text-cyan-600">
+                    {fmt(grey.dailyYield, 1)} gpd
+                  </span>
+                </div>
+                <p id="rw-grey-note" class="mt-3 text-sm font-semibold text-slate-700">
+                  {fmt(grey.dailyYield, 1)} gallons a day, every day — {fmt(greyAnnual, 0)} gallons a year.
+                  Because untreated grey water may not be held past {GREYWATER_MAX_STORAGE_HOURS} hours, the
+                  tank is a surge vessel sized on one day's flow, not a cistern. Size the distribution field,
+                  not the storage.
+                </p>
+
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                  <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                    <p class="text-xs text-slate-500">Maximum storage</p>
+                    <p id="rw-bd-storage" class="mt-1 text-xl font-bold text-slate-900">
+                      {fmt(grey.maxStorage, 0)} gal — one day, no more
+                    </p>
+                  </div>
+                  <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                    <p class="text-xs text-slate-500">Irrigates</p>
+                    <p id="rw-bd-irrigable" class="mt-1 text-xl font-bold text-slate-900">
+                      {fmt(grey.irrigableSqFt, 0)} ft² of landscape
+                    </p>
+                  </div>
+                </div>
+
+                <details class="group mt-5 rounded-xl border border-cyan-100 bg-white">
+                  <summary
+                    class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                  >
+                    See the breakdown
+                    <svg
+                      class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </summary>
+                  <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                    <div class="flex justify-between gap-3">
+                      <span>By source, gpd</span><span id="rw-bd-sources" class="font-semibold text-slate-900 text-right">—</span>
+                    </div>
+                    <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                      <span>Over a year</span><span id="rw-bd-annual" class="font-semibold text-slate-900">—</span>
+                    </div>
+                  </div>
+                </details>
+
+                <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                  Per-person yields are <strong>common planning figures, not code</strong>. Grey water systems
+                  need subsurface or mulch-basin distribution, no ponding, and backflow protection wherever a
+                  potable top-up exists.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formulas, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Rainwater is a volume caught over a period, then a storage question. Grey water is a flow you
+            already have, and the only real constraint on it is time.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-cyan-300"># What the catchment yields</div>
+            <div>
+              gal&nbsp;=&nbsp;area (ft²) × rain (in) ×
+              <span class="text-amber-300">{fmt(GAL_PER_SQFT_PER_INCH, 5)}</span> × Cr × Ce
+            </div>
+            <div class="mt-4 text-slate-400"># Where that constant comes from — not a table</div>
+            <div>1 in over 1 ft²&nbsp;=&nbsp;1/12 ft³</div>
+            <div>
+              × <span class="text-amber-300">{GALLONS_PER_CUBIC_FOOT}</span> gal/ft³&nbsp;=&nbsp;
+              <span class="text-amber-300">{fmt(GAL_PER_SQFT_PER_INCH, 5)}</span> gal
+            </div>
+            <div class="text-slate-400">
+              ÷ 60 gives {fmt(1 / ROOF_RUNOFF_DIVISOR, 7)} gpm — the storm calculator's {fmt(ROOF_RUNOFF_DIVISOR, 2)} divisor
+            </div>
+            <div class="mt-4 text-cyan-300"># The cistern — the SMALLER of two limits</div>
+            <div>demand-limited&nbsp;=&nbsp;daily demand × dry-spell days</div>
+            <div>yield-limited&nbsp;&nbsp;&nbsp;=&nbsp;what the roof delivers that month</div>
+            <div class="text-slate-400">storing past your own catchment buys an empty shell</div>
+            <div class="mt-4 text-cyan-300"># Grey water — a flow, not a store</div>
+            <div>gpd&nbsp;=&nbsp;Σ (occupants × per-person yield) + loads/wk × gal ÷ 7</div>
+            <div>
+              max hold&nbsp;=&nbsp;<span class="text-amber-300">{GREYWATER_MAX_STORAGE_HOURS} hours</span>
+              &nbsp;→&nbsp;tank&nbsp;=&nbsp;one day
+            </div>
+            <div class="mt-4 text-red-300"># What this does NOT do</div>
+            <div>no jurisdiction table&nbsp;&nbsp;·&nbsp;&nbsp;no treatment or disinfection design</div>
+            <div class="text-slate-400">potable reuse is out of scope entirely</div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Two sources, two questions</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A cistern separates supply from demand <em>in time</em>, so it is sized on how long the gap
+                is. A grey water tank cannot do that at all — it is a surge vessel that has to empty daily.
+                Sizing one with the other's method gives a plausible number that means nothing.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The dry spell, not the roof</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Across every roof material except a green roof, these defaults land on the same
+                {" "}{fmt(base.selected ?? 0, 0)} gallon tank. Move the dry spell from
+                {" "}{fmt(demandGoverned[0].days, 0)} days to {fmt(demandGoverned[demandGoverned.length - 1].days, 0)}
+                {" "}and the requirement moves about {fmt(drySpellSwing, 1)}×. Material is a rounding error
+                next to duration.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Cross-connection control is mandatory</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Any nonpotable system with a potable top-up is a cross connection. It needs an approved
+                assembly, purple pipe and labelled outlets — and remember that
+                {" "}<a href="/calculators/plumbing/backflow-prevention" class="font-semibold text-cyan-700 hover:underline">no vacuum breaker stops backpressure</a>,
+                which rules out four of the ten common devices as soon as a pump is in the line.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Use the driest month</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                An annual average hides the only month that matters. A tank sized on 42 inches a year and
+                emptied in the one month that gets half an inch was never sized at all — which is why the
+                rainfall field here asks for a design month, not a yearly total.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A house, the one roof surface that changes the answer, and the comparison that surprises people.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">
+                {fmt(DEFAULTS.areaSqFt, 0)} ft² asphalt roof, {fmt(DEFAULTS.drySpellDays, 0)}-day dry spell
+              </h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              caught per inch = {fmt(DEFAULTS.areaSqFt, 0)} × {fmt(GAL_PER_SQFT_PER_INCH, 5)} × {fmt(DEFAULTS.coefficient, 2)} = {fmt(galPerInch, 0)} gal<br />
+              supply that month = {fmt(base.supply, 0)} gal · demand = {fmt(base.periodDemand, 0)} gal<br />
+              dry spell wants {fmt(DEFAULTS.demandGpd, 0)} × {fmt(DEFAULTS.drySpellDays, 0)} = {fmt(base.demandStorage, 0)} gal<br />
+              roof can refill {fmt(base.yieldStorage, 0)} gal → smaller is{" "}
+              <span class="font-bold text-cyan-700">{fmt(base.required, 0)} gal</span><br />
+              → <span class="font-bold text-cyan-700">{fmt(base.selected ?? 0, 0)} gallon shell</span>, covers {fmt(base.daysCovered, 1)} days
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> demand governs, with
+              {" "}{fmt(periodBalance, 0)} gallons a month of surplus the tank simply cannot hold. That surplus
+              is the argument for a bigger tank <em>or</em> for finding more uses — but not for a bigger roof.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same house with a green roof</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              coefficient {fmt(0.85, 2)} → {fmt(0.3, 2)}<br />
+              supply {fmt(base.supply, 0)} → <span class="font-bold text-cyan-700">{fmt(greenRoof.supply, 0)} gal</span><br />
+              dry spell still wants {fmt(base.demandStorage, 0)} gal — now more than the roof gives<br />
+              → governed by the <span class="font-bold text-cyan-700">roof</span>, not the dry spell<br />
+              → {fmt(base.selected ?? 0, 0)} gal shell drops to{" "}
+              <span class="font-bold text-cyan-700">{fmt(greenRoof.selected ?? 0, 0)} gal</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a green roof is the only common
+              surface that flips which rule governs. Every other material — metal, tile, membrane, even
+              gravel — lands on the same tank, because the dry spell was always the binding limit. When the
+              roof becomes the limit, more tank is wasted money and the fix is more catchment or less demand.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100 text-cyan-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Grey water against rainwater, same house</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              grey water, 3 people = {fmt(grey.dailyYield, 1)} gpd ={" "}
+              <span class="font-bold text-cyan-700">{fmt(greyAnnual, 0)} gal/yr</span><br />
+              rainwater, 2,000 ft² at 42 in/yr = <span class="font-bold text-cyan-700">{fmt(rainAnnual, 0)} gal/yr</span><br />
+              <span class="text-slate-500">— but in the driest month —</span><br />
+              rainwater at 0.5 in = {fmt(rainDriestMonth, 0)} gal<br />
+              grey water over 30 days = <span class="font-bold text-cyan-700">{fmt(greyThirtyDays, 0)} gal</span>{" "}
+              = {fmt(driestRatio, 1)}× more
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> over a year the two are within a few
+              percent of each other. What separates them is timing — grey water arrives every single day,
+              including the month the roof produces almost nothing, which is precisely the month irrigation
+              demand peaks. Rainwater needs a tank because it is intermittent; grey water needs a field
+              because it is not.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Dry spell against roof surface
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Both tables hold everything else at the defaults — {fmt(DEFAULTS.areaSqFt, 0)} ft²,
+            {" "}{fmt(DEFAULTS.periodInches, 1)} in in the design month, {fmt(DEFAULTS.demandGpd, 0)} gpd of
+            demand. Compare how far each one moves the answer.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Dry spell</th>
+                  <th class="py-3 px-5 font-semibold">Storage required</th>
+                  <th class="py-3 px-5 font-semibold">Stocked shell</th>
+                  <th class="py-3 px-5 font-semibold">Governed by</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  drySpellTable.map((row, index) => (
+                    <tr class={index === drySpellTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{fmt(row.days, 0)} days</td>
+                      <td class="py-3 px-5">{fmt(row.required, 0)} gal</td>
+                      <td class="py-3 px-5">{row.tank === null ? "over 10,000" : `${fmt(row.tank, 0)} gal`}</td>
+                      <td class="py-3 px-5">
+                        <span
+                          class={
+                            row.governedBy === "yield"
+                              ? "font-semibold text-cyan-700"
+                              : "text-slate-500"
+                          }
+                        >
+                          {row.governedBy === "yield" ? "the roof" : "the dry spell"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-4 text-sm text-slate-500 leading-relaxed">
+            Past {firstYieldGoverned ? fmt(firstYieldGoverned.days, 0) : "—"} days the requirement stops
+            rising, because the roof cannot refill any more than {fmt(base.supply, 0)} gallons that month.
+            That plateau is the honest ceiling on what harvesting can do at this catchment.
+          </p>
+
+          <div class="mt-10 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Roof surface</th>
+                  <th class="py-3 px-5 font-semibold">Cr</th>
+                  <th class="py-3 px-5 font-semibold">Supply</th>
+                  <th class="py-3 px-5 font-semibold">Stocked shell</th>
+                  <th class="py-3 px-5 font-semibold">Governed by</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  materialTable.map((row, index) => (
+                    <tr class={index === materialTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">{fmt(row.coefficient, 2)}</td>
+                      <td class="py-3 px-5">{fmt(row.supply, 0)} gal</td>
+                      <td class="py-3 px-5">{row.tank === null ? "over 10,000" : `${fmt(row.tank, 0)} gal`}</td>
+                      <td class="py-3 px-5">
+                        <span
+                          class={
+                            row.governedBy === "yield"
+                              ? "font-semibold text-cyan-700"
+                              : "text-slate-500"
+                          }
+                        >
+                          {row.governedBy === "yield" ? "the roof" : "the dry spell"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-4 text-sm text-slate-500 leading-relaxed">
+            Runoff coefficients are <strong>commonly published planning values, not code</strong>, and every
+            one is editable on the calculator above.
+          </p>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            Grey water by household size
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Shower, bathroom sink and {fmt(greyDefaults.loadsPerWeek, 0)} laundry loads a week, irrigating at
+            {" "}{fmt(greyDefaults.irrigationRate, 1)} gal/ft²/wk. Unlike the cistern, none of this is
+            stored — the tank never exceeds one day.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Occupants</th>
+                  <th class="py-3 px-5 font-semibold">Daily yield</th>
+                  <th class="py-3 px-5 font-semibold">Over a year</th>
+                  <th class="py-3 px-5 font-semibold">Irrigates</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  occupantTable.map((row, index) => (
+                    <tr class={index === occupantTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{fmt(row.n, 0)}</td>
+                      <td class="py-3 px-5">{fmt(row.gpd, 1)} gpd</td>
+                      <td class="py-3 px-5">{fmt(row.annual, 0)} gal</td>
+                      <td class="py-3 px-5">{fmt(row.irrigable, 0)} ft²</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Planting</th>
+                  <th class="py-3 px-5 font-semibold">gal/ft²/wk</th>
+                  <th class="py-3 px-5 font-semibold">
+                    Area {fmt(grey.dailyYield, 1)} gpd covers
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  irrigationTable.map((row, index) => (
+                    <tr class={index === irrigationTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">{fmt(row.galPerSqFtPerWeek, 1)}</td>
+                      <td class="py-3 px-5">{fmt(row.sqft, 0)} ft²</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500 leading-relaxed">
+            <strong>Sources &amp; standards:</strong> the yield arithmetic is derived from
+            {" "}{GALLONS_PER_CUBIC_FOOT} gal/ft³ and shares its basis with the storm drainage calculator's
+            {" "}{fmt(ROOF_RUNOFF_DIVISOR, 2)} divisor. Runoff coefficients, collection efficiency, the
+            first-flush allowance, per-person grey water yields and irrigation rates are
+            <strong> commonly published planning figures, unverified here</strong>, and all are editable.
+            The IPC covers nonpotable water systems in Chapter 13 where adopted; the IAPMO green supplement
+            and the IRC cover it elsewhere; and state and county rules govern in practice. No jurisdiction
+            table is published on this page, deliberately. Cross-connection control is covered by the
+            {" "}<a href="/calculators/plumbing/backflow-prevention" class="font-semibold text-cyan-700 hover:underline">Backflow Prevention reference</a>.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="cyan"
+        subtitle="Common questions about cistern sizing, grey water limits, and what the code actually says."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingRainwaterHarvestingCalculator } from "@/scripts/calculators/plumbing-rainwater-harvesting-calculator";
+    initPlumbingRainwaterHarvestingCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #0891b2;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

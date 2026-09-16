@@ -1,0 +1,107 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  DFU_FIXTURES,
+  totalDfu,
+  minDrainSizeApplied,
+  trapArmMaxFeet,
+  sizeLabel,
+} from "@/lib/plumbing";
+
+/**
+ * Where the two codes part company.
+ *
+ * The IPC column is COMPUTED from the lib, exactly like every other diagram on
+ * the site. The UPC column deliberately carries no values: reproducing UPC
+ * numbers from secondary sources would be transcription without a primary
+ * source, which is the specific thing the rest of these pages refuse to do —
+ * and it is the point the post is making. Naming the subject and handing the
+ * reader back to the adopted code is the honest output here.
+ */
+const groupDfu = totalDfu({ "bathroom-group-16": 1 });
+const wetVented = Math.max(2, minDrainSizeApplied(groupDfu, "horizontal-branch", 0.25, true).size);
+const trapArm2 = trapArmMaxFeet(2);
+const dfuRows = DFU_FIXTURES.length;
+
+const AREAS = [
+  {
+    subject: "Wet venting",
+    ipc: `IPC 912 — a group of ${groupDfu} DFU on one ${sizeLabel(wetVented)} wet-vented section`,
+    upc: "A narrower arrangement, with different fixture and sizing rules",
+    weight: "high",
+  },
+  {
+    subject: "Air admittance valves",
+    ipc: "IPC 918 — accepted where the AHJ permits",
+    upc: "Historically restricted or prohibited; acceptance still varies",
+    weight: "high",
+  },
+  {
+    subject: "Fixture unit values",
+    ipc: `Table 709.1 — the ${dfuRows} fixtures this site computes DFU from`,
+    upc: "Its own fixture unit tables — the numbers are not interchangeable",
+    weight: "high",
+  },
+  {
+    subject: "Trap arm limits",
+    ipc: `Table 909.1 — ${sizeLabel(2)} reaches ${trapArm2} ft, weir to vent fitting`,
+    upc: "Measured differently, and slope within the arm counts differently",
+    weight: "medium",
+  },
+  {
+    subject: "Approved materials",
+    ipc: "Broadly permissive on plastics in both DWV and supply",
+    upc: "Historically more restrictive, with local amendments on top",
+    weight: "medium",
+  },
+  {
+    subject: "Cleanout spacing",
+    ipc: "Its own intervals and access requirements",
+    upc: "Different intervals — a common inspection difference",
+    weight: "medium",
+  },
+];
+
+const ROW_H = 40;
+const TOP = 84;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 356" fill="none" aria-hidden="true">
+  <title>Where the IPC and the UPC actually diverge</title>
+  <desc>
+    Six subjects where the two model codes take different approaches. The IPC column carries the computed values this
+    site publishes; the UPC column names the subject rather than reproducing values that vary by edition and amendment.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="340" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Where they part company — and it is mostly Chapter 7</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Drainage, waste and vent is where the two codes differ most. Supply sizing and cross-connection control differ least.
+  </text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SUBJECT</text>
+  <text x={186} y="76" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">IPC — WHAT THIS SITE COMPUTES WITH</text>
+  <text x={448} y="76" fill={C.orange} font-family={FONT} font-size="8" font-weight="700">UPC — CHECK BEFORE YOU ROUGH IN</text>
+
+  {AREAS.map((area, i) => {
+    const y = TOP + i * ROW_H;
+    const major = area.weight === "high";
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={major ? C.orange : C.border} opacity={major ? 0.07 : 0.1} />
+        <text x="34" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="800">{area.subject}</text>
+        {major && (
+          <text x="34" y={y + 27} fill={C.orange} font-family={FONT} font-size="7.5" font-weight="700">MAJOR DIFFERENCE</text>
+        )}
+        <text x={186} y={y + 14} fill={C.primary} font-family={FONT} font-size="8.5">{area.ipc}</text>
+        <text x={186} y={y + 26} fill={C.muted} font-family={FONT} font-size="7.5">computed from the lib, like every figure on this site</text>
+        <text x={448} y={y + 14} fill={C.orange} font-family={FONT} font-size="8.5">{area.upc}</text>
+        <text x={448} y={y + 26} fill={C.muted} font-family={FONT} font-size="7.5">no value published here — read the code your AHJ adopted</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="340" fill={C.muted} font-family={FONT} font-size="10">
+    The IPC column is computed. The UPC column is deliberately empty of values — copying them from a secondary source is the error itself.
+  </text>
+</svg>

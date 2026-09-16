@@ -1,0 +1,53 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { psiToHead, headToPsi, FEET_HEAD_PER_PSI, PSI_PER_FOOT_HEAD, fmt } from "@/lib/plumbing";
+
+/**
+ * Pressure head is where the surprise lives. Feet and psi are the same quantity
+ * in different clothes, and the conversion is steep enough that a modest
+ * discharge pressure dwarfs a residential lift.
+ */
+const PRESSURES = [20, 30, 40, 50, 60];
+const rows = PRESSURES.map((psi) => ({ psi, feet: psiToHead(psi) }));
+const maxFeet = Math.max(...rows.map((r) => r.feet));
+
+const STOREY_FT = 10;
+const BAR_X = 152;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Discharge pressure expressed as feet of head</title>
+  <desc>
+    Pressure and head are the same quantity in different units. A modest discharge pressure requirement converts to
+    far more head than any residential lift.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Pressure head dwarfs anything you can lift in a house</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${PSI_PER_FOOT_HEAD} psi per foot of water, so ${fmt(FEET_HEAD_PER_PSI, 3)} ft of head per psi. The same quantity, two units.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 30;
+    const w = Math.max(3, (row.feet / maxFeet) * BAR_MAX);
+    const storeys = row.feet / STOREY_FT;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${row.psi} psi`}</text>
+        <text x="86" y={y + 16} fill={C.muted} font-family={FONT} font-size="9">at the outlet</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={C.orange} opacity="0.72" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.feet, 1)} ft of head · ${fmt(storeys, 1)} storeys' worth`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="228" width="672" height="24" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="244" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`Asking for ${rows[2].psi} psi at the outlet is ${fmt(rows[2].feet, 1)} ft of head — more than lifting water to the roof of a ${fmt(rows[2].feet / STOREY_FT, 0)}-storey building.`}
+  </text>
+</svg>

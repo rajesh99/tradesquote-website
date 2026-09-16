@@ -1,0 +1,71 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  insideDiameter, pipeVolume, PIPE_MATERIAL_LABELS, sizeLabel, fmt,
+} from "@/lib/plumbing";
+/** The annual cost of the wait, at four hot draws a day — the number that
+ * makes the case for a smaller bore or a recirculation loop. */
+const RUN_FT = 50;
+const DRAWS_PER_DAY = 4;
+const OPTIONS: { m: "copper-l" | "pex"; n: number }[] = [
+  { m: "pex", n: 0.5 },
+  { m: "pex", n: 0.75 },
+  { m: "copper-l", n: 0.75 },
+  { m: "copper-l", n: 1 },
+];
+
+const rows = OPTIONS.map(({ m, n }) => {
+  const id = insideDiameter(m, n)!;
+  const gal = pipeVolume(id, RUN_FT).gallons;
+  const annual = gal * DRAWS_PER_DAY * 365;
+  return {
+    label: `${PIPE_MATERIAL_LABELS[m].split(" (")[0].split(",")[0]} ${sizeLabel(n)}`,
+    cells: [
+      `${fmt(gal, 2)} gal`,
+      `${fmt((gal / 2) * 60, 0)} s`,
+      `${fmt(annual, 0)} gal`,
+    ],
+    tone: ["neutral", "neutral", annual > 2500 ? "bad" : annual > 1500 ? "neutral" : "good"],
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" fill="none" aria-hidden="true">
+  <title>What the wait costs over a year</title>
+  <desc>50 ft of hot line, four draws a day, 365 days — water heated, never used, and poured down the drain</desc>
+
+  <rect x="8" y="8" width="704" height="236" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">What the wait costs over a year</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">50 ft of hot line, four draws a day, 365 days — water heated, never used, and poured down the drain</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOT LINE</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HELD IN PIPE</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WAIT AT 2 GPM</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WASTED PER YEAR</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">Same house, same heater, same habits: the pipe choice alone swings this by more than 1,700 gallons a year.</text>
+</svg>

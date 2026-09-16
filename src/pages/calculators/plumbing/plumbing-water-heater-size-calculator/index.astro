@@ -1,0 +1,664 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  PEAK_HOUR_USES,
+  STANDARD_TANK_SIZES,
+  firstHourRating,
+  fmt,
+  recoveryGph,
+} from "@/lib/plumbing";
+
+const title = "Water Heater Size Calculator — First-Hour Rating | TradesQuote";
+const description =
+  "Free water heater size calculator. Work out peak-hour hot water demand from how the house is actually used, then match it against first-hour rating and recovery to land on the tank size that keeps up.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-water-heater-size-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Water Heater Size Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Water Heater Size Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online storage water heater size calculator that builds peak-hour hot water demand from usage, computes recovery rate and first-hour rating, and selects the smallest tank that covers the peak.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "What size water heater do I need?",
+    answer:
+      "Size it on <strong>peak-hour demand</strong>, not on house size or bedroom count. A morning with three showers, a dishwasher, a clothes washer and two hand-washings comes to <strong>66 gallons</strong>. A 40,000 BTU gas heater at 80% efficiency with a 90 °F rise recovers 42.7 gallons an hour, so a <strong>40-gallon tank</strong> gives a 70.7 gallon first-hour rating — enough, with 4.7 gallons spare.",
+  },
+  {
+    question: "What is first-hour rating and why does it matter more than gallons?",
+    answer:
+      "First-hour rating is how much hot water the heater can actually deliver in one busy hour: roughly <strong>70% of the tank</strong> (the usable part before cold mixing spoils it) <strong>plus one hour of recovery</strong>. It is the number on the yellow EnergyGuide label and the one that decides whether the last shower is cold. A 40-gallon gas heater can out-deliver a 50-gallon electric one because recovery does more work in that hour than ten extra gallons of storage.",
+  },
+  {
+    question: "Why only 70% of the tank?",
+    answer:
+      "Because as you draw hot water off the top, cold water enters the bottom to replace it, and the two mix at the boundary. Long before the tank is empty the delivered water has dropped below usable temperature. The 0.70 factor is the long-standing allowance for that — it is not a safety margin, it is physics.",
+  },
+  {
+    question: "What is recovery rate?",
+    answer:
+      "Gallons per hour the burner or element can heat through your temperature rise: <strong>BTU input × efficiency ÷ (8.33 × rise)</strong>. At 40,000 BTU, 80% efficiency and a 90 °F rise that is <strong>42.7 gallons per hour</strong>. Electric heaters recover far more slowly — a 4,500 W element is only about 15,400 BTU, giving <strong>20.1 gallons an hour</strong> at the same rise against the gas burner's 42.7, which is why electric tanks have to be bigger.",
+  },
+  {
+    question: "Does the inlet temperature really matter?",
+    answer:
+      "A great deal, and it is seasonal. Groundwater at 40 °F in a northern winter needs a 100 °F rise to reach 140; the same house in summer at 65 °F needs only 75. Recovery is inversely proportional to rise, so the identical heater loses a quarter of its recovery between summer and winter. Size for the winter case.",
+  },
+  {
+    question: "Should I store hot water at 140 °F?",
+    answer:
+      "There is a genuine tension here and it is worth stating plainly. Storing at <strong>140 °F</strong> suppresses <em>Legionella</em>, which grows between roughly 77 and 113 °F. But 140 °F water scalds in about five seconds. The usual resolution is to store hot and <strong>temper down to 120 °F</strong> at the fixtures with a thermostatic mixing valve — which also stretches the effective capacity of the tank, since you are blending in cold.",
+  },
+  {
+    question: "Is a bigger tank always safer?",
+    answer:
+      "No. A larger tank has more standing surface area losing heat around the clock, which shows up on every bill whether the water is used or not. Get the first-hour rating right for the real peak hour and stop there — the aim is to cover the busiest hour of the day, not to store a day's supply.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Heater sized? Quote the whole job in seconds.";
+const ctaDescription =
+  "The unit is one line among venting, gas, water connections, expansion tank, pan and permit. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-tankless-water-heater-calculator",
+    title: "Tankless Water Heater Calculator",
+    description: "The other way to solve the same peak.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-heater-replacement-cost-calculator",
+    title: "Water Heater Replacement Cost Calculator",
+    description: "What the swap actually costs installed.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator",
+    title: "Water Supply Fixture Unit Calculator",
+    description: "Hot-side fixture units for the distribution.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Size the hot line at the 5 ft/s limit.",
+  },
+];
+
+const DEFAULT_USES: Record<string, number> = {
+  shower: 3,
+  dishwasher: 1,
+  "clothes-washer": 1,
+  "hands-face": 2,
+};
+
+/** Both tables computed from the lib. */
+const defaultRecovery = recoveryGph(40000, 0.8, 90);
+const fhrTable = STANDARD_TANK_SIZES.map((tank) => ({
+  tank,
+  storage: 0.7 * tank,
+  fhr: firstHourRating(tank, defaultRecovery),
+}));
+
+const riseTable = [40, 50, 60, 70].map((inletT) => {
+  const rise = 140 - inletT;
+  return { inletT, rise, recovery: recoveryGph(40000, 0.8, rise) };
+});
+
+const styles = plumbingAccentStyles.red;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Water Heater Size Calculator — First-Hour Rating" />
+    <meta
+      property="og:description"
+      content="Peak-hour hot water demand against first-hour rating and recovery, to land on the tank size that actually keeps up. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Water Heater Size Calculator — First-Hour Rating" />
+    <meta
+      name="twitter:description"
+      content="Size a storage water heater on peak-hour demand and first-hour rating. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <!-- ==== HERO ==== -->
+    <main>
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Water Heater Size Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                />
+              </svg>
+              Plumbing Tools · DOE first-hour rating · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Water Heater Size Calculator <span class="text-red-600">— First-Hour Rating</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Tank gallons is the wrong number to shop on. What decides whether the last shower runs cold is
+              <strong>first-hour rating</strong> — roughly 70% of the tank plus one hour of recovery — measured
+              against the busiest hour the house actually has. Count the uses in that hour below and this
+              returns the smallest tank that covers it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+            </svg>
+            Size your water heater
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Uses in the busiest hour</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Gallons of hot water per use, from the US DOE first-hour-rating worksheet.
+                </p>
+                <div class="mt-3 space-y-2">
+                  {
+                    PEAK_HOUR_USES.map((u) => (
+                      <div class="flex items-center justify-between gap-3">
+                        <label for={`wh-use-${u.key}`} class="text-sm text-slate-600 leading-snug">
+                          {u.label}
+                          <span class="ml-1.5 text-xs text-slate-400">{u.gallons} gal each</span>
+                        </label>
+                        <input
+                          id={`wh-use-${u.key}`}
+                          data-wh-use={u.key}
+                          type="number"
+                          min="0"
+                          max="99"
+                          value={DEFAULT_USES[u.key] ?? 0}
+                          class="w-16 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="wh-btu" class="text-sm font-semibold text-slate-800">Burner input</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="wh-btu"
+                      type="number"
+                      min="0"
+                      max="400000"
+                      step="1000"
+                      value="40000"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">BTU/h</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    Electric: watts × 3.412. A 4,500 W element ≈ 15,400 BTU/h.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="wh-efficiency" class="text-sm font-semibold text-slate-800">Efficiency</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="wh-efficiency"
+                      type="number"
+                      min="10"
+                      max="100"
+                      value="80"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">%</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Atmospheric gas ~80%, electric ~98%.</p>
+                </div>
+
+                <div>
+                  <label for="wh-inlet" class="text-sm font-semibold text-slate-800">
+                    Cold inlet temperature
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="wh-inlet"
+                      type="number"
+                      min="30"
+                      max="90"
+                      value="50"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">°F</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Use the winter figure, not the annual average.</p>
+                </div>
+
+                <div>
+                  <label for="wh-outlet" class="text-sm font-semibold text-slate-800">
+                    Storage temperature
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="wh-outlet"
+                      type="number"
+                      min="80"
+                      max="180"
+                      value="140"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">°F</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">140 °F stored, tempered to 120 at the fixtures.</p>
+                </div>
+              </div>
+
+              <button
+                id="wh-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-red-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-red-100 bg-red-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Recommended tank size</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="wh-tank" class="text-5xl font-extrabold tracking-tight text-red-600">40 gal</span>
+              </div>
+              <p id="wh-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Smallest stocked tank whose first-hour rating covers a 66 gallon peak hour, with 4.7 gallons to
+                spare.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Peak-hour demand</p>
+                  <p id="wh-demand" class="mt-1 text-2xl font-bold text-slate-900">66 gal</p>
+                </div>
+                <div class="rounded-xl border border-red-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">First-hour rating</p>
+                  <p id="wh-fhr" class="mt-1 text-2xl font-bold text-slate-900">70.7 gal</p>
+                </div>
+              </div>
+
+              <div id="wh-warning" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">No stocked tank covers this peak</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  Raise the burner input, spread the demand across the hour, or move to two heaters or a
+                  tankless unit.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-red-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Recovery rate</span><span id="wh-bd-recovery" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Temperature rise</span><span id="wh-bd-rise" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Usable storage</span><span id="wh-bd-storage" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Headroom</span><span id="wh-bd-headroom" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>One size up</span><span id="wh-bd-next" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Standby loss, pipe run and recirculation are not modelled, and a real
+                heater's published first-hour rating is measured under a DOE test procedure rather than
+                computed. A licensed plumber has final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Three steps: what the house wants in an hour, what the heater can make in an hour, and what it
+            already has in the tank.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-red-300"># Step 1 — Peak-hour demand (US DOE worksheet)</div>
+            <div>demand gal&nbsp;=&nbsp;Σ (uses × gallons per use)</div>
+            <div class="mt-4 text-red-300"># Step 2 — Recovery rate</div>
+            <div>
+              gph&nbsp;=&nbsp;BTU/h × efficiency ÷ (<span class="text-amber-300">8.33</span> × rise)
+            </div>
+            <div>8.33 lb/gal is the weight of water; rise = storage − inlet</div>
+            <div class="mt-4 text-red-300"># Step 3 — First-hour rating</div>
+            <div>
+              FHR&nbsp;=&nbsp;<span class="text-amber-300">0.70</span> × tank gallons + recovery gph
+            </div>
+            <div class="mt-4 text-red-300"># Step 4 — Pick the tank</div>
+            <div>smallest stocked size where FHR ≥ demand</div>
+            <div class="mt-4 text-slate-400"># Electric conversion</div>
+            <div>BTU/h&nbsp;=&nbsp;watts × <span class="text-amber-300">3.412</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Recovery beats storage</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                In the defaults the tank contributes 28 gallons of usable storage and recovery contributes
+                42.7 — recovery is 60% of the first-hour rating. That is exactly why a 40-gallon gas heater
+                out-delivers a 50-gallon electric one.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Rise is inversely proportional</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Double the temperature rise and you halve the recovery. A heater that recovers 54.9 gph on a
+                70 °F summer rise makes only 38.4 gph on a 100 °F winter rise — a 30% loss from nothing but
+                the season.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">The 0.70 is mixing, not margin</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Cold entering the bottom mixes with hot leaving the top, so usable output falls below
+                temperature well before the tank empties. It is a physical limit, not a safety factor you can
+                argue away.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Store hot, deliver warm</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Storing at 140 °F and tempering to 120 with a mixing valve suppresses <em>Legionella</em>,
+                prevents scalding, and stretches the tank — because every tempered gallon delivered is part
+                cold water.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the same house on electric, and a northern winter that changes the answer.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Family morning, 40,000 BTU gas</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              3 showers (15) = 45&nbsp;·&nbsp;dishwasher 6&nbsp;·&nbsp;washer 7&nbsp;·&nbsp;2 hand-wash (4) =
+              8<br />
+              demand = <span class="font-bold text-red-700">66 gal</span><br />
+              recovery = 40,000 × 0.80 ÷ (8.33 × 90) = 42.7 gph<br />
+              40 gal: FHR = 0.70 × 40 + 42.7 = <span class="font-bold text-red-700">70.7 gal ✓</span><br />
+              30 gal: FHR = 63.7 <span class="font-bold text-red-600">✗</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> a 40-gallon tank, with 4.7 gallons of
+              headroom. Note the 30-gallon tank fails by only 2.3 gallons — first-hour rating is a much finer
+              instrument than tank size.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same house on electric</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              A 4,500 W element is 15,354 BTU/h at 98% efficiency — a third of the gas burner.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              recovery = 15,354 × 0.98 ÷ (8.33 × 90) = <span class="font-bold text-red-700">20.1 gph</span
+              ><br />
+              50 gal: FHR = 35 + 20.1 = 55.1 <span class="font-bold text-red-600">✗</span><br />
+              60 gal: FHR = 42 + 20.1 = 62.1 <span class="font-bold text-red-600">✗</span><br />
+              75 gal: FHR = 52.5 + 20.1 = 72.6 <span class="font-bold text-red-700">✓</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same 66-gallon peak needs a
+              <strong>75-gallon</strong> electric tank against a 40-gallon gas one. Nearly twice the storage,
+              purely because the element cannot recover fast enough — this is the single biggest reason
+              electric tanks are physically larger.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Northern winter — 40 °F inlet</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              rise = 140 − 40 = 100 °F instead of 90<br />
+              recovery = 40,000 × 0.80 ÷ (8.33 × 100) =
+              <span class="font-bold text-red-700">38.4 gph</span><br />
+              40 gal: FHR = 28 + 38.4 = 66.4 gal against a 66 gal demand<br />
+              → <span class="font-bold text-red-700">0.4 gallons of margin</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the same heater that had 4.7 gallons
+              spare in the shoulder season has essentially none in January. Size on the winter inlet
+              temperature — a heater sized on an annual average will disappoint exactly when it matters.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            First-hour rating by tank size
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            At the default 40,000 BTU, 80% efficiency and 90 °F rise — {fmt(defaultRecovery, 1)} gallons per
+            hour of recovery. Computed from the same code the calculator runs.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Tank</th>
+                  <th class="py-3 px-5 font-semibold">Usable storage (70%)</th>
+                  <th class="py-3 px-5 font-semibold">Plus recovery</th>
+                  <th class="py-3 px-5 font-semibold">First-hour rating</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  fhrTable.map((row, index) => (
+                    <tr class={index === fhrTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.tank} gal</td>
+                      <td class="py-3 px-5">{fmt(row.storage, 1)} gal</td>
+                      <td class="py-3 px-5">{fmt(defaultRecovery, 1)} gal</td>
+                      <td class="py-3 px-5 font-semibold">{fmt(row.fhr, 1)} gal</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            What the season does to recovery
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The same 40,000 BTU heater storing at 140 °F, across the range of groundwater temperatures a US
+            house sees.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Inlet temperature</th>
+                  <th class="py-3 px-5 font-semibold">Rise to 140 °F</th>
+                  <th class="py-3 px-5 font-semibold">Recovery</th>
+                  <th class="py-3 px-5 font-semibold">40 gal tank FHR</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  riseTable.map((row, index) => (
+                    <tr class={index === riseTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.inletT} °F</td>
+                      <td class="py-3 px-5">{row.rise} °F</td>
+                      <td class="py-3 px-5">{fmt(row.recovery, 1)} gph</td>
+                      <td class="py-3 px-5">{fmt(firstHourRating(40, row.recovery), 1)} gal</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: per-use hot water figures and the first-hour-rating method from the <a
+              class="underline hover:text-red-600"
+              href="https://www.energy.gov/energysaver/sizing-new-water-heater"
+              target="_blank"
+              rel="noopener">US Department of Energy</a
+            > water heater sizing guidance; recovery derived from the specific heat and density of water (8.33
+            lb/gal). Storage and delivery temperature practice, including thermostatic mixing to limit
+            scalding, follows <a
+              class="underline hover:text-red-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 607 and ASSE 1017/1070 valve standards. A published first-hour rating is measured under the DOE
+            test procedure; this computes an equivalent. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="red"
+        subtitle="Common questions about water heater sizing, first-hour rating, and recovery."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingWaterHeaterSizeCalculator } from "@/scripts/calculators/plumbing-water-heater-size-calculator";
+    initPlumbingWaterHeaterSizeCalculator();
+  </script>
+</Layout>

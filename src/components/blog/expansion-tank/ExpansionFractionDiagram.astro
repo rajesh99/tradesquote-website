@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { expansionTank, waterDensity, selectExpansionTank, fmt } from "@/lib/plumbing";
+
+/**
+ * Where the expansion volume comes from. Mass is conserved, so the volume ratio
+ * is the density ratio — computed from the density table rather than quoting
+ * the familiar "about 2%".
+ *
+ * Base matches the calculator EXACTLY: 50 gal, 60 psi supply, 80 psi ceiling.
+ * An earlier draft of this diagram used a 150 psi ceiling and disagreed with the
+ * page it funnels to.
+ */
+const BASE = { systemGallons: 50, coldF: 40, hotF: 140, supplyPsi: 60, maxPsi: 80 };
+
+const CASES = [
+  { cold: 40, hot: 120 },
+  { cold: 60, hot: 140 },
+  { cold: 50, hot: 140 },
+  { cold: 40, hot: 140 },
+  { cold: 40, hot: 160 },
+  { cold: 40, hot: 180 },
+];
+
+const rows = CASES.map((c) => {
+  const r = expansionTank({ ...BASE, coldF: c.cold, hotF: c.hot });
+  return {
+    label: `${c.cold} °F → ${c.hot} °F`,
+    coldDensity: waterDensity(c.cold),
+    hotDensity: waterDensity(c.hot),
+    fraction: r.fraction,
+    acceptance: r.acceptance,
+    shell: selectExpansionTank(r.tankVolume),
+    isDefault: c.cold === BASE.coldF && c.hot === BASE.hotF,
+  };
+});
+
+const maxFraction = Math.max(...rows.map((r) => r.fraction));
+
+const BAR_X = 232;
+const BAR_MAX = 236;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>How much water expands when it is heated</title>
+  <desc>
+    Mass is conserved when water is heated, so the volume ratio is the density ratio. A fifty gallon system heated from
+    forty to a hundred and forty degrees produces well under a gallon of expansion.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The expansion is small — the pressure it makes is not</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Volume ratio equals density ratio, because mass is conserved. Gallons and shells for a ${BASE.systemGallons} gallon system at ${BASE.supplyPsi} psi supply, ${BASE.maxPsi} psi ceiling.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 28;
+    const w = Math.max(3, (row.fraction / maxFraction) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={row.isDefault ? 800 : 600}>{row.label}</text>
+        <text x={218} y={y + 15} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.coldDensity, 2)} → ${fmt(row.hotDensity, 2)} lb/ft³`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="19" rx="5" fill={row.isDefault ? C.primary : C.orange} opacity={row.isDefault ? 0.9 : 0.6} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.isDefault ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.isDefault ? 800 : 600}>
+          {`${fmt(row.fraction * 100, 2)}% · ${fmt(row.acceptance, 2)} gal · ${row.shell} gal shell`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">
+    Under a gallon of expansion in a typical heater. In a closed system with nowhere to put it, that gallon is what lifts the pressure to the relief setting.
+  </text>
+</svg>

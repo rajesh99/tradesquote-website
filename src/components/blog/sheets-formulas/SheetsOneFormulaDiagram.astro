@@ -1,0 +1,275 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { WSFU_FIXTURES, totalWsfu, wsfuToGpm, fmt } from "@/lib/plumbing";
+
+/**
+ * One formula against a filled-down column — the whole argument of the post in
+ * one picture.
+ *
+ * The fixture rows and every weight come from the library, so the schedule in
+ * the picture is a schedule that would actually total this way. Positions are
+ * resolved here and never in the template: a bare `<` there is read as a tag
+ * opener and breaks the build.
+ */
+
+const HOUSE: { key: string; n: number }[] = [
+  { key: "wc-private-tank", n: 2 },
+  { key: "lavatory-private", n: 3 },
+  { key: "bathtub-private", n: 1 },
+  { key: "shower-private", n: 1 },
+  { key: "kitchen-sink-private", n: 1 },
+  { key: "dishwasher-private", n: 1 },
+  { key: "clothes-washer-private", n: 1 },
+  { key: "hose-bibb", n: 2 },
+];
+
+/**
+ * The schedule joins on the fixture LABEL, not the internal key, because a
+ * dropdown sourced from the code table is what makes the spelling safe. Labels
+ * run long, so they are clipped to what the panel column actually fits.
+ */
+const CLIP = 27;
+const shortLabel = (s: string) => (s.length > CLIP ? `${s.slice(0, CLIP - 1)}…` : s);
+
+const ROWS = HOUSE.map((h) => {
+  const f = WSFU_FIXTURES.find((x) => x.key === h.key);
+  const each = f ? f.total : 0;
+  return { label: shortLabel(f ? f.label : h.key), n: h.n, each, total: h.n * each };
+});
+
+const COUNTS: Record<string, number> = Object.fromEntries(HOUSE.map((h) => [h.key, h.n]));
+const TOTAL = totalWsfu(COUNTS);
+const GPM = wsfuToGpm(TOTAL, "tank");
+
+/** The row somebody overtypes. Row 5 of 8 — a kitchen sink, plausibly. */
+const BROKEN_INDEX = 4;
+const BROKEN_SHOWN = 1;
+
+/* Geometry */
+const PANEL_Y = 74;
+const ROW_H = 22;
+const HEAD_H = 20;
+const BODY_H = ROWS.length * ROW_H;
+const PANEL_H = HEAD_H + BODY_H + 66;
+const LEFT_X = 24;
+const RIGHT_X = 372;
+const PANEL_W = 324;
+const FOOT_Y = PANEL_Y + PANEL_H + 26;
+const VIEW_H = FOOT_Y + 54;
+
+/** Column x offsets inside a panel. */
+const cKey = 12;
+const cN = 172;
+const cVal = 208;
+const cFormula = 208;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 720 ${VIEW_H}`} fill="none" aria-hidden="true">
+  <title>One array formula governing a whole column, against the same column filled down in Excel</title>
+
+  <rect x="0" y="0" width="720" height={VIEW_H} fill={C.white} />
+
+  <text x={LEFT_X} y="26" font-family={FONT} font-size="15" font-weight="700" fill={C.dark}>
+    The same fixture schedule, sized two ways
+  </text>
+  <text x={LEFT_X} y="46" font-family={FONT} font-size="11" fill={C.muted}>
+    {ROWS.length} fixture rows totalling {fmt(TOTAL, 1)} WSFU. Both columns return the same numbers. Only one of
+    them has a single copy of the logic.
+  </text>
+
+  {/* ---------- LEFT: Google Sheets ---------- */}
+  <rect
+    x={LEFT_X}
+    y={PANEL_Y}
+    width={PANEL_W}
+    height={PANEL_H}
+    rx="10"
+    fill={C.greenLight}
+    stroke={C.green}
+    stroke-width="1.5"
+  />
+  <text x={LEFT_X + cKey} y={PANEL_Y + 15} font-family={FONT} font-size="10.5" font-weight="700" fill={C.green}>
+    GOOGLE SHEETS — Schedule!D2
+  </text>
+
+  {/* header row */}
+  <rect x={LEFT_X + cKey} y={PANEL_Y + 24} width={PANEL_W - 24} height={HEAD_H} fill={C.white} stroke={C.border} />
+  <text x={LEFT_X + cKey + 6} y={PANEL_Y + 38} font-family={FONT} font-size="9.5" font-weight="700" fill={C.muted}>
+    B — fixture
+  </text>
+  <text x={LEFT_X + cN} y={PANEL_Y + 38} font-family={FONT} font-size="9.5" font-weight="700" fill={C.muted}>
+    C
+  </text>
+  <text x={LEFT_X + cVal} y={PANEL_Y + 38} font-family={FONT} font-size="9.5" font-weight="700" fill={C.muted}>
+    D — WSFU
+  </text>
+
+  {
+    ROWS.map((r, i) => (
+      <g>
+        <rect
+          x={LEFT_X + cKey}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H}
+          width={PANEL_W - 24}
+          height={ROW_H}
+          fill={i === 0 ? C.white : i % 2 === 0 ? C.white : C.panelBg}
+          stroke={C.border}
+          stroke-width="0.75"
+        />
+        <text
+          x={LEFT_X + cKey + 6}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H + 14}
+          font-family={FONT}
+          font-size="9"
+          fill={C.dark}
+        >
+          {r.label}
+        </text>
+        <text
+          x={LEFT_X + cN}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H + 14}
+          font-family={FONT}
+          font-size="9"
+          fill={C.muted}
+        >
+          {r.n}
+        </text>
+        <text
+          x={LEFT_X + cVal}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H + 14}
+          font-family={FONT}
+          font-size="9.5"
+          font-weight={i === 0 ? "700" : "400"}
+          fill={i === 0 ? C.green : C.dark}
+        >
+          {i === 0 ? "=ARRAYFORMULA(...)" : fmt(r.total, 1)}
+        </text>
+      </g>
+    ))
+  }
+
+  <text
+    x={LEFT_X + cKey}
+    y={PANEL_Y + 24 + HEAD_H + BODY_H + 20}
+    font-family={FONT}
+    font-size="10"
+    font-weight="700"
+    fill={C.green}
+  >
+    1 formula, {ROWS.length} answers
+  </text>
+  <text
+    x={LEFT_X + cKey}
+    y={PANEL_Y + 24 + HEAD_H + BODY_H + 36}
+    font-family={FONT}
+    font-size="9.5"
+    fill={C.muted}
+  >
+    Rows 3 down hold values, not formulas. Nothing
+  </text>
+  <text
+    x={LEFT_X + cKey}
+    y={PANEL_Y + 24 + HEAD_H + BODY_H + 49}
+    font-family={FONT}
+    font-size="9.5"
+    fill={C.muted}
+  >
+    to overtype, and row 9 works before it exists.
+  </text>
+
+  {/* ---------- RIGHT: Excel ---------- */}
+  <rect
+    x={RIGHT_X}
+    y={PANEL_Y}
+    width={PANEL_W}
+    height={PANEL_H}
+    rx="10"
+    fill={C.orangeLight}
+    stroke={C.orange}
+    stroke-width="1.5"
+  />
+  <text x={RIGHT_X + cKey} y={PANEL_Y + 15} font-family={FONT} font-size="10.5" font-weight="700" fill={C.orange}>
+    EXCEL — D2 filled down to D{ROWS.length + 1}
+  </text>
+
+  <rect x={RIGHT_X + cKey} y={PANEL_Y + 24} width={PANEL_W - 24} height={HEAD_H} fill={C.white} stroke={C.border} />
+  <text x={RIGHT_X + cKey + 6} y={PANEL_Y + 38} font-family={FONT} font-size="9.5" font-weight="700" fill={C.muted}>
+    B — fixture
+  </text>
+  <text x={RIGHT_X + cFormula} y={PANEL_Y + 38} font-family={FONT} font-size="9.5" font-weight="700" fill={C.muted}>
+    D — what the cell holds
+  </text>
+
+  {
+    ROWS.map((r, i) => (
+      <g>
+        <rect
+          x={RIGHT_X + cKey}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H}
+          width={PANEL_W - 24}
+          height={ROW_H}
+          fill={i === BROKEN_INDEX ? C.redLight : i % 2 === 0 ? C.white : C.panelBg}
+          stroke={i === BROKEN_INDEX ? C.red : C.border}
+          stroke-width={i === BROKEN_INDEX ? "1.25" : "0.75"}
+        />
+        <text
+          x={RIGHT_X + cKey + 6}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H + 14}
+          font-family={FONT}
+          font-size="9"
+          fill={C.dark}
+        >
+          {r.label}
+        </text>
+        <text
+          x={RIGHT_X + cFormula}
+          y={PANEL_Y + 24 + HEAD_H + i * ROW_H + 14}
+          font-family={FONT}
+          font-size="8.5"
+          fill={i === BROKEN_INDEX ? C.red : C.muted}
+        >
+          {i === BROKEN_INDEX ? `${BROKEN_SHOWN}   typed by hand` : `=C${i + 2}*XLOOKUP(B${i + 2},...)`}
+        </text>
+      </g>
+    ))
+  }
+
+  <text
+    x={RIGHT_X + cKey}
+    y={PANEL_Y + 24 + HEAD_H + BODY_H + 20}
+    font-family={FONT}
+    font-size="10"
+    font-weight="700"
+    fill={C.orange}
+  >
+    {ROWS.length} copies of the logic, {ROWS.length} answers
+  </text>
+  <text
+    x={RIGHT_X + cKey}
+    y={PANEL_Y + 24 + HEAD_H + BODY_H + 36}
+    font-family={FONT}
+    font-size="9.5"
+    fill={C.red}
+  >
+    Row {BROKEN_INDEX + 2} was overtyped. The column still
+  </text>
+  <text
+    x={RIGHT_X + cKey}
+    y={PANEL_Y + 24 + HEAD_H + BODY_H + 49}
+    font-family={FONT}
+    font-size="9.5"
+    fill={C.red}
+  >
+    totals, and nothing anywhere says so.
+  </text>
+
+  {/* ---------- FOOTER ---------- */}
+  <rect x={LEFT_X} y={FOOT_Y} width={696} height="44" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.25" />
+  <text x={LEFT_X + 14} y={FOOT_Y + 19} font-family={FONT} font-size="11" font-weight="700" fill={C.dark}>
+    Both columns total {fmt(TOTAL, 1)} WSFU, which is {fmt(GPM, 2)} gpm of peak demand on flush tanks.
+  </text>
+  <text x={LEFT_X + 14} y={FOOT_Y + 34} font-family={FONT} font-size="10" fill={C.muted}>
+    Until somebody edits one. The overtyped row on the right reads {BROKEN_SHOWN} where the table says{" "}
+    {fmt(ROWS[BROKEN_INDEX].each, 1)} — a silent {fmt(ROWS[BROKEN_INDEX].total - BROKEN_SHOWN, 1)} WSFU short.
+  </text>
+</svg>

@@ -1,0 +1,660 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  DFU_BY_DRAIN_SIZE,
+  DFU_FIXTURES,
+  DRAIN_APPLICATION_LABELS,
+  fmt,
+  sizeLabel,
+  type DrainApplication,
+} from "@/lib/plumbing";
+
+const title = "Drainage Fixture Unit Calculator — DFU Totals | TradesQuote";
+const description =
+  "Free drainage fixture unit calculator. Count your fixtures, get the total DFU from IPC Table 709.1, and see the minimum drain size it needs — including the water-closet rule that floors a building drain at 3 inches.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-drainage-fixture-unit-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Drainage Fixture Unit Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Drainage Fixture Unit Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online drainage fixture unit calculator that totals DFU values from IPC Table 709.1 for any set of plumbing fixtures and reports the minimum drain size required, with minimum trap sizes.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many DFU is a bathroom group?",
+    answer:
+      "A bathroom group with a 1.6 gpf water closet is <strong>5 DFU</strong> under IPC Table 709.1; with a water closet over 1.6 gpf it is 6. That is deliberately less than counting the fixtures separately (3 + 1 + 2 = 6), because the fixtures in one bathroom compete for one person and rarely discharge together.",
+  },
+  {
+    question: "How many DFU is a typical house?",
+    answer:
+      "Two bathroom groups plus a kitchen sink, dishwasher, clothes washer and laundry tray comes to <strong>18 DFU</strong> — the defaults above. That is comfortably inside a 3-inch building drain, which carries 42 DFU at 1/4 inch per foot.",
+  },
+  {
+    question: "Why does 18 DFU still need a 3-inch drain?",
+    answer:
+      "Because of the water closet, not the load. Table 710.1(1) would carry 18 DFU on a <strong>2-inch</strong> building drain at 1/4 in/ft, but the table's own footnote floors any building drain serving a water closet at <strong>3 inches</strong>. This is the single most commonly missed line in residential drainage sizing, and the calculator applies it and tells you when it bit.",
+  },
+  {
+    question: "What is the difference between DFU and WSFU?",
+    answer:
+      'They measure opposite ends of the same fixture. <strong>DFU</strong> weights what a fixture puts down the drain; <strong>WSFU</strong> weights how hard it pulls on the supply. The same lavatory is 1 DFU and 0.7 WSFU. Use the <a href="/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator" class="font-semibold text-emerald-700 underline decoration-emerald-300 hover:decoration-emerald-600">Water Supply Fixture Unit Calculator</a> for the pressure side.',
+  },
+  {
+    question: "What if my fixture isn't on the list?",
+    answer:
+      "IPC Table 709.2 handles it: a fixture not listed in Table 709.1 takes its DFU value from the size of its drain connection — 1 DFU for 1-1/4 inch, 2 for 1-1/2, 3 for 2 inch, 5 for 3 inch and 6 for 4 inch. Those rows are in the reference tables below.",
+  },
+  {
+    question: "Does a shower over a bathtub count twice?",
+    answer:
+      "No. A showerhead over a bathtub does not increase the tub's drainage fixture unit value — it is still <strong>2 DFU</strong>, because only one of them can drain at a time. The same logic applies to a whirlpool attachment.",
+  },
+  {
+    question: "Why do some fixtures have no trap size?",
+    answer:
+      "Because they trap themselves. Water closets and urinals have an integral trap built into the china, so Table 709.1 gives them no separate minimum trap size — the fixture <em>is</em> the trap. Everything else needs a trap sized at or above the value shown.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Load totalled? Quote the whole job in seconds.";
+const ctaDescription =
+  "Fixture units decide the pipe; the quote decides whether the job is worth doing. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-drain-pipe-size-calculator",
+    title: "Drain Pipe Size Calculator",
+    description: "Size branches, stacks and sewers from this total.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-slope-calculator",
+    title: "Drain Pipe Slope Calculator",
+    description: "Set the fall the drain needs to scour.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-vent-size-calculator",
+    title: "Vent Pipe Size Calculator",
+    description: "Vent it so the traps hold their seal.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator",
+    title: "Water Supply Fixture Unit Calculator",
+    description: "The same fixtures, weighted for the supply.",
+  },
+];
+
+const residential = DFU_FIXTURES.filter((f) => f.group === "Residential");
+const commercial = DFU_FIXTURES.filter((f) => f.group === "Commercial");
+
+const DEFAULTS: Record<string, number> = {
+  "bathroom-group-16": 2,
+  "kitchen-sink": 1,
+  dishwasher: 1,
+  "clothes-washer-res": 1,
+  "laundry-tray": 1,
+};
+
+const APPLICATIONS: DrainApplication[] = [
+  "building-drain",
+  "horizontal-branch",
+  "stack-short",
+  "stack-tall",
+];
+
+const styles = plumbingAccentStyles.emerald;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Drainage Fixture Unit Calculator — DFU Totals" />
+    <meta
+      property="og:description"
+      content="Total drainage fixture units from IPC Table 709.1 and get the minimum drain size, including the water-closet rule that floors a building drain at 3 inches. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Drainage Fixture Unit Calculator — DFU Totals" />
+    <meta
+      name="twitter:description"
+      content="Total DFU from IPC Table 709.1 and the drain size it needs. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Drainage Fixture Unit Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · IPC Table 709.1 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Drainage Fixture Unit Calculator <span class="text-emerald-600">— DFU Totals</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every drain, branch, stack and sewer is sized from one number: the total
+              <strong>drainage fixture units</strong> discharging into it. Count your fixtures and this gives
+              you that total from IPC Table 709.1, the minimum trap size for each one, and the drain size the
+              load requires — including the water-closet rule that overrides the table.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            Count your fixtures
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="dfu-application" class="text-sm font-semibold text-slate-800">
+                    What are you sizing?
+                  </label>
+                  <select
+                    id="dfu-application"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    {
+                      APPLICATIONS.map((a) => (
+                        <option value={a} selected={a === "building-drain"}>
+                          {DRAIN_APPLICATION_LABELS[a]}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="dfu-slope" class="text-sm font-semibold text-slate-800">Slope</label>
+                  <select
+                    id="dfu-slope"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                  >
+                    <option value="0.0625">1/16 in/ft</option>
+                    <option value="0.125">1/8 in/ft</option>
+                    <option value="0.25" selected>1/4 in/ft</option>
+                    <option value="0.5">1/2 in/ft</option>
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">Building drains and sewers only.</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Residential fixtures</p>
+                <div class="mt-3 space-y-2">
+                  {
+                    residential.map((f) => (
+                      <div class="flex items-center justify-between gap-3">
+                        <label for={`dfu-fx-${f.key}`} class="text-sm text-slate-600 leading-snug">
+                          {f.label}
+                          <span class="ml-1.5 text-xs text-slate-400">
+                            {fmt(f.dfu, f.dfu % 1 === 0 ? 0 : 1)} DFU
+                            {f.trap !== null ? ` · trap ${sizeLabel(f.trap)}` : ""}
+                          </span>
+                        </label>
+                        <input
+                          id={`dfu-fx-${f.key}`}
+                          data-dfu-fixture={f.key}
+                          type="number"
+                          min="0"
+                          max="999"
+                          value={DEFAULTS[f.key] ?? 0}
+                          class="w-16 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <details class="group rounded-xl border border-slate-200 bg-slate-50">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  Commercial fixtures
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 space-y-2">
+                  {
+                    commercial.map((f) => (
+                      <div class="flex items-center justify-between gap-3">
+                        <label for={`dfu-fx-${f.key}`} class="text-sm text-slate-600 leading-snug">
+                          {f.label}
+                          <span class="ml-1.5 text-xs text-slate-400">
+                            {fmt(f.dfu, f.dfu % 1 === 0 ? 0 : 1)} DFU
+                            {f.trap !== null ? ` · trap ${sizeLabel(f.trap)}` : ""}
+                          </span>
+                        </label>
+                        <input
+                          id={`dfu-fx-${f.key}`}
+                          data-dfu-fixture={f.key}
+                          type="number"
+                          min="0"
+                          max="999"
+                          value="0"
+                          class="w-16 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </details>
+
+              <button
+                id="dfu-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div
+              class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-emerald-100 bg-emerald-50 p-5 sm:p-6"
+            >
+              <p class="text-sm font-medium text-slate-600">Total drainage fixture units</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="dfu-total" class="text-5xl font-extrabold tracking-tight text-emerald-600">18</span>
+                <span class="text-lg font-semibold text-slate-500">DFU</span>
+              </div>
+              <p id="dfu-note" class="mt-1 text-sm font-semibold text-slate-700">
+                The table alone allows 2", but a water closet on a building drain floors it at 3 inches.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Minimum drain size</p>
+                  <p id="dfu-size" class="mt-1 text-2xl font-bold text-slate-900">3"</p>
+                </div>
+                <div class="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">That size carries</p>
+                  <p id="dfu-capacity" class="mt-1 text-2xl font-bold text-slate-900">42 DFU</p>
+                </div>
+              </div>
+
+              <div id="dfu-wc-notice" class="mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">The water-closet floor applied</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  IPC Table 710.1(1)'s footnote sets a 3-inch minimum on any building drain serving a water
+                  closet, regardless of DFU load. The load alone would have allowed a smaller pipe.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-emerald-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Fixtures counted</span><span id="dfu-bd-fixtures" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Size from the table</span><span id="dfu-bd-table" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Slope applied</span><span id="dfu-bd-slope" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Largest trap on the run</span><span id="dfu-bd-largest-trap" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Spare capacity</span><span id="dfu-bd-headroom" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate based on IPC 2021 Tables 709.1, 709.2 and 710.1. UPC jurisdictions assign
+                some fixtures different values. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The method, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Addition, a table lookup, and one footnote that overrides both.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-emerald-300"># Step 1 — Total the load (IPC Table 709.1)</div>
+            <div>total DFU&nbsp;=&nbsp;Σ (fixture count × fixture DFU value)</div>
+            <div class="mt-4 text-emerald-300"># Unlisted fixtures take their drain size (Table 709.2)</div>
+            <div>
+              1-1/4"&nbsp;→&nbsp;<span class="text-amber-300">1</span>&nbsp;·&nbsp;1-1/2"&nbsp;→&nbsp;<span
+                class="text-amber-300">2</span
+              >&nbsp;·&nbsp;2"&nbsp;→&nbsp;<span class="text-amber-300">3</span>&nbsp;·&nbsp;3"&nbsp;→&nbsp;<span
+                class="text-amber-300">5</span
+              >&nbsp;·&nbsp;4"&nbsp;→&nbsp;<span class="text-amber-300">6</span>
+            </div>
+            <div class="mt-4 text-emerald-300"># Step 2 — Look the total up</div>
+            <div>building drain / sewer&nbsp;→&nbsp;Table 710.1(1), by slope</div>
+            <div>branch or stack&nbsp;→&nbsp;Table 710.1(2), slope-independent</div>
+            <div class="mt-4 text-emerald-300"># Step 3 — The override</div>
+            <div>
+              any building drain serving a water closet&nbsp;≥&nbsp;<span class="text-amber-300">3"</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A fixture unit is not gallons</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                It is a dimensionless weight bundling discharge rate, duration and frequency of use. That is
+                what lets one number compare a floor drain with a urinal.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Groups beat the sum of the parts</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A bathroom group is 5 DFU where its fixtures counted individually give 6, because one person
+                cannot use them all at once. Always use the group value when the fixtures share a bathroom.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A shower over a tub is free</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Table 709.1 says outright that a showerhead over a bathtub, or a whirlpool attachment, does
+                not increase the tub's value. It stays at 2 DFU because only one can drain at a time.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Trap size is a separate rule</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                The DFU value and the minimum trap size come from the same table but are independent
+                requirements. A 2 DFU kitchen sink needs a 1-1/2 inch trap; a 2 DFU floor drain needs 2 inch.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A house, a single bathroom branch, and a small commercial washroom.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+              >
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Two-bathroom house building drain</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              2 × bathroom group (5) = 10<br />
+              1 × kitchen sink (2) = 2&nbsp;·&nbsp;1 × dishwasher (2) = 2<br />
+              1 × clothes washer (2) = 2&nbsp;·&nbsp;1 × laundry tray (2) = 2<br />
+              total = <span class="font-bold text-emerald-700">18 DFU</span><br />
+              Table 710.1(1) at 1/4 in/ft: 2" carries 21 DFU → 2" would do<br />
+              water-closet footnote → <span class="font-bold text-emerald-700">3 inch minimum</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 3 inch, carrying 42 DFU — more than
+              double the load. The footnote, not the arithmetic, decided it.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+              >
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">One bathroom on a horizontal branch</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              1 × bathroom group = <span class="font-bold text-emerald-700">5 DFU</span><br />
+              Table 710.1(2) horizontal branch: 1-1/2" = 3, 2" = 6<br />
+              → 2 inch on load alone<br />
+              but a water closet needs a 3" branch in practice — Table 710.1(2)<br />
+              footnotes cap a 3" branch at two water closets
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the DFU load says 2 inch, but you
+              cannot run a water closet on a 2-inch branch. This is why the 3-inch closet bend is universal in
+              residential work — and why load is only ever half the sizing question.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold"
+              >
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Small commercial washroom</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Four public 1.6 gpf water closets, two urinals, four lavatories and a service sink on a building
+              drain at 1/8 in/ft.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              4 × WC public (4) = 16&nbsp;·&nbsp;2 × urinal (4) = 8<br />
+              4 × lavatory (1) = 4&nbsp;·&nbsp;1 × service sink (2) = 2<br />
+              total = <span class="font-bold text-emerald-700">30 DFU</span><br />
+              Table 710.1(1) at 1/8 in/ft: 3" carries 36 DFU → 3 inch ✓<br />
+              at 1/4 in/ft the same 3" carries 42
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 3 inch even on the flatter grade, with
+              6 DFU spare. Note how much heavier commercial fixtures are — four public water closets alone
+              nearly match the whole house in example 1.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            IPC Table 709.1 — DFU values and trap sizes
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Rendered from the same data the calculator uses, so the two cannot disagree. Fixtures with no trap
+            size shown have an integral trap.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Fixture</th>
+                  <th class="py-3 px-5 font-semibold">DFU</th>
+                  <th class="py-3 px-5 font-semibold">Min trap</th>
+                  <th class="py-3 px-5 font-semibold">Type</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  DFU_FIXTURES.map((f, index) => (
+                    <tr class={index === DFU_FIXTURES.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{f.label}</td>
+                      <td class="py-3 px-5">{fmt(f.dfu, f.dfu % 1 === 0 ? 0 : 1)}</td>
+                      <td class="py-3 px-5">{f.trap === null ? "integral" : sizeLabel(f.trap)}</td>
+                      <td class="py-3 px-5 text-slate-500">{f.group}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            IPC Table 709.2 — fixtures not otherwise listed
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            When a fixture is not in Table 709.1, its drain connection decides its value.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Drain connection</th>
+                  <th class="py-3 px-5 font-semibold">DFU value</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  DFU_BY_DRAIN_SIZE.map((row, index) => (
+                    <tr class={index === DFU_BY_DRAIN_SIZE.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{sizeLabel(row.size)}</td>
+                      <td class="py-3 px-5">{row.dfu}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-emerald-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 Table 709.1 (drainage fixture unit values), Table 709.2 (fixtures not listed), Table 710.1(1)
+            (building drains and sewers) and Table 710.1(2) (horizontal branches and stacks), including the
+            footnote setting a 3-inch minimum on a building drain serving a water closet. Roughly fifteen
+            states use the <a
+              class="underline hover:text-emerald-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative, which assigns some fixtures different values. Local amendments override the
+            model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="emerald"
+        subtitle="Common questions about drainage fixture units, trap sizes, and the water-closet rule."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingDrainageFixtureUnitCalculator } from "@/scripts/calculators/plumbing-drainage-fixture-unit-calculator";
+    initPlumbingDrainageFixtureUnitCalculator();
+  </script>
+</Layout>

@@ -1,0 +1,145 @@
+---
+title: "What Size Well Pressure Tank? Drawdown Is a Ratio, Not a Difference"
+meta_title: "What Size Well Pressure Tank Do I Need? Drawdown Sizing (2026) | TradesQuote"
+description: "A 44 gallon pressure tank delivers 13 gallons. Drawdown is a fraction of the shell set by absolute pressures, and the pre-charge moves it more than the tank size does — worked through with the numbers."
+image: /images/posts/what-size-pressure-tank-do-i-need-hero.svg
+date: 2026-09-03T10:30:00Z
+categories: ["plumbing"]
+tags: ["pressure tank","well pump","drawdown","pump cycling","well water"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import TankDrawdownRatioDiagram from "@/components/blog/pressure-tank/TankDrawdownRatioDiagram.astro";
+import TankPrechargeSweepDiagram from "@/components/blog/pressure-tank/TankPrechargeSweepDiagram.astro";
+import TankPumpSizeDiagram from "@/components/blog/pressure-tank/TankPumpSizeDiagram.astro";
+
+A well pressure tank is sold by the number painted on the side, and that number is not how much water it gives you. It is not close.
+
+**A 44 gallon tank on an ordinary 30/50 switch delivers 13.0 gallons.** The rest of the shell is air, and the air never leaves. What you actually get is the volume the air sweeps as it expands from cut-out pressure back down to cut-in — a *ratio* of absolute pressures, not a difference between gauge readings. Get that distinction wrong and every number downstream of it is wrong too.
+
+## What a tank actually delivers
+
+<BlogInfographic
+  title="A 44 gallon tank does not hold 44 gallons"
+  caption="Drawdown is the fraction of the shell swept between cut-in and cut-out, worked in absolute pressure. On a 30/50 switch with a correct 28 psi pre-charge that is 29.5 percent — 13.0 gallons out of 44."
+>
+  <TankDrawdownRatioDiagram />
+</BlogInfographic>
+
+A diaphragm tank is an air spring. Water entering compresses the air; water leaving lets it expand. The usable volume — the **drawdown** — is the difference between how much of the shell is air at cut-in and how much is air at cut-out:
+
+    air at cut-in  = pre-charge ÷ cut-in    (absolute)
+    air at cut-out = pre-charge ÷ cut-out   (absolute)
+    drawdown       = the difference
+
+Every pressure in that calculation is **absolute** — gauge plus 14.7. This is the step almost every rule of thumb skips, and skipping it flatters the tank badly. The gauge shortcut says 1 − 30/50 = 40%, which claims **17.6 gallons**. The real answer is **29.5%, or 13.0 gallons**. The shortcut promises 4.6 gallons that do not exist, and it is worst exactly where it matters most, at low pressures.
+
+Run your own switch settings through the **[Well Pressure Tank Calculator](/calculators/plumbing/plumbing-well-pressure-tank-calculator)**, which works in absolute pressure throughout for this reason.
+
+## The pre-charge matters more than the tank
+
+<BlogInfographic
+  title="The pre-charge decides more than the tank size does"
+  caption="One 44 gallon shell on one 30/50 switch, with only the pre-charge changing. The peak is two psi below cut-in; above cut-in the tank is already empty of water before the pump starts."
+>
+  <TankPrechargeSweepDiagram />
+</BlogInfographic>
+
+Set the pre-charge two psi below cut-in and the tank gives **29.5%, or 13.0 gallons**. Now look at what happens when it drifts:
+
+- **20 psi** (under-charged): 24.0% — 10.6 gallons
+- **28 psi** (correct): **29.5% — 13.0 gallons**
+- **35 psi**: 23.2% — 10.2 gallons
+- **40 psi**: 15.5% — 6.8 gallons
+- **48 psi**: **3.1% — 1.4 gallons**
+
+At 48 psi that 44 gallon tank has become a 1.4 gallon tank. Nothing has failed. The bladder is intact, the pump is fine, the switch is fine — and the pump is short cycling on every flush.
+
+**This is why an over-charged tank and a waterlogged tank present identically.** Both make the pump start and stop rapidly, both feel like a failed bladder, and only one of them costs anything to fix. Check the pre-charge with a tyre gauge on the schrader valve **with the system drained of pressure** — with water pressure on it you are reading the water, not the air.
+
+Air is also lost slowly through the schrader valve and around the diaphragm over years. **A pressure tank is a serviceable item, not a fit-and-forget one**, and an annual pre-charge check is the cheapest maintenance in the whole water system.
+
+## Sizing from the pump
+
+The tank is not sized from the house. It is sized from the pump, and the goal is not storage — it is **making the pump run long enough per start to avoid destroying itself**.
+
+Motor wear happens at starting, not running. The convention is a minimum run time per cycle: about one minute for small pumps, rising with capacity.
+
+    required drawdown = pump gpm × minimum run minutes
+    required shell    = required drawdown ÷ drawdown fraction
+
+<BlogInfographic
+  title="The pump sizes the tank — the house never enters it"
+  caption="Required drawdown is pump output times minimum run time, and both terms grow with pump size. A 20 gpm pump needs six times the shell of a 5 gpm pump."
+>
+  <TankPumpSizeDiagram />
+</BlogInfographic>
+
+A 10 gpm pump needs 10 gallons of drawdown, which at 29.5% means **33.9 gallons of shell** — so a 44 gallon tank, delivering 13.0 gallons and buying 1.30 minutes of run. A 20 gpm pump needs 30 gallons of drawdown and **101.6 gallons of shell**, because it carries both a larger output and a longer minimum run.
+
+Past about 25 gpm you leave the commonly stocked ladder and the answer is two tanks plumbed in parallel, which is normal practice rather than a compromise. Two 86 gallon tanks behave as one 172 gallon tank.
+
+Notice what is *not* in the calculation: the number of bathrooms, the peak demand, the fixture units. A pressure tank is not a buffer against demand — the pump handles demand. It is a device for limiting motor starts.
+
+## Higher pressure settings give you less
+
+A counter-intuitive result worth having: raising the switch settings **reduces** drawdown from the same shell.
+
+- **30/50**: 29.5% — 13.0 gallons from a 44 gallon tank
+- **40/60**: 25.8% — 11.3 gallons
+- **50/70**: 22.9% — 10.1 gallons
+
+The span is 20 psi in all three cases, but the *ratio* of absolute pressures narrows as both numbers rise, and drawdown is a ratio. So a homeowner who bumps the switch to 40/60 chasing better shower pressure has quietly shortened every pump cycle by about 13%.
+
+Widening the span is the fix that actually works. A 30/50 switch has a 20 psi span; a 20/40 or a 30/60 gives the air more room to expand and more drawdown from the same tank — at the cost of a more noticeable pressure swing at the fixtures. It is a real trade, not a free win.
+
+## Where sizing goes wrong
+
+**Sizing on the shell number.** The tank's badge is not its drawdown. Compare drawdown to drawdown when you are comparing products, and note that some manufacturers publish drawdown at a specific switch setting — check which one.
+
+**Never checking the pre-charge.** It is the single highest-leverage number in the system and it drifts. Check it with the water pressure released.
+
+**Raising the switch to fix weak fixtures.** It costs you drawdown, and if the weak fixture is caused by friction rather than pressure it does not fix anything anyway — the diagnosis in **[low water pressure in a house](/blog/low-water-pressure-in-house)** applies to well systems exactly as it does to municipal ones.
+
+**Undersizing to save money.** The saving is a few hundred dollars once. The cost is pump starts, which is what pumps die of.
+
+**Assuming a bigger tank fixes short cycling.** Sometimes. But if the pre-charge is wrong, or the bladder has failed, a bigger tank cycles fast too. Diagnose first.
+
+## Frequently asked questions
+
+### What size pressure tank do I need for a 10 gpm well pump?
+
+Around **44 gallons**. A 10 gpm pump wants at least one minute of run per cycle, so it needs 10 gallons of drawdown. At the 29.5% drawdown a 30/50 switch gives with a correct pre-charge, that means 33.9 gallons of shell, and 44 is the next stocked size — delivering 13.0 gallons and 1.30 minutes of run.
+
+### How much water does a 44 gallon pressure tank actually hold?
+
+**About 13 gallons of usable water** on a 30/50 switch with the pre-charge set to 28 psi. The rest of the shell is air that never leaves. Drawdown is a fraction of the shell, not the shell, and that fraction changes with both the switch settings and the pre-charge.
+
+### What should my pressure tank pre-charge be?
+
+**Two psi below cut-in.** A 30/50 switch takes a 28 psi pre-charge, a 40/60 takes 38. Check it with a tyre gauge at the schrader valve with the system drained of water pressure — with pressure on it you are measuring the water side, not the air.
+
+### Why is my well pump short cycling?
+
+Most often the pre-charge, not the tank. At 48 psi on a 30/50 switch a 44 gallon tank delivers **1.4 gallons instead of 13.0**, so the pump starts and stops constantly. A waterlogged tank with a failed bladder produces exactly the same symptom, which is why the pre-charge is what you check first — it is free.
+
+### Is a bigger pressure tank always better?
+
+Better for the pump, up to a point. More drawdown means fewer starts and longer motor life, and there is no functional penalty beyond cost and space. What a bigger tank does not do is fix a wrong pre-charge, a failed bladder, or weak pressure caused by friction in the house.
+
+### Does raising the pressure switch give me more water?
+
+No — it gives you less. Drawdown is a ratio of absolute pressures, and that ratio narrows as both settings rise. The same 44 gallon tank gives **13.0 gallons at 30/50 but only 10.1 at 50/70**, despite an identical 20 psi span. Widening the span, not raising it, is what buys drawdown.
+
+### How do I know if my pressure tank is waterlogged?
+
+Tap it. A healthy tank sounds hollow above the water line and solid below; a waterlogged one sounds solid throughout. Rock it if you can — it will feel far heavier than it should. Confirm by draining the system and checking the schrader valve: air means the bladder is intact and the pre-charge is just wrong, water means the bladder has failed and the tank is finished.
+
+### How is pressure tank drawdown calculated?
+
+Pre-charge divided by cut-in, minus pre-charge divided by cut-out, with all three pressures in **absolute** terms — gauge plus 14.7 psi. On a 30/50 switch with a 28 psi pre-charge that is 29.5%. The common gauge-pressure shortcut, 1 − cut-in ÷ cut-out, returns 40% and overstates the usable volume by about a third.
+
+---
+
+**Sources & standards:** Drawdown is derived from Boyle's law with all pressures converted to absolute at 14.7 psi atmospheric, which is why the figures here disagree with gauge-pressure rules of thumb. **The two-psi-below-cut-in pre-charge rule and the minimum pump run times are pump-industry and manufacturer practice, not code requirements** — no plumbing code publishes either. Stocked shell sizes are common diaphragm tank capacities and vary by manufacturer. Well systems themselves sit largely outside the IPC, which addresses the water service downstream of the source; well construction, pump installation and water quality are governed by state and county rules. Confirm sizing against your pump manufacturer's own data and have a licensed well contractor commission the system.

@@ -1,0 +1,89 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { meterLeakGpm, gpmToGpd, leakCost, fmt, usd, usd2 } from "@/lib/plumbing";
+
+/**
+ * The meter test, turned into an answer. Whatever the dial registers over a
+ * measured half hour becomes gallons a day and dollars a year — which is the
+ * step almost every "how to find a leak" article leaves out.
+ *
+ * RATES copied from plumbing-leak-water-waste-calculator/index.astro.
+ */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+const MINUTES = 30;
+
+const READINGS = [
+  { gallons: 0.1, note: "one dial tick, barely moving" },
+  { gallons: 0.5, note: "half a gallon" },
+  { gallons: 1, note: "one gallon" },
+  { gallons: 2, note: "two gallons" },
+  { gallons: 5, note: "five gallons" },
+];
+
+const rows = READINGS.map((r) => {
+  const gpm = meterLeakGpm(r.gallons, MINUTES);
+  const gpd = gpmToGpd(gpm);
+  const cost = leakCost({ gallonsPerDay: gpd, ...RATES, hotFraction: 0 }).totalCost;
+  return { ...r, gpm, gpd, cost };
+});
+
+const maxCost = Math.max(...rows.map((r) => r.cost));
+const BAR_X = 258;
+const BAR_MAX = 198;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 100 + i * 30,
+  w: Math.max(3, (r.cost / maxCost) * BAR_MAX),
+}));
+
+const tick = rows[0];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Converting a thirty-minute water meter reading into gallons per day and dollars per year</title>
+  <desc>
+    Whatever the meter registers over a measured thirty minutes with every fixture off scales directly to a
+    daily volume and an annual cost, so even one barely-moving dial tick is worth twenty-two dollars a year.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The meter test, turned into an answer</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Shut every fixture, read the meter, wait ${MINUTES} minutes, read it again. Whatever moved is the leak — and it scales straight to a year.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    {`Costed at ${usd2(RATES.waterRatePer1000)} water and ${usd2(RATES.sewerRatePer1000)} sewer per 1,000 gallons.`}
+  </text>
+
+  <text x="28" y="94" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">{`REGISTERED IN ${MINUTES} MIN`}</text>
+  <text x={BAR_X + BAR_MAX + 10} y="94" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">GAL/DAY · $/YEAR</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.gallons, 1)} gal`}
+      </text>
+      <text x="82" y={row.y + 13} fill={C.muted} font-family={FONT} font-size="9">
+        {`${row.note} — ${fmt(row.gpm, 4)} gpm`}
+      </text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="17" rx="4" fill={C.border} opacity="0.28" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="17" rx="4" fill={C.orange} opacity="0.62" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 13} fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.gpd, 1)} · ${usd(row.cost)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="282" fill={C.muted} font-family={FONT} font-size="10">
+    {`Even ${fmt(tick.gallons, 1)} of a gallon in ${MINUTES} minutes — one dial tick you could easily call "nothing" — is ${fmt(tick.gpd, 1)} gallons a day and ${usd(tick.cost)} a year.`}
+  </text>
+</svg>

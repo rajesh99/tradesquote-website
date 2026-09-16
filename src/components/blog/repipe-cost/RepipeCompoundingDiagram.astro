@@ -1,0 +1,79 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  repipeCost,
+} from "@/lib/plumbing";
+/** The two levers multiply rather than add, which is how a quote people
+ * expected near nine thousand dollars arrives near twenty-eight. */
+const BASE = {
+  squareFeet: 1800,
+  storeys: 1,
+  bathrooms: 2,
+  permit: 450,
+  drywallRepair: 1500,
+  regionKey: "average",
+};
+const CASES = [
+  { label: "PEX, open walls", materialKey: "pex", accessKey: "easy" },
+  { label: "PEX, average access", materialKey: "pex", accessKey: "average" },
+  { label: "Copper, average access", materialKey: "copper", accessKey: "average" },
+  { label: "PEX, plaster and tile", materialKey: "pex", accessKey: "difficult" },
+  { label: "Copper, plaster and tile", materialKey: "copper", accessKey: "difficult" },
+];
+const totals = CASES.map((c) => repipeCost({ ...BASE, materialKey: c.materialKey, accessKey: c.accessKey }));
+const cheapest = Math.min(...totals.map((t) => t.total));
+
+const rows = CASES.map((c, i) => {
+  const t = totals[i];
+  const ratio = t.total / cheapest;
+  return {
+    label: c.label,
+    cells: [
+      `$${t.total.toLocaleString("en-US")}`,
+      `$${(t.total / BASE.squareFeet).toFixed(2)}/ft2`,
+      `${ratio.toFixed(2)}x`,
+    ],
+    tone: ["neutral", "neutral", ratio >= 2.5 ? "bad" : ratio >= 1.5 ? "neutral" : "good"],
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Material and access compound — they do not add</title>
+  <desc>The same 1,800 ft2 house, five combinations, measured against the cheapest</desc>
+
+  <rect x="8" y="8" width="704" height="266" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Material and access compound — they do not add</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">The same 1,800 ft2 house, five combinations, measured against the cheapest</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">COMBINATION</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TOTAL</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PER SQUARE FOOT</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VS CHEAPEST</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="260" fill={C.muted} font-family={FONT} font-size="10">Each lever alone is manageable. Together they triple the job, which is why a walkthrough beats a phone quote every time.</text>
+</svg>

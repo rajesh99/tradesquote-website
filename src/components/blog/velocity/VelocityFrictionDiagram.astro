@@ -1,0 +1,93 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  MAX_VELOCITY_COLD,
+  MAX_VELOCITY_HOT,
+  flowAtVelocity,
+  frictionLossPsiPer100Ft,
+  insideDiameter,
+  HAZEN_WILLIAMS_C,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * Why the limit exists at all. Velocity is not itself a code number — the
+ * physical costs are erosion, noise and friction, and friction is the one you
+ * can compute. It rises roughly as the square of velocity, so the last two
+ * ft/s cost far more than the first two.
+ */
+const NOMINAL = 0.75;
+const MATERIAL = "copper-l" as const;
+const id = insideDiameter(MATERIAL, NOMINAL)!;
+const C_FACTOR = HAZEN_WILLIAMS_C[MATERIAL];
+
+const SPEEDS = [2, 4, 5, 6, 8, 10];
+const rows = SPEEDS.map((v) => {
+  const gpm = flowAtVelocity(v, id);
+  return {
+    v,
+    gpm,
+    loss: frictionLossPsiPer100Ft(gpm, id, C_FACTOR),
+    isHotLimit: v === MAX_VELOCITY_HOT,
+    isColdLimit: v === MAX_VELOCITY_COLD,
+    over: v > MAX_VELOCITY_COLD,
+  };
+});
+
+const maxLoss = Math.max(...rows.map((r) => r.loss));
+const atHot = rows.find((r) => r.isHotLimit)!;
+const atCold = rows.find((r) => r.isColdLimit)!;
+
+const BAR_X = 224;
+const BAR_MAX = 244;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Friction loss against velocity in a three quarter inch line</title>
+  <desc>
+    Friction rises steeply with velocity, so the last few feet per second cost far more than the first. The two
+    marked rows are the hot and cold design ceilings.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Speed is not free — friction climbs faster than flow does</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${sizeLabel(NOMINAL)} type L copper, ${fmt(id, 3)} in bore. Hazen-Williams at C = ${C_FACTOR}, loss per 100 ft.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 30;
+    const w = Math.max(3, (row.loss / maxLoss) * BAR_MAX);
+    const tone = row.over ? C.red : row.isColdLimit ? C.blue : row.isHotLimit ? C.orange : C.primary;
+    const marked = row.isHotLimit || row.isColdLimit || row.over;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="11" font-weight={marked ? 800 : 600}>
+          {`${row.v} ft/s`}
+        </text>
+        <text x="86" y={y + 15} fill={C.muted} font-family={FONT} font-size="9.5">
+          {`${fmt(row.gpm, 2)} gpm`}
+        </text>
+        {row.isHotLimit && (
+          <text x="152" y={y + 15} fill={C.orange} font-family={FONT} font-size="8.5" font-weight="700">HOT CAP</text>
+        )}
+        {row.isColdLimit && (
+          <text x="152" y={y + 15} fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">COLD CAP</text>
+        )}
+        {row.over && (
+          <text x="152" y={y + 15} fill={C.red} font-family={FONT} font-size="8.5" font-weight="700">PAST BOTH</text>
+        )}
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="18" rx="5" fill={tone} opacity={marked ? 0.85 : 0.5} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={tone} font-family={FONT} font-size="10.5" font-weight={marked ? 800 : 600}>
+          {`${fmt(row.loss, 2)} psi per 100 ft`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="268" fill={C.muted} font-family={FONT} font-size="10">
+    {`Going from the hot cap to the cold cap adds ${fmt(atCold.gpm - atHot.gpm, 2)} gpm and ${fmt(atCold.loss - atHot.loss, 2)} psi per 100 ft — ${fmt(atCold.loss / atHot.loss, 1)}x the friction for ${fmt(atCold.gpm / atHot.gpm, 1)}x the flow.`}
+  </text>
+</svg>

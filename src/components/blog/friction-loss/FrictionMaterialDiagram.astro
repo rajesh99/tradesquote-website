@@ -1,0 +1,92 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  frictionLossPsiPer100Ft,
+  insideDiameter,
+  HAZEN_WILLIAMS_C,
+  PIPE_MATERIAL_LABELS,
+  velocity,
+  MAX_VELOCITY_COLD,
+  sizeLabel,
+  fmt,
+  type PipeMaterial,
+} from "@/lib/plumbing";
+
+/**
+ * The C factor is the smoothness term, and it is the LESS important of the two
+ * material properties. Bore matters more: PEX has the best C factor in this set
+ * and the worst loss, because its bore is so much smaller.
+ */
+const NOMINAL = 0.75;
+const GPM = 10;
+const MATERIALS: PipeMaterial[] = ["cpvc-40", "copper-m", "copper-l", "pex"];
+
+const rows = MATERIALS.map((m) => {
+  const id = insideDiameter(m, NOMINAL)!;
+  const v = velocity(GPM, id);
+  return {
+    label: PIPE_MATERIAL_LABELS[m],
+    id,
+    c: HAZEN_WILLIAMS_C[m],
+    loss: frictionLossPsiPer100Ft(GPM, id, HAZEN_WILLIAMS_C[m]),
+    velocity: v,
+    overVelocity: v > MAX_VELOCITY_COLD,
+  };
+});
+
+const best = rows.reduce((a, b) => (a.loss < b.loss ? a : b));
+const worst = rows.reduce((a, b) => (a.loss > b.loss ? a : b));
+
+const maxLoss = Math.max(...rows.map((r) => r.loss));
+const BAR_X = 300;
+const BAR_MAX = 214;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Friction loss by material at the same nominal size</title>
+  <desc>
+    Four materials at the same nominal size and flow. The one with the best smoothness factor has the worst loss,
+    because its bore is the smallest.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Best C factor, worst loss</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${GPM} gpm through nominal ${sizeLabel(NOMINAL)}. The C factor is smoothness; the bore is everything else.`}
+  </text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MATERIAL</text>
+  <text x="196" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">BORE</text>
+  <text x="252" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">C</text>
+  <text x={BAR_X} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">LOSS PER 100 FT</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 34;
+    const w = Math.max(3, (row.loss / maxLoss) * BAR_MAX);
+    const isWorst = row.loss === worst.loss;
+    const isBest = row.loss === best.loss;
+    const tone = isWorst ? C.red : isBest ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="196" y={y + 15} fill={C.muted} font-family={FONT} font-size="10">{fmt(row.id, 3)}</text>
+        <text x="252" y={y + 15} fill={C.muted} font-family={FONT} font-size="10">{row.c}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="19" rx="5" fill={tone} opacity="0.78" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.loss, 2)} psi`}
+        </text>
+        {row.overVelocity && (
+          <text x={BAR_X + BAR_MAX + 10} y={y + 27} fill={C.red} font-family={FONT} font-size="8" font-weight="700">
+            {`${fmt(row.velocity, 2)} ft/s — past the cold cap`}
+          </text>
+        )}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="228" width="672" height="24" rx="6" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="36" y="244" fill={C.red} font-family={FONT} font-size="10" font-weight="700">
+    {`${worst.label} has C = ${worst.c} against ${best.label}'s ${best.c} and still loses ${fmt(worst.loss / best.loss, 1)}x as much. Bore beats smoothness.`}
+  </text>
+</svg>

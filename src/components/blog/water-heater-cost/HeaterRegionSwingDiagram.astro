@@ -1,0 +1,81 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { waterHeaterCost, REGION_MULTIPLIERS, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * The same job in four markets, plus the band. Two honest points: geography
+ * moves the number nearly as much as appliance choice does, and no single
+ * figure is the right answer anyway.
+ */
+const JOB = {
+  unitKey: "tank-gas-50",
+  labourRate: 125,
+  permit: 150,
+  haulAway: 75,
+  upgrades: ["expansionTank", "pan"] as const,
+};
+
+const rows = REGION_MULTIPLIERS.map((region) => {
+  const r = waterHeaterCost({ ...JOB, upgrades: [...JOB.upgrades], regionKey: region.key });
+  return {
+    label: region.label,
+    factor: region.factor,
+    total: r.total,
+    low: r.low,
+    high: r.high,
+  };
+});
+
+const maxHigh = Math.max(...rows.map((r) => r.high));
+const minLow = Math.min(...rows.map((r) => r.low));
+
+/* Band geometry — the scale runs from zero so the bars stay comparable. */
+const SCALE_X = 250;
+const SCALE_W = 280;
+const toX = (v: number) => SCALE_X + (v / maxHigh) * SCALE_W;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The same water heater job across four markets, with its band</title>
+  <desc>
+    A fifty gallon gas replacement with an expansion tank and a pan, priced in four regional markets. Each bar shows a
+    plus or minus eighteen percent band rather than a single figure.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One job, four markets, and a band rather than a number</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    50 gallon gas replacement with an expansion tank and a drain pan. The bar is the quoted band; the tick is the midpoint.
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 84 + i * 34;
+    const x1 = toX(row.low);
+    const x2 = toX(row.high);
+    const mid = toX(row.total);
+    const extreme = row.factor === 0.85 || row.factor === 1.5;
+    const tone = extreme ? C.orange : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 25} fill={C.muted} font-family={FONT} font-size="9">{`multiplier ${fmt(row.factor, 2)}`}</text>
+        <rect x={x1} y={y + 2} width={Math.max(3, x2 - x1)} height="18" rx="5" fill={tone} opacity="0.32" />
+        <line x1={mid} y1={y} x2={mid} y2={y + 22} stroke={tone} stroke-width="2.6" />
+        <text x={x2 + 10} y={y + 15} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${usd(row.total)}`}
+        </text>
+        <text x={x1 - 8} y={y + 15} text-anchor="end" fill={C.muted} font-family={FONT} font-size="8.5">
+          {`${usd(row.low)}–${usd(row.high)}`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x={SCALE_X} y="222" fill={C.muted} font-family={FONT} font-size="9">$0</text>
+  <text x={SCALE_X + SCALE_W} y="222" text-anchor="end" fill={C.muted} font-family={FONT} font-size="9">{usd(maxHigh)}</text>
+  <line x1={SCALE_X} y1="226" x2={SCALE_X + SCALE_W} y2="226" stroke={C.border} stroke-width="1" />
+
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">
+    {`Across markets the same job spans ${usd(minLow)} to ${usd(maxHigh)} — a ${fmt(maxHigh / minLow, 1)}x range with nothing about the work changing.`}
+  </text>
+</svg>

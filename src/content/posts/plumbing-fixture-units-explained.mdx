@@ -1,0 +1,148 @@
+---
+title: "Fixture Units Explained: WSFU, DFU, and Why They Are Different Numbers"
+meta_title: "Plumbing Fixture Units Explained - WSFU vs DFU (2026) | TradesQuote"
+description: "A water closet is 2.2 supply fixture units and 3 drainage fixture units. Not a typo — they measure different physical loads, and confusing them is how a system gets sized wrong."
+image: /images/posts/plumbing-fixture-units-explained-hero.svg
+date: 2026-09-02T09:10:00Z
+categories: ["plumbing"]
+tags: ["fixture units","wsfu","dfu","hunters curve","plumbing load calculation"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import FixtureUnitTwoWeightsDiagram from "@/components/blog/fixture-units/FixtureUnitTwoWeightsDiagram.astro";
+import FixtureUnitDemandCurveDiagram from "@/components/blog/fixture-units/FixtureUnitDemandCurveDiagram.astro";
+import FixtureUnitGroupSavingDiagram from "@/components/blog/fixture-units/FixtureUnitGroupSavingDiagram.astro";
+
+A fixture unit is not a unit of anything. It has no dimension — it is not gallons, not minutes, not pressure. It is a **weight**, invented so that fixtures with wildly different behaviour can be added together and turned into a design number.
+
+And there are **two** of them, for the same fixture, measuring different things.
+
+## The same fixture, two different weights
+
+<BlogInfographic
+  title="One fixture, two completely different weights"
+  caption="Water supply fixture units against drainage fixture units for the same seven fixtures. A toilet is light on supply and heavy on drainage; a dishwasher is the reverse."
+>
+  <FixtureUnitTwoWeightsDiagram />
+</BlogInfographic>
+
+A water closet is **2.2 WSFU** and **3 DFU**. That is not an inconsistency. It is two honest answers to two different questions.
+
+**On the supply side**, a tank toilet is a light load. It draws a small flow through a fill valve for about a minute, and it does not care much if that takes ninety seconds instead of sixty. What the supply system needs to know is *how much flow is likely to be demanded at once*.
+
+**On the drainage side**, that same toilet is one of the heaviest fixtures in a house. It discharges its entire tank in a few seconds — a violent, solids-bearing slug the drain has to swallow whole. What the drainage system needs to know is *how big the surges are and how often they come*.
+
+A dishwasher inverts it: modest, sustained discharge, but it pulls hot water through a solenoid at a rate the supply system has to plan for.
+
+**The rule that follows: never carry a fixture-unit total from one side of the system to the other.** They are not convertible.
+
+## The supply side: WSFU into gpm
+
+WSFU totals are useless on their own — they exist to be fed into a demand curve, which converts the total to probable peak flow in gpm.
+
+The curve's shape is the interesting part.
+
+<BlogInfographic
+  title="Demand per fixture unit falls as the building grows"
+  caption="Hunter's curve, flush-tank column. At 5 fixture units you get 1.88 gpm per unit; at 200 you get 0.33."
+>
+  <FixtureUnitDemandCurveDiagram />
+</BlogInfographic>
+
+At 5 fixture units you are getting about **1.88 gpm per unit**. At 200 you are getting **0.33** — less than a fifth as much per unit.
+
+That is not a fudge factor. It is probability. With five fixtures, one running is a large fraction of the total and two at once is unremarkable. With two hundred, the *proportion* running simultaneously collapses, because independent events cluster far less than intuition suggests. A 200-unit building draws **65 gpm**, not forty times the 5-unit figure.
+
+This is why a hotel does not need twenty times the water main of a house with twenty times the fixtures, and it is the single most useful thing to understand about supply sizing. Work your own total with the **[Water Supply Fixture Unit Calculator](/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator)**, then take the gpm to the **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)**.
+
+Note also that the curve has **two columns** — flush tank and flushometer valve. A building on flushometers draws far more at peak (32.1 gpm against 18.2 gpm for the same 16.4 units), because a flushometer valve dumps at high rate rather than refilling a tank slowly.
+
+## The drainage side: DFU straight into a table
+
+DFU is simpler. There is no curve — the coincidence assumption is already baked into the table values. You add the DFUs and read the drain size off IPC Table 710.1(1) or 710.1(2), depending on where the pipe sits.
+
+Full values are in the **[drainage fixture unit chart](/blog/drainage-fixture-unit-chart)**, and the **[Drainage Fixture Unit Calculator](/calculators/plumbing/plumbing-drainage-fixture-unit-calculator)** adds them up with the minimum trap for each fixture.
+
+One catch worth carrying: **the DFU total does not always decide the answer.** A water closet anywhere on a building drain floors that drain at 3 inch regardless of what the arithmetic allows, because solids need bore and DFU says nothing about solids. That is covered in **[what size drain pipe do I need](/blog/what-size-drain-pipe-do-i-need)**.
+
+## A group counts for less than its parts
+
+<BlogInfographic
+  title="A bathroom group counts for less than its parts"
+  caption="A water closet, a lavatory and a shower, added up individually and then taken as one group. The code discounts both sides."
+>
+  <FixtureUnitGroupSavingDiagram />
+</BlogInfographic>
+
+Counted separately, those three fixtures are **4.3 WSFU** and **6 DFU**. Counted as a bathroom group, they are **3.6 WSFU** and **5 DFU**.
+
+The code is betting that a toilet, a basin and a shower in one room are never all discharging together. It is a good bet — one person cannot use all three at once, and the room usually holds one person.
+
+Use the group value when the fixtures genuinely form a bathroom group. Do not use it for three fixtures scattered across a floor.
+
+## The fixture with no drainage value at all
+
+A **hose bibb** is **2.5 WSFU** — one of the heaviest supply loads in a house, because a hose can run wide open for an hour. It has **no DFU value whatsoever**, because whatever comes out of it goes on the garden, not into the drain.
+
+That is a useful sanity check on your own arithmetic. If your DFU total and your WSFU total look proportional to each other, you have probably made an error somewhere — outdoor fixtures, irrigation and hose bibbs load one side and not the other.
+
+## Common mistakes
+
+**Using DFU values to size supply pipe, or vice versa.** The most consequential error on this page.
+
+**Counting a bathroom group and its fixtures.** Pick one.
+
+**Forgetting the flushometer column.** A commercial building on flush valves has nearly double the peak demand of the same fixture count on tanks.
+
+**Treating fixture units as gallons.** They are dimensionless weights. The conversion to gpm happens only through the demand curve, and only on the supply side.
+
+**Adding fixture units across buildings.** The curve is non-linear, so summing two buildings' totals and reading the curve once gives a different — and lower — answer than sizing each separately. That is correct for a shared main and wrong for anything else.
+
+## An honest note on provenance
+
+The WSFU values and the demand curve come from **IPC Appendix E**, and two things about that are worth stating plainly.
+
+**Appendix E is an appendix.** It is enforceable only where a jurisdiction has specifically adopted it. Many have; many have not.
+
+**The curve is old.** Roy Hunter's method dates from 1940, when a toilet used five gallons rather than 1.6. For modern low-flow fixtures the curve runs **high**, so the error is toward larger pipe — conservative, but not precise. Anyone telling you fixture-unit sizing is exact is overselling it.
+
+DFU values from Table 709.1 are on firmer ground — they sit in the body of the code, not an appendix.
+
+## Frequently asked questions
+
+### What is a plumbing fixture unit?
+
+A dimensionless **weight** assigned to a fixture so that fixtures with different flow rates, durations and frequencies can be added together and converted to a design load. It is not gallons, minutes or pressure — it only means something once it goes into a table or a demand curve.
+
+### What is the difference between WSFU and DFU?
+
+WSFU measures **supply** load — probable simultaneous demand. DFU measures **drainage** load — the size and frequency of discharge surges. The same fixture carries different values on each side: a water closet is 2.2 WSFU and 3 DFU. They are not interchangeable.
+
+### How many fixture units is a bathroom?
+
+A full bathroom group with a 1.6 gpf water closet is **3.6 WSFU** on the supply side and **5 DFU** on the drainage side. Both are less than counting the toilet, basin and shower individually, because the code assumes they do not all run at once.
+
+### How do I convert fixture units to gpm?
+
+Through a demand curve, on the supply side only. **16.4 WSFU is about 18.2 gpm** on flush tanks and 32.1 gpm on flushometer valves. There is no equivalent conversion for DFU — those go straight into a drain-sizing table.
+
+### Why does gpm per fixture unit go down as fixtures go up?
+
+Probability. The more fixtures there are, the smaller the *proportion* likely to be running at any instant. At 5 units you get 1.88 gpm per unit; at 200 you get 0.33. It is why large buildings need far less main than a naive multiplication suggests.
+
+### Does a hose bibb have a drainage fixture unit value?
+
+No. It is 2.5 WSFU — one of the heaviest supply loads in a house — and zero DFU, because the water goes onto the garden rather than into the drain. Outdoor fixtures load one side of the system only.
+
+### Are fixture unit values the same in the UPC?
+
+No. The UPC uses its own fixture-unit values and its own sizing tables, and roughly fifteen states enforce the UPC or a derivative such as California's CPC. Confirm which code your jurisdiction adopts before relying on any table.
+
+### Are these numbers exact?
+
+No, and the honest framing matters. Supply values come from IPC Appendix E — an appendix, enforceable only where adopted — and the underlying Hunter's curve dates from 1940, so it runs high for modern low-flow fixtures. The error is toward larger pipe.
+
+---
+
+**Sources & standards:** IPC 2021 Table 709.1 for drainage fixture unit values and Appendix E Tables E103.3(2) and E103.3(3) for water supply fixture units and the demand curve. Appendix E is an appendix and enforceable only where adopted; the Hunter's-curve basis dates from 1940 and runs high for modern low-flow fixtures, so results err toward larger pipe. The IPC is a model code — roughly fifteen states enforce the UPC or a derivative such as California's CPC, where fixture-unit values differ. Confirm the edition your jurisdiction adopts, and have a licensed plumber sign off anything installed.

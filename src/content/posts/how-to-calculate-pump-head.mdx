@@ -1,0 +1,147 @@
+---
+title: "Total Dynamic Head: Static Lift, Friction, Pressure, and the Term Everyone Drops"
+meta_title: "How to Calculate Pump Head (TDH): The Four Terms (2026) | TradesQuote"
+description: "Same lift, same flow: 1 inch discharge pipe needs 30.7 ft of head and 2 inch needs 12.7. The pipe you chose is most of the head — and a 40 psi discharge requirement is another 92.4 ft."
+image: /images/posts/how-to-calculate-pump-head-hero.svg
+date: 2026-09-04T13:30:00Z
+categories: ["plumbing"]
+tags: ["total dynamic head","pump sizing","tdh","pump head","sump pump"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import TdhComponentsDiagram from "@/components/blog/pump-head/TdhComponentsDiagram.astro";
+import TdhPipeSizeDiagram from "@/components/blog/pump-head/TdhPipeSizeDiagram.astro";
+import TdhPressureDiagram from "@/components/blog/pump-head/TdhPressureDiagram.astro";
+
+A pump curve has two axes: flow and head. Everybody gets the flow right. **Head is where pumps get specified wrong**, and it is usually because one of the four terms was left out — sometimes the smallest, more often the largest.
+
+## Four terms
+
+<BlogInfographic
+  title="Four terms, and the small one is the one people drop"
+  caption="30 gpm through 40 ft of 1-1/2 inch Schedule 40 PVC, lifting 12 ft. Static lift, friction head and velocity head make a sump duty; add a discharge pressure requirement and the answer changes character entirely."
+>
+  <TdhComponentsDiagram />
+</BlogInfographic>
+
+    TDH = static lift + friction head + velocity head + pressure head
+
+**Static lift** is the vertical rise from the water surface to the discharge point. It does not care about pipe or flow.
+
+**Friction head** is what the pipe and fittings take. It goes up sharply with flow and down sharply with diameter — the exponents are in **[friction loss in water pipes](/blog/friction-loss-in-pipes)**.
+
+**Velocity head** is V² over 2g — the energy in the moving water itself. It is genuinely small, usually a fraction of a foot, and it is the term textbooks include and site calculations omit. Omitting it is defensible; not knowing it exists is not.
+
+**Pressure head** is what you need *left over* at the outlet. Zero for a sump discharging to daylight. Not zero for anything feeding a system.
+
+That zero is why a sump is the clearest case of the whole method: with no pressure term, the static lift is over 80% of the answer and the rest is detail. **[What size sump pump do I need](/blog/what-size-sump-pump-do-i-need)** works that case through, including the discharge reduction that doubles the head for nothing.
+
+## The pipe is most of the head
+
+<BlogInfographic
+  title="The pipe you chose is most of the head"
+  caption="The same 30 gpm and the same 12 ft lift through six discharge sizes. The dashed line is the lift alone — everything to the right of it was created by the pipe."
+>
+  <TdhPipeSizeDiagram />
+</BlogInfographic>
+
+At 30 gpm through 40 ft of PVC lifting 12 ft:
+
+- **1 inch** — 11.14 ft/s — **TDH 30.7 ft**
+- **1-1/4 inch** — 6.44 ft/s — 17.1 ft
+- **1-1/2 inch** — 4.73 ft/s — 14.4 ft
+- **2 inch** — 2.87 ft/s — **TDH 12.7 ft**
+
+The lift is 12 ft in every one of those rows. **On 1 inch pipe, 16.8 ft of the 30.7 is friction** and another 1.9 is velocity head — so the pipe is doing more work against you than gravity is. On 2 inch pipe the friction is 0.6 ft.
+
+That is a decision usually made by whoever glued the discharge together, and it lands on the pump. Two nominal sizes is the difference between specifying a pump for 30 ft and one for 13, and the pipe is far cheaper than the pump.
+
+The 1 inch row is also running at 11.14 ft/s, well past any sensible velocity ceiling — see **[water velocity in pipes](/blog/water-velocity-in-pipes)** for why that matters beyond the head.
+
+## And pressure head dwarfs everything
+
+<BlogInfographic
+  title="Pressure head dwarfs anything you can lift in a house"
+  caption="Pressure and head are the same quantity in different units, at 2.309 feet per psi. Asking for 40 psi at the outlet is 92.4 feet of head — more than lifting water to the roof of a nine-storey building."
+>
+  <TdhPressureDiagram />
+</BlogInfographic>
+
+- **20 psi** — 46.2 ft
+- **40 psi** — **92.4 ft**
+- **60 psi** — 138.5 ft
+
+Adding a 40 psi discharge requirement to that 1-1/2 inch scenario takes it from **14.4 ft to 106.8 ft** — the pressure term is 87% of the total.
+
+This is the single biggest source of badly specified pumps. A sump pump and a booster pump doing the same lift at the same flow are not remotely the same machine, and the difference is entirely in this term. **If the water has to arrive somewhere at a working pressure, convert that pressure to feet and add it.** Work it through with the **[Pump Head Calculator](/calculators/plumbing/plumbing-pump-head-calculator)**.
+
+## Suction side, briefly
+
+Everything above is discharge. On the suction side the constraint is different and unforgiving: **a pump cannot pull water up more than about 25 feet at sea level**, and rather less in practice, because it works by letting atmospheric pressure push water up into a low-pressure region and atmosphere only has so much to give.
+
+Below that depth you need a submersible or a jet pump with a downhole ejector. This is why deep wells use submersibles — not preference, physics.
+
+The related failure is **cavitation**: if suction-side pressure drops below the water's vapour pressure, vapour bubbles form and then collapse violently on the impeller. It sounds like gravel and it destroys pumps. Keeping the suction line short, large and free of restrictions is what prevents it.
+
+## Reading a pump curve
+
+The curve slopes down: more flow, less head. **You do not pick a point on it — you find where it crosses your system.**
+
+Your system curve starts at the static lift with zero flow and rises as flow increases, because friction rises. The operating point is the intersection.
+
+Two consequences worth having:
+
+**A pump does not deliver its rated flow into your system.** It delivers whatever the intersection says. A "60 gpm" pump on a restrictive discharge might deliver 35.
+
+**Oversizing does not help as much as it looks.** A bigger pump pushes the operating point further right, where friction is higher, so you gain far less flow than the curve suggests — and you spend the difference on energy.
+
+## Where it goes wrong
+
+**Measuring the lift from the pump instead of the water surface.** Static lift starts at the water level, and in a sump that level moves.
+
+**Forgetting the fittings.** A discharge with several elbows and a check valve carries meaningful equivalent length. Check valves in particular are heavy.
+
+**Using measured length instead of developed length.** The same mistake as in supply piping and it costs the same way.
+
+**Leaving out pressure head.** The big one, above.
+
+**Sizing the discharge pipe to match the pump outlet.** The outlet size is a connection, not a recommendation. On a long run the discharge should usually be a size or two larger.
+
+## Frequently asked questions
+
+### What is total dynamic head?
+
+The total head a pump must produce: **static lift + friction head + velocity head + pressure head**, all in feet. It is the vertical axis of a pump curve, and getting it wrong is the usual reason a correctly-flowing pump underperforms.
+
+### How do you calculate pump head?
+
+Add the four terms in feet. Vertical rise from the water surface to the discharge; friction through pipe and fittings over the developed length; V² over 2g for the velocity; and any required outlet pressure converted at **2.309 feet per psi**. At 30 gpm through 40 ft of 1-1/2 inch PVC lifting 12 ft, that is 14.4 ft — or 106.8 ft if 40 psi is needed at the outlet.
+
+### Does pipe size affect pump head?
+
+Substantially. At 30 gpm over 40 ft with a 12 ft lift, **1 inch pipe needs 30.7 ft of head and 2 inch needs 12.7** — the lift is identical and the pipe created the difference. On the 1 inch run, friction is more of the total than gravity is.
+
+### How many feet of head is 40 psi?
+
+**92.4 feet.** One psi is 2.309 feet of water column, because a foot of water exerts 0.4331 psi. That conversion is why a modest discharge pressure requirement dominates any residential lift.
+
+### What is velocity head and does it matter?
+
+The energy in the moving water itself, V² ÷ 2g — typically a fraction of a foot at ordinary velocities. It is small enough to omit on most site calculations and it is the term textbooks include, so knowing what it is prevents confusion when two methods disagree slightly.
+
+### How high can a pump lift water on the suction side?
+
+**About 25 feet at sea level in theory, less in practice**, because a pump does not pull water — it reduces pressure and lets the atmosphere push. Beyond that you need a submersible or a jet pump with a downhole ejector, which is why deep wells use submersibles.
+
+### Why does my pump not deliver its rated flow?
+
+Because rated flow is a point on a curve, not a promise. The pump delivers where its curve intersects your system's resistance, and a restrictive discharge moves that intersection well to the left. Reducing friction — larger pipe, fewer fittings — moves it back right.
+
+### What is cavitation?
+
+Vapour bubbles forming on the suction side when pressure drops below the water's vapour pressure, then collapsing violently on the impeller. It sounds like pumping gravel and it destroys pumps quickly. Short, large, unrestricted suction piping is what prevents it.
+
+---
+
+**Sources & standards:** Total dynamic head is the standard four-term sum used in pump selection; friction head is computed with Hazen-Williams over Schedule 40 PVC bore dimensions and converted to feet at 2.309 ft per psi, which is derived from water at 62.37 lb/ft³ rather than quoted. Velocity head is V² ÷ 2g with g = 32.174 ft/s². **None of this is plumbing code** — it is pump engineering, and the velocity ceilings referenced are ASPE and manufacturer design practice rather than IPC requirements. The ~25 ft theoretical suction lift is atmospheric pressure expressed as head at sea level and falls with altitude; real practical limits are lower and pump-specific. Fitting equivalent lengths use L/D ratios, a widely used convention that varies between published sources. Always check the specific pump's published curve and NPSH requirement rather than relying on a calculated head alone.

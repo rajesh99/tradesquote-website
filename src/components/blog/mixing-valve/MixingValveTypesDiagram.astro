@@ -1,0 +1,94 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { mixedFlow, fmt } from "@/lib/plumbing";
+
+/**
+ * Three devices with overlapping names and different jobs, plus the cold-inlet
+ * point: a colder inlet needs MORE hot for the same delivered temperature, so
+ * the multiplier is worst in winter — exactly when the tank is under most load.
+ */
+const BASE = { hotF: 140, coldF: 50, mixF: 120, mixedGpm: 2.5 };
+
+const seasons = [40, 50, 60, 70].map((coldF) => {
+  const r = mixedFlow({ ...BASE, coldF });
+  return { coldF, hotFraction: r.hotFraction, multiplier: r.storageMultiplier };
+});
+const winter = seasons[0];
+const summer = seasons[seasons.length - 1];
+
+const TYPES = [
+  {
+    name: "Thermostatic mixing valve",
+    standard: "ASSE 1017",
+    where: "At the water heater — whole system",
+    job: "Holds a set delivery temperature for the house",
+    tone: C.primary,
+  },
+  {
+    name: "Point-of-use tempering valve",
+    standard: "ASSE 1070",
+    where: "At a fixture or group of fixtures",
+    job: "Limits temperature at one outlet",
+    tone: C.blue,
+  },
+  {
+    name: "Shower / tub control valve",
+    standard: "ASSE 1016",
+    where: "In the shower or bath itself",
+    job: "Scald protection at the bathing fixture — usually required",
+    tone: C.orange,
+  },
+];
+
+const ROW_H = 38;
+const TOP = 88;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Three mixing devices, three standards, three jobs</title>
+  <desc>
+    A whole-system mixing valve, a point-of-use tempering valve and a shower control valve are separate devices
+    under separate standards. Fitting one does not satisfy the requirement for another.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three devices, and they do not substitute for each other</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    The names overlap and the standards do not. A valve at the heater does not remove a requirement at the shower.
+  </text>
+
+  <text x="40" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DEVICE</text>
+  <text x={296} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHERE IT SITS</text>
+  <text x={492} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT IT IS FOR</text>
+
+  {TYPES.map((t, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={t.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 6} rx="2" fill={t.tone} opacity="0.9" />
+        <text x="40" y={y + 15} fill={t.tone} font-family={FONT} font-size="10.5" font-weight="800">{t.name}</text>
+        <text x="40" y={y + 27} fill={C.muted} font-family={FONT} font-size="8.5">{t.standard}</text>
+        <text x={296} y={y + 15} fill={C.dark} font-family={FONT} font-size="9">{t.where}</text>
+        <text x={492} y={y + 15} fill={C.dark} font-family={FONT} font-size="9">{t.job}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="208" width="672" height="52" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="38" y="226" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">
+    {`AND THE COLD INLET MOVES IT — same valve, same ${BASE.hotF} °F store, same ${BASE.mixF} °F delivery`}
+  </text>
+  {seasons.map((s, i) => (
+    <text x={44 + i * 166} y={246} fill={C.dark} font-family={FONT} font-size="9.5">
+      {`${s.coldF} °F in → ${fmt(s.hotFraction * 100, 1)}% hot (${fmt(s.multiplier, 3)}x)`}
+    </text>
+  ))}
+  <text x="38" y="256" fill={C.muted} font-family={FONT} font-size="8">
+    {`Winter costs you capacity: ${fmt(winter.multiplier, 3)}x at ${winter.coldF} °F against ${fmt(summer.multiplier, 3)}x at ${summer.coldF} °F.`}
+  </text>
+
+  <text x="24" y="284" fill={C.muted} font-family={FONT} font-size="10">
+    Which is the real reason hot water seems to run out faster in January — the tank has not changed, the mix has.
+  </text>
+</svg>

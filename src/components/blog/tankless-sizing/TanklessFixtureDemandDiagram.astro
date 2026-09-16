@@ -1,0 +1,65 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  tanklessGpm,
+} from "@/lib/plumbing";
+/** What a household actually asks for at once, against what one 199k unit
+ * delivers at a 70 F rise. Simultaneity is what the headline gpm ignores. */
+const CAPACITY = tanklessGpm(199000, 0.95, 70);
+const SCENARIOS = [
+  { label: "One shower", gpm: 2.0 },
+  { label: "Shower + kitchen sink", gpm: 3.5 },
+  { label: "Two showers", gpm: 4.0 },
+  { label: "Two showers + sink", gpm: 5.5 },
+  { label: "Two showers + tub fill", gpm: 8.0 },
+];
+const maxGpm = Math.max(CAPACITY, ...SCENARIOS.map((s) => s.gpm));
+
+const rows = [
+  {
+    label: "UNIT CAPACITY",
+    value: CAPACITY,
+    frac: CAPACITY / maxGpm,
+    display: `${CAPACITY.toFixed(2)} gpm at a 70 F rise`,
+    highlight: true,
+  },
+  ...SCENARIOS.map((s) => ({
+    label: s.label,
+    value: s.gpm,
+    frac: s.gpm / maxGpm,
+    display: `${s.gpm.toFixed(2)} gpm  ·  ${s.gpm <= CAPACITY ? "keeps up" : "runs cold"}`,
+    highlight: false,
+  })),
+];
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 176;
+const BAR_MAX = 252;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>Simultaneous demand against one unit at a 70 F rise</title>
+  <desc>A tankless unit does not run out of hot water — it runs out of flow, and then everything gets cooler at once</desc>
+
+  <rect x="8" y="8" width="704" height="294" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Simultaneous demand against one unit at a 70 F rise</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">A tankless unit does not run out of hot water — it runs out of flow, and then everything gets cooler at once</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="288" fill={C.muted} font-family={FONT} font-size="10">A tank buffers simultaneity and a tankless does not. That difference, not total capacity, is what people notice.</text>
+</svg>

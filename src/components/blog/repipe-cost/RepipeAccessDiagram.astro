@@ -1,0 +1,62 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  repipeCost, REPIPE_ACCESS,
+} from "@/lib/plumbing";
+/** Access is the variable nobody puts on a quote until a wall is open, and it
+ * moves the total further than the pipe material does. */
+const BASE = {
+  squareFeet: 1800,
+  materialKey: "pex",
+  accessKey: "average",
+  storeys: 1,
+  bathrooms: 2,
+  permit: 450,
+  drywallRepair: 1500,
+  regionKey: "average",
+};
+const results = REPIPE_ACCESS.map((a) => ({
+  access: a,
+  r: repipeCost({ ...BASE, accessKey: a.key }),
+}));
+const maxTotal = Math.max(...results.map((x) => x.r.total));
+
+const rows = results.map(({ access, r }) => ({
+  label: access.label.split(" — ")[0],
+  value: r.total,
+  frac: r.total / maxTotal,
+  display: `$${r.total.toLocaleString("en-US")}  ·  $${(r.total / BASE.squareFeet).toFixed(2)}/ft2  ·  x${access.factor}`,
+  highlight: access.key === "difficult",
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 150;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 218" fill="none" aria-hidden="true">
+  <title>Wall access on an 1,800 ft2 PEX repipe</title>
+  <desc>Identical house, identical pipe — only how hard it is to reach the walls changes</desc>
+
+  <rect x="8" y="8" width="704" height="204" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Wall access on an 1,800 ft2 PEX repipe</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Identical house, identical pipe — only how hard it is to reach the walls changes</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="198" fill={C.muted} font-family={FONT} font-size="10">Open walls to plaster and tile is a 79% swing on the same house. It is the single most under-quoted line on a repipe.</text>
+</svg>

@@ -1,0 +1,78 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { tanklessBtuRequired, selectTank, peakHourDemand, fmt } from "@/lib/plumbing";
+
+/**
+ * Simultaneity is the real dividing line. A tank absorbs simultaneous draws out
+ * of storage; a tankless has to make every gallon in real time, so its BTU
+ * requirement scales linearly with how many fixtures run at once.
+ */
+const RISE = 70;
+const EFF = 0.95;
+const SHOWER_GPM = 2;
+const LARGEST_RESIDENTIAL = 199000;
+
+const rows = [1, 2, 3].map((showers) => {
+  const gpm = showers * SHOWER_GPM;
+  const btu = tanklessBtuRequired(gpm, RISE, EFF);
+  return {
+    showers,
+    gpm,
+    btu,
+    overLargest: btu > LARGEST_RESIDENTIAL,
+  };
+});
+
+/* The tank answer to the same question, for contrast. */
+const DEMAND = peakHourDemand({ shower: 3, "hands-face": 2, dishwasher: 1, "clothes-washer": 1 });
+const tank = selectTank(DEMAND, 40000, 0.8, RISE);
+
+const maxBtu = Math.max(...rows.map((r) => r.btu));
+const BAR_X = 208;
+const BAR_MAX = 262;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>Burner size required for simultaneous showers</title>
+  <desc>
+    A tankless unit must make every gallon in real time, so its burner requirement scales directly with how many
+    fixtures run at once. A third simultaneous shower runs past the largest residential unit.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Simultaneity is the dividing line, not capacity</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`BTU per hour a tankless needs at a ${RISE} °F rise and ${fmt(EFF * 100)}% efficiency, for ${SHOWER_GPM} gpm showers running together`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (row.btu / maxBtu) * BAR_MAX);
+    const tone = row.overLargest ? C.red : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+          {`${row.showers} shower${row.showers === 1 ? "" : "s"} at once`}
+        </text>
+        <text x={190} y={y + 15} text-anchor="end" fill={C.muted} font-family={FONT} font-size="10">{`${row.gpm} gpm`}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="19" rx="5" fill={tone} opacity="0.72" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {row.overLargest
+            ? `${fmt(row.btu)} BTU/hr — past any residential unit`
+            : `${fmt(row.btu)} BTU/hr`}
+        </text>
+      </g>
+    );
+  })}
+
+  <line x1="24" y1="192" x2="696" y2="192" stroke={C.border} stroke-width="1" />
+
+  <text x="28" y="212" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">THE TANK ANSWERS THE SAME QUESTION DIFFERENTLY</text>
+  <text x="28" y="230" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`Three showers, two hand washes, a dishwasher and a clothes washer in one hour is ${fmt(DEMAND)} gallons of demand.`}
+  </text>
+  <text x="28" y="248" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`A ${tank.tank} gallon tank on a 40k BTU burner covers it — first-hour rating ${fmt(tank.fhr, 1)} gallons, recovering ${fmt(tank.recovery, 1)} gph — because it never has to make it all at once.`}
+  </text>
+</svg>

@@ -1,0 +1,100 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { waterHeaterCost, WATER_HEATER_UPGRADES, usd } from "@/lib/plumbing";
+
+/**
+ * The point of the post in one figure. A swap is a swap; a change of appliance
+ * type drags in a stack of code-driven upgrades that nearly doubles it.
+ */
+const BASE = {
+  labourRate: 125,
+  permit: 150,
+  haulAway: 75,
+  regionKey: "average",
+};
+
+const SCENARIOS = [
+  {
+    label: "50 gal gas, like for like",
+    detail: "same fuel, same vent, same location",
+    unitKey: "tank-gas-50",
+    upgrades: [] as const,
+  },
+  {
+    label: "50 gal gas, code catch-up",
+    detail: "closed system found, no pan under it",
+    unitKey: "tank-gas-50",
+    upgrades: ["expansionTank", "pan"] as const,
+  },
+  {
+    label: "50 gal heat pump",
+    detail: "needs a circuit and a condensate path",
+    unitKey: "tank-hpwh-50",
+    upgrades: ["expansionTank", "pan", "electricalCircuit", "condensateDrain"] as const,
+  },
+  {
+    label: "Gas tankless conversion",
+    detail: "new sealed vent, bigger gas line, condensate",
+    unitKey: "tankless-gas",
+    upgrades: ["expansionTank", "ventUpgrade", "gasLineUpgrade", "condensateDrain"] as const,
+  },
+];
+
+const rows = SCENARIOS.map((s) => {
+  const r = waterHeaterCost({ ...BASE, unitKey: s.unitKey, upgrades: [...s.upgrades] });
+  return {
+    label: s.label,
+    detail: s.detail,
+    total: r.total,
+    upgradeTotal: r.upgradeTotal,
+    lines: r.upgradeLines,
+  };
+});
+
+const baseline = rows[0].total;
+const maxTotal = Math.max(...rows.map((r) => r.total));
+
+const BAR_X = 246;
+const BAR_MAX = 240;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>What the upgrades add to a water heater replacement</title>
+  <desc>
+    A like-for-like swap against three jobs that carry code-driven upgrades. Changing appliance type is what turns a
+    replacement into a project.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="292" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The upgrades turn a swap into a project</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Same labour rate, same permit, same haul-away throughout. The light section of each bar is what the upgrades add.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 48;
+    const w = Math.max(3, (row.total / maxTotal) * BAR_MAX);
+    const upgradeW = row.total > 0 ? w * (row.upgradeTotal / row.total) : 0;
+    const isBase = i === 0;
+    const tone = isBase ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 27} fill={C.muted} font-family={FONT} font-size="9">{row.detail}</text>
+        <text x="28" y={y + 40} fill={C.muted} font-family={FONT} font-size="9">
+          {row.lines.length === 0 ? "no upgrades" : row.lines.map((l) => l.label).join(" · ")}
+        </text>
+        <rect x={BAR_X} y={y + 8} width={w} height="22" rx="5" fill={tone} opacity="0.8" />
+        <rect x={BAR_X + w - upgradeW} y={y + 8} width={upgradeW} height="22" rx="5" fill={tone} opacity="0.32" />
+        <text x={BAR_X + w + 10} y={y + 24} fill={tone} font-family={FONT} font-size="11" font-weight="800">
+          {isBase ? usd(row.total) : `${usd(row.total)}  (+${usd(row.total - baseline)})`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="276" width="672" height="20" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="290" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`A gas tankless conversion carries ${usd(rows[3].upgradeTotal)} of upgrades before anyone touches the appliance price.`}
+  </text>
+</svg>

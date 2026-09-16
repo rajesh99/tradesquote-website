@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  recoveryGph,
+  tanklessGpm,
+  FHR_USABLE_FRACTION,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The crossover. A tank wins the first few minutes because it has water already
+ * hot; a tankless wins everything after, because it never stops. The figure
+ * computes both curves rather than asserting the shape.
+ */
+const TANK_GALLONS = 50;
+const TANK_BTU = 40000;
+const TANK_EFF = 0.8;
+const TANKLESS_BTU = 199000;
+const TANKLESS_EFF = 0.95;
+const RISE = 70;
+
+const recovery = recoveryGph(TANK_BTU, TANK_EFF, RISE);
+const tanklessFlow = tanklessGpm(TANKLESS_BTU, TANKLESS_EFF, RISE);
+const stored = TANK_GALLONS * FHR_USABLE_FRACTION;
+
+const MINUTES = [5, 10, 20, 30, 60];
+const rows = MINUTES.map((minutes) => {
+  const tank = stored + recovery * (minutes / 60);
+  const tankless = tanklessFlow * minutes;
+  return { minutes, tank, tankless, tanklessAhead: tankless > tank };
+});
+
+const maxVal = Math.max(...rows.flatMap((r) => [r.tank, r.tankless]));
+
+const BAR_X = 150;
+const BAR_MAX = 400;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" fill="none" aria-hidden="true">
+  <title>Hot water delivered over time by a tank and a tankless unit</title>
+  <desc>
+    A fifty gallon tank starts ahead because its water is already hot, but its curve flattens to the recovery rate. A
+    tankless unit starts behind and never stops, so it overtakes within about ten minutes.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="292" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The tank wins the first few minutes. Nothing after that.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Gallons delivered at a ${RISE} °F rise: a ${TANK_GALLONS} gal tank at ${fmt(TANK_BTU / 1000)}k BTU against a ${fmt(TANKLESS_BTU / 1000)}k BTU tankless at ${fmt(tanklessFlow, 2)} gpm`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 42;
+    const tankW = Math.max(3, (row.tank / maxVal) * BAR_MAX);
+    const tanklessW = Math.max(3, (row.tankless / maxVal) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 20} fill={C.dark} font-family={FONT} font-size="11" font-weight="800">{`${row.minutes} min`}</text>
+        <rect x={BAR_X} y={y} width={tankW} height="15" rx="4" fill={C.orange} opacity="0.75" />
+        <text x={BAR_X + tankW + 8} y={y + 12} fill={C.orange} font-family={FONT} font-size="9.5" font-weight="700">
+          {`tank ${fmt(row.tank, 1)} gal`}
+        </text>
+        <rect x={BAR_X} y={y + 19} width={tanklessW} height="15" rx="4" fill={C.primary} opacity="0.75" />
+        <text x={BAR_X + tanklessW + 8} y={y + 31} fill={C.primary} font-family={FONT} font-size="9.5" font-weight="700">
+          {`tankless ${fmt(row.tankless, 1)} gal`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="272" width="672" height="20" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="36" y="286" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">
+    {`The tank curve flattens to ${fmt(recovery, 1)} gallons per hour of recovery. The tankless curve is a straight line that never bends.`}
+  </text>
+</svg>

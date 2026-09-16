@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { mixedFlow, hotFraction, fmt } from "@/lib/plumbing";
+
+/**
+ * The bonus nobody expects. Storing hotter means each gallon of stored water
+ * goes further once it is mixed down, so the same tank behaves like a larger
+ * one. Base copied from plumbing-mixing-valve-calculator/index.astro.
+ */
+const BASE = { hotF: 140, coldF: 50, mixF: 120, mixedGpm: 2.5 };
+const TANK_GALLONS = 50;
+
+const rows = [120, 130, 140, 150].map((hotF) => {
+  const r = mixedFlow({ ...BASE, hotF });
+  const fraction = hotFraction(BASE.mixF, BASE.coldF, hotF);
+  return {
+    hotF,
+    fraction,
+    hotGpm: r.hotGpm,
+    effective: fraction > 0 ? TANK_GALLONS / fraction : Infinity,
+    multiplier: r.storageMultiplier,
+  };
+});
+
+const baseline = rows[0];
+const standard = rows[2];
+
+const maxEffective = Math.max(...rows.map((r) => r.effective));
+const BAR_X = 234;
+const BAR_MAX = 240;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Effective tank capacity against storage temperature</title>
+  <desc>
+    Storing hotter and mixing down to the same delivery temperature makes each stored gallon go further, so the
+    same tank behaves like a larger one.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Storing hotter makes the tank bigger</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Delivering ${BASE.mixF} °F from ${BASE.coldF} °F cold, ${TANK_GALLONS} gallon tank. Only the storage temperature changes.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (row.effective / maxEffective) * BAR_MAX);
+    const isStandard = row.hotF === 140;
+    const tone = isStandard ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="11" font-weight={isStandard ? 800 : 700}>
+          {`Store at ${row.hotF} °F`}
+        </text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.fraction * 100, 1)}% of the draw comes from the tank`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity={isStandard ? 0.85 : 0.6} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`behaves like ${fmt(row.effective, 1)} gal`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="222" width="672" height="30" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y="238" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`Storing ${standard.hotF} instead of ${baseline.hotF} turns a ${TANK_GALLONS} gallon tank into ${fmt(standard.effective, 1)} gallons of ${BASE.mixF} °F water — a ${fmt(standard.multiplier, 2)}x multiplier.`}
+  </text>
+  <text x="36" y="250" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`At ${standard.hotF} °F only ${fmt(standard.hotGpm, 2)} gpm of a ${BASE.mixedGpm} gpm shower comes from the tank; the rest is cold that never needed heating.`}
+  </text>
+</svg>

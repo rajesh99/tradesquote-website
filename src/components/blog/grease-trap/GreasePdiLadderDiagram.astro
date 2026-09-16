@@ -1,0 +1,86 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  PDI_GREASE_TRAPS,
+  PDI_GREASE_LB_PER_GPM,
+  greaseTrapHydraulic,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The PDI ladder, with the pound capacity DERIVED from the rating rather than
+ * transcribed — PDI-G101 defines retention as exactly twice the flow rating, so
+ * the second column can never disagree with the first.
+ *
+ * Four representative sinks are placed on the ladder so the reader can see how
+ * fast a compartment count moves the answer.
+ */
+const SINKS = [
+  { label: "1 comp · 18 × 18 × 12", lengthIn: 18, widthIn: 18, depthIn: 12, compartments: 1 },
+  { label: "2 comp · 24 × 24 × 14", lengthIn: 24, widthIn: 24, depthIn: 14, compartments: 2 },
+  { label: "3 comp · 20 × 20 × 12", lengthIn: 20, widthIn: 20, depthIn: 12, compartments: 3 },
+  { label: "3 comp · 24 × 24 × 12", lengthIn: 24, widthIn: 24, depthIn: 12, compartments: 3 },
+];
+
+const sinkRows = SINKS.map((s) => {
+  const r = greaseTrapHydraulic(s);
+  return { label: s.label, flow: r.flowGpm, rated: r.ratedGpm, capacity: r.capacityLb };
+});
+
+const maxGpm = PDI_GREASE_TRAPS[PDI_GREASE_TRAPS.length - 1].gpm;
+const LADDER_X = 40;
+const LADDER_W = 640;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>The PDI flow rating ladder and where four sinks land on it</title>
+  <desc>
+    PDI-G101 defines grease retention capacity as exactly two pounds per gallon per minute of flow rating, so the
+    capacity column is derived from the rating. Four representative sink configurations are placed on the ladder.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The PDI ladder — capacity is exactly twice the rating</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`PDI-G101 defines retention capacity as ${PDI_GREASE_LB_PER_GPM} lb per gpm. It is a definition, not a coincidence.`}
+  </text>
+
+  <line x1={LADDER_X} y1="96" x2={LADDER_X + LADDER_W} y2="96" stroke={C.border} stroke-width="2" />
+  {PDI_GREASE_TRAPS.map((t) => {
+    const x = LADDER_X + (Math.sqrt(t.gpm / maxGpm)) * LADDER_W;
+    return (
+      <g>
+        <line x1={x} y1="90" x2={x} y2="102" stroke={C.blue} stroke-width="1.6" />
+        <text x={x} y="84" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">{t.gpm}</text>
+        <text x={x} y="116" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{t.capacityLb}</text>
+      </g>
+    );
+  })}
+  <text x={LADDER_X} y="70" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">FLOW RATING, GPM</text>
+  <text x={LADDER_X} y="130" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">GREASE CAPACITY, LB</text>
+
+  {sinkRows.map((row, i) => {
+    const y = 150 + i * 27;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x={252} y={y + 14} text-anchor="end" fill={C.muted} font-family={FONT} font-size="10.5">
+          {`${fmt(row.flow, 1)} gpm needed`}
+        </text>
+        <text x={272} y={y + 14} fill={C.muted} font-family={FONT} font-size="11">→</text>
+        <rect x={296} y={y - 2} width={168} height="22" rx="6" fill={C.blue} opacity="0.1" />
+        <rect x={296} y={y - 2} width={168} height="22" rx="6" fill="none" stroke={C.blue} stroke-width="1.4" />
+        <text x={380} y={y + 14} text-anchor="middle" fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${row.rated} gpm unit`}
+        </text>
+        <text x={480} y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+          {`holds ${row.capacity} lb of grease`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="270" fill={C.muted} font-family={FONT} font-size="10">
+    Compartments multiply directly. One extra bowl on the same sink is another third of the required flow rating.
+  </text>
+</svg>

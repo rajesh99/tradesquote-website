@@ -1,0 +1,84 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { MIN_BUILDING_DRAIN_WITH_WC, sizeLabel } from "@/lib/plumbing";
+
+/**
+ * The part that actually costs people money — three boundaries, not one, and
+ * they do not sit in the same place. Deliberately qualitative: ownership and
+ * insurance vary by utility and by policy, so this names the questions rather
+ * than answering them.
+ */
+const ROWS = [
+  {
+    zone: "Building drain",
+    where: "Inside, out to 30 in past the wall",
+    code: "Plumbing code, your plumbing permit",
+    owner: "You",
+    tone: C.blue,
+  },
+  {
+    zone: "Building sewer",
+    where: "From that line to the property line or main",
+    code: "Often a separate sewer permit and inspection",
+    owner: "Usually still you",
+    tone: C.orange,
+  },
+  {
+    zone: "The lateral in the street",
+    where: "Property line to the public main",
+    code: "The sewer authority's rules, not the plumbing code",
+    owner: "Varies",
+    tone: C.red,
+  },
+];
+
+const ROW_H = 44;
+const TOP = 92;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Three zones, three sets of rules, three answers about who pays</title>
+  <desc>
+    The pipe from a fixture to the public main crosses three regulatory zones. The boundaries between them do not
+    coincide, and the third one is where a repair becomes expensive.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three zones, and the boundaries do not line up</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`The pipe is continuous. The rules are not — and a ${sizeLabel(MIN_BUILDING_DRAIN_WITH_WC)} minimum applies from the first water closet all the way out.`}
+  </text>
+
+  <text x="40" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">ZONE</text>
+  <text x={200} y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHERE IT RUNS</text>
+  <text x={412} y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHOSE RULES</text>
+  <text x={632} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHO PAYS</text>
+
+  {ROWS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 8} rx="7" fill={row.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 8} rx="2" fill={row.tone} opacity="0.9" />
+        <text x="40" y={y + 16} fill={row.tone} font-family={FONT} font-size="10.5" font-weight="800">{row.zone}</text>
+        <text x={200} y={y + 16} fill={C.dark} font-family={FONT} font-size="9">{row.where}</text>
+        <text x={412} y={y + 16} fill={C.dark} font-family={FONT} font-size="9">{row.code}</text>
+        <text x={632} y={y + 16} text-anchor="middle" fill={row.tone} font-family={FONT} font-size="9.5" font-weight="800">
+          {row.owner}
+        </text>
+        <text x={200} y={y + 28} fill={C.muted} font-family={FONT} font-size="8">
+          {i === 2
+            ? "The expensive question. Some utilities own it; many make the homeowner responsible to the main."
+            : "Same pipe, same table, different paperwork."}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="244" fill={C.muted} font-family={FONT} font-size="10">
+    Ownership of the lateral, and whether a standard policy covers it, varies by utility and by insurer — ask both before you need to know.
+  </text>
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">
+    This page names the question rather than answering it, because there is no answer that holds across jurisdictions.
+  </text>
+</svg>

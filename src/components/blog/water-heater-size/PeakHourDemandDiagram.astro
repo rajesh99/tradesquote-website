@@ -1,0 +1,67 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  PEAK_HOUR_USES, peakHourDemand,
+} from "@/lib/plumbing";
+/** Peak-hour demand is a shopping list, not a guess. These are the DOE
+ * first-hour-rating worksheet allowances per use. */
+const USES: Record<string, number> = {
+  shower: 3,
+  dishwasher: 1,
+  "clothes-washer": 1,
+  "hands-face": 2,
+};
+const TOTAL = peakHourDemand(USES);
+
+const used = PEAK_HOUR_USES.filter((u) => USES[u.key]);
+const parts = used.map((u) => ({ ...u, count: USES[u.key], subtotal: u.gallons * USES[u.key] }));
+const maxPart = Math.max(...parts.map((p) => p.subtotal));
+
+const rows = [
+  ...parts.map((p) => ({
+    label: `${p.count} x ${p.label}`,
+    value: p.subtotal,
+    frac: p.subtotal / maxPart,
+    display: `${p.count} x ${p.gallons} gal = ${p.subtotal} gal`,
+    highlight: false,
+  })),
+  {
+    label: "PEAK HOUR",
+    value: TOTAL,
+    frac: 1,
+    display: `${TOTAL} gallons in the busiest hour`,
+    highlight: true,
+  },
+];
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 176;
+const BAR_MAX = 260;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 278" fill="none" aria-hidden="true">
+  <title>Peak-hour demand for a family morning</title>
+  <desc>Three showers, a dishwasher, a laundry load and two hand-washings, all inside one hour</desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Peak-hour demand for a family morning</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Three showers, a dishwasher, a laundry load and two hand-washings, all inside one hour</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">This is the number a heater has to beat. Compare it with first-hour rating, never with the gallons on the label.</text>
+</svg>

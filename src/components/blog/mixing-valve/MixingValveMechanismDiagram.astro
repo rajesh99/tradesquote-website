@@ -1,0 +1,70 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { mixedFlow, fmt } from "@/lib/plumbing";
+
+/**
+ * How the device works, as opposed to why you would want one. A thermostatic
+ * element moves a spool; it is closed-loop on outlet temperature rather than on
+ * inlet ratio, which is the whole difference from a manual tempering valve.
+ *
+ * Base copied from plumbing-mixing-valve-calculator/index.astro.
+ */
+const defs = markerDefs("mix-mech");
+const BASE = { hotF: 140, coldF: 50, mixF: 120, mixedGpm: 2.5 };
+const r = mixedFlow(BASE);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>How a thermostatic mixing valve works</title>
+  <desc>
+    A wax or bimetallic element expands with outlet temperature and moves a spool that opens one port as it closes
+    the other, holding the delivered temperature as inlet conditions change.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">It measures the outlet, not the inlets</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    A thermostatic element sits in the mixed stream and moves a spool. That closed loop is the entire difference from a manual blend.
+  </text>
+
+  <!-- hot in -->
+  <line x1="40" y1="106" x2="252" y2="106" stroke={C.red} stroke-width="7" stroke-linecap="round" marker-end="url(#mix-mech-arrow-orange)" />
+  <text x="44" y="96" fill={C.red} font-family={FONT} font-size="10" font-weight="800">{`HOT ${BASE.hotF} °F`}</text>
+  <text x="44" y="126" fill={C.muted} font-family={FONT} font-size="9">{`${fmt(r.hotGpm, 2)} gpm — ${fmt(r.hotFraction * 100, 1)}% of the draw`}</text>
+
+  <!-- cold in -->
+  <line x1="40" y1="176" x2="252" y2="176" stroke={C.blue} stroke-width="7" stroke-linecap="round" marker-end="url(#mix-mech-arrow-blue)" />
+  <text x="44" y="166" fill={C.blue} font-family={FONT} font-size="10" font-weight="800">{`COLD ${BASE.coldF} °F`}</text>
+  <text x="44" y="196" fill={C.muted} font-family={FONT} font-size="9">{`${fmt(r.coldGpm, 2)} gpm — ${fmt(r.coldFraction * 100, 1)}%`}</text>
+
+  <!-- valve body -->
+  <rect x="258" y="86" width="140" height="110" rx="12" fill={C.white} stroke={C.dark} stroke-width="2.4" />
+  <text x="328" y="106" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="9" font-weight="700">SPOOL</text>
+  <rect x="290" y="114" width="76" height="22" rx="5" fill={C.dark} opacity="0.7" />
+  <line x1="328" y1="136" x2="328" y2="158" stroke={C.primary} stroke-width="3" />
+  <rect x="300" y="158" width="56" height="18" rx="5" fill={C.primary} opacity="0.85" />
+  <text x="328" y="171" text-anchor="middle" fill={C.white} font-family={FONT} font-size="8" font-weight="800">ELEMENT</text>
+  <text x="328" y="190" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">expands with heat</text>
+
+  <!-- mixed out -->
+  <line x1="404" y1="141" x2="612" y2="141" stroke={C.primary} stroke-width="8" stroke-linecap="round" marker-end="url(#mix-mech-arrow-primary)" />
+  <text x="418" y="130" fill={C.primary} font-family={FONT} font-size="11" font-weight="800">
+    {`MIXED ${BASE.mixF} °F · ${BASE.mixedGpm} gpm`}
+  </text>
+  <text x="418" y="162" fill={C.muted} font-family={FONT} font-size="9">held as inlet temperature and pressure change</text>
+
+  <!-- feedback -->
+  <line x1="500" y1="150" x2="360" y2="182" stroke={C.primary} stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#mix-mech-arrow-primary)" />
+  <text x="430" y="182" fill={C.primary} font-family={FONT} font-size="8.5" font-weight="700">feedback: outlet temperature moves the spool</text>
+
+  <text x="24" y="222" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+    Because it corrects on the outlet, it holds temperature when the cold pressure drops, the tank cools, or the draw changes.
+  </text>
+  <text x="24" y="240" fill={C.muted} font-family={FONT} font-size="10">
+    A manual tempering valve sets a fixed ratio instead — which is why the shower goes cold when someone flushes a toilet.
+  </text>
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">
+    Elements are wax or bimetallic, they age, and a valve that has drifted delivers the wrong temperature silently.
+  </text>
+</svg>

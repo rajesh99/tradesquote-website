@@ -1,0 +1,87 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { PERC_APPLICATION_RATES } from "@/lib/plumbing";
+
+/**
+ * What the test actually is. The pre-soak is the step that gets skipped and the
+ * step that decides the answer, so it gets its own emphasis.
+ */
+const defs = markerDefs("perc-proc");
+
+const STEPS = [
+  {
+    n: "1",
+    label: "Dig the holes",
+    detail: "Several, spread across the proposed field, at the depth the trenches will sit",
+    tone: C.blue,
+  },
+  {
+    n: "2",
+    label: "Scratch the sides",
+    detail: "Digging smears and seals the bore — an unscratched hole reads slower than the soil is",
+    tone: C.orange,
+  },
+  {
+    n: "3",
+    label: "Pre-soak",
+    detail: "Keep them full for hours, sometimes overnight. Dry soil drinks and flatters the result",
+    tone: C.red,
+  },
+  {
+    n: "4",
+    label: "Measure the drop",
+    detail: "Refill to a set depth and time how long the level takes to fall one inch",
+    tone: C.primary,
+  },
+  {
+    n: "5",
+    label: "Convert to a rate",
+    detail: "Minutes per inch, then to gallons per square foot per day via the jurisdiction's table",
+    tone: C.primary,
+  },
+];
+
+const fastest = PERC_APPLICATION_RATES[0];
+const slowest = PERC_APPLICATION_RATES[PERC_APPLICATION_RATES.length - 1];
+
+const ROW_H = 34;
+const TOP = 84;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>What a percolation test actually involves</title>
+  <desc>
+    Five steps, of which the pre-soak is the one most often skipped and the one that most changes the answer.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Five steps, and one of them decides the answer</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    The procedure varies by jurisdiction — some have moved to soil morphology instead — but the shape is consistent.
+  </text>
+
+  {STEPS.map((s, i) => {
+    const y = TOP + i * ROW_H;
+    const critical = s.n === "3";
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={s.tone} opacity={critical ? 0.12 : 0.07} />
+        <circle cx="44" cy={y + 14} r="11" fill={s.tone} opacity="0.85" />
+        <text x="44" y={y + 18} text-anchor="middle" fill={C.white} font-family={FONT} font-size="11" font-weight="800">{s.n}</text>
+        <text x="66" y={y + 12} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={critical ? 800 : 700}>{s.label}</text>
+        <text x="66" y={y + 24} fill={C.muted} font-family={FONT} font-size="8.5">{s.detail}</text>
+        {critical && (
+          <text x={676} y={y + 18} text-anchor="end" fill={C.red} font-family={FONT} font-size="9" font-weight="800">
+            SKIPPED MOST OFTEN
+          </text>
+        )}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="256" width="672" height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="36" y="272" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">
+    {`Most buildable ground lands between ${fastest.maxMinPerInch} and ${slowest.maxMinPerInch} min/in. Past ${slowest.maxMinPerInch}, conventional trenches usually stop being permitted.`}
+  </text>
+</svg>

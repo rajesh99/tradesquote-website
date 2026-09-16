@@ -1,0 +1,55 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  tanklessGpm,
+} from "@/lib/plumbing";
+/** One unit, one target temperature, five inlet temperatures. Nothing about
+ * the appliance changes across these rows — only the water coming in. */
+const BTU = 199000;
+const EFF = 0.95;
+const TARGET = 120;
+const INLETS = [70, 60, 50, 45, 40];
+
+const results = INLETS.map((inlet) => ({ inlet, gpm: tanklessGpm(BTU, EFF, TARGET - inlet) }));
+const maxGpm = Math.max(...results.map((r) => r.gpm));
+const best = results[0].gpm;
+
+const rows = results.map(({ inlet, gpm }) => ({
+  label: `${inlet} F inlet`,
+  value: gpm,
+  frac: gpm / maxGpm,
+  display: `${gpm.toFixed(2)} gpm  ·  ${(TARGET - inlet)} F rise  ·  ${((1 - gpm / best) * 100).toFixed(1)}% below best`,
+  highlight: inlet === 40,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 118;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 278" fill="none" aria-hidden="true">
+  <title>The same 199,000 BTU unit at five inlet temperatures</title>
+  <desc>Delivering 120 F. gpm = BTU/hr x efficiency divided by 500 times the temperature rise</desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The same 199,000 BTU unit at five inlet temperatures</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Delivering 120 F. gpm = BTU/hr x efficiency divided by 500 times the temperature rise</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">From a Gulf-coast inlet to a northern winter the same appliance loses over a third of its flow. Nothing on the box changes.</text>
+</svg>

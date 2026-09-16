@@ -1,0 +1,129 @@
+---
+title: "Water Pipe Size Chart: GPM and Fixture Units to Nominal Size"
+meta_title: "Water Pipe Size Chart - GPM to Pipe Size (2026) | TradesQuote"
+description: "A pipe size chart that shows its working. 10 gpm is 3/4 inch at 60 psi over 120 ft — and 15 gpm needs 1-1/2 inch at 40 psi over 400 ft. Why every row is conditional."
+image: /images/posts/water-pipe-size-chart-hero.svg
+date: 2026-09-02T09:00:00Z
+categories: ["plumbing"]
+tags: ["water pipe size chart","pipe sizing","gpm to pipe size","pipe velocity","ipc appendix e"]
+draft: false
+---
+
+import BlogInfographic from "@/components/blog/BlogInfographic.astro";
+import PipeSizeChartDiagram from "@/components/blog/pipe-size-chart/PipeSizeChartDiagram.astro";
+import PipeSizeConditionalDiagram from "@/components/blog/pipe-size-chart/PipeSizeConditionalDiagram.astro";
+import PipeSizeMaxFlowDiagram from "@/components/blog/pipe-size-chart/PipeSizeMaxFlowDiagram.astro";
+
+You came for a chart. Here it is — with the one thing most versions leave out, which is what the numbers are conditional on.
+
+<BlogInfographic
+  title="Peak demand to nominal size — copper Type L"
+  caption="Computed rather than transcribed, for a 120 ft developed run at 60 psi with the highest fixture 20 ft up. Each row names the rule that decided it."
+>
+  <PipeSizeChartDiagram />
+</BlogInfographic>
+
+Read that as a starting point, not an answer. Every row assumes a particular run length and supply pressure, and change either one and the row changes.
+
+## Why no chart can stand alone
+
+A water line has to clear **two** independent rules, and you take whichever asks for more pipe:
+
+```
+Rule 1 — VELOCITY.  Under about 8 ft/s cold, 5 ft/s hot.
+Rule 2 — PRESSURE.  Friction over the whole run has to fit
+                    inside what is left after lift, meter
+                    and the pressure the fixture needs.
+```
+
+On a short run at good pressure, velocity almost always binds first — which is why a velocity-only chart usually gets away with it. Tighten the budget and it stops getting away with it.
+
+<BlogInfographic
+  title="The same 15 gpm, four pressures, four run lengths"
+  caption="Green means velocity decided, amber means both rules agreed, red means friction took over and forced a size up. Same flow throughout."
+>
+  <PipeSizeConditionalDiagram />
+</BlogInfographic>
+
+At **80 psi**, one size covers every run out to 400 ft. At **40 psi**, the same 15 gpm needs **1-1/4 inch by 150 ft and 1-1/2 inch by 400 ft**. That is two sizes of difference driven by nothing but the pressure at the street and the distance to the fixture — neither of which a chart can know.
+
+The **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)** takes both and tells you which rule governed. That last part matters when an inspector or a customer questions the size.
+
+## Reading it the other way: max flow per size
+
+Sometimes the pipe is already in the wall and the question is what it can carry.
+
+<BlogInfographic
+  title="Maximum flow per size at the velocity ceiling"
+  caption="8 ft/s cold and 5 ft/s hot. The hot column is 62% of the cold one at every size, and PEX carries less than copper at the same nominal size."
+>
+  <PipeSizeMaxFlowDiagram />
+</BlogInfographic>
+
+Two things worth pulling out of that table.
+
+**The hot limit is stricter than the cold one, and it is not arbitrary.** Erosion-corrosion — fast water scouring the protective oxide layer off the inside of copper tube — accelerates with temperature. Pinhole leaks concentrated on the hot side of a house are the signature. The **[Pipe Velocity Calculator](/calculators/plumbing/plumbing-pipe-velocity-calculator)** checks any combination.
+
+**PEX carries meaningfully less than copper at the same nominal size**, because it bores smaller. That is a large enough effect to change the size you buy — see **[PEX vs copper vs CPVC](/blog/pex-vs-copper-vs-cpvc)**.
+
+## Getting to the gpm in the first place
+
+Every row above starts from a flow rate, and the flow rate is not the sum of your fixtures. Nobody runs all of them at once.
+
+The IPC handles this with **water supply fixture units**: each fixture gets a weight, you add the weights, and a demand curve converts the total to probable peak flow. A two-bath house with a kitchen sink, dishwasher, clothes washer and two hose bibbs totals **16.4 WSFU**, which the curve turns into about **18.2 gpm**.
+
+The **[Water Supply Fixture Unit Calculator](/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator)** does the addition and the curve. If the difference between WSFU and DFU is not obvious, **[fixture units explained](/blog/plumbing-fixture-units-explained)** covers why the same fixture carries two different numbers.
+
+## An honest caveat about the source
+
+The fixture-unit values and the demand curve behind them come from **IPC Appendix E**. Appendix E is an *appendix* — enforceable only where a jurisdiction has adopted it — and Hunter's curve, which underlies it, was developed when fixtures used far more water than they do now.
+
+The practical consequence: for modern low-flow fixtures the curve runs **high**, so the error is toward a larger pipe. That is the safe direction, but it is worth knowing you are usually being sold a slightly conservative answer rather than a precise one.
+
+## What the chart cannot see
+
+**Developed length, not tape measure.** Every elbow, tee and valve adds equivalent length. A fitting-heavy run can be 20% longer hydraulically than it looks. The **[Pipe Friction Loss Calculator](/calculators/plumbing/plumbing-friction-loss-calculator)** converts fittings for you.
+
+**The meter.** A 5/8 inch meter at peak flow can cost 8 to 12 psi, and it sits ahead of everything.
+
+**Elevation.** 0.4331 psi per foot, charged whether water moves or not — see **[normal water pressure for a house](/blog/normal-water-pressure-for-a-house)**.
+
+**Branch versus main.** The main carries total demand; each branch carries only what is downstream of it. Running the main size everywhere wastes money and, on the hot side, makes the wait at the tap longer.
+
+## Frequently asked questions
+
+### What size water pipe do I need for 10 gpm?
+
+**3/4 inch** copper on a typical residential run — 120 ft at 60 psi with the highest fixture 20 ft up. At that flow both rules agree on 3/4 inch. On a longer run or at lower street pressure the answer moves up; check yours with the **[Water Pipe Size Calculator](/calculators/plumbing/plumbing-pipe-size-calculator)**.
+
+### How many gpm can a 3/4 inch pipe carry?
+
+At the 8 ft/s cold ceiling, about **12.1 gpm** in copper Type L and **9.1 gpm** in PEX. On hot water the limit drops to 5 ft/s, so roughly 7.5 gpm in copper. Those are velocity limits — a long run may hit the friction budget before reaching them.
+
+### Is there a standard water pipe size chart?
+
+Not one that is universally correct, no. Fixture-unit values and the demand curve live in **IPC Appendix E**, which is enforceable only where adopted, and UPC states use different values entirely. Any chart also has to assume a run length and a supply pressure, which is why the same flow can need two different sizes.
+
+### What size water line from meter to house?
+
+Most single-family homes use **1 inch** from the meter, with 3/4 inch trunk branches and 1/2 inch fixture drops. Long runs from the street, three or more bathrooms, or marginal supply pressure push the main to 1-1/4 inch.
+
+### Does pipe material change the size I need?
+
+Yes, and more than people expect. At 18 gpm on a 120 ft run, copper, CPVC and PVC all land on 1 inch while **PEX needs 1-1/4 inch**, because a nominal 1 inch PEX tube bores 0.875 in against copper's 1.025.
+
+### What is a good water velocity for pipe sizing?
+
+Under **8 ft/s on cold** and **5 ft/s on hot**. These are ASPE and manufacturer design limits, not IPC figures — the code requires a system free of noise and erosion without naming a number. Above them you get noise, water hammer and accelerated erosion-corrosion.
+
+### How does run length change the pipe size?
+
+By changing the friction budget. The available pressure is spread across the developed length, so doubling the run halves the allowable loss per 100 ft. At 40 psi supply, 15 gpm goes from 1 inch at 100 ft to 1-1/2 inch at 400 ft.
+
+### Should I use fixture units or gpm?
+
+Fixture units when you are sizing a whole building — they account for the fact that fixtures do not all run together. Straight gpm when you know the actual simultaneous demand, such as a single appliance or an irrigation zone.
+
+---
+
+**Sources & standards:** IPC 2021 Chapter 6 (water supply and distribution) and Appendix E (water pipe sizing) — Appendix E is an appendix and is enforceable only where adopted, and the Hunter's-curve values behind it run high for modern low-flow fixtures. Velocity limits of 8 ft/s cold and 5 ft/s hot are ASPE and manufacturer design practice, not IPC numbers. Pipe inside diameters are computed from ASTM B88 (copper) and F876 (PEX) dimensions rather than transcribed. The IPC is a model code — roughly fifteen states enforce the UPC or a derivative such as California's CPC. Confirm the edition your jurisdiction adopts, and have a licensed plumber sign off anything installed.

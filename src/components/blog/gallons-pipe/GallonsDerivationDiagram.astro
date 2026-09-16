@@ -1,0 +1,96 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import {
+  gallonsPerFoot,
+  CUBIC_INCHES_PER_GALLON,
+  GALLONS_PER_CUBIC_FOOT,
+  insideDiameter,
+  pipeVolume,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The formula from geometry, with a cross-check. Nothing here is looked up —
+ * the constant falls out of pi/4 x d^2 x 12 / 231, and the published gal/ft for
+ * 1 inch Schedule 40 confirms it.
+ */
+const defs = markerDefs("gal-deriv");
+
+const CHECK_ID = 1.049;
+const checkValue = gallonsPerFoot(CHECK_ID);
+const constant = gallonsPerFoot(1);
+
+const id34 = insideDiameter("copper-l", 0.75)!;
+const example = pipeVolume(id34, 50);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Where the gallons per foot formula comes from</title>
+  <desc>
+    The constant falls out of the area of a circle, twelve inches to a foot, and two hundred and thirty-one cubic
+    inches to a gallon. It is geometry, not a lookup table.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`${fmt(constant, 4)} × diameter squared — and every part of it is geometry`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Diameter is the INSIDE diameter in inches, which is where most errors come from — not from the arithmetic.
+  </text>
+
+  <rect x="24" y="70" width="152" height="66" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="38" y="88" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">AREA OF THE BORE</text>
+  <text x="38" y="110" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">π ÷ 4 × d²</text>
+  <text x="38" y="128" fill={C.muted} font-family={FONT} font-size="9">square inches</text>
+
+  <line x1="182" y1="103" x2="204" y2="103" stroke={C.muted} stroke-width="2" marker-end="url(#gal-deriv-arrow-muted)" />
+
+  <rect x="212" y="70" width="152" height="66" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="226" y="88" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">TIMES A FOOT OF LENGTH</text>
+  <text x="226" y="110" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">× 12</text>
+  <text x="226" y="128" fill={C.muted} font-family={FONT} font-size="9">cubic inches per foot</text>
+
+  <line x1="370" y1="103" x2="392" y2="103" stroke={C.muted} stroke-width="2" marker-end="url(#gal-deriv-arrow-muted)" />
+
+  <rect x="400" y="70" width="152" height="66" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.8" />
+  <text x="414" y="88" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">INTO GALLONS</text>
+  <text x="414" y="110" fill={C.dark} font-family={FONT} font-size="13" font-weight="800">{`÷ ${CUBIC_INCHES_PER_GALLON}`}</text>
+  <text x="414" y="128" fill={C.muted} font-family={FONT} font-size="9">cubic inches per gallon</text>
+
+  <line x1="558" y1="103" x2="580" y2="103" stroke={C.primary} stroke-width="2" marker-end="url(#gal-deriv-arrow-primary)" />
+
+  <rect x="588" y="70" width="108" height="66" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="2.2" />
+  <text x="642" y="90" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="8.5" font-weight="700">CONSTANT</text>
+  <text x="642" y="114" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="15" font-weight="800">
+    {fmt(constant, 4)}
+  </text>
+  <text x="642" y="130" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8.5">gal per ft per in²</text>
+
+  <rect x="24" y="152" width="330" height="56" rx="9" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="38" y="170" fill={C.orange} font-family={FONT} font-size="8.5" font-weight="700">CROSS-CHECK AGAINST A PUBLISHED VALUE</text>
+  <text x="38" y="188" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`1 inch Schedule 40, ${CHECK_ID} in bore`}
+  </text>
+  <text x="38" y="203" fill={C.orange} font-family={FONT} font-size="11.5" font-weight="800">
+    {`→ ${fmt(checkValue, 4)} gal/ft, which is what the tables print`}
+  </text>
+
+  <rect x="366" y="152" width="330" height="56" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="380" y="170" fill={C.primary} font-family={FONT} font-size="8.5" font-weight="700">A REAL EXAMPLE</text>
+  <text x="380" y="188" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`${sizeLabel(0.75)} type L copper, ${fmt(id34, 3)} in bore, 50 ft`}
+  </text>
+  <text x="380" y="203" fill={C.primary} font-family={FONT} font-size="11.5" font-weight="800">
+    {`→ ${fmt(example.perFoot, 4)} gal/ft = ${fmt(example.gallons, 2)} gallons`}
+  </text>
+
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">
+    {`Both constants are definitions: ${CUBIC_INCHES_PER_GALLON} cubic inches per gallon, and ${GALLONS_PER_CUBIC_FOOT} gallons per cubic foot. That 50 ft run weighs ${fmt(example.weightLb, 1)} lb full.`}
+  </text>
+  <text x="24" y="248" fill={C.muted} font-family={FONT} font-size="10">
+    Use the bore, never the nominal size. A "3/4 inch" pipe is not 0.75 inches across in any material.
+  </text>
+</svg>

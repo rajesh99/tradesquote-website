@@ -1,0 +1,72 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { cisternSizing, GREYWATER_MAX_STORAGE_HOURS, fmt } from "@/lib/plumbing";
+
+/**
+ * The two candidates and which one wins. A cistern is sized by demand storage
+ * until the roof simply cannot yield that much, at which point the yield caps
+ * it — and a yield-capped system is one that will run dry, not one that is
+ * correctly sized.
+ */
+const defs = markerDefs("rw-gov");
+const DEFAULTS = {
+  areaSqFt: 2000,
+  periodInches: 3.5,
+  periodDays: 30,
+  coefficient: 0.85,
+  demandGpd: 60,
+  drySpellDays: 21,
+  events: 4,
+};
+const r = cisternSizing(DEFAULTS);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>The two candidates a cistern is sized against</title>
+  <desc>
+    Demand storage carries the dry spell; yield storage is what the roof can actually deliver in the period. The
+    smaller of the two is the tank, and which one wins tells you whether the system works.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Which candidate wins tells you whether it works</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${fmt(DEFAULTS.areaSqFt)} sq ft asphalt shingle, ${DEFAULTS.demandGpd} gal/day, ${DEFAULTS.periodInches} in over ${DEFAULTS.periodDays} days, ${DEFAULTS.drySpellDays} dry days.`}
+  </text>
+
+  <rect x="24" y="70" width="330" height="96" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="40" y="90" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">DEMAND STORAGE — CARRY THE DRY SPELL</text>
+  <text x="40" y="110" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`${DEFAULTS.demandGpd} gal/day × ${DEFAULTS.drySpellDays} dry days`}
+  </text>
+  <text x="40" y="134" fill={C.orange} font-family={FONT} font-size="17" font-weight="800">
+    {`${fmt(r.demandStorage)} gallons`}
+  </text>
+  <text x="40" y="154" fill={C.muted} font-family={FONT} font-size="9">what you must already be holding when the rain stops</text>
+
+  <rect x="366" y="70" width="330" height="96" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="2" />
+  <text x="382" y="90" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">YIELD STORAGE — WHAT THE ROOF DELIVERS</text>
+  <text x="382" y="110" fill={C.dark} font-family={FONT} font-size="10.5">
+    {`${DEFAULTS.periodInches} in on ${fmt(DEFAULTS.areaSqFt)} sq ft, after losses`}
+  </text>
+  <text x="382" y="134" fill={C.blue} font-family={FONT} font-size="17" font-weight="800">
+    {`${fmt(r.yieldStorage)} gallons`}
+  </text>
+  <text x="382" y="154" fill={C.muted} font-family={FONT} font-size="9">the ceiling — you cannot store what never arrives</text>
+
+  <line x1="189" y1="166" x2="330" y2="186" stroke={C.orange} stroke-width="2" marker-end="url(#rw-gov-arrow-orange)" />
+  <line x1="531" y1="166" x2="390" y2="186" stroke={C.blue} stroke-width="2" marker-end="url(#rw-gov-arrow-blue)" />
+
+  <rect x="180" y="190" width="360" height="46" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2.2" />
+  <text x="360" y="212" text-anchor="middle" fill={C.primary} font-family={FONT} font-size="14" font-weight="800">
+    {`take the smaller → ${fmt(r.required)} gal → a ${fmt(r.selected ?? 0)} gal tank`}
+  </text>
+  <text x="360" y="229" text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10">
+    {`governed by ${r.governedBy} · covers ${fmt(r.daysCovered, 1)} days at full draw`}
+  </text>
+
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">
+    {`Governed by "demand" means the roof can keep up. Governed by "yield" means it cannot, and the system will run dry however big the tank is.`}
+  </text>
+</svg>

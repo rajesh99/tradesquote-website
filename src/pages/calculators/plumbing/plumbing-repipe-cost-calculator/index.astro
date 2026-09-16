@@ -1,0 +1,776 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  REGION_MULTIPLIERS,
+  REPIPE_ACCESS,
+  REPIPE_MATERIAL_COST,
+  repipeCost,
+  usd,
+  usd2,
+} from "@/lib/plumbing";
+
+const title = "Repipe Cost Calculator — Whole-House Repipe | TradesQuote";
+const description =
+  "Free whole-house repipe cost calculator. Estimate the installed cost by floor area, pipe material, wall access and storeys — with the access factor that moves the total more than the pipe choice does.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-repipe-cost-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Repipe Cost Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Repipe Cost Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online whole-house repipe cost calculator estimating installed cost from floor area, pipe material, wall access difficulty, storeys, bathroom count, permit and drywall repair, with a regional multiplier.",
+};
+
+const base = {
+  squareFeet: 1800,
+  materialKey: "pex",
+  accessKey: "average",
+  storeys: 1,
+  bathrooms: 2,
+  permit: 450,
+  drywallRepair: 1500,
+  regionKey: "average",
+};
+const defaults = repipeCost(base);
+const easy = repipeCost({ ...base, accessKey: "easy" });
+const difficult = repipeCost({ ...base, accessKey: "difficult" });
+const copper = repipeCost({ ...base, materialKey: "copper" });
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much does it cost to repipe a house?",
+    answer: `For a 1,800 ft² single-storey house in PEX with average wall access, the estimate here is <strong>${usd(defaults.total)}</strong>, or ${usd2(defaults.perSqFt)} per square foot, with a band of ${usd(defaults.low)} to ${usd(defaults.high)}. Change the access to difficult and the same house is <strong>${usd(difficult.total)}</strong>; change the material to copper and it is <strong>${usd(copper.total)}</strong>.`,
+  },
+  {
+    question: "What actually drives the price?",
+    answer: `Two things, and only one of them is the pipe. Copper adds <strong>${usd(copper.total - defaults.total)}</strong> over PEX on this house. Difficult access — plaster over lath, tile, finished ceilings, slab — adds <strong>${usd(difficult.total - defaults.total)}</strong>. Access is the one clients never expect to pay for and the one that most often blows a fixed price, because you cannot see it from the driveway.`,
+  },
+  {
+    question: "Is PEX or copper better for a repipe?",
+    answer:
+      "PEX is faster to install, needs far fewer fittings, tolerates freezing better and costs roughly half as much fitted. Copper is rigid, UV-stable, holds up to high temperatures, and has decades of proven service. The honest summary is that PEX wins on cost and speed, copper wins on longevity and resale perception, and both are code-compliant nearly everywhere. Some jurisdictions restrict PEX in specific applications — check locally.",
+  },
+  {
+    question: "Why does a second storey add cost?",
+    answer:
+      "Vertical risers, more fishing between floors, and far more of the work happening in finished ceilings rather than an accessible crawlspace. The model here adds <strong>15%</strong> per storey above the first. In practice the penalty is worse when the ground floor ceiling is finished and better when there is an attic to work from.",
+  },
+  {
+    question: "Does the price include drywall repair?",
+    answer:
+      "Here it is a separate, editable line — the default is $1,500 — because plumbers differ on whether they carry it. Some quote repipe as pipe-only and leave the client to hire a drywall finisher; others include patch, tape and texture but not paint. Whatever you do, <strong>say so explicitly on the quote</strong>: it is the single most common source of dispute on a repipe.",
+  },
+  {
+    question: "How long does a whole-house repipe take?",
+    answer:
+      "For a typical single-storey house in PEX, roughly <strong>two to four days</strong> of pipework plus drywall repair and paint afterwards. Copper takes longer. Water is usually off during working hours and restored each evening. Difficult access can double the schedule as easily as it doubles the labour.",
+  },
+  {
+    question: "When is a repipe worth it rather than repairs?",
+    answer:
+      "When you are on the third or fourth leak in a year, when the pipe is polybutylene or galvanized steel that has scaled internally, or when a slab leak makes access ruinous anyway. The usual trigger is repair spend approaching a meaningful fraction of the repipe estimate — at that point you are renting a solution you could have owned.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Repipe scoped? Quote the whole job in seconds.";
+const ctaDescription =
+  "A repipe quote lives or dies on what is included. TradesQuote turns the scope into a detailed, line-item estimate — pipe, fittings, fixtures, drywall and labor with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-estimate-calculator",
+    title: "Plumbing Estimate Calculator",
+    description: "Price any job from hours, material and margin.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-labor-rate-calculator",
+    title: "Plumbing Labor Rate Calculator",
+    description: "The hourly rate behind every one of these numbers.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Size the new mains and branches properly.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "Confirm whether pressure was the real problem.",
+  },
+];
+
+/** Tables computed from the lib. */
+const accessTable = REPIPE_ACCESS.map((a) => {
+  const r = repipeCost({ ...base, accessKey: a.key });
+  return { label: a.label, factor: a.factor, total: r.total, perSqFt: r.perSqFt };
+});
+
+const materialTable = REPIPE_MATERIAL_COST.map((m) => {
+  const r = repipeCost({ ...base, materialKey: m.key });
+  return { label: m.label, rate: m.perSqFt, total: r.total, perSqFt: r.perSqFt };
+});
+
+const areaTable = [1000, 1400, 1800, 2400, 3000].map((sf) => {
+  const pex = repipeCost({ ...base, squareFeet: sf });
+  const cu = repipeCost({ ...base, squareFeet: sf, materialKey: "copper" });
+  return { sf, pex: pex.total, pexPer: pex.perSqFt, cu: cu.total };
+});
+
+const styles = plumbingAccentStyles.indigo;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Repipe Cost Calculator — Whole-House Repipe" />
+    <meta
+      property="og:description"
+      content="Estimate a whole-house repipe by area, material, wall access and storeys — with the access factor that moves the total more than the pipe does. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Repipe Cost Calculator — Whole-House Repipe" />
+    <meta
+      name="twitter:description"
+      content="Whole-house repipe cost by area, material and access. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Repipe Cost Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
+              Plumbing Tools · 2026 pricing · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Repipe Cost Calculator <span class="text-indigo-600">— Whole-House Repipe</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Most repipe estimates get the pipe right and the <strong>access</strong> wrong. Fishing new lines
+              through open framing and fishing them through plaster over lath are the same drawing and
+              wildly different jobs — on this calculator's defaults the gap is
+              <strong>{usd(difficult.total - easy.total)}</strong> on one house. Set the area, the material and
+              how open the walls really are.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            Price the repipe
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="rp-area" class="text-sm font-semibold text-slate-800">Floor area</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="rp-area"
+                      type="number"
+                      min="200"
+                      max="20000"
+                      step="50"
+                      value="1800"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">ft²</span>
+                  </div>
+                </div>
+                <input
+                  id="rp-area-range"
+                  type="range"
+                  min="500"
+                  max="5000"
+                  step="50"
+                  value="1800"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-indigo-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>500</span><span>5,000 ft²</span>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="rp-material" class="text-sm font-semibold text-slate-800">Pipe material</label>
+                  <select
+                    id="rp-material"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    {
+                      REPIPE_MATERIAL_COST.map((m) => (
+                        <option value={m.key} selected={m.key === "pex"}>
+                          {m.label} — ${m.perSqFt}/ft²
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="rp-storeys" class="text-sm font-semibold text-slate-800">Storeys</label>
+                  <select
+                    id="rp-storeys"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    <option value="1" selected>Single storey</option>
+                    <option value="2">Two storeys (+15%)</option>
+                    <option value="3">Three storeys (+30%)</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="rp-access" class="text-sm font-semibold text-slate-800">Wall access</label>
+                  <select
+                    id="rp-access"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    {
+                      REPIPE_ACCESS.map((a) => (
+                        <option value={a.key} selected={a.key === "average"}>
+                          {a.label} (×{a.factor})
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    The biggest single lever. Walk the house before choosing.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="rp-bathrooms" class="text-sm font-semibold text-slate-800">Bathrooms</label>
+                  <input
+                    id="rp-bathrooms"
+                    type="number"
+                    min="0"
+                    max="12"
+                    value="2"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  />
+                  <p class="mt-1.5 text-xs text-slate-500">Each one past two adds a branch group.</p>
+                </div>
+
+                <div>
+                  <label for="rp-region" class="text-sm font-semibold text-slate-800">Region</label>
+                  <select
+                    id="rp-region"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  >
+                    {
+                      REGION_MULTIPLIERS.map((r) => (
+                        <option value={r.key} selected={r.key === "average"}>
+                          {r.label} (×{r.factor})
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label for="rp-permit" class="text-sm font-semibold text-slate-800">Permit</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="rp-permit"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      value="450"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="rp-drywall" class="text-sm font-semibold text-slate-800">Drywall repair</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="text-sm text-slate-500 shrink-0">$</span>
+                    <input
+                      id="rp-drywall"
+                      type="number"
+                      min="0"
+                      max="50000"
+                      value="1500"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    />
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Set to zero if you quote pipe only.</p>
+                </div>
+              </div>
+
+              <button
+                id="rp-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div
+              class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6"
+            >
+              <p class="text-sm font-medium text-slate-600">Estimated installed cost</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="rp-total" class="text-5xl font-extrabold tracking-tight text-indigo-600">
+                  {usd(defaults.total)}
+                </span>
+              </div>
+              <p id="rp-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Wall access alone moves this job between {usd(easy.total)} and {usd(difficult.total)} — a
+                {" "}{usd(difficult.total - easy.total)} spread on the same house.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Likely range</p>
+                  <p id="rp-band" class="mt-1 text-lg font-bold text-slate-900">
+                    {usd(defaults.low)} – {usd(defaults.high)}
+                  </p>
+                </div>
+                <div class="rounded-xl border border-indigo-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Per square foot</p>
+                  <p id="rp-per-sqft" class="mt-1 text-lg font-bold text-slate-900">
+                    {usd2(defaults.perSqFt)}/ft²
+                  </p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-indigo-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Base pipe and labour</span><span id="rp-bd-base" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Access factor</span><span id="rp-bd-access" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Storey factor</span><span id="rp-bd-storeys" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Extras</span><span id="rp-bd-extras" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>After region</span><span id="rp-bd-region" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate on 2026 US national-average pricing, not a quote. Slab work, asbestos or lead
+                abatement, fixture replacement and painting are not included. Walk the house before committing
+                to a fixed price.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            How the estimate is built
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            A rate per square foot, then the multipliers that describe how hard the house is to work in.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-indigo-300"># Step 1 — Base rate by material</div>
+            <div>
+              base&nbsp;=&nbsp;ft² × rate&nbsp;&nbsp;·&nbsp;&nbsp;PEX&nbsp;<span class="text-amber-300">$5</span
+              >&nbsp;·&nbsp;CPVC&nbsp;<span class="text-amber-300">$6</span>&nbsp;·&nbsp;copper&nbsp;<span
+                class="text-amber-300">$9</span
+              >
+            </div>
+            <div class="mt-4 text-indigo-300"># Step 2 — Access multiplier</div>
+            <div>
+              easy&nbsp;<span class="text-amber-300">×0.8</span>&nbsp;·&nbsp;average&nbsp;<span
+                class="text-amber-300">×1.0</span
+              >&nbsp;·&nbsp;difficult&nbsp;<span class="text-amber-300">×1.6</span>
+            </div>
+            <div class="mt-4 text-indigo-300"># Step 3 — Storeys and bathrooms</div>
+            <div>+<span class="text-amber-300">15%</span> per storey above one</div>
+            <div>+<span class="text-amber-300">$750</span> per bathroom above two</div>
+            <div class="mt-4 text-indigo-300"># Step 4 — Fixed lines and region</div>
+            <div>total&nbsp;=&nbsp;(subtotal + permit + drywall) × region multiplier</div>
+            <div>band&nbsp;=&nbsp;total ± <span class="text-amber-300">15%</span></div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Access is a 2× spread</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                0.8 to 1.6 is a doubling, and it applies to the labour-heavy part of the job. On this house it
+                is worth {usd(difficult.total - easy.total)} — more than the whole permit and drywall
+                allowance combined.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Square feet is a proxy</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                What actually drives cost is pipe runs and fixture groups, and floor area correlates with both.
+                A long single-storey ranch costs more than a compact two-up two-down of the same area —
+                adjust the access factor if the layout is unusually spread out.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Drywall is the argument</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Patch, tape, texture and paint are four separate scopes and different contractors include
+                different subsets. Whatever you include, spell it out — this is where repipe quotes go wrong
+                with clients far more often than the pipework does.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What is not in here</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Slab penetration, asbestos or lead abatement, fixture replacement, and painting. Any one of
+                them can exceed the pipework, and none can be estimated from floor area.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, the same house in copper behind plaster, and the case where a repipe is not worth it.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+              >
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">1,800 ft² ranch, PEX, average access</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              base = 1,800 × $5 = {usd(defaults.base)}<br />
+              access ×1.0, single storey ×1.0, 2 bathrooms → no extras<br />
+              + $450 permit + $1,500 drywall<br />
+              total = <span class="font-bold text-indigo-700">{usd(defaults.total)}</span> ={" "}
+              {usd2(defaults.perSqFt)}/ft²<br />
+              band {usd(defaults.low)} – {usd(defaults.high)}
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> {usd(defaults.total)}. This is the
+              straightforward case — accessible walls, one floor, common material.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+              >
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same house in copper, behind plaster</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              base = 1,800 × $9 = $16,200<br />
+              difficult access ×1.6 = $25,920<br />
+              + $450 + $1,500 = <span class="font-bold text-indigo-700">
+                {usd(repipeCost({ ...base, materialKey: "copper", accessKey: "difficult" }).total)}
+              </span><br />
+              versus {usd(defaults.total)} for the PEX easy case — over 2.5×
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the two choices compound. Copper alone
+              adds {usd(copper.total - defaults.total)}; difficult access alone adds{" "}
+              {usd(difficult.total - defaults.total)}; together they more than double the job. This is why
+              "how much to repipe a house" has no single answer.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold"
+              >
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">When a repipe is not the answer</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              One pinhole leak in an otherwise sound 15-year-old copper system, in an accessible basement.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              repair: 2 h + fittings ≈ <span class="font-bold text-indigo-700">$300</span><br />
+              repipe: <span class="font-bold text-indigo-700">{usd(easy.total)}</span> even at easy access<br />
+              → repair is 3% of the repipe
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> repair it. A repipe earns its place
+              when leaks are <em>recurring</em>, when the material is polybutylene or scaled galvanized, or
+              when access is about to be opened up anyway. One leak in sound copper is a leak, not a system
+              failure — and 15-year-old copper often has decades left.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            What wall access is worth
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The default 1,800 ft² PEX job with only the access factor changed. Computed from the same code the
+            calculator runs.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Access</th>
+                  <th class="py-3 px-5 font-semibold">Factor</th>
+                  <th class="py-3 px-5 font-semibold">Total</th>
+                  <th class="py-3 px-5 font-semibold">Per ft²</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  accessTable.map((row, index) => (
+                    <tr class={index === accessTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">×{row.factor}</td>
+                      <td class="py-3 px-5">{usd(row.total)}</td>
+                      <td class="py-3 px-5">{usd2(row.perSqFt)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            What the material is worth
+          </h2>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Material</th>
+                  <th class="py-3 px-5 font-semibold">Rate</th>
+                  <th class="py-3 px-5 font-semibold">Total</th>
+                  <th class="py-3 px-5 font-semibold">Per ft²</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  materialTable.map((row, index) => (
+                    <tr class={index === materialTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.label}</td>
+                      <td class="py-3 px-5">${row.rate}/ft²</td>
+                      <td class="py-3 px-5">{usd(row.total)}</td>
+                      <td class="py-3 px-5">{usd2(row.perSqFt)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">Cost by house size</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Average access, single storey, two bathrooms, with the permit and drywall allowance included —
+            which is why the per-square-foot figure falls as the house gets bigger.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Floor area</th>
+                  <th class="py-3 px-5 font-semibold">PEX</th>
+                  <th class="py-3 px-5 font-semibold">PEX per ft²</th>
+                  <th class="py-3 px-5 font-semibold">Copper</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  areaTable.map((row, index) => (
+                    <tr class={index === areaTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.sf.toLocaleString("en-US")} ft²</td>
+                      <td class="py-3 px-5">{usd(row.pex)}</td>
+                      <td class="py-3 px-5">{usd2(row.pexPer)}</td>
+                      <td class="py-3 px-5">{usd(row.cu)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: these are <strong>market assumptions, not code</strong> — 2026 US
+            national-average retail pricing with a ±15% band and the same 0.85/1.00/1.25/1.50 regional ladder
+            the electrical cost calculators use. Pipe materials must comply with <a
+              class="underline hover:text-indigo-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > Chapter 6 and the relevant <a
+              class="underline hover:text-indigo-600"
+              href="https://www.astm.org/"
+              target="_blank"
+              rel="noopener">ASTM</a
+            > standard; some jurisdictions restrict PEX in specific applications. Replace these rates with your
+            own from recent jobs before quoting.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="indigo"
+        subtitle="Common questions about repipe cost, PEX versus copper, and what drives the price."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingRepipeCostCalculator } from "@/scripts/calculators/plumbing-repipe-cost-calculator";
+    initPlumbingRepipeCostCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

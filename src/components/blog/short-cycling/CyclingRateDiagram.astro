@@ -1,0 +1,85 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { drawdownFraction, PRECHARGE_BELOW_CUTIN_PSI, fmt } from "@/lib/plumbing";
+
+/**
+ * Starts per hour against pre-charge. This is the figure that turns "it cycles
+ * a lot" into a number, and it shows that the damage is not linear — the last
+ * few psi of over-charge multiply the start rate.
+ */
+const SHELL = 44;
+const CUT_IN = 30;
+const CUT_OUT = 50;
+const PUMP_GPM = 10;
+const DRAW_GPM = 5;
+const CORRECT = CUT_IN - PRECHARGE_BELOW_CUTIN_PSI;
+
+const rows = [20, 28, 35, 40, 45, 48].map((precharge) => {
+  const fraction = drawdownFraction(CUT_IN, CUT_OUT, precharge);
+  const drawdown = SHELL * fraction;
+  const runMin = drawdown / PUMP_GPM;
+  /* While the pump runs it also supplies the draw, so the tank fills at the
+     difference — the classic cycle-time treatment. */
+  const fillMin = drawdown / (PUMP_GPM - DRAW_GPM);
+  const emptyMin = drawdown / DRAW_GPM;
+  const cycleMin = fillMin + emptyMin;
+  return {
+    precharge,
+    drawdown,
+    runMin,
+    startsPerHour: cycleMin > 0 ? 60 / cycleMin : Infinity,
+    correct: precharge === CORRECT,
+    overCharged: precharge >= CUT_IN,
+  };
+});
+
+const maxStarts = Math.max(...rows.map((r) => r.startsPerHour));
+const good = rows.find((r) => r.correct)!;
+const worst = rows[rows.length - 1];
+
+const BAR_X = 216;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" fill="none" aria-hidden="true">
+  <title>Pump starts per hour against pre-charge pressure</title>
+  <desc>
+    The same tank and pump at six pre-charge pressures, drawing five gallons a minute. Over-charging the tank
+    multiplies the number of pump starts without anything having failed.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="272" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Starts per hour, and nothing is broken in any row</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${SHELL} gal shell, ${CUT_IN}/${CUT_OUT} switch, ${PUMP_GPM} gpm pump, a steady ${DRAW_GPM} gpm draw. Only the pre-charge changes.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 29;
+    const w = Math.max(3, (row.startsPerHour / maxStarts) * BAR_MAX);
+    const tone = row.correct ? C.primary : row.overCharged ? C.red : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={row.correct ? 800 : 600}>
+          {`${row.precharge} psi pre-charge`}
+        </text>
+        <text x={204} y={y + 16} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9">
+          {`${fmt(row.drawdown, 1)} gal`}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="19" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight={row.correct || row.overCharged ? 800 : 600}>
+          {`${fmt(row.startsPerHour, 1)} starts per hour`}
+        </text>
+        {row.correct && (
+          <text x={BAR_X + 8} y={y + 17} fill={C.white} font-family={FONT} font-size="9" font-weight="800">correct</text>
+        )}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="252" width="672" height="24" rx="6" fill={C.redLight} stroke={C.red} stroke-width="1.4" />
+  <text x="36" y="268" fill={C.red} font-family={FONT} font-size="10" font-weight="700">
+    {`Twenty psi of surplus air takes the pump from ${fmt(good.startsPerHour, 1)} starts an hour to ${fmt(worst.startsPerHour, 1)} — ${fmt(worst.startsPerHour / good.startsPerHour, 1)}x the wear, for free.`}
+  </text>
+</svg>

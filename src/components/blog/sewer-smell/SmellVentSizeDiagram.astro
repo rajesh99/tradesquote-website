@@ -1,0 +1,94 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  ventSize,
+  sizeLabel,
+  fmt,
+  MIN_VENT_SIZE,
+  VENT_LENGTH_UPSIZE_FEET,
+} from "@/lib/plumbing";
+
+/**
+ * If the smell traces back to venting, this is the vent that should have been
+ * there. Half the drain size, floored at 1-1/4 inch, upsized once the developed
+ * length passes 40 feet.
+ *
+ * Computed with ventSize — the same function behind the vent size calculator.
+ */
+const DRAINS = [1.5, 2, 3, 4];
+const SHORT_FT = 20;
+const LONG_FT = 60;
+
+const rows = DRAINS.map((drain) => {
+  const short = ventSize(drain, SHORT_FT);
+  const long = ventSize(drain, LONG_FT);
+  return {
+    drain,
+    label: sizeLabel(drain),
+    halfDrain: short.halfDrain,
+    shortSize: short.size,
+    longSize: long.size,
+    flooredByMinimum: short.size > short.halfDrain,
+  };
+});
+
+const maxSize = Math.max(...rows.map((r) => r.longSize));
+const BAR_X = 210;
+const BAR_MAX = 300;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 104 + i * 34,
+  shortW: Math.max(4, (r.shortSize / maxSize) * BAR_MAX),
+  longW: Math.max(4, (r.longSize / maxSize) * BAR_MAX),
+  note: r.flooredByMinimum ? "floor governs" : "halving governs",
+  noteColour: r.flooredByMinimum ? C.red : C.muted,
+}));
+
+const floored = rows.filter((r) => r.flooredByMinimum);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Required vent size for each drain size at short and long developed lengths</title>
+  <desc>
+    A vent is half the drain size with a one-and-a-quarter inch floor, upsized one step once the developed length
+    passes forty feet. The floor only binds on drains of two inches and below.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">If it is the venting, this is the vent that should be there</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Half the drain size, floored at ${sizeLabel(MIN_VENT_SIZE)}, then one size up once developed length passes ${fmt(VENT_LENGTH_UPSIZE_FEET, 0)} ft.`}
+  </text>
+
+  <g font-family={FONT} font-size="9" font-weight="700">
+    <rect x="416" y="72" width="9" height="9" rx="2" fill={C.primary} opacity="0.75" />
+    <text x="430" y="80" fill={C.muted}>{`${fmt(SHORT_FT, 0)} ft developed`}</text>
+    <rect x="546" y="72" width="9" height="9" rx="2" fill={C.blue} opacity="0.75" />
+    <text x="560" y="80" fill={C.muted}>{`${fmt(LONG_FT, 0)} ft developed`}</text>
+  </g>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">DRAIN SERVED</text>
+  <text x={BAR_X + BAR_MAX + 10} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">VENT SIZE</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="82" y={row.y + 13} fill={row.noteColour} font-family={FONT} font-size="8" font-weight="600">
+        {`half = ${sizeLabel(row.halfDrain)} · ${row.note}`}
+      </text>
+      <rect x={BAR_X} y={row.y} width={row.shortW} height="10" rx="2" fill={C.primary} opacity="0.7" />
+      <rect x={BAR_X} y={row.y + 12} width={row.longW} height="10" rx="2" fill={C.blue} opacity="0.7" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+        {`${sizeLabel(row.shortSize)} → ${sizeLabel(row.longSize)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="266" fill={C.muted} font-family={FONT} font-size="10">
+    {`The ${sizeLabel(MIN_VENT_SIZE)} minimum only binds at ${floored.map((r) => r.label).join(" and ")} — at 3 inches and above the halving already exceeds it.`}
+  </text>
+  <text x="24" y="282" fill={C.muted} font-family={FONT} font-size="9">
+    Developed length is measured to the outside air, and every size steps up once it passes the threshold.
+  </text>
+</svg>

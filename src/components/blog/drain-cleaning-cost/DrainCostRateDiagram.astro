@@ -1,0 +1,104 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { labourRate, fmt, usd, usd2 } from "@/lib/plumbing";
+
+/**
+ * Why an hour costs what it costs. The wage is the smallest part of it, and
+ * utilisation is the multiplier nobody outside the trade knows about — you can
+ * only invoice about three quarters of the hours you pay for.
+ *
+ * Base copied from plumbing-labor-rate-calculator/index.astro.
+ */
+const BASE = {
+  wage: 38,
+  burdenPercent: 32,
+  overheadPerTech: 11000,
+  billableHours: 1560,
+  marginPercent: 40,
+};
+
+const r = labourRate(BASE);
+
+const STEPS = [
+  {
+    label: "Technician wage",
+    detail: `${usd2(BASE.wage)} an hour — what lands on the payslip`,
+    value: BASE.wage,
+    colour: C.muted,
+  },
+  {
+    label: "Plus payroll burden",
+    detail: `${fmt(BASE.burdenPercent, 0)}% — taxes, workers' comp, insurance, paid leave`,
+    value: BASE.wage * (1 + BASE.burdenPercent / 100),
+    colour: C.blue,
+  },
+  {
+    label: "Plus overhead per tech",
+    detail: `${usd(BASE.overheadPerTech)} a year — van, licensing, software, office`,
+    value: r.loadedCost,
+    colour: C.orange,
+  },
+  {
+    label: "Divided by billable hours",
+    detail: `${fmt(BASE.billableHours, 0)} of 2,080 paid hours — ${fmt(r.utilisation, 0)}% utilisation`,
+    value: r.loadedCost,
+    colour: C.orange,
+    isPivot: true,
+  },
+  {
+    label: "Plus margin",
+    detail: `${fmt(BASE.marginPercent, 0)}% margin, so divide by ${fmt(1 - BASE.marginPercent / 100, 2)}`,
+    value: r.billRate,
+    colour: C.primary,
+  },
+];
+
+const maxValue = r.billRate;
+const BAR_X = 296;
+const BAR_MAX = 230;
+
+const rows = STEPS.map((s, i) => ({
+  ...s,
+  y: 92 + i * 30,
+  w: Math.max(3, (s.value / maxValue) * BAR_MAX),
+}));
+
+const nonBillableShare = 100 - r.utilisation;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>How a thirty-eight dollar wage becomes a hundred and twenty-three dollar bill rate</title>
+  <desc>
+    Payroll burden, overhead per technician and the fact that only about three quarters of paid hours can be
+    invoiced take a 38 dollar wage to a 123.22 bill rate — 3.24 times the wage.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Why the hour costs what it costs</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`The labour rate calculator's defaults. Each row is the running hourly figure — the wage is the smallest part of the answer.`}
+  </text>
+
+  <text x="28" y="84" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">STEP</text>
+  <text x={BAR_X + BAR_MAX + 10} y="84" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">RUNNING RATE</text>
+
+  {rows.map((row) => (
+    <g>
+      <text x="28" y={row.y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="28" y={row.y + 23} fill={C.muted} font-family={FONT} font-size="8">{row.detail}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="15" rx="4" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="15" rx="4" fill={row.colour} opacity="0.72" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 12} fill={row.colour} font-family={FONT} font-size="10" font-weight="700">
+        {usd2(row.value)}
+      </text>
+    </g>
+  ))}
+
+  <line x1="24" y1="248" x2="696" y2="248" stroke={C.border} stroke-width="1" />
+  <text x="28" y="266" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {`${usd2(r.billRate)} an hour is ${fmt(r.multiple, 2)}x the wage`}
+  </text>
+  <text x="248" y="266" fill={C.muted} font-family={FONT} font-size="10">
+    {`— and ${fmt(nonBillableShare, 0)}% of paid hours are never invoiced, so the rest carry them.`}
+  </text>
+</svg>

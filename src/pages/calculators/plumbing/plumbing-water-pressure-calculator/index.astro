@@ -1,0 +1,663 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  FEET_HEAD_PER_PSI,
+  PRV_THRESHOLD_PSI,
+  PSI_PER_FOOT_HEAD,
+  fmt,
+  headToPsi,
+  psiToHead,
+} from "@/lib/plumbing";
+
+const title = "Water Pressure Calculator — PSI, Head & PRV | TradesQuote";
+const description =
+  "Free water pressure calculator. Convert psi to feet of head and back, subtract the elevation loss to the highest fixture, and check whether IPC 604.8 requires a pressure-reducing valve above 80 psi.";
+
+const pageUrl = "https://www.tradesquote.ai/calculators/plumbing/plumbing-water-pressure-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Water Pressure Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Water Pressure Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online water pressure calculator that converts between psi and feet of head, applies the elevation loss to the highest fixture, and flags the IPC 604.8 pressure-reducing valve requirement above 80 psi.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much pressure do I lose going up a storey?",
+    answer:
+      "<strong>4.33 psi per 10 feet</strong>, and nothing else affects it. Elevation is the one loss in a plumbing system that is completely independent of flow, pipe size, material and fittings — a foot of height costs 0.4331 psi whether you are drawing 2 gpm or 200. That is why the top-floor fixture is always the worst case in a design.",
+  },
+  {
+    question: "How do I convert psi to feet of head?",
+    answer:
+      "Multiply psi by <strong>2.309</strong> to get feet, or multiply feet by <strong>0.4331</strong> to get psi. The number comes straight from the density of water: 62.37 lb per cubic foot divided by 144 square inches per square foot. So 65 psi of street pressure is <strong>150.1 feet</strong> of water column — the height a column of water would stand at that pressure.",
+  },
+  {
+    question: "When is a pressure-reducing valve required?",
+    answer:
+      "IPC 604.8 requires an approved pressure-reducing valve wherever the static supply pressure exceeds <strong>80 psi</strong>, reducing it to 80 psi or less at the fixtures. The reason is not comfort: high static pressure stresses supply lines, valve seats and appliance inlets, and it is a common cause of washing-machine hose failures and slab-leak damage.",
+  },
+  {
+    question: "What is a good water pressure for a house?",
+    answer:
+      "Between about <strong>45 and 60 psi</strong> static is comfortable and easy on the fittings. Below 40 psi multi-fixture use gets noticeably weak, especially upstairs. Above 80 psi a PRV is mandatory. Individual fixtures typically want 8 to 15 psi at the inlet to work properly, with a flushometer valve wanting closer to 25.",
+  },
+  {
+    question: "Why is my upstairs shower weak but the downstairs one is fine?",
+    answer:
+      "Two effects stack. The upstairs fixture loses the elevation — about 4.33 psi per storey — and it sits further along the pipe, so it eats more friction as well. A 65 psi supply reaching a third-storey fixture is down to <strong>52.01 psi</strong> before any pipe loss is counted. If the drop is dramatic rather than gradual, suspect a partly closed valve, a clogged aerator, or old galvanized pipe scaling internally.",
+  },
+  {
+    question: "Does a taller building need a booster pump?",
+    answer:
+      "Above roughly six to eight storeys, usually yes. At 4.33 psi per 10 feet, an 80-foot lift alone consumes <strong>34.6 psi</strong> — over half a typical municipal supply — before the fixture requirement and friction are even considered. Booster pumps and pressure zones are how tall buildings get around it.",
+  },
+  {
+    question: "Is static pressure the same as working pressure?",
+    answer:
+      "No, and mixing them up is a classic diagnostic error. <strong>Static</strong> is measured with nothing running; <strong>working</strong> (or residual) is measured with fixtures open, and it is always lower because friction only exists when water moves. A system can show a healthy 70 psi static and collapse to 25 psi working if the piping is undersized or scaled.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Pressure checked? Quote the whole job in seconds.";
+const ctaDescription =
+  "A PRV, a booster, or a repipe — whichever the pressure calls for, it needs a price. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Spend the leftover pressure on a pipe size.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-friction-loss-calculator",
+    title: "Pipe Friction Loss Calculator",
+    description: "Work out the friction figure to enter here.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-pump-head-calculator",
+    title: "Pump Head Calculator",
+    description: "When the pressure has to be made rather than found.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator",
+    title: "Water Supply Fixture Unit Calculator",
+    description: "Peak demand, the other half of supply design.",
+  },
+];
+
+/** Both tables computed from the lib. */
+const storeyTable = [1, 2, 3, 4, 5, 6, 8, 10].map((storey) => {
+  const ft = storey * 10;
+  return { storey, ft, loss: headToPsi(ft), left: 65 - headToPsi(ft) };
+});
+
+const conversionTable = [20, 30, 40, 50, 60, 65, 80, 100].map((psi) => ({
+  psi,
+  head: psiToHead(psi),
+  prv: psi > PRV_THRESHOLD_PSI,
+}));
+
+const styles = plumbingAccentStyles.amber;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Water Pressure Calculator — PSI, Head & PRV" />
+    <meta
+      property="og:description"
+      content="Convert psi and feet of head, subtract the lift to the highest fixture, and check the IPC 604.8 pressure-reducing valve threshold. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Water Pressure Calculator — PSI, Head & PRV" />
+    <meta
+      name="twitter:description"
+      content="psi to head, elevation loss, and the 80 psi PRV threshold. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Water Pressure Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3v3l2.5 2.5" />
+              </svg>
+              Plumbing Tools · IPC 604.8 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Water Pressure Calculator <span class="text-amber-600">— PSI, Head &amp; PRV</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Pressure and height are the same thing measured two ways: <strong>one psi is 2.309 feet</strong>
+              of water column, and one foot of lift costs <strong>0.4331 psi</strong>. That single conversion
+              explains why the top-floor fixture is always the weak one, and it is the first thing to check
+              before blaming the pipe. This also flags the 80 psi threshold where IPC 604.8 makes a
+              pressure-reducing valve mandatory.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3v3l2.5 2.5"></path>
+            </svg>
+            Check your pressure
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label for="wp-static" class="text-sm font-semibold text-slate-800">
+                    Static supply pressure
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="wp-static"
+                      type="number"
+                      min="0"
+                      max="200"
+                      value="65"
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">psi</span>
+                  </div>
+                </div>
+                <input
+                  id="wp-static-range"
+                  type="range"
+                  min="10"
+                  max="150"
+                  step="1"
+                  value="65"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-amber-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>10</span><span>150 psi</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Measured at a hose bibb with nothing else running.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="wp-rise" class="text-sm font-semibold text-slate-800">
+                    Height to the fixture
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="wp-rise"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="25"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">ft</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">Above the supply, about 10 ft per storey.</p>
+                </div>
+
+                <div>
+                  <label for="wp-friction" class="text-sm font-semibold text-slate-800">
+                    Friction loss (optional)
+                  </label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="wp-friction"
+                      type="number"
+                      min="0"
+                      max="200"
+                      step="0.1"
+                      value="0"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">psi</span>
+                  </div>
+                  <p class="mt-1.5 text-xs text-slate-500">
+                    From the friction loss calculator, plus meter and softener.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="wp-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-amber-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-amber-100 bg-amber-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Pressure at the fixture</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="wp-at-fixture" class="text-5xl font-extrabold tracking-tight text-amber-600">
+                  54.17 psi
+                </span>
+              </div>
+              <p id="wp-verdict" class="mt-1 text-sm font-semibold text-slate-700">
+                54.2 psi arrives at the fixture — comfortable for ordinary fixtures, and no pressure-reducing
+                valve is required.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Supply as head</p>
+                  <p id="wp-head" class="mt-1 text-2xl font-bold text-slate-900">150.1 ft</p>
+                </div>
+                <div class="rounded-xl border border-amber-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Elevation cost</p>
+                  <p id="wp-elevation" class="mt-1 text-2xl font-bold text-slate-900">10.83 psi</p>
+                </div>
+              </div>
+
+              <div id="wp-prv-notice" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Pressure-reducing valve required</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  IPC 604.8 requires an approved PRV wherever static pressure exceeds 80 psi, reduced to 80 psi
+                  or less at the fixtures. Note a PRV creates a closed system, which then needs thermal
+                  expansion control at the water heater under IPC 607.3.
+                </p>
+              </div>
+
+              <div id="wp-low-notice" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">Marginal at the fixture</p>
+                <p class="mt-1 text-sm text-amber-800">
+                  Most fixtures want 8–15 psi at the inlet and a flushometer valve wants about 25. Below that
+                  the fixture works poorly when anything else is running.
+                </p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-amber-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Supply as head</span><span id="wp-bd-static-head" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Elevation</span><span id="wp-bd-elevation-psi" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Friction</span><span id="wp-bd-friction" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>At the fixture, as head</span><span id="wp-bd-fixture-head" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Cost of one storey</span><span id="wp-bd-storeys" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. Static pressure varies through the day and season; measure at the worst
+                time, not the best. A licensed plumber and your AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One constant, derived from the weight of water, does almost all the work here.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-amber-300"># The conversion, both directions</div>
+            <div>psi&nbsp;=&nbsp;<span class="text-amber-300">{PSI_PER_FOOT_HEAD}</span> × feet of head</div>
+            <div>feet&nbsp;=&nbsp;<span class="text-amber-300">{fmt(FEET_HEAD_PER_PSI, 3)}</span> × psi</div>
+            <div class="mt-4 text-slate-400"># Where 0.4331 comes from</div>
+            <div>water at 60 °F weighs <span class="text-amber-300">62.37</span> lb/ft³</div>
+            <div>62.37 ÷ <span class="text-amber-300">144</span> in²/ft²&nbsp;=&nbsp;0.4331 psi per foot</div>
+            <div class="mt-4 text-amber-300"># What reaches the fixture</div>
+            <div>at fixture&nbsp;=&nbsp;static&nbsp;−&nbsp;0.4331 × lift&nbsp;−&nbsp;friction</div>
+            <div class="mt-4 text-amber-300"># The code threshold (IPC 604.8)</div>
+            <div>
+              static &gt; <span class="text-amber-300">{PRV_THRESHOLD_PSI}</span> psi&nbsp;→&nbsp;approved
+              pressure-reducing valve required
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Elevation ignores everything else</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Pipe size, material, fittings and flow rate all change friction. None of them change the
+                elevation cost. 10 feet is 4.33 psi in a 1/2-inch PEX line and in a 4-inch main alike.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Static versus working</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Static is measured with nothing running. Working pressure is always lower, because friction
+                only exists when water moves. A healthy static reading with a poor working reading points
+                straight at undersized or scaled pipe.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">A PRV creates a closed system</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Once a check or reducing valve stops backflow toward the street, heated water has nowhere to
+                expand. IPC 607.3 then requires thermal expansion control — usually an expansion tank at the
+                water heater. Fitting a PRV without one is a common oversight.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why 80 psi is the line</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Not comfort — component life. Sustained high static stresses supply hoses, valve seats,
+                fill valves and appliance inlets, and it turns a small weep into a burst. Most failures blamed
+                on age are really pressure.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          The defaults, a high-pressure street that needs a PRV, and a tall building where the lift eats the
+          supply.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Two-storey house — 65 psi, 25 ft of lift</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              supply as head = 65 × 2.309 = <span class="font-bold text-amber-700">150.1 ft</span><br />
+              elevation = 0.4331 × 25 = 10.83 psi<br />
+              at fixture = 65 − 10.83 = <span class="font-bold text-amber-700">54.17 psi</span><br />
+              65 psi &lt; 80 → no PRV required
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 54.17 psi at the upstairs fixture
+              before any pipe friction. Plenty of margin — the elevation has taken 17% of the supply and the
+              pipe still has its share to spend.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">High-pressure street — 110 psi</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              110 psi static = 254.0 ft of head<br />
+              110 &gt; 80 → <span class="font-bold text-red-600">PRV required (IPC 604.8)</span><br />
+              set to 60 psi: at a 25 ft fixture = 60 − 10.83 = 49.17 psi<br />
+              PRV closes the system → expansion tank required (IPC 607.3)
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the PRV is mandatory and it brings a
+              second requirement with it. Reducing to 60 psi still leaves nearly 50 psi upstairs — you lose
+              nothing useful, and supply hoses and fill valves last far longer.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Eight-storey building — where the pump comes in</h3>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              80 ft of lift = 0.4331 × 80 = <span class="font-bold text-amber-700">34.65 psi</span><br />
+              from 65 psi: 65 − 34.65 = 30.35 psi at the top floor<br />
+              minus 15 psi fixture requirement = 15.35 psi for friction<br />
+              over a long riser that is <span class="font-bold text-red-600">not enough</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> the lift alone has consumed 53% of the
+              supply. This is why tall buildings need booster pumps and pressure zones — and why the
+              break-even is usually around six to eight storeys on a normal municipal supply.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLES ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Pressure lost by storey
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            From a 65 psi supply, 10 feet per storey. Computed from the same constant the calculator uses.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Storey</th>
+                  <th class="py-3 px-5 font-semibold">Height</th>
+                  <th class="py-3 px-5 font-semibold">Pressure lost</th>
+                  <th class="py-3 px-5 font-semibold">Left from 65 psi</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  storeyTable.map((row, index) => (
+                    <tr class={index === storeyTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.storey}</td>
+                      <td class="py-3 px-5">{row.ft} ft</td>
+                      <td class="py-3 px-5">{fmt(row.loss, 2)} psi</td>
+                      <td class="py-3 px-5">
+                        {fmt(row.left, 2)} psi
+                        {row.left < 30 && (
+                          <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            booster territory
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">PSI to feet of head</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            The conversion both trades need, with the IPC 604.8 threshold marked.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Pressure</th>
+                  <th class="py-3 px-5 font-semibold">Feet of head</th>
+                  <th class="py-3 px-5 font-semibold">PRV required?</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  conversionTable.map((row, index) => (
+                    <tr class={index === conversionTable.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.psi} psi</td>
+                      <td class="py-3 px-5">{fmt(row.head, 1)} ft</td>
+                      <td class="py-3 px-5">
+                        {row.prv ? (
+                          <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            Yes — IPC 604.8
+                          </span>
+                        ) : (
+                          "No"
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: <a
+              class="underline hover:text-amber-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">IPC</a
+            > 2021 604.8 (maximum flow and water-hammer arrestors — pressure-reducing valve required above 80
+            psi) and 607.3 (thermal expansion control on a closed system). The psi-to-head constant is derived
+            from the density of water at 60 °F, not taken from a table. Roughly fifteen states use the <a
+              class="underline hover:text-amber-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="amber"
+        subtitle="Common questions about water pressure, head, elevation loss, and pressure-reducing valves."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingWaterPressureCalculator } from "@/scripts/calculators/plumbing-water-pressure-calculator";
+    initPlumbingWaterPressureCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #d97706;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

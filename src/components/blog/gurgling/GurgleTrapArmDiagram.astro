@@ -1,0 +1,66 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { TABLE_909_1, minSlope, totalFall, sizeLabel, fmt } from "@/lib/plumbing";
+
+/**
+ * The single most common cause: a trap arm past its limit. The table is short,
+ * the rule is simple, and the reason for it is geometric — over the maximum
+ * length the arm has fallen far enough that the vent opening sits below the
+ * trap weir and is no longer above the flow line.
+ */
+const rows = TABLE_909_1.map((r) => {
+  const fallAtMax = totalFall(r.slope, r.maxFeet);
+  return { size: r.size, maxFeet: r.maxFeet, slope: r.slope, fallAtMax, diameters: fallAtMax / r.size };
+});
+
+/* The classic teaching is "an arm may not fall more than one pipe diameter".
+   The table implements that EXACTLY for the small sizes and is twice as
+   conservative for the large ones — computed here rather than asserted. */
+const oneDiameter = rows.filter((r) => Math.abs(r.diameters - 1) < 0.01);
+const halfDiameter = rows.filter((r) => Math.abs(r.diameters - 0.5) < 0.01);
+
+const maxFeet = Math.max(...rows.map((r) => r.maxFeet));
+const BAR_X = 148;
+const BAR_MAX = 300;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Maximum trap arm length by size</title>
+  <desc>
+    The trap arm length limits from IPC Table 909.1, with the total fall each maximum represents. The limit is
+    geometric — beyond it the arm has dropped far enough to lose its own vent.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The limit is geometry, not a preference</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Measured from the trap weir to the vent fitting. Past the maximum, the vent opening drops below the flow line.
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 30;
+    const w = Math.max(3, (row.maxFeet / maxFeet) * BAR_MAX);
+    const common = row.size === 2 || row.size === 1.5;
+    const tone = common ? C.primary : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="11.5" font-weight={common ? 800 : 700}>
+          {sizeLabel(row.size)}
+        </text>
+        <text x="88" y={y + 16} fill={C.muted} font-family={FONT} font-size="9">{`${row.slope} in/ft`}</text>
+        <rect x={BAR_X} y={y + 3} width={w} height="19" rx="5" fill={tone} opacity={common ? 0.85 : 0.55} />
+        <text x={BAR_X + w + 10} y={y + 17} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${row.maxFeet} ft maximum`}
+        </text>
+        <text x={BAR_X + w + 100} y={y + 17} fill={C.muted} font-family={FONT} font-size="9.5">
+          {`falls ${fmt(row.fallAtMax, 2)} in — ${fmt(row.diameters, 2)} diameters`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="230" width="672" height="24" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="246" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`The old rule is "never fall more than one diameter". The table is exactly that at ${oneDiameter.map((r) => sizeLabel(r.size)).join(", ")} — and twice as strict at ${halfDiameter.map((r) => sizeLabel(r.size)).join(" and ")}.`}
+  </text>
+</svg>

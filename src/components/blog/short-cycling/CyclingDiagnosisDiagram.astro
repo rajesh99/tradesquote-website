@@ -1,0 +1,74 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { PRECHARGE_BELOW_CUTIN_PSI, fmt } from "@/lib/plumbing";
+
+/**
+ * The diagnostic tree, ordered by cost. Two of the three causes are free to
+ * check and one of those is free to fix, so the order matters more than the
+ * content.
+ */
+const defs = markerDefs("cycle-dx");
+const CUT_IN = 30;
+const CORRECT = CUT_IN - PRECHARGE_BELOW_CUTIN_PSI;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Diagnosing a short-cycling well pump in cost order</title>
+  <desc>
+    Three causes present identically. Two are free to check, one is free to fix, and only the third costs
+    anything — so the order of investigation matters more than the list itself.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Three causes, one symptom, and a strict order to check them</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Drain the system of water pressure first — with pressure on it, the schrader valve reads the water side, not the air.
+  </text>
+
+  <rect x="24" y="70" width="216" height="120" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="40" y="90" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">1 — CHECK THE PRE-CHARGE</text>
+  <text x="40" y="110" fill={C.dark} font-family={FONT} font-size="10">Tyre gauge on the schrader,</text>
+  <text x="40" y="125" fill={C.dark} font-family={FONT} font-size="10">system drained.</text>
+  <text x="40" y="148" fill={C.primary} font-family={FONT} font-size="12" font-weight="800">
+    {`Should read ${CORRECT} psi`}
+  </text>
+  <text x="40" y="166" fill={C.muted} font-family={FONT} font-size="9">
+    {`(${PRECHARGE_BELOW_CUTIN_PSI} psi below a ${CUT_IN} psi cut-in)`}
+  </text>
+  <text x="40" y="181" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">FREE to check. FREE to fix.</text>
+
+  <rect x="252" y="70" width="216" height="120" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="268" y="90" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">2 — IS AIR COMING OUT?</text>
+  <text x="268" y="110" fill={C.dark} font-family={FONT} font-size="10">Press the schrader pin.</text>
+  <text x="268" y="132" fill={C.orange} font-family={FONT} font-size="11" font-weight="800">Air = bladder intact</text>
+  <text x="268" y="150" fill={C.red} font-family={FONT} font-size="11" font-weight="800">Water = bladder failed</text>
+  <text x="268" y="170" fill={C.muted} font-family={FONT} font-size="9">Tap it too — hollow above the</text>
+  <text x="268" y="182" fill={C.muted} font-family={FONT} font-size="9">water line, solid below.</text>
+
+  <rect x="480" y="70" width="216" height="120" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="2" />
+  <text x="496" y="90" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">3 — ONLY THEN, THE REST</text>
+  <text x="496" y="110" fill={C.dark} font-family={FONT} font-size="10">Waterlogged tank → replace</text>
+  <text x="496" y="128" fill={C.dark} font-family={FONT} font-size="10">Undersized shell → add one</text>
+  <text x="496" y="146" fill={C.dark} font-family={FONT} font-size="10">Faulty pressure switch</text>
+  <text x="496" y="164" fill={C.dark} font-family={FONT} font-size="10">Leak downstream keeping</text>
+  <text x="496" y="176" fill={C.dark} font-family={FONT} font-size="10">the system flowing</text>
+
+  <line x1="240" y1="130" x2="248" y2="130" stroke={C.muted} stroke-width="2" marker-end="url(#cycle-dx-arrow-muted)" />
+  <line x1="468" y1="130" x2="476" y2="130" stroke={C.muted} stroke-width="2" marker-end="url(#cycle-dx-arrow-muted)" />
+
+  <rect x="24" y="204" width="672" height="34" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="36" y="220" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+    An over-charged tank and a dead bladder produce exactly the same symptom, and only one of them costs money.
+  </text>
+  <text x="36" y="233" fill={C.dark} font-family={FONT} font-size="9.5">
+    Tanks get replaced every year on the strength of a symptom that twenty seconds with a tyre gauge would have explained.
+  </text>
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">
+    A leak downstream is the one that fools people twice — the pump cycles because water is genuinely leaving, not because the tank is wrong.
+  </text>
+  <text x="24" y="276" fill={C.muted} font-family={FONT} font-size="10">
+    Shut the main valve after the tank. If the cycling stops, the fault is in the house, not at the pump.
+  </text>
+</svg>

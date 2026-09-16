@@ -1,4 +1,5 @@
 import { hvacCalculators } from "@/config/hvacCalculators";
+import { plumbingCalculators } from "@/config/plumbingCalculators";
 
 export type ElectricalCalculatorAccent =
   | "blue"
@@ -892,6 +893,6 @@ export const electricalFaqs = [
   },
   {
     question: "Do you have calculators for other trades?",
-    answer: `Yes — there are ${hvacCalculators.length} free HVAC calculators covering sizing, airflow, diagnostics, efficiency, and cost. Electrical is the second set, and calculators for plumbing, carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.`,
+    answer: `Yes — there are ${hvacCalculators.length} free HVAC calculators covering sizing, airflow, diagnostics, efficiency, and cost, and ${plumbingCalculators.length} free IPC-based plumbing calculators covering supply sizing, drainage, venting, water heating, and pricing. Electrical was the second set; carpentry, painting, and cleaning are planned next, matching the trades TradesQuote supports for AI-powered estimating.`,
   },
 ];

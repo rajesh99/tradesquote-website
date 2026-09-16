@@ -1,0 +1,62 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  repipeCost, REPIPE_MATERIAL_COST,
+} from "@/lib/plumbing";
+/** Material at average access. Copper roughly doubles the pipe line but the
+ * total moves less than that, because labour and repair are shared. */
+const BASE = {
+  squareFeet: 1800,
+  materialKey: "pex",
+  accessKey: "average",
+  storeys: 1,
+  bathrooms: 2,
+  permit: 450,
+  drywallRepair: 1500,
+  regionKey: "average",
+};
+const results = REPIPE_MATERIAL_COST.map((m) => ({
+  material: m,
+  r: repipeCost({ ...BASE, materialKey: m.key }),
+}));
+const maxTotal = Math.max(...results.map((x) => x.r.total));
+
+const rows = results.map(({ material, r }) => ({
+  label: material.label,
+  value: r.total,
+  frac: r.total / maxTotal,
+  display: `$${r.total.toLocaleString("en-US")}  ·  $${(r.total / BASE.squareFeet).toFixed(2)}/ft2  ·  $${material.perSqFt}/ft2 rate`,
+  highlight: material.key === "copper",
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 136;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 218" fill="none" aria-hidden="true">
+  <title>Pipe material on the same 1,800 ft2 house</title>
+  <desc>Average wall access, single storey, two bathrooms, $450 permit and $1,500 of drywall repair</desc>
+
+  <rect x="8" y="8" width="704" height="204" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Pipe material on the same 1,800 ft2 house</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Average wall access, single storey, two bathrooms, $450 permit and $1,500 of drywall repair</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="198" fill={C.muted} font-family={FONT} font-size="10">Copper adds $7,200 over PEX here. Worth it for longevity and resale in some markets; rarely worth it for performance.</text>
+</svg>

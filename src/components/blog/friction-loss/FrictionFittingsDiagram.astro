@@ -1,0 +1,89 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  FITTING_LD,
+  FITTING_LABELS,
+  fittingEquivalentFeet,
+  insideDiameter,
+  frictionLossPsiPer100Ft,
+  HAZEN_WILLIAMS_C,
+  developedLength,
+  sizeLabel,
+  fmt,
+  type FittingKey,
+} from "@/lib/plumbing";
+
+/**
+ * Fittings are not a rounding error. Each one is worth a length of straight
+ * pipe, and a normal residential run has enough of them to add more than the
+ * measured length in some cases — the globe valve alone is worth more than the
+ * whole run.
+ */
+const NOMINAL = 0.75;
+const MATERIAL = "copper-l" as const;
+const id = insideDiameter(MATERIAL, NOMINAL)!;
+const GPM = 10;
+const STRAIGHT_FT = 60;
+
+const SHOWN: FittingKey[] = ["elbow90", "elbow45", "teeRun", "teeBranch", "ballValve", "globeValve"];
+const rows = SHOWN.map((key) => ({
+  key,
+  label: FITTING_LABELS[key],
+  ld: FITTING_LD[key],
+  feet: fittingEquivalentFeet(key, id),
+}));
+
+/* A realistic run: 60 ft of pipe, six elbows, two branch tees and a ball valve. */
+const COUNTS: Partial<Record<FittingKey, number>> = {
+  elbow90: 6,
+  teeBranch: 2,
+  ballValve: 1,
+};
+const developed = developedLength(STRAIGHT_FT, COUNTS, id);
+const fittingFeet = developed - STRAIGHT_FT;
+const lossPer100 = frictionLossPsiPer100Ft(GPM, id, HAZEN_WILLIAMS_C[MATERIAL]);
+
+const maxFeet = Math.max(...rows.map((r) => r.feet));
+const BAR_X = 262;
+const BAR_MAX = 200;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>What each fitting is worth in equivalent straight pipe</title>
+  <desc>
+    Every fitting costs a length of straight pipe. A realistic residential run carries enough of them to add a
+    meaningful fraction of its measured length.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Fittings are pipe you forgot to measure</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Equivalent length on ${sizeLabel(NOMINAL)} type L copper, ${fmt(id, 3)} in bore. Each is L/D × bore ÷ 12.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 28;
+    const w = Math.max(3, (row.feet / maxFeet) * BAR_MAX);
+    const huge = row.key === "globeValve";
+    const tone = huge ? C.red : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x={244} y={y + 15} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9.5">{`L/D ${row.ld}`}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="18" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={tone} font-family={FONT} font-size="10.5" font-weight={huge ? 800 : 600}>
+          {`${fmt(row.feet, 1)} ft of straight pipe`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="250" width="672" height="34" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y="266" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`A real run: ${STRAIGHT_FT} ft measured, six elbows, two branch tees and a ball valve = ${fmt(developed, 1)} ft developed.`}
+  </text>
+  <text x="36" y="279" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`The fittings add ${fmt(fittingFeet, 1)} ft — ${fmt((fittingFeet / STRAIGHT_FT) * 100)}% more pipe, and ${fmt((fittingFeet / 100) * lossPer100, 2)} psi at ${GPM} gpm that a tape measure never sees.`}
+  </text>
+</svg>

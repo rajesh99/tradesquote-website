@@ -1,0 +1,64 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  ventSize, trapArmMaxFeet, sizeLabel,
+} from "@/lib/plumbing";
+/** 906.2 in one table: the vent is at least half the drain diameter and never
+ * below 1-1/4 inch, and the whole run goes up a size past 40 ft developed. */
+const DRAINS = [1.5, 2, 3, 4, 6];
+
+const rows = DRAINS.map((n) => {
+  const short = ventSize(n, 30);
+  const long = ventSize(n, 60);
+  const arm = trapArmMaxFeet(n);
+  return {
+    label: `${sizeLabel(n)} drain`,
+    cells: [
+      sizeLabel(short.size),
+      sizeLabel(long.size),
+      arm === null ? "not tabulated" : `${arm} ft`,
+    ],
+    tone: ["good", long.size > short.size ? "bad" : "good", "neutral"],
+  };
+});
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" fill="none" aria-hidden="true">
+  <title>Vent size from drain size, and the length penalty</title>
+  <desc>IPC 906.2 — half the drain diameter, minimum 1-1/4 in, one size up past 40 ft developed</desc>
+
+  <rect x="8" y="8" width="704" height="266" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Vent size from drain size, and the length penalty</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">IPC 906.2 — half the drain diameter, minimum 1-1/4 in, one size up past 40 ft developed</text>
+
+  <text x="28" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DRAIN SERVED</text>
+  <text x={302} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VENT AT 30 FT</text>
+  <text x={454} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">VENT AT 60 FT</text>
+  <text x={606} y="76" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TRAP ARM CAP</text>
+
+  {rows.map((row, i) => {
+    const y = 86 + i * 30;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+            <rect x={232} y={y} width={140} height="24" rx="6" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} opacity={row.tone[0] === "bad" ? 0.18 : 0.1} />
+            <rect x={232} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} stroke-width={row.tone[0] === "bad" ? 2 : 1.2} />
+            <text x={302} y={y + 16} text-anchor="middle" fill={row.tone[0] === "bad" ? C.red : row.tone[0] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[0] === "bad" ? 800 : 700}>
+              {row.cells[0]}
+            </text>
+            <rect x={384} y={y} width={140} height="24" rx="6" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} opacity={row.tone[1] === "bad" ? 0.18 : 0.1} />
+            <rect x={384} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} stroke-width={row.tone[1] === "bad" ? 2 : 1.2} />
+            <text x={454} y={y + 16} text-anchor="middle" fill={row.tone[1] === "bad" ? C.red : row.tone[1] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[1] === "bad" ? 800 : 700}>
+              {row.cells[1]}
+            </text>
+            <rect x={536} y={y} width={140} height="24" rx="6" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} opacity={row.tone[2] === "bad" ? 0.18 : 0.1} />
+            <rect x={536} y={y} width={140} height="24" rx="6" fill="none" stroke={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} stroke-width={row.tone[2] === "bad" ? 2 : 1.2} />
+            <text x={606} y={y + 16} text-anchor="middle" fill={row.tone[2] === "bad" ? C.red : row.tone[2] === "good" ? C.green : C.orange} font-family={FONT} font-size="10.5" font-weight={row.tone[2] === "bad" ? 800 : 700}>
+              {row.cells[2]}
+            </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="260" fill={C.muted} font-family={FONT} font-size="10">Past 40 ft the whole vent goes up a size, not just the far end. That is a materials decision made at rough-in, not later.</text>
+</svg>

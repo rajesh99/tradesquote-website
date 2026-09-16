@@ -1,0 +1,79 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import {
+  GAL_PER_SQFT_PER_INCH,
+  ROOF_RUNOFF_COEFFICIENTS,
+  COLLECTION_EFFICIENCY,
+  FIRST_FLUSH_PER_SQFT,
+  rainwaterYieldGallons,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * What actually reaches the tank. Three separate losses sit between the rain
+ * that lands and the water you can use, and the roof material is the largest
+ * of them by a wide margin.
+ */
+const defs = markerDefs("rw-yield");
+const AREA = 2000;
+const INCHES = 1;
+
+const gross = AREA * INCHES * GAL_PER_SQFT_PER_INCH;
+
+const rows = ROOF_RUNOFF_COEFFICIENTS.map((c) => ({
+  label: c.label,
+  coefficient: c.coefficient,
+  /* rainwaterYieldGallons returns {gross, firstFlush, net} — take .net. */
+  net: rainwaterYieldGallons({
+    areaSqFt: AREA,
+    inches: INCHES,
+    coefficient: c.coefficient,
+  }).net,
+}));
+
+const maxNet = Math.max(...rows.map((r) => r.net));
+const best = rows.reduce((a, b) => (a.net > b.net ? a : b));
+const worst = rows.reduce((a, b) => (a.net < b.net ? a : b));
+
+const BAR_X = 264;
+const BAR_MAX = 210;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Rainwater yield by roof material</title>
+  <desc>
+    Gross catchment against what each roof material actually delivers to the tank. A green roof gives away most
+    of it; standing-seam metal gives away very little.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The roof material is the biggest single loss</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${fmt(AREA)} sq ft, ${INCHES} inch of rain at ${fmt(GAL_PER_SQFT_PER_INCH, 4)} gal per sq ft per inch — ${fmt(gross)} gallons gross, before any losses.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 74 + i * 30;
+    const w = Math.max(3, (row.net / maxNet) * BAR_MAX);
+    const isBest = row.net === best.net;
+    const isWorst = row.net === worst.net;
+    const tone = isWorst ? C.red : isBest ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+        <text x={252} y={y + 15} text-anchor="end" fill={C.muted} font-family={FONT} font-size="9.5">{fmt(row.coefficient, 2)}</text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="18" rx="5" fill={tone} opacity="0.72" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={tone} font-family={FONT} font-size="10.5" font-weight={isWorst || isBest ? 800 : 600}>
+          {`${fmt(row.net)} gal to the tank`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="258" width="672" height="24" rx="6" fill={C.orangeLight} stroke={C.orange} stroke-width="1.4" />
+  <text x="36" y="274" fill={C.orange} font-family={FONT} font-size="10" font-weight="700">
+    {`${best.label} delivers ${fmt(best.net / worst.net, 1)}x what ${worst.label.toLowerCase()} does. Collection efficiency (${fmt(COLLECTION_EFFICIENCY * 100)}%) and first flush (${FIRST_FLUSH_PER_SQFT} gal/sq ft) come off on top.`}
+  </text>
+</svg>

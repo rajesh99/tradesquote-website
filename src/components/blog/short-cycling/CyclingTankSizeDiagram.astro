@@ -1,0 +1,79 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { pressureTankSizing, minRunMinutes, STANDARD_PRESSURE_TANKS, fmt } from "@/lib/plumbing";
+
+/**
+ * When the pre-charge really is right and the tank really is too small. Sized
+ * from the pump's own minimum run time, which is what the tank exists to
+ * protect — the house's demand never enters it.
+ *
+ * Base copied from plumbing-well-pressure-tank-calculator/index.astro.
+ */
+const BASE = { pumpGpm: 10, cutInPsi: 30, cutOutPsi: 50 };
+
+const rows = [5, 10, 15, 20].map((pumpGpm) => {
+  const r = pressureTankSizing({ ...BASE, pumpGpm });
+  return {
+    pumpGpm,
+    runMinutes: minRunMinutes(pumpGpm),
+    requiredDrawdown: r.requiredDrawdown,
+    requiredTank: r.requiredTank,
+    stockedTank: r.stockedTank,
+    runAtStocked: r.runMinutesAtStocked,
+  };
+});
+
+const ROW_H = 32;
+const TOP = 92;
+const largest = STANDARD_PRESSURE_TANKS[STANDARD_PRESSURE_TANKS.length - 1];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Tank size needed to give a pump its minimum run time</title>
+  <desc>
+    The tank exists to keep the pump running long enough per start. Required shell grows faster than pump output,
+    because a bigger pump also carries a longer minimum run time.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">If the pre-charge is right, the tank may just be small</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${BASE.cutInPsi}/${BASE.cutOutPsi} switch, pre-charge set correctly. The house's demand never enters this calculation.`}
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">PUMP</text>
+  <text x={196} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MIN RUN WANTED</text>
+  <text x={338} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DRAWDOWN NEEDED</text>
+  <text x={490} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SHELL REQUIRED</text>
+  <text x={624} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">STOCKED SIZE</text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const offLadder = row.stockedTank === null;
+    const tone = offLadder ? C.red : C.primary;
+    return (
+      <g>
+        <text x="28" y={y + 17} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{`${row.pumpGpm} gpm`}</text>
+        <text x={196} y={y + 17} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">{`${row.runMinutes} min`}</text>
+        <text x={338} y={y + 17} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="10" font-weight="600">
+          {`${fmt(row.requiredDrawdown, 1)} gal`}
+        </text>
+        <text x={490} y={y + 17} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10">
+          {`${fmt(row.requiredTank, 1)} gal`}
+        </text>
+        <rect x={564} y={y + 1} width={120} height="24" rx="6" fill={tone} opacity="0.12" />
+        <rect x={564} y={y + 1} width={120} height="24" rx="6" fill="none" stroke={tone} stroke-width="1.4" />
+        <text x={624} y={y + 17} text-anchor="middle" fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {offLadder ? "two in parallel" : `${row.stockedTank} gal`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="238" fill={C.muted} font-family={FONT} font-size="10">
+    {`A 20 gpm pump needs ${fmt(rows[3].requiredTank / rows[0].requiredTank, 1)}x the shell of a 5 gpm one — a longer minimum run multiplied by a larger output.`}
+  </text>
+  <text x="24" y="254" fill={C.muted} font-family={FONT} font-size="10">
+    {`Past the ${largest} gallon shell the answer is two tanks in parallel, which behaves as one larger tank and is ordinary practice.`}
+  </text>
+</svg>

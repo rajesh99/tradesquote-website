@@ -1,0 +1,124 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { trapArmMaxFeet, sizeLabel, fmt } from "@/lib/plumbing";
+
+/**
+ * Where to actually look, in order. The ordering is by how often it turns out
+ * to be the answer against how much work it is to check — the cheap, likely
+ * ones first, the slab and the stack last.
+ *
+ * The trap-arm figures come straight from TABLE_909_1 via trapArmMaxFeet.
+ */
+const ARM_SIZES = [1.25, 1.5, 2];
+const arms = ARM_SIZES.map((n) => ({
+  label: sizeLabel(n),
+  maxFeet: trapArmMaxFeet(n),
+}));
+const lavArm = arms.find((a) => a.label === '1-1/4"')!;
+
+const CAUSES = [
+  {
+    rank: "1",
+    where: "An unused fixture",
+    check: "Run every tap and flush every WC in the building",
+    why: "A dry trap is the single most common cause and costs nothing to rule out",
+    tone: "green" as const,
+  },
+  {
+    rank: "2",
+    where: "Floor drain or shower drain",
+    check: "Pour a couple of quarts of water down it",
+    why: "Floor drains have no fixture above them, so nothing ever refills the seal",
+    tone: "green" as const,
+  },
+  {
+    rank: "3",
+    where: "WC wax ring or closet flange",
+    check: "Rock the pan — any movement means a failed seal",
+    why: "A leaking flange vents sewer gas around the base rather than into the drain",
+    tone: "orange" as const,
+  },
+  {
+    rank: "4",
+    where: "A cleanout with no cap",
+    check: "Find every cleanout, indoors and out, and check the plug",
+    why: "An open cleanout is a direct, unsealed opening into the drainage system",
+    tone: "orange" as const,
+  },
+  {
+    rank: "5",
+    where: "A failed air admittance valve",
+    check: "Sniff at the AAV under the sink while another fixture drains",
+    why: "AAVs are mechanical and fail open. They are also often buried in a cabinet",
+    tone: "blue" as const,
+  },
+  {
+    rank: "6",
+    where: "Trap arm too long, or unvented",
+    check: `Measure trap to vent — a ${lavArm.label} arm may not exceed ${fmt(lavArm.maxFeet ?? 0, 0)} ft`,
+    why: "An over-long arm siphons its own seal out every time the fixture drains",
+    tone: "blue" as const,
+  },
+  {
+    rank: "7",
+    where: "Blocked or frozen vent terminal",
+    check: "Look at the roof: nest, leaves, snow, or a capped-off stack",
+    why: "The whole system loses its air path, so seals get siphoned and blown",
+    tone: "red" as const,
+  },
+  {
+    rank: "8",
+    where: "A broken pipe in a wall or slab",
+    check: "Camera and a smoke test — this is the professional end",
+    why: "Real but last. Everything above is cheaper to eliminate first",
+    tone: "red" as const,
+  },
+];
+
+const TONES = {
+  green: { colour: C.green, label: "free to check" },
+  orange: { colour: C.orange, label: "minutes" },
+  blue: { colour: C.blue, label: "some access" },
+  red: { colour: C.red, label: "call someone" },
+};
+
+const rows = CAUSES.map((c, i) => ({
+  ...c,
+  y: 92 + i * 27,
+  colour: TONES[c.tone].colour,
+  effort: TONES[c.tone].label,
+}));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 336" fill="none" aria-hidden="true">
+  <title>Where to look for a sewer smell, in order of likelihood against effort</title>
+  <desc>
+    A dry trap in an unused fixture is the most common cause and free to rule out. A broken pipe in a wall or
+    slab is real but last, because everything above it is cheaper to eliminate.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="320" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Work down this list, not up it</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Ordered by how often it turns out to be the answer against how much work it is to check. The first two cost nothing.
+  </text>
+
+  <text x="28" y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHERE</text>
+  <text x="216" y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOW TO CHECK</text>
+  <text x="628" y="82" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">EFFORT</text>
+
+  {rows.map((row) => (
+    <g>
+      <circle cx="34" cy={row.y + 8} r="9" fill={row.colour} opacity="0.16" />
+      <text x="34" y={row.y + 12} text-anchor="middle" fill={row.colour} font-family={FONT} font-size="9" font-weight="800">{row.rank}</text>
+      <text x="50" y={row.y + 8} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.where}</text>
+      <text x="50" y={row.y + 19} fill={C.muted} font-family={FONT} font-size="8">{row.why}</text>
+      <text x="216" y={row.y + 8} fill={row.colour} font-family={FONT} font-size="9" font-weight="600">{row.check}</text>
+      <text x="628" y={row.y + 8} fill={row.colour} font-family={FONT} font-size="8" font-weight="700">{row.effort}</text>
+    </g>
+  ))}
+
+  <text x="24" y="322" fill={C.muted} font-family={FONT} font-size="10">
+    {`Trap arm limits are IPC Table 909.1: ${arms.map((a) => `${a.label} ${fmt(a.maxFeet ?? 0, 0)} ft`).join(" · ")} — measured from the trap weir to the vent.`}
+  </text>
+</svg>

@@ -1,0 +1,105 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  wsfuToGpm,
+  flowAtVelocity,
+  insideDiameter,
+  frictionLossPsiPer100Ft,
+  HAZEN_WILLIAMS_C,
+  MAX_VELOCITY_COLD,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The honest version of "how many fixtures". Velocity gives a generous answer;
+ * a real developed length and a real friction budget give a much smaller one,
+ * and the smaller one is the one that governs.
+ */
+const MATERIAL = "copper-l" as const;
+const CF = HAZEN_WILLIAMS_C[MATERIAL];
+const SIZES = [0.5, 0.75, 1, 1.25];
+const BUDGET_PSI_PER_100 = 8;
+
+/** Largest whole fixture-unit load each size carries on each constraint. */
+function maxFuFor(id: number, limitGpm: number): number {
+  let best = 0;
+  for (let fu = 1; fu <= 60; fu += 1) {
+    if (wsfuToGpm(fu, "tank") <= limitGpm) best = fu;
+    else break;
+  }
+  return best;
+}
+
+const rows = SIZES.map((nominal) => {
+  const id = insideDiameter(MATERIAL, nominal)!;
+  const velocityCap = flowAtVelocity(MAX_VELOCITY_COLD, id);
+  /* Largest flow whose loss stays inside the budget. */
+  let frictionCap = 0;
+  for (let gpm = 0.5; gpm <= 120; gpm += 0.1) {
+    if (frictionLossPsiPer100Ft(gpm, id, CF) <= BUDGET_PSI_PER_100) frictionCap = gpm;
+    else break;
+  }
+  const fuVelocity = maxFuFor(id, velocityCap);
+  const fuFriction = maxFuFor(id, frictionCap);
+  /* `<=` must not appear in the template half — the Astro compiler reads `<`
+     as a tag opener there. Derive it here. */
+  return {
+    label: sizeLabel(nominal),
+    velocityCap,
+    frictionCap,
+    fuVelocity,
+    fuFriction,
+    frictionGoverns: fuFriction <= fuVelocity,
+  };
+});
+
+const ROW_H = 34;
+const TOP = 92;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 292" fill="none" aria-hidden="true">
+  <title>Fixture unit capacity by pipe size, on velocity and on friction</title>
+  <desc>
+    Each size carries two different fixture unit loads depending on which constraint you apply. Over a real
+    developed length friction gives the smaller answer, and the smaller answer governs.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="276" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two constraints, two answers, and you take the smaller</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Type L copper. Friction column allows ${BUDGET_PSI_PER_100} psi per 100 ft — a fairly generous budget on a long run.`}
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">SIZE</text>
+  <text x={218} y="80" text-anchor="middle" fill={C.blue} font-family={FONT} font-size="8" font-weight="700">ON VELOCITY ALONE</text>
+  <text x={432} y="80" text-anchor="middle" fill={C.orange} font-family={FONT} font-size="8" font-weight="700">
+    {`ON AN ${BUDGET_PSI_PER_100} PSI / 100 FT BUDGET`}
+  </text>
+  <text x={624} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT GOVERNS</text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const { frictionGoverns } = row;
+    return (
+      <g>
+        <text x="28" y={y + 18} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{row.label}</text>
+        <rect x={132} y={y} width={172} height="26" rx="6" fill={C.blue} opacity="0.09" />
+        <text x={218} y={y + 17} text-anchor="middle" fill={C.blue} font-family={FONT} font-size="10.5" font-weight="700">
+          {`${row.fuVelocity} WSFU · ${fmt(row.velocityCap, 1)} gpm`}
+        </text>
+        <rect x={330} y={y} width={204} height="26" rx="6" fill={C.orange} opacity="0.09" />
+        <text x={432} y={y + 17} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="700">
+          {`${row.fuFriction} WSFU · ${fmt(row.frictionCap, 1)} gpm`}
+        </text>
+        <text x={624} y={y + 17} text-anchor="middle" fill={frictionGoverns ? C.orange : C.blue} font-family={FONT} font-size="10" font-weight="800">
+          {frictionGoverns ? "friction" : "velocity"}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="266" fill={C.muted} font-family={FONT} font-size="10">
+    Ask "how many fixtures" without naming a length and the question has no answer. The run is half the input.
+  </text>
+</svg>

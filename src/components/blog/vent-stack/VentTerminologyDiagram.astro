@@ -1,0 +1,86 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { sizeLabel, MIN_VENT_SIZE, trapArmMaxFeet } from "@/lib/plumbing";
+
+/**
+ * The whole vent vocabulary in one place, because most of the confusion is
+ * naming rather than principle. Each row says what the pipe IS, not what it
+ * does — which is the distinction the names actually encode.
+ */
+const TERMS = [
+  {
+    term: "Stack vent",
+    is: "The drainage stack itself, above the highest branch",
+    carries: "Air only — by position, not by design",
+    tone: C.primary,
+  },
+  {
+    term: "Vent stack",
+    is: "A separate vertical pipe beside the drainage stack",
+    carries: "Air only — joined at both ends, never waste",
+    tone: C.orange,
+  },
+  {
+    term: "Individual vent",
+    is: "A vent serving one fixture's trap",
+    carries: `Air. Sized at half the drain, floor ${sizeLabel(MIN_VENT_SIZE)}`,
+    tone: C.blue,
+  },
+  {
+    term: "Branch vent",
+    is: "A vent connecting several vents to a stack vent or vent stack",
+    carries: "Air, collected from more than one fixture",
+    tone: C.blue,
+  },
+  {
+    term: "Wet vent",
+    is: "A drain that also serves as a vent for fixtures downstream",
+    carries: `Both — waste below, air above, ${sizeLabel(2)} minimum`,
+    tone: C.red,
+  },
+  {
+    term: "Relief vent",
+    is: "A cross connection between a drainage stack and a vent stack",
+    carries: "Air, to relieve pressure on tall stacks",
+    tone: C.muted,
+  },
+];
+
+const ROW_H = 30;
+const TOP = 84;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>The vent vocabulary, by what each pipe actually is</title>
+  <desc>
+    Six vent terms defined by what the pipe is rather than what it does, because most of the confusion in venting
+    is naming rather than principle.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Most vent confusion is vocabulary, not principle</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Each name describes what the pipe IS. Only one of these carries waste, and a ${sizeLabel(2)} trap arm still stops at ${trapArmMaxFeet(2)} ft regardless of which one vents it.`}
+  </text>
+
+  <text x="40" y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TERM</text>
+  <text x={200} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT IT IS</text>
+  <text x={492} y="76" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">WHAT IT CARRIES</text>
+
+  {TERMS.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 5} rx="6" fill={row.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 5} rx="2" fill={row.tone} opacity="0.9" />
+        <text x="40" y={y + 16} fill={row.tone} font-family={FONT} font-size="10.5" font-weight="800">{row.term}</text>
+        <text x={200} y={y + 16} fill={C.dark} font-family={FONT} font-size="9">{row.is}</text>
+        <text x={492} y={y + 16} fill={C.muted} font-family={FONT} font-size="9">{row.carries}</text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">
+    Vent stacks on multi-storey drainage stacks are sized from IPC Table 906.1, which depends on stack size, height and load — and is not reproduced here.
+  </text>
+</svg>

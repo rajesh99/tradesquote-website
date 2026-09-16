@@ -1,0 +1,102 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { trapArmMaxFeet, sizeLabel } from "@/lib/plumbing";
+
+/**
+ * The sequence, and the one irreversible step in it. Everything before the
+ * rough-in inspection is cheap to change; everything after it is behind
+ * drywall someone paid to hang.
+ */
+const defs = markerDefs("permit-flow");
+
+/* `isLast` is derived HERE — a `<` in the template half is read by the Astro
+   compiler as a tag opener, not a comparison. */
+const STEPS = [
+  { label: "Apply", detail: "Scope, sometimes drawings, sometimes a fixture count", tone: C.blue },
+  { label: "Rough-in", detail: "Pipe in, nothing covered, system under test pressure", tone: C.blue },
+  { label: "ROUGH-IN INSPECTION", detail: "The last cheap moment on the whole job", tone: C.red },
+  { label: "Close up", detail: "Insulation, drywall, tile, fixtures", tone: C.muted },
+  { label: "Final inspection", detail: "Fixtures set, everything working, air gaps present", tone: C.primary },
+  { label: "Sign-off", detail: "The record that shows up at resale", tone: C.primary },
+].map((s, i, arr) => ({ ...s, isLast: i === arr.length - 1 }));
+
+const BOX_W = 104;
+const GAP = 8;
+const START_X = 26;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>The permit and inspection sequence</title>
+  <desc>
+    Six steps from application to sign-off. The rough-in inspection is the point of no return — everything after it
+    is behind finishes someone has paid for.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One step in this sequence is irreversible</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Not the application and not the final. The rough-in inspection is the last moment anything is cheap to change.
+  </text>
+
+  {STEPS.map((s, i) => {
+    const x = START_X + i * (BOX_W + GAP);
+    const critical = s.label.startsWith("ROUGH-IN INSPECTION");
+    return (
+      <g>
+        <rect
+          x={x}
+          y={critical ? 74 : 82}
+          width={BOX_W}
+          height={critical ? 84 : 68}
+          rx="9"
+          fill={critical ? C.redLight : C.white}
+          stroke={s.tone}
+          stroke-width={critical ? 2.6 : 1.8}
+        />
+        <text x={x + BOX_W / 2} y={critical ? 96 : 102} text-anchor="middle" fill={s.tone} font-family={FONT} font-size={critical ? 8 : 9.5} font-weight="800">
+          {critical ? "ROUGH-IN" : s.label}
+        </text>
+        {critical && (
+          <text x={x + BOX_W / 2} y="108" text-anchor="middle" fill={s.tone} font-family={FONT} font-size="8" font-weight="800">
+            INSPECTION
+          </text>
+        )}
+        <text x={x + BOX_W / 2} y={critical ? 126 : 120} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5">
+          {s.detail.length > 22 ? s.detail.slice(0, 22) : s.detail}
+        </text>
+        {s.detail.length > 22 && (
+          <text x={x + BOX_W / 2} y={critical ? 136 : 130} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="7.5">
+            {s.detail.slice(22, 44)}
+          </text>
+        )}
+        {!s.isLast && (
+          <line
+            x1={x + BOX_W + 1}
+            y1="116"
+            x2={x + BOX_W + GAP - 1}
+            y2="116"
+            stroke={C.border}
+            stroke-width="1.8"
+            marker-end="url(#permit-flow-arrow-muted)"
+          />
+        )}
+      </g>
+    );
+  })}
+
+  <rect x="24" y="176" width="672" height="34" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="36" y="192" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+    {`Before it: a ${sizeLabel(2)} trap arm two feet over its ${trapArmMaxFeet(2)} ft limit is an hour's work. After it: the wall comes down first.`}
+  </text>
+  <text x="36" y="205" fill={C.dark} font-family={FONT} font-size="9.5">
+    Which is why an inspector's time at rough-in is the cheapest hour anyone spends on the job — including yours.
+  </text>
+
+  <text x="24" y="230" fill={C.muted} font-family={FONT} font-size="10">
+    Unpermitted work fails later and worse: it surfaces at resale, and it can complicate a water-damage insurance claim.
+  </text>
+  <text x="24" y="246" fill={C.muted} font-family={FONT} font-size="10">
+    The number of inspections, what each covers, and the test method and duration are all set locally — ask before you schedule.
+  </text>
+</svg>

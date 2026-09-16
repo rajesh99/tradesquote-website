@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  MAX_VELOCITY_COLD,
+  MAX_VELOCITY_HOT,
+  flowAtVelocity,
+  insideDiameter,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * The two ceilings, and what they cost you in capacity. The hot limit is not a
+ * rounding of the cold one — it is 62.5% of it, exactly 5/8, and that ratio
+ * holds at every size because both are the same linear function of area.
+ */
+const SIZES = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const MATERIAL = "copper-l" as const;
+
+const rows = SIZES.map((nominal) => {
+  const id = insideDiameter(MATERIAL, nominal)!;
+  return {
+    label: sizeLabel(nominal),
+    cold: flowAtVelocity(MAX_VELOCITY_COLD, id),
+    hot: flowAtVelocity(MAX_VELOCITY_HOT, id),
+  };
+});
+
+const maxCold = Math.max(...rows.map((r) => r.cold));
+const hotShare = (MAX_VELOCITY_HOT / MAX_VELOCITY_COLD) * 100;
+
+const BAR_X = 92;
+const BAR_MAX = 330;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Maximum flow at the cold and hot velocity ceilings</title>
+  <desc>
+    The flow each pipe size carries before it hits the eight foot per second cold ceiling and the five foot per
+    second hot ceiling. The hot column is the same fraction of the cold one at every size.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`The hot ceiling costs you ${fmt(100 - hotShare)}% of the pipe`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Type L copper. Most flow each size carries before reaching ${MAX_VELOCITY_COLD} ft/s cold (upper) and ${MAX_VELOCITY_HOT} ft/s hot (lower).`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 33;
+    const coldW = Math.max(3, (row.cold / maxCold) * BAR_MAX);
+    const hotW = Math.max(3, (row.hot / maxCold) * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 17} fill={C.dark} font-family={FONT} font-size="12" font-weight="800">{row.label}</text>
+        <rect x={BAR_X} y={y} width={coldW} height="12" rx="3" fill={C.blue} opacity="0.75" />
+        <text x={BAR_X + coldW + 8} y={y + 10} fill={C.blue} font-family={FONT} font-size="9.5" font-weight="700">
+          {`${fmt(row.cold, 1)} gpm cold`}
+        </text>
+        <rect x={BAR_X} y={y + 15} width={hotW} height="12" rx="3" fill={C.orange} opacity="0.75" />
+        <text x={BAR_X + hotW + 8} y={y + 25} fill={C.orange} font-family={FONT} font-size="9.5" font-weight="700">
+          {`${fmt(row.hot, 1)} gpm hot`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="256" width="672" height="24" rx="6" fill={C.primaryLight} stroke={C.primary} stroke-width="1.4" />
+  <text x="36" y="272" fill={C.primary} font-family={FONT} font-size="10" font-weight="700">
+    {`The hot figure is ${fmt(hotShare, 1)}% of the cold one at every size — exactly five eighths, because both are the same limit applied to the same bore.`}
+  </text>
+</svg>

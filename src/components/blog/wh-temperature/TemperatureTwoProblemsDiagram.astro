@@ -1,0 +1,106 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { hotFraction, fmt } from "@/lib/plumbing";
+
+/**
+ * Two hazards pulling in opposite directions, which is why one setting cannot
+ * satisfy both and why a mixing valve exists at all. Deliberately qualitative:
+ * scald times and bacterial thresholds are health-agency figures, not values
+ * this site computes, and are presented as such.
+ */
+const BANDS = [
+  { from: 90, to: 108, label: "Legionella grows readily", tone: C.red, kind: "bacteria" },
+  { from: 108, to: 122, label: "Growth slows", tone: C.orange, kind: "bacteria" },
+  { from: 122, to: 140, label: "Growth stops; dies off slowly", tone: C.primary, kind: "bacteria" },
+  { from: 140, to: 160, label: "Dies rapidly", tone: C.primary, kind: "bacteria" },
+];
+
+const SCALD = [
+  { from: 90, to: 110, label: "Comfortable", tone: C.primary },
+  { from: 110, to: 120, label: "Hot, safe for normal contact", tone: C.primary },
+  { from: 120, to: 133, label: "Scalds in minutes", tone: C.orange },
+  { from: 133, to: 160, label: "Scalds in seconds", tone: C.red },
+];
+
+const MIN_T = 90;
+const MAX_T = 160;
+const SCALE_X = 120;
+const SCALE_W = 500;
+const toX = (t: number) => SCALE_X + ((t - MIN_T) / (MAX_T - MIN_T)) * SCALE_W;
+
+const STORE = 140;
+const DELIVER = 120;
+const COLD_IN = 50;
+
+/* The temperature BANDS above are health-agency guidance, not values this site
+   computes. The consequence of choosing the two settings is computed. */
+const hotShare = hotFraction(DELIVER, COLD_IN, STORE);
+const multiplier = 1 / hotShare;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>The two hazards that pull water heater temperature in opposite directions</title>
+  <desc>
+    Bacterial growth argues for storing hot; scalding argues for delivering cool. The two bands barely overlap,
+    which is why one setting cannot serve both.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two hazards, pulling opposite ways</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    One setting cannot satisfy both. That is the entire argument for storing hot and mixing down.
+  </text>
+
+  <text x="28" y="86" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">BACTERIA</text>
+  <text x="28" y="98" fill={C.muted} font-family={FONT} font-size="8">wants hot</text>
+  {BANDS.map((b) => (
+    <g>
+      <rect x={toX(b.from)} y="76" width={toX(b.to) - toX(b.from)} height="26" fill={b.tone} opacity="0.25" />
+      <rect x={toX(b.from)} y="76" width={toX(b.to) - toX(b.from)} height="26" fill="none" stroke={b.tone} stroke-width="1" opacity="0.6" />
+    </g>
+  ))}
+  <text x={toX(96)} y="93" fill={C.red} font-family={FONT} font-size="8" font-weight="700">grows readily</text>
+  <text x={toX(126)} y="93" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">stops</text>
+  <text x={toX(144)} y="93" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">dies fast</text>
+
+  <text x="28" y="132" fill={C.muted} font-family={FONT} font-size="8.5" font-weight="700">SCALDING</text>
+  <text x="28" y="144" fill={C.muted} font-family={FONT} font-size="8">wants cool</text>
+  {SCALD.map((b) => (
+    <g>
+      <rect x={toX(b.from)} y="122" width={toX(b.to) - toX(b.from)} height="26" fill={b.tone} opacity="0.25" />
+      <rect x={toX(b.from)} y="122" width={toX(b.to) - toX(b.from)} height="26" fill="none" stroke={b.tone} stroke-width="1" opacity="0.6" />
+    </g>
+  ))}
+  <text x={toX(96)} y="139" fill={C.primary} font-family={FONT} font-size="8" font-weight="700">safe</text>
+  <text x={toX(122)} y="139" fill={C.orange} font-family={FONT} font-size="8" font-weight="700">minutes</text>
+  <text x={toX(138)} y="139" fill={C.red} font-family={FONT} font-size="8" font-weight="700">seconds</text>
+
+  <line x1={SCALE_X} y1="158" x2={SCALE_X + SCALE_W} y2="158" stroke={C.border} stroke-width="1" />
+  {[90, 100, 110, 120, 130, 140, 150, 160].map((t) => (
+    <g>
+      <line x1={toX(t)} y1="158" x2={toX(t)} y2="163" stroke={C.border} stroke-width="1" />
+      <text x={toX(t)} y="174" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8">{t}</text>
+    </g>
+  ))}
+  <text x={SCALE_X + SCALE_W + 12} y="174" fill={C.muted} font-family={FONT} font-size="8">°F</text>
+
+  <line x1={toX(STORE)} y1="70" x2={toX(STORE)} y2="158" stroke={C.dark} stroke-width="2" stroke-dasharray="4 3" />
+  <line x1={toX(DELIVER)} y1="70" x2={toX(DELIVER)} y2="158" stroke={C.blue} stroke-width="2" stroke-dasharray="4 3" />
+
+  <rect x="24" y="188" width="330" height="34" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1.6" />
+  <text x="38" y="204" fill={C.orange} font-family={FONT} font-size="10.5" font-weight="800">{`STORE at ${STORE} °F`}</text>
+  <text x="38" y="217" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`Hot enough that the tank is not a culture — and only ${fmt(hotShare * 100, 1)}% of a draw comes from it`}
+  </text>
+
+  <rect x="366" y="188" width="330" height="34" rx="8" fill={C.blueLight} stroke={C.blue} stroke-width="1.6" />
+  <text x="380" y="204" fill={C.blue} font-family={FONT} font-size="10.5" font-weight="800">{`DELIVER at ${DELIVER} °F`}</text>
+  <text x="380" y="217" fill={C.dark} font-family={FONT} font-size="9.5">Cool enough not to scald in seconds</text>
+
+  <text x="24" y="242" fill={C.muted} font-family={FONT} font-size="10">
+    Temperature bands are public-health and burn-injury guidance, not values computed here — they are shown to explain the conflict, not to size anything.
+  </text>
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">
+    {`A thermostatic mixing valve resolves it, and pays twice: safety, plus a ${fmt(multiplier, 2)}x storage multiplier from ${COLD_IN} °F cold.`}
+  </text>
+</svg>

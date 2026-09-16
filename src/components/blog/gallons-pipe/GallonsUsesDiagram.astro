@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { pipeVolume, insideDiameter, sizeLabel, fmt } from "@/lib/plumbing";
+
+/**
+ * Four jobs the same number does. The point is that pipe volume is not a
+ * curiosity — it is the input to wait time, purge volume, chlorination dose and
+ * the structural load of a full line.
+ */
+const NOMINAL = 0.75;
+const LENGTH = 50;
+const id = insideDiameter("copper-l", NOMINAL)!;
+const v = pipeVolume(id, LENGTH);
+
+const USES = [
+  {
+    label: "Hot water wait time",
+    value: `${fmt(v.minutesToPurge(2) * 60)} seconds`,
+    detail: `the ${fmt(v.gallons, 2)} gal of cold in the line, cleared at 2 gpm`,
+    tone: C.orange,
+  },
+  {
+    label: "Purge and flush volume",
+    value: `${fmt(v.gallons * 3, 1)} gallons`,
+    detail: "three line volumes is the usual rule after work on a main",
+    tone: C.blue,
+  },
+  {
+    label: "Disinfection dose",
+    value: `${fmt(v.gallons, 2)} gallons`,
+    detail: "chlorination is dosed on the volume held, not the length",
+    tone: C.primary,
+  },
+  {
+    label: "Weight when full",
+    value: `${fmt(v.weightLb, 1)} lb`,
+    detail: "what the hangers and the joists are actually carrying",
+    tone: C.red,
+  },
+];
+
+const ROW_H = 40;
+const TOP = 88;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 268" fill="none" aria-hidden="true">
+  <title>Four jobs the pipe volume figure does</title>
+  <desc>
+    Wait time, purge volume, disinfection dose and the structural weight of a full line are all the same
+    calculation with different units on the end.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="252" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">One number, four jobs</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${LENGTH} ft of ${sizeLabel(NOMINAL)} type L copper — ${fmt(v.perFoot, 4)} gal/ft, ${fmt(v.gallons, 2)} gallons, ${fmt(v.litres, 1)} litres.`}
+  </text>
+
+  {USES.map((u, i) => {
+    const y = TOP + i * ROW_H;
+    return (
+      <g>
+        <rect x="24" y={y} width="672" height={ROW_H - 6} rx="7" fill={u.tone} opacity="0.07" />
+        <rect x="24" y={y} width="4" height={ROW_H - 6} rx="2" fill={u.tone} opacity="0.9" />
+        <text x="40" y={y + 16} fill={C.dark} font-family={FONT} font-size="11" font-weight="700">{u.label}</text>
+        <text x="40" y={y + 28} fill={C.muted} font-family={FONT} font-size="8.5">{u.detail}</text>
+        <text x={676} y={y + 22} text-anchor="end" fill={u.tone} font-family={FONT} font-size="13" font-weight="800">
+          {u.value}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="252" fill={C.muted} font-family={FONT} font-size="10">
+    Every "why does my hot water take so long" question is this figure divided by a flow rate. Nothing else is involved.
+  </text>
+</svg>

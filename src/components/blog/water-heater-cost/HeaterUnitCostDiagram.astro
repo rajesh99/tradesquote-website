@@ -1,0 +1,74 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { waterHeaterCost, WATER_HEATER_UNITS, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * A like-for-like swap of every unit type, with nothing added. This is the
+ * baseline the next figure builds on: it is the number people expect, and it is
+ * not the number they get.
+ */
+const LABOUR_RATE = 125;
+const PERMIT = 150;
+const HAUL = 75;
+
+const rows = WATER_HEATER_UNITS.map((u) => {
+  const r = waterHeaterCost({
+    unitKey: u.key,
+    labourRate: LABOUR_RATE,
+    permit: PERMIT,
+    haulAway: HAUL,
+    upgrades: [],
+    regionKey: "average",
+  });
+  return {
+    label: u.label,
+    unit: r.unit,
+    hours: r.hours,
+    labour: r.labour,
+    total: r.total,
+    unitShare: r.unitShare,
+  };
+});
+
+const maxTotal = Math.max(...rows.map((r) => r.total));
+
+const BAR_X = 230;
+const BAR_MAX = 262;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Straight swap cost by water heater type</title>
+  <desc>
+    A like-for-like replacement of six water heater types with nothing upgraded. The bar splits the unit price from the
+    labour, permit and haul-away that go with it.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A straight swap, with nothing upgraded</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Labour at ${usd(LABOUR_RATE)} an hour, ${usd(PERMIT)} permit, ${usd(HAUL)} haul-away, national average. The dark part of each bar is the appliance.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 76 + i * 33;
+    const w = Math.max(3, (row.total / maxTotal) * BAR_MAX);
+    const unitW = w * (row.unitShare / 100);
+    return (
+      <g>
+        <text x="28" y={y + 12} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x="28" y={y + 24} fill={C.muted} font-family={FONT} font-size="9">
+          {`${usd(row.unit)} unit · ${row.hours} h labour`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={C.orange} opacity="0.35" />
+        <rect x={BAR_X} y={y + 2} width={unitW} height="20" rx="5" fill={C.orange} opacity="0.85" />
+        <text x={BAR_X + w + 10} y={y + 17} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${usd(row.total)} · unit is ${fmt(row.unitShare)}%`}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    The appliance is between two fifths and two thirds of a bare swap. Everything else on the invoice is labour and the fixed items around it.
+  </text>
+</svg>

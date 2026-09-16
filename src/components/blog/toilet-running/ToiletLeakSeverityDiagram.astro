@@ -1,0 +1,94 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { leakCost, daysToWaste, fmt, usd, usd2, EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR } from "@/lib/plumbing";
+
+/**
+ * The severity sweep. A toilet does not fail at one rate — a weeping flapper
+ * and a wide-open flush valve are the same fault at twenty times the flow, and
+ * the bill is strictly linear in it.
+ *
+ * RATES copied from plumbing-leak-water-waste-calculator/index.astro.
+ */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+const STEPS = [
+  { gpd: 50, note: "weeping flapper, no sound" },
+  { gpd: 200, note: "silent leak, EPA figure" },
+  { gpd: 500, note: "audible trickle" },
+  { gpd: 1000, note: "visibly running" },
+  { gpd: 1500, note: "flapper off its seat" },
+];
+
+const rows = STEPS.map((s) => {
+  const r = leakCost({ gallonsPerDay: s.gpd, ...RATES, hotFraction: 0 });
+  return {
+    ...s,
+    gallonsPerYear: r.gallonsPerYear,
+    cost: r.totalCost,
+    perMonth: r.totalCost / 12,
+    days: daysToWaste(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, s.gpd),
+    isHeadline: s.gpd === 1000,
+  };
+});
+
+const maxCost = Math.max(...rows.map((r) => r.cost));
+const BAR_X = 214;
+const BAR_MAX = 210;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 96 + i * 32,
+  w: Math.max(3, (r.cost / maxCost) * BAR_MAX),
+  fill: r.isHeadline ? C.red : C.orange,
+  opacity: r.isHeadline ? 0.85 : 0.5,
+  colour: r.isHeadline ? C.red : C.muted,
+  weight: r.isHeadline ? 800 : 600,
+}));
+
+const headline = rows.find((r) => r.isHeadline)!;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Cost of a running toilet against how badly it is running</title>
+  <desc>
+    From a silent weeping flapper at 50 gallons a day to a flapper off its seat at 1,500, the annual cost rises
+    strictly in proportion to the flow, because water and sewer are both billed on metered volume.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Same fault, twenty times the bill</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Cost is linear in the flow — water and sewer are both billed on metered volume, so no leak gets cheaper per gallon.
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    {`The last column is how long that leak takes to waste the ${fmt(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, 0)} gallons EPA puts on a leaky household for a year.`}
+  </text>
+
+  <text x="28" y="90" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">GAL/DAY</text>
+  <text x={BAR_X + BAR_MAX + 10} y="90" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">$/YEAR · $/MONTH · DAYS TO 10,000 GAL</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {`${fmt(row.gpd, 0)} gpd`}
+      </text>
+      <text x="92" y={row.y + 13} fill={C.muted} font-family={FONT} font-size="9">{row.note}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="17" rx="4" fill={C.border} opacity="0.28" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="17" rx="4" fill={row.fill} opacity={row.opacity} />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {`${usd(row.cost)} · ${usd(row.perMonth)}/mo · ${fmt(row.days, 0)} d`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="286" fill={C.muted} font-family={FONT} font-size="10">
+    {`A visibly running toilet is ${usd2(headline.cost / 365)} a day and ${usd(headline.perMonth)} a month, and passes EPA's annual household figure in ${fmt(headline.days, 0)} days.`}
+  </text>
+</svg>

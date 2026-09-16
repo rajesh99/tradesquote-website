@@ -1,0 +1,93 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { roofRunoffGpm, fmt, GAL_PER_SQFT_PER_INCH } from "@/lib/plumbing";
+
+/**
+ * The half of sump sizing nobody does: estimating the INFLOW. A footing drain
+ * serves a contributing area, and the same runoff arithmetic the storm
+ * drainage calculator uses gives the gpm that has to leave the pit.
+ *
+ * roofRunoffGpm is the storm calculator's own function — a footing drain sheds
+ * a drained area the same way a roof sheds a plan area.
+ */
+const AREAS = [800, 1200, 1600, 2400];
+const INTENSITIES = [
+  { inPerHr: 1, label: "steady rain", colour: C.primary },
+  { inPerHr: 2, label: "heavy rain", colour: C.blue },
+  { inPerHr: 4, label: "cloudburst", colour: C.red },
+];
+
+const rows = AREAS.map((area) => ({
+  area,
+  flows: INTENSITIES.map((i) => ({
+    ...i,
+    gpm: roofRunoffGpm(area, i.inPerHr),
+  })),
+}));
+
+const maxGpm = Math.max(...rows.flatMap((r) => r.flows.map((f) => f.gpm)));
+
+const BAR_X = 156;
+const BAR_MAX = 396;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 108 + i * 42,
+  bars: r.flows.map((fl, j) => ({
+    ...fl,
+    by: 108 + i * 42 + j * 11,
+    w: Math.max(2, (fl.gpm / maxGpm) * BAR_MAX),
+  })),
+}));
+
+const typical = rows.find((r) => r.area === 1600)!;
+const steady = typical.flows[0];
+const heavy = typical.flows[1];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 316" fill="none" aria-hidden="true">
+  <title>Water arriving at a sump pit from the contributing drained area at three rainfall intensities</title>
+  <desc>
+    A footing drain serving 1,600 square feet sheds about 16.6 gallons a minute in steady rain and 33.2 in heavy
+    rain, which is the inflow the pump has to keep up with rather than a number read off a box.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="300" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Size to the inflow, not to the pit</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`An inch of rain over a square foot is ${fmt(GAL_PER_SQFT_PER_INCH, 4)} gallons, so a drained area converts straight to gallons a minute.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    This is an upper bound — soil, grading and how much the drain actually intercepts all reduce it. Treat it as the worst case to survive.
+  </text>
+
+  <g font-family={FONT} font-size="9" font-weight="700">
+    {INTENSITIES.map((i, j) => (
+      <g>
+        <rect x={340 + j * 122} y="80" width="9" height="9" rx="2" fill={i.colour} opacity="0.75" />
+        <text x={354 + j * 122} y="88" fill={C.muted}>{`${fmt(i.inPerHr, 0)} in/hr ${i.label}`}</text>
+      </g>
+    ))}
+  </g>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 14} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+        {`${fmt(row.area, 0)} sq ft`}
+      </text>
+      <text x="28" y={row.y + 27} fill={C.muted} font-family={FONT} font-size="8">drained area</text>
+      {row.bars.map((b) => (
+        <g>
+          <rect x={BAR_X} y={b.by} width={b.w} height="9" rx="2" fill={b.colour} opacity="0.72" />
+          <text x={BAR_X + b.w + 8} y={b.by + 8} fill={b.colour} font-family={FONT} font-size="9" font-weight="700">
+            {`${fmt(b.gpm, 1)} gpm`}
+          </text>
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text x="24" y="294" fill={C.muted} font-family={FONT} font-size="10">
+    {`A ${fmt(typical.area, 0)} sq ft footprint sheds ${fmt(steady.gpm, 1)} gpm in steady rain and ${fmt(heavy.gpm, 1)} gpm in heavy rain — which is why a 25 gpm pump copes all year and drowns in one storm.`}
+  </text>
+</svg>

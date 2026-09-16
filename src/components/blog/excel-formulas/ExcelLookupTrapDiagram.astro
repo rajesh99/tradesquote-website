@@ -1,0 +1,132 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  minDrainSizeApplied,
+  drainCapacity,
+  trapArmMaxFeet,
+  TABLE_909_1,
+  MIN_BUILDING_DRAIN_WITH_WC,
+  sizeLabel,
+} from "@/lib/plumbing";
+
+/**
+ * Two ways a correct-looking lookup ships a wrong answer. Both results are
+ * computed, so the "violation" column is the library's own verdict rather than
+ * a claim written into the picture.
+ */
+const DFU = 18;
+const APPLIED = minDrainSizeApplied(DFU, "building-drain", 0.25, true);
+const TABLE_SIZE = APPLIED.fromTable;
+const FINAL_SIZE = APPLIED.size;
+const TABLE_CAP = drainCapacity(TABLE_SIZE, "building-drain", 0.25);
+
+/** 2-1/2 in is absent from Table 909.1, so an approximate match slides down a row. */
+const MISSING_ARM = 2.5;
+const NEAREST_BELOW = TABLE_909_1.filter((r) => r.size < MISSING_ARM).slice(-1)[0];
+const EXACT_RESULT = trapArmMaxFeet(MISSING_ARM);
+
+const X = 24;
+const CARD_W = 320;
+const TOP = 96;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 384" fill="none" aria-hidden="true">
+  <title>Two ways a correct lookup still returns a wrong plumbing answer</title>
+
+  <rect x="0" y="0" width="720" height="384" fill={C.white} />
+
+  <text x={X} y="26" font-family={FONT} font-size="15" font-weight="700" fill={C.dark}>
+    The lookup works. The answer is still wrong.
+  </text>
+  <text x={X} y="46" font-family={FONT} font-size="11" fill={C.muted}>
+    Both of these return a number rather than an error, which is exactly what makes them dangerous in a sheet.
+  </text>
+
+  {/* ---- Left card: the water-closet floor ---- */}
+  <rect x={X} y={TOP - 26} width={CARD_W} height="258" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1" />
+  <text x={X + 14} y={TOP - 8} font-family={FONT} font-size="12" font-weight="700" fill={C.red}>
+    1 · The table is not the whole rule
+  </text>
+
+  <text x={X + 14} y={TOP + 16} font-family={FONT} font-size="10.5" fill={C.dark}>
+    A two-bath house on a building drain:
+  </text>
+  <text x={X + 14} y={TOP + 34} font-family={FONT} font-size="13" font-weight="700" fill={C.dark}>
+    {DFU} drainage fixture units
+  </text>
+
+  <rect x={X + 14} y={TOP + 46} width={CARD_W - 28} height="46" rx="5" fill={C.white} stroke={C.border} stroke-width="1" />
+  <text x={X + 24} y={TOP + 64} font-family={FONT} font-size="10" fill={C.muted}>
+    Table 710.1(1) lookup returns
+  </text>
+  <text x={X + 24} y={TOP + 82} font-family={FONT} font-size="12" font-weight="700" fill={C.dark}>
+    {sizeLabel(TABLE_SIZE)} — capacity {TABLE_CAP} DFU, so it fits
+  </text>
+
+  <text x={X + 150} y={TOP + 110} font-family={FONT} font-size="16" fill={C.red}>↓</text>
+
+  <rect x={X + 14} y={TOP + 118} width={CARD_W - 28} height="46" rx="5" fill={C.white} stroke={C.red} stroke-width="1.5" />
+  <text x={X + 24} y={TOP + 136} font-family={FONT} font-size="10" fill={C.muted}>
+    But a water closet floors a building drain at
+  </text>
+  <text x={X + 24} y={TOP + 154} font-family={FONT} font-size="12" font-weight="700" fill={C.red}>
+    {MIN_BUILDING_DRAIN_WITH_WC} in — so the answer is {sizeLabel(FINAL_SIZE)}
+  </text>
+
+  <text x={X + 14} y={TOP + 188} font-family="ui-monospace, monospace" font-size="9.5" fill={C.dark}>
+    =MAX(3, XLOOKUP(...))
+  </text>
+  <text x={X + 14} y={TOP + 206} font-family={FONT} font-size="9.5" fill={C.muted}>
+    Leave the MAX out and the sheet specifies a
+  </text>
+  <text x={X + 14} y={TOP + 219} font-family={FONT} font-size="9.5" font-weight="600" fill={C.red}>
+    {sizeLabel(TABLE_SIZE)} building drain under a toilet. That is a violation.
+  </text>
+
+  {/* ---- Right card: approximate vs exact match ---- */}
+  <rect x="376" y={TOP - 26} width={CARD_W} height="258" rx="8" fill={C.orangeLight} stroke={C.orange} stroke-width="1" />
+  <text x="390" y={TOP - 8} font-family={FONT} font-size="12" font-weight="700" fill={C.orange}>
+    2 · The wrong third argument to MATCH
+  </text>
+
+  <text x="390" y={TOP + 16} font-family={FONT} font-size="10.5" fill={C.dark}>
+    A {sizeLabel(MISSING_ARM)} trap arm, looked up in Table 909.1:
+  </text>
+
+  <rect x="390" y={TOP + 28} width={CARD_W - 28} height="60" rx="5" fill={C.white} stroke={C.orange} stroke-width="1" />
+  <text x="400" y={TOP + 46} font-family="ui-monospace, monospace" font-size="9.5" fill={C.muted}>
+    MATCH(2.5, sizes, 1) — approximate
+  </text>
+  <text x="400" y={TOP + 64} font-family={FONT} font-size="12" font-weight="700" fill={C.orange}>
+    returns {NEAREST_BELOW.maxFeet} ft
+  </text>
+  <text x="400" y={TOP + 80} font-family={FONT} font-size="9.5" fill={C.muted}>
+    — silently the {sizeLabel(NEAREST_BELOW.size)} row, one size down
+  </text>
+
+  <rect x="390" y={TOP + 98} width={CARD_W - 28} height="60" rx="5" fill={C.white} stroke={C.green} stroke-width="1.5" />
+  <text x="400" y={TOP + 116} font-family="ui-monospace, monospace" font-size="9.5" fill={C.muted}>
+    MATCH(2.5, sizes, 0) — exact
+  </text>
+  <text x="400" y={TOP + 134} font-family={FONT} font-size="12" font-weight="700" fill={C.green}>
+    returns #N/A
+  </text>
+  <text x="400" y={TOP + 150} font-family={FONT} font-size="9.5" fill={C.muted}>
+    — {EXACT_RESULT === null ? "correct: there is no such row" : "a row exists"}
+  </text>
+
+  <text x="390" y={TOP + 184} font-family={FONT} font-size="9.5" fill={C.muted}>
+    Table 909.1 lists {TABLE_909_1.length} sizes only: {TABLE_909_1.map((r) => sizeLabel(r.size)).join(", ")}.
+  </text>
+  <text x="390" y={TOP + 200} font-family={FONT} font-size="9.5" fill={C.muted}>
+    An error you can see beats a number you cannot check —
+  </text>
+  <text x="390" y={TOP + 213} font-family={FONT} font-size="9.5" font-weight="600" fill={C.orange}>
+    use 0 for a listed size, 1 only for a curve.
+  </text>
+
+  {/* Footer */}
+  <text x={X} y="368" font-family={FONT} font-size="10" fill={C.muted}>
+    Neither of these produces an Excel error by default. Both produce a confident number that fails an inspection.
+  </text>
+</svg>

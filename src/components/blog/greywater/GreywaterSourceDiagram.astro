@@ -1,0 +1,76 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { greywaterYield, GREYWATER_SOURCE_YIELD, fmt } from "@/lib/plumbing";
+
+/**
+ * Where the water comes from, and which sources are grey at all. The shower
+ * dominates so heavily that a shower-only system captures most of the available
+ * yield for a fraction of the plumbing.
+ */
+const GREY = {
+  occupants: 3,
+  sources: { shower: true, lavatory: true, washer: true },
+  loadsPerWeek: 5,
+  irrigationRate: 0.6,
+};
+const g = greywaterYield(GREY as any);
+const showerOnly = greywaterYield({ ...GREY, sources: { shower: true } } as any);
+
+const rows = g.bySource.map((s) => ({
+  label: s.label,
+  gpd: s.gpd,
+  share: g.dailyYield > 0 ? (s.gpd / g.dailyYield) * 100 : 0,
+}));
+
+const maxGpd = Math.max(...rows.map((r) => r.gpd));
+const BAR_X = 236;
+const BAR_MAX = 240;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>Where grey water comes from in a household</title>
+  <desc>
+    Shower and bath water dominates the available yield so heavily that a shower-only system captures most of it
+    for a fraction of the plumbing work.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">The shower is nearly the whole system</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${GREY.occupants} people, ${GREY.loadsPerWeek} washer loads a week. Kitchen sink and dishwasher are excluded almost everywhere — grease and food solids.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 80 + i * 36;
+    const w = Math.max(3, (row.gpd / maxGpd) * BAR_MAX);
+    const dominant = row.gpd === maxGpd;
+    const tone = dominant ? C.primary : C.blue;
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={dominant ? 800 : 700}>
+          {row.label}
+        </text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="20" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 18} fill={tone} font-family={FONT} font-size="10.5" font-weight="800">
+          {`${fmt(row.gpd, 1)} gpd · ${fmt(row.share)}%`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="196" width="672" height="34" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y="212" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`Showers alone give ${fmt(showerOnly.dailyYield, 1)} gpd — ${fmt((showerOnly.dailyYield / g.dailyYield) * 100)}% of the full ${fmt(g.dailyYield, 1)} gpd, from one drain.`}
+  </text>
+  <text x="36" y="225" fill={C.dark} font-family={FONT} font-size="9.5">
+    A laundry-to-landscape system is even simpler — the washer already has a pump, so no new drain plumbing is needed at all.
+  </text>
+
+  <text x="24" y="250" fill={C.muted} font-family={FONT} font-size="10">
+    {`Planning allowances, not measurements: ${GREYWATER_SOURCE_YIELD.map((s: any) => `${s.label.toLowerCase()} ${s.galPerPersonPerDay}`).join(" · ")}.`}
+  </text>
+  <text x="24" y="264" fill={C.muted} font-family={FONT} font-size="10">
+    Toilet waste is black water and never grey. Kitchen waste is treated as black water in most jurisdictions.
+  </text>
+</svg>

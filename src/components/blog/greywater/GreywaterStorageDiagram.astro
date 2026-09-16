@@ -1,0 +1,82 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { greywaterYield, GREYWATER_MAX_STORAGE_HOURS, fmt } from "@/lib/plumbing";
+
+/**
+ * The 24-hour rule, and why it turns grey water into a distribution problem
+ * rather than a storage one. The cap equals exactly one day's yield, so the
+ * tank can never be larger than what the house makes in a day.
+ *
+ * greyDefaults copied from plumbing-rainwater-harvesting-calculator/index.astro.
+ */
+const defs = markerDefs("grey-store");
+const GREY = {
+  occupants: 3,
+  sources: { shower: true, lavatory: true, washer: true },
+  loadsPerWeek: 5,
+  irrigationRate: 0.6,
+};
+const g = greywaterYield(GREY as any);
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 276" fill="none" aria-hidden="true">
+  <title>Why grey water cannot be stored</title>
+  <desc>
+    Untreated grey water turns septic within about a day, so storage is capped at twenty-four hours of yield. The
+    tank can never hold more than one day's production.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="260" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`The ${GREYWATER_MAX_STORAGE_HOURS}-hour rule is what shapes everything`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Untreated grey water goes septic. Hold it longer than ${GREYWATER_MAX_STORAGE_HOURS} hours and it stops being grey water and starts being sewage.`}
+  </text>
+
+  <rect x="24" y="74" width="200" height="92" rx="10" fill={C.primaryLight} stroke={C.primary} stroke-width="2" />
+  <text x="40" y="94" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">WHAT THE HOUSE PRODUCES</text>
+  <text x="40" y="120" fill={C.primary} font-family={FONT} font-size="19" font-weight="800">
+    {`${fmt(g.dailyYield, 1)} gpd`}
+  </text>
+  <text x="40" y="140" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`${GREY.occupants} people, shower + basin + ${GREY.loadsPerWeek} washer loads a week`}
+  </text>
+  <text x="40" y="156" fill={C.muted} font-family={FONT} font-size="9">arriving in bursts, not evenly</text>
+
+  <line x1="232" y1="120" x2="262" y2="120" stroke={C.muted} stroke-width="2" marker-end="url(#grey-store-arrow-muted)" />
+
+  <rect x="270" y="74" width="200" height="92" rx="10" fill={C.orangeLight} stroke={C.orange} stroke-width="2" />
+  <text x="286" y="94" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">WHAT YOU MAY HOLD</text>
+  <text x="286" y="120" fill={C.orange} font-family={FONT} font-size="19" font-weight="800">
+    {`${fmt(g.maxStorage, 1)} gal`}
+  </text>
+  <text x="286" y="140" fill={C.dark} font-family={FONT} font-size="9.5">
+    {`${GREYWATER_MAX_STORAGE_HOURS} hours of yield — and no more, ever`}
+  </text>
+  <text x="286" y="156" fill={C.muted} font-family={FONT} font-size="9">a bigger tank is not an option, it is a violation</text>
+
+  <line x1="478" y1="120" x2="508" y2="120" stroke={C.muted} stroke-width="2" marker-end="url(#grey-store-arrow-muted)" />
+
+  <rect x="516" y="74" width="180" height="92" rx="10" fill={C.blueLight} stroke={C.blue} stroke-width="2" />
+  <text x="532" y="94" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">SO IT HAS TO LEAVE</text>
+  <text x="532" y="120" fill={C.blue} font-family={FONT} font-size="15" font-weight="800">into the ground</text>
+  <text x="532" y="140" fill={C.dark} font-family={FONT} font-size="9.5">within the day, subsurface,</text>
+  <text x="532" y="154" fill={C.dark} font-family={FONT} font-size="9.5">whether the plants want it or not</text>
+
+  <rect x="24" y="184" width="672" height="34" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="36" y="200" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+    That is the design constraint nobody expects: grey water is a DISTRIBUTION problem, not a storage one.
+  </text>
+  <text x="36" y="213" fill={C.dark} font-family={FONT} font-size="9.5">
+    You cannot save Tuesday's shower for Saturday's watering. The system has to dispose of it on Tuesday.
+  </text>
+
+  <text x="24" y="238" fill={C.muted} font-family={FONT} font-size="10">
+    Which also means it irrigates in winter, in the rain, and while you are away — unless there is a diverter back to the sewer.
+  </text>
+  <text x="24" y="256" fill={C.muted} font-family={FONT} font-size="10">
+    A three-way diverter valve is the single most useful component in a grey water system, and it is frequently required.
+  </text>
+</svg>

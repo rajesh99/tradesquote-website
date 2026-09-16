@@ -1,0 +1,105 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { mixedFlow, fmt } from "@/lib/plumbing";
+
+/**
+ * A shower's rating is a MIXED flow. The hot half is what the water heater
+ * sees, and it swings with the storage temperature, the delivery temperature
+ * and — the one nobody expects — the incoming cold temperature.
+ *
+ * Base copied from plumbing-mixing-valve-calculator: 140 / 50 / 120 / 2.5 gpm,
+ * with the delivery reset to shower temperatures.
+ */
+const GPM = 2.5;
+const COLD_BASE = 50;
+
+const deliverRows = [100, 105, 110, 115].map((mixF) => ({
+  label: `${mixF} °F`,
+  atHot: mixedFlow({ hotF: 140, coldF: COLD_BASE, mixF, mixedGpm: GPM }),
+  atCool: mixedFlow({ hotF: 120, coldF: COLD_BASE, mixF, mixedGpm: GPM }),
+  isBase: mixF === 105,
+}));
+
+const coldRows = [40, 50, 60, 70].map((coldF) => {
+  const r = mixedFlow({ hotF: 140, coldF, mixF: 105, mixedGpm: GPM });
+  return { label: `${coldF} °F in`, hotGpm: r.hotGpm, fraction: r.hotFraction * 100, isBase: coldF === 50 };
+});
+
+const BAR_X = 128;
+const BAR_MAX = 168;
+
+const deliver = deliverRows.map((r, i) => ({
+  ...r,
+  y: 100 + i * 26,
+  hotW: Math.max(2, (r.atHot.hotGpm / GPM) * BAR_MAX),
+  coolW: Math.max(2, (r.atCool.hotGpm / GPM) * BAR_MAX),
+}));
+
+const cold = coldRows.map((r, i) => ({
+  ...r,
+  y: 100 + i * 26,
+  w: Math.max(2, (r.hotGpm / GPM) * BAR_MAX),
+}));
+
+const base = deliverRows.find((r) => r.isBase)!;
+const winter = coldRows[0];
+const summer = coldRows[coldRows.length - 1];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 284" fill="none" aria-hidden="true">
+  <title>How much of a shower's flow is hot water, against delivery temperature and cold inlet temperature</title>
+  <desc>
+    A 2.5 gallon per minute shower delivered at 105 degrees from 140 degree storage draws only 1.528 gallons a
+    minute of hot water. Colder incoming water raises the hot share, which is why winter showers drain a tank faster.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="268" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">A 2.5 gpm shower is not 2.5 gpm of hot water</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Bars show the HOT gallons a minute inside a ${fmt(GPM, 1)} gpm mixed flow. Everything not shown is cold, and the water heater never sees it.`}
+  </text>
+
+  <text x="28" y="80" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">DELIVERY TEMPERATURE</text>
+  <text x="152" y="80" fill={C.muted} font-family={FONT} font-size="8">{`dark = ${fmt(140, 0)} °F stored · pale = ${fmt(120, 0)} °F stored`}</text>
+
+  {deliver.map((row) => (
+    <g>
+      <text x="28" y={row.y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.isBase ? 800 : 600}>{row.label}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="15" rx="3" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.coolW} height="15" rx="3" fill={C.orange} opacity="0.3" />
+      <rect x={BAR_X} y={row.y} width={row.hotW} height="15" rx="3" fill={C.orange} opacity={row.isBase ? 0.85 : 0.6} />
+      <text x={BAR_X + BAR_MAX + 8} y={row.y + 12} fill={C.orange} font-family={FONT} font-size="9" font-weight={row.isBase ? 800 : 600}>
+        {`${fmt(row.atHot.hotGpm, 3)} gpm`}
+      </text>
+      <text x={BAR_X + BAR_MAX + 62} y={row.y + 12} fill={C.muted} font-family={FONT} font-size="9">
+        {`${fmt(row.atCool.hotGpm, 3)} at 120`}
+      </text>
+    </g>
+  ))}
+
+  <line x1="376" y1="70" x2="376" y2="212" stroke={C.border} stroke-width="1" />
+
+  <text x="396" y="80" fill={C.blue} font-family={FONT} font-size="9" font-weight="700">COLD INLET TEMPERATURE</text>
+  <text x="396" y="92" fill={C.muted} font-family={FONT} font-size="8">{`delivering ${fmt(105, 0)} °F from ${fmt(140, 0)} °F stored`}</text>
+
+  {cold.map((row) => (
+    <g>
+      <text x="396" y={row.y + 22} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.isBase ? 800 : 600}>{row.label}</text>
+      <rect x="470" y={row.y + 10} width={BAR_MAX} height="15" rx="3" fill={C.border} opacity="0.24" />
+      <rect x="470" y={row.y + 10} width={row.w} height="15" rx="3" fill={C.blue} opacity={row.isBase ? 0.85 : 0.55} />
+      <text x={470 + BAR_MAX + 8} y={row.y + 22} fill={C.blue} font-family={FONT} font-size="9" font-weight={row.isBase ? 800 : 600}>
+        {`${fmt(row.fraction, 1)}%`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="234" fill={C.muted} font-family={FONT} font-size="10">
+    {`At the base case — ${fmt(105, 0)} °F from ${fmt(140, 0)} °F storage — only ${fmt(base.atHot.hotGpm, 3)} gpm of the ${fmt(GPM, 1)} is hot, which is ${fmt(base.atHot.hotFraction * 100, 1)}% of the flow.`}
+  </text>
+  <text x="24" y="246" fill={C.muted} font-family={FONT} font-size="9">
+    {`Store only ${fmt(120, 0)} °F and the same shower needs ${fmt(base.atCool.hotFraction * 100, 1)}% hot — ${fmt(base.atCool.hotGpm, 3)} gpm — because each hot gallon carries less heat to share.`}
+  </text>
+  <text x="24" y="264" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {`Cold inlet moves it the wrong way in winter: ${fmt(winter.fraction, 1)}% hot at ${winter.label} against ${fmt(summer.fraction, 1)}% at ${summer.label}.`}
+  </text>
+</svg>

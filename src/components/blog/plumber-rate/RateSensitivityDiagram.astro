@@ -1,0 +1,82 @@
+---
+import { C, FONT, markerDefs } from "../infographicTokens";
+import { labourRate, usd2, fmt } from "@/lib/plumbing";
+
+/**
+ * The counter-intuitive result the post is named for. Move wage and utilisation
+ * by the SAME 20% and compare: utilisation moves the rate further, and in the
+ * direction the owner wants rather than against them.
+ */
+const defs = markerDefs("rate-sens");
+
+const BASE = {
+  wage: 32,
+  burdenPercent: 30,
+  overheadPerTech: 45000,
+  billableHours: 1400,
+  marginPercent: 20,
+};
+
+const STEP = 0.2;
+
+const base = labourRate(BASE);
+const wageUp = labourRate({ ...BASE, wage: BASE.wage * (1 + STEP) });
+const hoursUp = labourRate({ ...BASE, billableHours: BASE.billableHours * (1 + STEP) });
+
+const pct = (after: number) => ((after - base.billRate) / base.billRate) * 100;
+const wagePct = pct(wageUp.billRate);
+const hoursPct = pct(hoursUp.billRate);
+
+const CENTRE = 360;
+const SCALE = 9;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>Which moves the bill rate more, a pay rise or a better week</title>
+  <desc>
+    Raising the wage twenty percent and raising billable hours twenty percent, compared against the same baseline.
+    Utilisation moves the required rate further, and downward.
+  </desc>
+  <defs set:html={defs} />
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">
+    {`Move each by ${fmt(STEP * 100)}% and see which matters`}
+  </text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Baseline: ${usd2(BASE.wage)} wage, ${fmt(BASE.billableHours)} billable hours, ${usd2(base.billRate)} bill rate`}
+  </text>
+
+  <line x1={CENTRE} y1="76" x2={CENTRE} y2="196" stroke={C.border} stroke-width="1.6" stroke-dasharray="4 4" />
+  <text x={CENTRE} y="70" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">no change</text>
+
+  <text x="28" y="106" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+    {`Pay the tech ${fmt(STEP * 100)}% more`}
+  </text>
+  <text x="28" y="119" fill={C.muted} font-family={FONT} font-size="9">
+    {`${usd2(BASE.wage)} → ${usd2(BASE.wage * (1 + STEP))} an hour`}
+  </text>
+  <rect x={CENTRE} y="96" width={Math.max(3, wagePct * SCALE)} height="22" rx="5" fill={C.orange} opacity="0.8" />
+  <text x={CENTRE + wagePct * SCALE + 10} y="112" fill={C.orange} font-family={FONT} font-size="11" font-weight="800">
+    {`${usd2(wageUp.billRate)} · rate up ${fmt(wagePct, 1)}%`}
+  </text>
+
+  <text x="28" y="160" fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">
+    {`Sell ${fmt(STEP * 100)}% more hours`}
+  </text>
+  <text x="28" y="173" fill={C.muted} font-family={FONT} font-size="9">
+    {`${fmt(BASE.billableHours)} → ${fmt(BASE.billableHours * (1 + STEP))} billable hours`}
+  </text>
+  <rect x={CENTRE + hoursPct * SCALE} y="150" width={Math.max(3, -hoursPct * SCALE)} height="22" rx="5" fill={C.primary} opacity="0.8" />
+  <text x={CENTRE + hoursPct * SCALE - 10} y="166" text-anchor="end" fill={C.primary} font-family={FONT} font-size="11" font-weight="800">
+    {`${usd2(hoursUp.billRate)} · rate down ${fmt(Math.abs(hoursPct), 1)}%`}
+  </text>
+
+  <rect x="24" y="208" width="672" height="38" rx="8" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="36" y="226" fill={C.primary} font-family={FONT} font-size="10.5" font-weight="800">
+    {`Utilisation moves the rate ${fmt(Math.abs(hoursPct) / wagePct, 1)}x as far as wage does — and it moves it the way you want.`}
+  </text>
+  <text x="36" y="240" fill={C.dark} font-family={FONT} font-size="9.5">
+    Paying better raises the rate you must charge. Selling more of the week lowers it. Only one of those wins work.
+  </text>
+</svg>

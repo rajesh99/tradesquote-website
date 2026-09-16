@@ -1,0 +1,612 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import { WSFU_FIXTURES, wsfuToGpm, fmt } from "@/lib/plumbing";
+
+const title = "Water Supply Fixture Unit Calculator — WSFU to GPM | TradesQuote";
+const description =
+  "Free water supply fixture unit calculator. Count your fixtures, get the total WSFU, and convert it to probable peak demand in gpm on Hunter's curve — separate answers for flush-tank and flushometer-valve systems. Instant, no sign-up.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-water-supply-fixture-unit-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Water Supply Fixture Unit Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Water Supply Fixture Unit Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online water supply fixture unit calculator that totals WSFU from a fixture count and converts it to probable peak demand in gallons per minute using Hunter's curve, for both flush-tank and flushometer-valve systems.",
+};
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How many fixture units is a typical house?",
+    answer:
+      "A two-bathroom house with a kitchen sink, dishwasher, clothes washer and two hose bibbs comes to about <strong>16.4 WSFU</strong>, which is roughly <strong>18 gpm</strong> of probable peak demand on a flush-tank system. Those are this calculator's defaults. A three-bathroom house lands nearer 22 WSFU and 20 gpm — the demand curve flattens fast, which is the whole point of it.",
+  },
+  {
+    question: "Why isn't peak demand just the sum of the fixture flow rates?",
+    answer:
+      "Because the fixtures are never all running at once. Those defaults add up to about 30 gpm of connected fixture capacity but only <strong>18 gpm</strong> of probable demand. Roy Hunter's 1940 work at the National Bureau of Standards turned that into a probability curve: the more fixtures you add, the smaller the fraction that runs simultaneously. At 5 fixture units you get 1.88 gpm per unit; at 200 units you get 0.33.",
+  },
+  {
+    question: "What is the difference between a flush tank and a flushometer valve?",
+    answer:
+      "A flush tank refills slowly through a small fill valve, so it barely dents the system. A <strong>flushometer valve</strong> takes its whole flush straight off the supply in a few seconds — a huge, brief draw. The same 16.4 fixture units demand about 18 gpm on tanks and <strong>32 gpm</strong> on valves, so guessing wrong here can undersize a main by two pipe sizes. Valve systems are almost always commercial.",
+  },
+  {
+    question: "Are WSFU and DFU the same thing?",
+    answer:
+      'No, and mixing them up is the most common fixture-unit mistake. <strong>WSFU</strong> weights a fixture by how hard it pulls on the <em>supply</em>; <strong>DFU</strong> weights it by what it puts down the <em>drain</em>. The same lavatory is 0.7 WSFU and 1 DFU. Use the <a href="/calculators/plumbing/plumbing-drainage-fixture-unit-calculator" class="font-semibold text-blue-700 underline decoration-blue-300 hover:decoration-blue-600">Drainage Fixture Unit Calculator</a> for the gravity side.',
+  },
+  {
+    question: "Does the cold and hot split have to add up to the total?",
+    answer:
+      "No — and it deliberately doesn't. A lavatory is 0.5 cold, 0.5 hot, and <strong>0.7 total</strong>, not 1.0. The code assigns the total separately because you never draw full hot and full cold at the same instant. Size the cold main on the total, and size the hot distribution on the hot column.",
+  },
+  {
+    question: "Is this method actually in the code?",
+    answer:
+      "The fixture-unit sizing method lives in <strong>IPC Appendix E</strong>, and an appendix is only enforceable where the jurisdiction has specifically adopted it. Many have not, in which case supply sizing falls to engineering judgement or a local method. Check before you rely on it for a permit.",
+  },
+  {
+    question: "Does the curve still work with modern low-flow fixtures?",
+    answer:
+      "It runs high. Hunter calibrated the curve on fixtures that used several times the water today's do, and IPC 604.3 has cut fixture flow rates hard since — a water closet went from 5 gallons a flush to 1.6. The result is that a WSFU-derived demand overstates what a modern building actually draws, so the error pushes you toward <strong>larger</strong> pipe. Conservative, but worth knowing when a result looks generous.",
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Demand worked out? Quote the whole job in seconds.";
+const ctaDescription =
+  "Fixture units are the first line of a plumbing job, not the last. TradesQuote turns the whole scope into a detailed, line-item estimate — fixtures, pipe, fittings, and labor with quantities and unit prices — validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pipe-size-calculator",
+    title: "Water Pipe Size Calculator",
+    description: "Turn that gpm into a nominal pipe size.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-friction-loss-calculator",
+    title: "Pipe Friction Loss Calculator",
+    description: "See what the run costs you in pressure.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-drainage-fixture-unit-calculator",
+    title: "Drainage Fixture Unit Calculator",
+    description: "The same fixtures, weighted for the drain.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "Check what pressure reaches the top fixture.",
+  },
+];
+
+const residential = WSFU_FIXTURES.filter((f) => f.group === "Residential");
+const commercial = WSFU_FIXTURES.filter((f) => f.group === "Commercial");
+
+const DEFAULTS: Record<string, number> = {
+  "bathroom-group-tank": 2,
+  "kitchen-sink-private": 1,
+  "dishwasher-private": 1,
+  "clothes-washer-private": 1,
+  "hose-bibb": 2,
+};
+
+/** Demand ladder rendered straight from the lib so it cannot drift. */
+const ladder = [5, 10, 20, 30, 50, 100, 200, 500].map((fu) => ({
+  fu,
+  tank: wsfuToGpm(fu, "tank"),
+  valve: wsfuToGpm(fu, "valve"),
+  perFu: wsfuToGpm(fu, "tank") / fu,
+}));
+
+const styles = plumbingAccentStyles.blue;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Water Supply Fixture Unit Calculator — WSFU to GPM" />
+    <meta
+      property="og:description"
+      content="Count your fixtures, get total WSFU, and convert to peak demand in gpm on Hunter's curve. Flush-tank and flushometer-valve answers side by side. Free and instant."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Water Supply Fixture Unit Calculator — WSFU to GPM" />
+    <meta
+      name="twitter:description"
+      content="Total water supply fixture units and probable peak demand in gpm. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Water Supply Fixture Unit Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · IPC 2021 · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Water Supply Fixture Unit Calculator <span class="text-blue-600">— WSFU to GPM</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              Every water supply pipe is sized from one number: the <strong>probable peak demand</strong> in
+              gallons per minute. You get there in two steps — weight each fixture in water supply fixture
+              units, then read the demand off Hunter's curve, which accounts for the fact that the fixtures are
+              never all running at once. Count your fixtures below and both numbers come out.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 17h.01M9 14h.01M12 14h.01M15 14h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            Count your fixtures
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <div>
+                <label for="wsfu-control" class="text-sm font-semibold text-slate-800">
+                  Water closet supply control
+                </label>
+                <select
+                  id="wsfu-control"
+                  class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                >
+                  <option value="tank" selected>Flush tanks — typical residential</option>
+                  <option value="valve">Flushometer valves — typical commercial</option>
+                </select>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Decides which column of the demand curve is read. Valve systems demand far more for the same
+                  fixture count.
+                </p>
+              </div>
+
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Residential fixtures</p>
+                <div class="mt-3 space-y-2">
+                  {
+                    residential.map((f) => (
+                      <div class="flex items-center justify-between gap-3">
+                        <label for={`wsfu-fx-${f.key}`} class="text-sm text-slate-600 leading-snug">
+                          {f.label}
+                          <span class="ml-1.5 text-xs text-slate-400">{fmt(f.total, 1)} WSFU</span>
+                        </label>
+                        <input
+                          id={`wsfu-fx-${f.key}`}
+                          data-wsfu-fixture={f.key}
+                          type="number"
+                          min="0"
+                          max="999"
+                          value={DEFAULTS[f.key] ?? 0}
+                          class="w-16 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <details class="group rounded-xl border border-slate-200 bg-slate-50">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  Commercial fixtures
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 space-y-2">
+                  {
+                    commercial.map((f) => (
+                      <div class="flex items-center justify-between gap-3">
+                        <label for={`wsfu-fx-${f.key}`} class="text-sm text-slate-600 leading-snug">
+                          {f.label}
+                          <span class="ml-1.5 text-xs text-slate-400">{fmt(f.total, 2)} WSFU</span>
+                        </label>
+                        <input
+                          id={`wsfu-fx-${f.key}`}
+                          data-wsfu-fixture={f.key}
+                          type="number"
+                          min="0"
+                          max="999"
+                          value="0"
+                          class="w-16 shrink-0 rounded-lg border border-slate-300 px-2 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </details>
+
+              <button
+                id="wsfu-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-blue-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Probable peak demand</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="wsfu-demand" class="text-5xl font-extrabold tracking-tight text-blue-600">
+                  18.2 gpm
+                </span>
+              </div>
+              <p id="wsfu-note" class="mt-1 text-sm font-semibold text-slate-700">
+                Flush-tank system — tanks refill slowly, so peak demand is far below the sum of the fixture
+                flows.
+              </p>
+
+              <div class="mt-6 grid grid-cols-3 gap-3">
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Total WSFU</p>
+                  <p id="wsfu-total" class="mt-1 text-2xl font-bold text-slate-900">16.4</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Cold</p>
+                  <p id="wsfu-cold" class="mt-1 text-2xl font-bold text-slate-900">12.4</p>
+                </div>
+                <div class="rounded-xl border border-blue-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Hot</p>
+                  <p id="wsfu-hot" class="mt-1 text-2xl font-bold text-slate-900">6.4</p>
+                </div>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-blue-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Fixtures counted</span><span id="wsfu-bd-fixtures" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Total load</span><span id="wsfu-bd-total" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Demand per fixture unit</span><span id="wsfu-bd-per-fu" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>The other supply type</span><span id="wsfu-bd-other" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                Planning estimate. The fixture-unit sizing method lives in IPC <strong>Appendix E</strong>,
+                which is only enforceable where your jurisdiction has adopted it. A licensed plumber and your
+                AHJ have final say.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Provenance disclosure -->
+        <div class="mx-auto mt-6 max-w-5xl rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <h2 class="text-sm font-bold text-amber-900">About these numbers</h2>
+          <p class="mt-2 text-sm text-amber-900 leading-relaxed">
+            The fixture weights and the demand curve here are the <strong>commonly published</strong> water
+            supply fixture unit values and Hunter's-curve demand figures. They approximate IPC Appendix E
+            Tables E103.3(2) and E103.3(3), and where your jurisdiction has adopted Appendix E, the code
+            tables are the authority — check a result against the book before it goes on a permit drawing.
+            Hunter's original method is US government work from 1940 (NBS report BMS65) and is not itself
+            proprietary; the code tables' exact values are. The error runs toward <em>larger</em> pipe, for the
+            low-flow reason in the FAQ below.
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== FORMULA ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The formula, explained in plain English
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Two steps. The first is arithmetic; the second is statistics, and it is the one that surprises
+            people.
+          </p>
+
+          <div
+            class="mt-8 rounded-2xl bg-slate-900 p-6 sm:p-8 text-slate-100 font-mono text-sm leading-relaxed overflow-x-auto"
+          >
+            <div class="text-blue-300"># Step 1 — Total the load (IPC Appendix E Table E103.3(2))</div>
+            <div>total WSFU&nbsp;=&nbsp;Σ (fixture count × fixture weight)</div>
+            <div class="mt-4 text-blue-300"># Step 2 — Read probable demand off the curve (Table E103.3(3))</div>
+            <div>demand gpm&nbsp;=&nbsp;Hunter(total WSFU, supply control)</div>
+            <div>
+              separate columns for <span class="text-amber-300">flush tank</span> and
+              <span class="text-amber-300">flushometer valve</span>
+            </div>
+            <div class="mt-4 text-slate-400"># The curve is not linear — that is the entire point</div>
+            <div>
+              5 FU&nbsp;→&nbsp;<span class="text-amber-300">1.88</span> gpm/FU&nbsp;&nbsp;·&nbsp;&nbsp;50
+              FU&nbsp;→&nbsp;<span class="text-amber-300">0.58</span>&nbsp;&nbsp;·&nbsp;&nbsp;200
+              FU&nbsp;→&nbsp;<span class="text-amber-300">0.33</span>
+            </div>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">What a fixture unit actually is</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A dimensionless weight, not a flow rate. It bundles how much water a fixture uses, how long it
+                runs, and how often — so one number can compare a hose bibb with a dishwasher.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Why cold + hot ≠ total</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A lavatory is 0.5 cold, 0.5 hot, 0.7 total. You never draw full hot and full cold in the same
+                instant, so the code assigns the combined weight separately rather than adding the two.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Bathroom groups are a shortcut</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                A group counts as 3.6 WSFU rather than the 4.3 you would get adding a water closet, lavatory
+                and tub separately — because fixtures in one room compete for one person.
+              </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5">
+              <h3 class="font-bold text-slate-900">Where the curve flattens</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                Past roughly 1,000 fixture units the tank and valve columns converge — at that scale the
+                averaging has done all the work it can, and demand grows almost linearly again.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== WORKED EXAMPLES ==== -->
+      <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-14">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Worked examples</h2>
+        <p class="mt-4 text-slate-600">
+          A house, a small office, and the case that catches people out — the same fixture count on
+          flushometer valves.
+        </p>
+
+        <div class="mt-8 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Two-bathroom house — the defaults</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              2 bathroom groups on flush tanks, kitchen sink, dishwasher, clothes washer, 2 hose bibbs.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              2 × bathroom group (3.6) = 7.2<br />
+              1 × kitchen sink (1.4) = 1.4<br />
+              1 × dishwasher (1.4) = 1.4<br />
+              1 × clothes washer (1.4) = 1.4<br />
+              2 × hose bibb (2.5) = 5.0<br />
+              total = <span class="font-bold text-blue-700">16.4 WSFU</span> → demand
+              <span class="font-bold text-blue-700">18.2 gpm</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 18.2 gpm. The connected fixture
+              capacity is about 30 gpm, so the curve has cut the design flow by roughly 40% — and that is
+              before any pipe is chosen.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">The same house, flushometer valves</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              Change nothing but the supply control on the water closets.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              same 16.4 WSFU, valve column<br />
+              → demand <span class="font-bold text-blue-700">32.1 gpm</span> instead of 18.2<br />
+              ratio = <span class="font-bold text-blue-700">1.77×</span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> 32.1 gpm — a 77% jump from one
+              dropdown. On the pipe-size calculator's defaults, 18 gpm rides a 1-inch copper main and 32 gpm
+              needs 1-1/2 inch — two sizes up from one dropdown. This is why the supply control matters more
+              than almost any other input.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold">
+                3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900">Small office — 50 fixture units</h3>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              A build-up of public water closets, lavatories and a service sink reaching 50 WSFU on tanks.
+            </p>
+            <div class="mt-4 rounded-xl bg-slate-50 p-4 font-mono text-sm text-slate-700">
+              50 WSFU → <span class="font-bold text-blue-700">29.1 gpm</span><br />
+              = 0.58 gpm per fixture unit<br />
+              versus the house at 16.4 WSFU → 1.11 gpm per fixture unit
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+              <span class="font-semibold text-slate-900">Result:</span> triple the fixture units, but only 60%
+              more flow. Demand per fixture unit almost halved — which is why a large building's main is never
+              proportional to its fixture count.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== REFERENCE TABLE ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            Fixture units to gpm — the demand curve
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Rendered from the same data the calculator uses, so the two cannot disagree. Watch the last column:
+            <strong>demand per fixture unit falls by more than 5× across the table</strong>. That single fact
+            is the difference between a properly sized main and a wildly oversized one.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Fixture units</th>
+                  <th class="py-3 px-5 font-semibold">Flush tanks</th>
+                  <th class="py-3 px-5 font-semibold">Flush valves</th>
+                  <th class="py-3 px-5 font-semibold">gpm per unit (tanks)</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ladder.map((row, index) => (
+                    <tr class={index === ladder.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900">{row.fu}</td>
+                      <td class="py-3 px-5">{fmt(row.tank, 1)} gpm</td>
+                      <td class="py-3 px-5">{fmt(row.valve, 1)} gpm</td>
+                      <td class="py-3 px-5">{fmt(row.perFu, 2)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: IPC 2021 Appendix E — <a
+              class="underline hover:text-blue-600"
+              href="https://codes.iccsafe.org/codes/i-codes"
+              target="_blank"
+              rel="noopener">Sizing of Water Piping System</a
+            >, Tables E103.3(2) and E103.3(3); IPC 604.3 maximum fixture flow rates; Roy Hunter, <em
+              >Methods of Estimating Loads in Plumbing Systems</em
+            >, NBS Building Materials and Structures Report BMS65 (1940); <a
+              class="underline hover:text-blue-600"
+              href="https://www.aspe.org/"
+              target="_blank"
+              rel="noopener">ASPE</a
+            > design guidance. Appendix E applies only where adopted. Roughly fifteen states use the <a
+              class="underline hover:text-blue-600"
+              href="https://www.iapmo.org/uniform-plumbing-code"
+              target="_blank"
+              rel="noopener">UPC</a
+            > or a derivative, whose fixture-unit values differ. Local amendments override the model code.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="blue"
+        subtitle="Common questions about water supply fixture units, Hunter's curve, and peak demand."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingWaterSupplyFixtureUnitCalculator } from "@/scripts/calculators/plumbing-water-supply-fixture-unit-calculator";
+    initPlumbingWaterSupplyFixtureUnitCalculator();
+  </script>
+</Layout>

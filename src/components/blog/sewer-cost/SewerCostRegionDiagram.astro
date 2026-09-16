@@ -1,0 +1,102 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, costBand, REGION_MULTIPLIERS, fmt, usd, COST_BAND } from "@/lib/plumbing";
+
+/**
+ * The regional spread, which is wider than the difference between two scopes.
+ * Any single national "average sewer replacement cost" figure is arithmetic
+ * over a 1.76x range, which is why this page publishes the range instead.
+ *
+ * Basis copied from plumbing-estimate-calculator, applied to the 40 ft open cut.
+ */
+const LABOUR_RATE = 110;
+const OVERHEAD_PERCENT = 15;
+const MARGIN_PERCENT = 25;
+
+const base = estimateJob({
+  labourHours: 40,
+  labourRate: LABOUR_RATE,
+  fixtureCost: 0,
+  materialCost: 2600,
+  overheadPercent: OVERHEAD_PERCENT,
+  marginPercent: MARGIN_PERCENT,
+});
+
+const rows = REGION_MULTIPLIERS.map((m) => {
+  const price = base.price * m.factor;
+  const band = costBand(price);
+  return {
+    label: m.label,
+    factor: m.factor,
+    price,
+    low: band.low,
+    high: band.high,
+    isBase: m.factor === 1,
+  };
+});
+
+const maxHigh = Math.max(...rows.map((r) => r.high));
+const BAR_X = 218;
+const BAR_MAX = 300;
+const scale = (v: number) => (v / maxHigh) * BAR_MAX;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 106 + i * 38,
+  lowX: BAR_X + scale(r.low),
+  priceX: BAR_X + scale(r.price),
+  bandW: Math.max(4, scale(r.high) - scale(r.low)),
+  colour: r.isBase ? C.orange : C.blue,
+  weight: r.isBase ? 800 : 600,
+}));
+
+const cheapest = rows[0];
+const dearest = rows[rows.length - 1];
+const spread = dearest.price / cheapest.price;
+const overallLow = Math.min(...rows.map((r) => r.low));
+const overallHigh = Math.max(...rows.map((r) => r.high));
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 304" fill="none" aria-hidden="true">
+  <title>The same forty foot sewer replacement priced across four regional cost levels</title>
+  <desc>
+    The same scope prices at 9,123 dollars in a lower-cost market and 16,100 in a major coastal metro — a
+    1.76 times spread, wider than the difference between a forty and a seventy foot run.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="288" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Region moves it more than scope does</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`The identical ${fmt(40, 0)} foot open cut — same hours, same materials — priced at four regional cost levels, each with its ±${fmt(COST_BAND * 100, 0)}% band.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    This is why a single national average is close to meaningless for deciding whether your quote is fair.
+  </text>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">MARKET</text>
+  <text x={BAR_X + BAR_MAX + 12} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">PRICE · BAND</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.weight}>{row.label}</text>
+      <text x="28" y={row.y + 24} fill={C.muted} font-family={FONT} font-size="8">
+        {`factor ${fmt(row.factor, 2)}`}
+      </text>
+      <rect x={row.lowX} y={row.y + 2} width={row.bandW} height="14" rx="4" fill={row.colour} opacity="0.24" />
+      <rect x={row.priceX - 1} y={row.y} width="2.5" height="18" rx="1" fill={row.colour} />
+      <text x={BAR_X + BAR_MAX + 12} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {usd(row.price)}
+      </text>
+      <text x={BAR_X + BAR_MAX + 12} y={row.y + 24} fill={C.muted} font-family={FONT} font-size="8">
+        {`${usd(row.low)} to ${usd(row.high)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    {`End to end that is ${usd(overallLow)} to ${usd(overallHigh)} for one scope — a ${fmt(spread, 2)}x spread on the price before the quoting band is applied.`}
+  </text>
+  <text x="24" y="292" fill={C.muted} font-family={FONT} font-size="9">
+    Depth, hard surfaces, permits, traffic control and how much of the run is under something also move it, and none of them are in this factor.
+  </text>
+</svg>

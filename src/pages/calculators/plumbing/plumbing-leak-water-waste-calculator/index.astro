@@ -1,0 +1,797 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import RelatedCalculators from "@/components/RelatedCalculators.astro";
+import CalculatorBreadcrumb from "@/components/CalculatorBreadcrumb.astro";
+import CalculatorFaqSection from "@/components/CalculatorFaqSection.astro";
+import CalculatorTradesQuoteCta from "@/components/CalculatorTradesQuoteCta.astro";
+import { buildFaqPageSchema, type CalculatorFaq } from "@/lib/calculatorFaq";
+import { plumbingAccentStyles } from "@/config/plumbingCalculators";
+import {
+  COMMON_LEAKS,
+  DRIPS_PER_GALLON,
+  EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR,
+  EPA_LEAKY_HOME_FRACTION,
+  EPA_LEAKY_HOME_GPD,
+  ML_PER_DRIP,
+  daysToWaste,
+  dripsToGpd,
+  fmt,
+  leakCost,
+  usd,
+  usd2,
+} from "@/lib/plumbing";
+
+const title = "Leak & Water Waste Calculator — Gallons and Dollars | TradesQuote";
+const description =
+  "Free leak and water waste calculator. Turn a drip rate, a fill test or a meter reading into gallons per year and what it costs — including the energy on a hot-water leak that most calculators ignore.";
+
+const pageUrl =
+  "https://www.tradesquote.ai/calculators/plumbing/plumbing-leak-water-waste-calculator";
+
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.tradesquote.ai/" },
+    { "@type": "ListItem", position: 2, name: "Calculators", item: "https://www.tradesquote.ai/calculators" },
+    { "@type": "ListItem", position: 3, name: "Plumbing", item: "https://www.tradesquote.ai/calculators/plumbing" },
+    { "@type": "ListItem", position: 4, name: "Leak & Water Waste Calculator", item: pageUrl },
+  ],
+};
+
+const webAppData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Leak & Water Waste Calculator",
+  url: pageUrl,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any (web-based)",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Free online leak and water waste calculator that converts a drip rate, container fill test or water meter reading into gallons per day and per year, and prices it including the energy cost of a hot-water leak.",
+};
+
+/* ---- The page's canonical defaults. Everything below derives from these. ---- */
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 70,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+const DEFAULT_DPM = 60;
+
+const defaultGpd = dripsToGpd(DEFAULT_DPM);
+const defaults = leakCost({ gallonsPerDay: defaultGpd, ...RATES, hotFraction: 0 });
+const defaultHot = leakCost({ gallonsPerDay: defaultGpd, ...RATES, hotFraction: 1 });
+
+/* The ladder — this is the point of the page. */
+const ladder = COMMON_LEAKS.map((l) => {
+  const r = leakCost({ gallonsPerDay: l.gpd, ...RATES, hotFraction: l.hot ? 1 : 0 });
+  return { ...l, gallonsPerYear: r.gallonsPerYear, cost: r.totalCost };
+});
+const faucet = ladder.find((l) => l.key === "faucet-drip")!;
+const runningToilet = ladder.find((l) => l.key === "toilet-running")!;
+const silentToilet = ladder.find((l) => l.key === "toilet-silent")!;
+const toiletVsFaucet = runningToilet.cost / faucet.cost;
+
+const dripLadder = [10, 30, 60, 120, 180].map((dripsPerMinute) => {
+  const gpd = dripsToGpd(dripsPerMinute);
+  const r = leakCost({ gallonsPerDay: gpd, ...RATES, hotFraction: 0 });
+  return { dripsPerMinute, gpd, gallonsPerYear: r.gallonsPerYear, cost: r.totalCost };
+});
+
+const epaGpd = EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR / 365;
+const epa = leakCost({ gallonsPerDay: epaGpd, ...RATES, hotFraction: 0 });
+const toiletDaysToEpa = daysToWaste(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, runningToilet.gpd);
+const faucetDaysToEpa = daysToWaste(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR, faucet.gpd);
+
+const electricHot = leakCost({
+  gallonsPerDay: defaultGpd,
+  waterRatePer1000: RATES.waterRatePer1000,
+  sewerRatePer1000: RATES.sewerRatePer1000,
+  hotFraction: 1,
+  fuel: "electric",
+  deltaT: 70,
+  efficiency: 0.95,
+  energyRate: 0.17,
+});
+
+const faqs: CalculatorFaq[] = [
+  {
+    question: "How much water does a dripping faucet waste?",
+    answer: `At one drip a second — ${DEFAULT_DPM} drips a minute — a faucet wastes <strong>${fmt(defaultGpd, 2)} gallons a day</strong>, or ${fmt(defaults.gallonsPerYear)} gallons a year. At the default rates on this page that is about <strong>${usd(defaults.totalCost)} a year</strong>. It is the leak everyone notices and very nearly the cheapest one you can have.`,
+  },
+  {
+    question: "Why does a running toilet cost so much more?",
+    answer: `Because it is a continuous flow rather than a drip. A visibly running toilet passes roughly ${fmt(runningToilet.gpd)} gallons a day against the faucet's ${fmt(faucet.gpd, 1)} — so it costs about <strong>${usd(runningToilet.cost)} a year against ${usd(faucet.cost)}</strong>, which is <strong>${fmt(toiletVsFaucet)} times</strong> as much. The leak you can hear is almost never the expensive one.`,
+  },
+  {
+    question: "What is a silent toilet leak and how do I find it?",
+    answer: `A worn flapper letting tank water seep into the bowl with no sound at all. At around ${fmt(silentToilet.gpd)} gallons a day it costs roughly <strong>${usd(silentToilet.cost)} a year</strong> and gives you nothing to hear or see. Find it by putting food colouring in the tank, waiting fifteen minutes without flushing, and checking whether colour has reached the bowl.`,
+  },
+  {
+    question: "Does a hot water leak cost more than a cold one?",
+    answer: `Yes, and by more than people expect — this is the part most leak calculators leave out. The same ${fmt(defaultGpd, 2)} gpd drip costs <strong>${usd2(defaults.totalCost)}</strong> a year on the cold side and <strong>${usd2(defaultHot.totalCost)}</strong> on the hot, because you paid to heat every gallon before losing it. That is ${fmt(defaultHot.totalCost / defaults.totalCost, 2)}× on gas; on an electric resistance heater the energy is <strong>${fmt(electricHot.energyShare, 0)}%</strong> of the total.`,
+  },
+  {
+    question: "How do I check my house for a leak?",
+    answer:
+      "Shut every fixture and appliance that uses water, then read the meter and read it again after thirty minutes to two hours. Any movement is a leak. Most meters also carry a small triangular or star-shaped <strong>low-flow indicator</strong> that spins on tiny flows — if it is turning with everything off, water is going somewhere. This is the only test that catches an underground service line leak.",
+  },
+  {
+    question: "How do I measure a leak I cannot count drips on?",
+    answer:
+      "Catch it. Hold a measuring jug or a marked container under the leak for a fixed time, then enter the volume and the seconds into the fill-test mode above. It is faster and far more accurate than counting drips once the leak is running faster than about three drips a second.",
+  },
+  {
+    question: "Am I charged sewer on water that leaks away?",
+    answer:
+      "At most utilities, yes. Sewer is usually billed on <strong>metered water in</strong> rather than on what actually reaches the sewer, so a leak is charged twice before any heating is counted — which is why sewer is a separate line here. Some utilities offer a one-time leak adjustment once the leak is repaired and documented; it is always worth asking.",
+  },
+  {
+    question: "How much water do household leaks waste in total?",
+    answer: `EPA WaterSense puts the average household at around <strong>${fmt(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR)} gallons a year</strong> lost to leaks, with about ${fmt(EPA_LEAKY_HOME_FRACTION * 100)}% of homes leaking ${EPA_LEAKY_HOME_GPD} gallons a day or more. At the default rates that ${fmt(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR)} gallons is roughly ${usd(epa.totalCost)} a year — and a running toilet gets through the whole annual figure in <strong>${fmt(toiletDaysToEpa, 1)} days</strong>.`,
+  },
+  {
+    question: "Where do the drip figures come from?",
+    answer: `From one published constant: the USGS figure of <strong>${fmt(DRIPS_PER_GALLON)} drips per gallon</strong>. Everything else on this page is arithmetic from it. That constant reconciles with a ${fmt(ML_PER_DRIP, 2)} mL drip — 3,785.41 mL per gallon divided by ${fmt(ML_PER_DRIP, 2)} mL gives ${fmt(3785.411784 / ML_PER_DRIP, 1)}, which is the same number.`,
+  },
+];
+const faqData = buildFaqPageSchema(faqs);
+
+const ctaHeading = "Found the leak? Quote the repair in seconds.";
+const ctaDescription =
+  "A leak call rarely stops at the leak — it turns into a fixture, a valve, sometimes a section of line. TradesQuote turns the whole scope into a detailed, line-item estimate with quantities and unit prices, validated by a built-in quality control agent and ready for your client to sign online.";
+
+const relatedCalculators = [
+  {
+    href: "/calculators/plumbing/plumbing-pipe-volume-calculator",
+    title: "Pipe Volume Calculator",
+    description: "How much water a run of pipe actually holds.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-water-pressure-calculator",
+    title: "Water Pressure Calculator",
+    description: "High pressure is what makes fixtures leak.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-unit-converter",
+    title: "Plumbing Unit Converter",
+    description: "gpm, lpm, psi and head, converted both ways.",
+  },
+  {
+    href: "/calculators/plumbing/plumbing-repipe-cost-calculator",
+    title: "Repipe Cost Calculator",
+    description: "When repeated leaks stop being repairs.",
+  },
+];
+
+const styles = plumbingAccentStyles.rose;
+---
+
+<Layout {title} {description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Leak & Water Waste Calculator — Gallons and Dollars" />
+    <meta
+      property="og:description"
+      content="Turn a drip rate, fill test or meter reading into gallons per year and dollars — including the energy cost of a hot-water leak."
+    />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:site_name" content="TradesQuote" />
+    <meta property="og:image" content="https://www.tradesquote.ai/logo.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Leak & Water Waste Calculator — Gallons and Dollars" />
+    <meta
+      name="twitter:description"
+      content="What a leak actually costs, drips to dollars, with the hot-water energy most calculators ignore. Free, instant, no sign-up."
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webAppData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </Fragment>
+
+  <div class="bg-white min-h-screen text-slate-700">
+    <Header />
+
+    <main>
+      <!-- ==== HERO ==== -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <CalculatorBreadcrumb
+            category="Plumbing"
+            categoryHref="/calculators/plumbing"
+            current="Leak & Water Waste Calculator"
+          />
+
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+              </svg>
+              Plumbing Tools · USGS drip constant · Free
+            </span>
+
+            <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+              Leak &amp; Water Waste Calculator <span class="text-rose-600">— Gallons and Dollars</span>
+            </h1>
+
+            <p class="mt-5 text-lg text-slate-600 leading-relaxed">
+              A faucet dripping once a second wastes <strong>{fmt(defaults.gallonsPerYear)} gallons a year</strong
+              > and costs about <strong>{usd(defaults.totalCost)}</strong>. A toilet running silently in the next
+              room wastes {fmt(silentToilet.gallonsPerYear)} and costs <strong>{usd(silentToilet.cost)}</strong>.
+              <strong>The leak you can hear is almost never the expensive one</strong> — this prices the one you
+              cannot.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== CALCULATOR ==== -->
+      <section id="calculator" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"></path>
+            </svg>
+            Price the leak
+          </h2>
+
+          <div class="mt-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            <div class="space-y-6">
+              <!-- Method -->
+              <div>
+                <span class="text-sm font-semibold text-slate-800">How are you measuring it?</span>
+                <div class="mt-2 grid grid-cols-2 gap-2" role="group" aria-label="Measurement method">
+                  <button
+                    type="button"
+                    data-leak-method="drip"
+                    class="leak-method rounded-lg border border-rose-500 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition"
+                  >
+                    Counting drips
+                  </button>
+                  <button
+                    type="button"
+                    data-leak-method="fill"
+                    class="leak-method rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:border-rose-300"
+                  >
+                    Fill a container
+                  </button>
+                  <button
+                    type="button"
+                    data-leak-method="meter"
+                    class="leak-method rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:border-rose-300"
+                  >
+                    Water meter
+                  </button>
+                  <button
+                    type="button"
+                    data-leak-method="flow"
+                    class="leak-method rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:border-rose-300"
+                  >
+                    Known flow
+                  </button>
+                </div>
+              </div>
+
+              <!-- Drip mode -->
+              <div data-leak-panel="drip">
+                <div class="flex items-center justify-between">
+                  <label for="lk-dpm" class="text-sm font-semibold text-slate-800">Drips per minute</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="lk-dpm"
+                      type="number"
+                      min="1"
+                      max="600"
+                      value={DEFAULT_DPM}
+                      class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">drips</span>
+                  </div>
+                </div>
+                <input
+                  id="lk-dpm-range"
+                  type="range"
+                  min="1"
+                  max="300"
+                  step="1"
+                  value={DEFAULT_DPM}
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>1</span><span>300 per min</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  One drip a second is 60 a minute. Past about 180 the drips merge — use the fill test instead.
+                </p>
+              </div>
+
+              <!-- Fill mode -->
+              <div data-leak-panel="fill" class="hidden grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="lk-oz" class="text-sm font-semibold text-slate-800">Volume caught</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="lk-oz"
+                      type="number"
+                      min="0"
+                      max="512"
+                      value="16"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">fl oz</span>
+                  </div>
+                </div>
+                <div>
+                  <label for="lk-secs" class="text-sm font-semibold text-slate-800">Time it took</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="lk-secs"
+                      type="number"
+                      min="1"
+                      max="3600"
+                      value="30"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">sec</span>
+                  </div>
+                </div>
+                <p class="sm:col-span-2 -mt-1 text-xs text-slate-500">
+                  A standard measuring cup is 8 fl oz. Catch the leak for a timed run and read the volume.
+                </p>
+              </div>
+
+              <!-- Meter mode -->
+              <div data-leak-panel="meter" class="hidden grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="lk-gal" class="text-sm font-semibold text-slate-800">Gallons registered</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="lk-gal"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      step="0.1"
+                      value="2"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">gal</span>
+                  </div>
+                </div>
+                <div>
+                  <label for="lk-mins" class="text-sm font-semibold text-slate-800">Over how long</label>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input
+                      id="lk-mins"
+                      type="number"
+                      min="1"
+                      max="1440"
+                      value="30"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500 shrink-0">min</span>
+                  </div>
+                </div>
+                <p class="sm:col-span-2 -mt-1 text-xs text-slate-500">
+                  Every fixture and appliance off. Any movement at all is a leak somewhere on your side of the meter.
+                </p>
+              </div>
+
+              <!-- Flow mode -->
+              <div data-leak-panel="flow" class="hidden">
+                <label for="lk-gpm" class="text-sm font-semibold text-slate-800">Flow rate</label>
+                <div class="mt-2 flex items-center gap-2">
+                  <input
+                    id="lk-gpm"
+                    type="number"
+                    min="0"
+                    max="60"
+                    step="0.01"
+                    value="0.5"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                  />
+                  <span class="text-sm text-slate-500 shrink-0">gpm</span>
+                </div>
+                <p class="mt-1.5 text-xs text-slate-500">
+                  Straight from a flow meter, or a known fixture rate for something left running.
+                </p>
+              </div>
+
+              <!-- Hot share -->
+              <div class="border-t border-slate-200 pt-5">
+                <div class="flex items-center justify-between">
+                  <label for="lk-hot" class="text-sm font-semibold text-slate-800">Share that is hot water</label>
+                  <div class="flex items-center gap-1">
+                    <input
+                      id="lk-hot"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value="0"
+                      class="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-right text-sm font-semibold text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                    <span class="text-sm text-slate-500">%</span>
+                  </div>
+                </div>
+                <input
+                  id="lk-hot-range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value="0"
+                  class="plumb-range mt-3 w-full bg-slate-200 accent-rose-600"
+                />
+                <p class="mt-1.5 text-xs text-slate-500">
+                  A cold supply leak is 0. A dripping shower or a hot-side valve is 100 — and you paid to heat
+                  every gallon of it.
+                </p>
+              </div>
+
+              <!-- Rates -->
+              <details class="rounded-xl border border-slate-200 bg-slate-50">
+                <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800">
+                  Your rates — change these to your own bill
+                </summary>
+                <div class="px-4 pb-4 grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="lk-water" class="text-xs font-semibold text-slate-700">Water, $ per 1,000 gal</label>
+                    <input
+                      id="lk-water"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={RATES.waterRatePer1000}
+                      class="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lk-sewer" class="text-xs font-semibold text-slate-700">Sewer, $ per 1,000 gal</label>
+                    <input
+                      id="lk-sewer"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      value={RATES.sewerRatePer1000}
+                      class="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lk-fuel" class="text-xs font-semibold text-slate-700">Water heater fuel</label>
+                    <select
+                      id="lk-fuel"
+                      class="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    >
+                      <option value="gas" selected>Gas — $ per therm</option>
+                      <option value="electric">Electric — $ per kWh</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="lk-energy" class="text-xs font-semibold text-slate-700">Energy rate, $</label>
+                    <input
+                      id="lk-energy"
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.01"
+                      value={RATES.energyRate}
+                      class="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lk-rise" class="text-xs font-semibold text-slate-700">Temperature rise, °F</label>
+                    <input
+                      id="lk-rise"
+                      type="number"
+                      min="0"
+                      max="150"
+                      value={RATES.deltaT}
+                      class="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label for="lk-eff" class="text-xs font-semibold text-slate-700">Heater efficiency, %</label>
+                    <input
+                      id="lk-eff"
+                      type="number"
+                      min="10"
+                      max="100"
+                      value={RATES.efficiency * 100}
+                      class="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none"
+                    />
+                  </div>
+                  <p class="sm:col-span-2 text-xs text-slate-500">
+                    Rates vary enormously by utility. Sewer is normally billed on metered water in, not on what
+                    reaches the sewer — which is why a leak is usually charged twice.
+                  </p>
+                </div>
+              </details>
+
+              <button
+                id="lk-reset"
+                type="button"
+                class="text-sm font-medium text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Reset to defaults
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div class="mt-6 lg:mt-0 lg:sticky lg:top-6 rounded-xl border border-rose-100 bg-rose-50 p-5 sm:p-6">
+              <p class="text-sm font-medium text-slate-600">Costing you every year</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="lk-cost" class="text-5xl font-extrabold tracking-tight text-rose-600">
+                  {usd(defaults.totalCost)}
+                </span>
+              </div>
+              <p id="lk-note" class="mt-1 text-sm font-semibold text-slate-700">
+                {fmt(defaults.gallonsPerYear)} gallons a year, at {fmt(defaultGpd, 2)} gallons a day.
+              </p>
+
+              <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Per day</p>
+                  <p id="lk-gpd" class="mt-1 text-2xl font-bold text-slate-900">{fmt(defaultGpd, 2)} gal</p>
+                </div>
+                <div class="rounded-xl border border-rose-100 bg-white p-4">
+                  <p class="text-xs text-slate-500">Per year</p>
+                  <p id="lk-gpy" class="mt-1 text-2xl font-bold text-slate-900">
+                    {fmt(defaults.gallonsPerYear)} gal
+                  </p>
+                </div>
+              </div>
+
+              <div id="lk-hotcard" class="hidden mt-4 rounded-xl border border-amber-300 bg-amber-100 p-4">
+                <p class="text-sm font-semibold text-amber-800">You are paying for this water twice</p>
+                <p id="lk-hotnote" class="mt-1 text-sm text-amber-800"></p>
+              </div>
+
+              <details class="group mt-5 rounded-xl border border-rose-100 bg-white">
+                <summary
+                  class="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-semibold text-slate-800"
+                >
+                  See the breakdown
+                  <svg
+                    class="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <div class="px-4 pb-4 text-sm space-y-1.5 text-slate-600">
+                  <div class="flex justify-between gap-3">
+                    <span>Water charge</span><span id="lk-bd-water" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Sewer charge</span><span id="lk-bd-sewer" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Energy to heat it</span><span id="lk-bd-energy" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3 border-t border-slate-200 pt-1.5 mt-1.5">
+                    <span>Per month</span><span id="lk-bd-month" class="font-semibold text-slate-900">—</span>
+                  </div>
+                  <div class="flex justify-between gap-3">
+                    <span>Days to waste 10,000 gal</span><span id="lk-bd-days" class="font-semibold text-slate-900">—</span>
+                  </div>
+                </div>
+              </details>
+
+              <p class="mt-4 text-xs text-slate-500 leading-relaxed">
+                A planning figure, not a bill. Water, sewer and energy rates vary enormously by utility and many
+                bills are tiered, so put your own numbers in above. Ask your utility whether it offers a
+                <strong>leak adjustment</strong> once the repair is documented — many do.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== THE LADDER ==== -->
+      <section class="bg-slate-50 border-y border-slate-200">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">
+            The leak you can hear is not the expensive one
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Every row priced at the default rates on this page. A faucet dripping once a second is
+            <strong>{usd(faucet.cost)}</strong> a year. A toilet running where nobody is listening is
+            <strong>{usd(runningToilet.cost)}</strong> — <strong>{fmt(toiletVsFaucet)} times</strong> as much,
+            for a fault that costs a few dollars in parts to fix.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Leak</th>
+                  <th class="py-3 px-5 font-semibold">Per day</th>
+                  <th class="py-3 px-5 font-semibold">Per year</th>
+                  <th class="py-3 px-5 font-semibold">Cost</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  ladder.map((row, index) => (
+                    <tr class={index === ladder.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5">
+                        <span class="font-semibold text-slate-900">{row.label}</span>
+                        <span class="block text-xs text-slate-500">{row.note}</span>
+                      </td>
+                      <td class="py-3 px-5 whitespace-nowrap">{fmt(row.gpd, 1)} gal</td>
+                      <td class="py-3 px-5 whitespace-nowrap">{fmt(row.gallonsPerYear)} gal</td>
+                      <td class="py-3 px-5 whitespace-nowrap font-semibold text-slate-900">{usd(row.cost)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-4 text-sm text-slate-500">
+            Daily volumes are the ranges published in EPA WaterSense and utility conservation material — common
+            starting points, not measurements. Measure the leak in front of you rather than looking it up.
+          </p>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">Drips to gallons</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            One published constant does the whole conversion: the USGS figure of
+            <strong>{fmt(DRIPS_PER_GALLON)} drips per gallon</strong>. That reconciles exactly with a
+            {" "}{fmt(ML_PER_DRIP, 2)} mL drop — 3,785.41 mL in a gallon divided by {fmt(ML_PER_DRIP, 2)} is
+            {" "}{fmt(3785.411784 / ML_PER_DRIP, 1)}, the same number by a different route.
+          </p>
+
+          <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-5 font-semibold">Drip rate</th>
+                  <th class="py-3 px-5 font-semibold">Per day</th>
+                  <th class="py-3 px-5 font-semibold">Per year</th>
+                  <th class="py-3 px-5 font-semibold">Cost, cold</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                {
+                  dripLadder.map((row, index) => (
+                    <tr class={index === dripLadder.length - 1 ? "" : "border-b border-slate-100"}>
+                      <td class="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">
+                        {row.dripsPerMinute} per min
+                      </td>
+                      <td class="py-3 px-5 whitespace-nowrap">{fmt(row.gpd, 2)} gal</td>
+                      <td class="py-3 px-5 whitespace-nowrap">{fmt(row.gallonsPerYear)} gal</td>
+                      <td class="py-3 px-5 whitespace-nowrap">{usd(row.cost)}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">
+            A hot leak is charged twice
+          </h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            Most leak calculators stop at the water bill. But a hot-water leak was heated before it escaped, and
+            that energy is gone too. The same {fmt(defaultGpd, 2)} gpd drip costs
+            <strong>{usd2(defaults.totalCost)}</strong> a year on the cold side and
+            <strong>{usd2(defaultHot.totalCost)}</strong> on the hot — {fmt(defaultHot.totalCost / defaults.totalCost, 2)}× —
+            with <strong>{fmt(defaultHot.energyUnits, 1)} therms</strong> going up the flue for nothing. On an
+            electric resistance heater the energy share is worse still, at
+            <strong>{fmt(electricHot.energyShare, 0)}%</strong> of the total.
+          </p>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            It is the reason a dripping shower head deserves more attention than a dripping outside tap, even
+            though the tap is usually dripping faster.
+          </p>
+
+          <h2 class="mt-14 text-3xl font-extrabold tracking-tight text-slate-900">Finding it</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            <strong>The meter test settles it.</strong> Shut every fixture and appliance, read the meter, wait
+            thirty minutes to two hours, read it again. Any movement is a leak on your side. Most meters also
+            carry a small triangular or star-shaped low-flow indicator that turns on flows far too small to
+            register on the dial — if that is moving with the house shut down, water is going somewhere.
+          </p>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            <strong>For toilets, use dye.</strong> A few drops of food colouring in the tank, fifteen minutes
+            without flushing, then look in the bowl. Colour in the bowl is a flapper leak — the
+            {" "}{fmt(silentToilet.gpd)} gallon-a-day fault that makes no sound and costs
+            {" "}<strong>{usd(silentToilet.cost)}</strong> a year.
+          </p>
+          <p class="mt-4 text-slate-600 leading-relaxed">
+            <strong>Scale it against the household figure.</strong> EPA WaterSense puts the average home at
+            around {fmt(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR)} gallons a year lost to leaks, with about
+            {" "}{fmt(EPA_LEAKY_HOME_FRACTION * 100)}% of homes losing {EPA_LEAKY_HOME_GPD} gallons a day or
+            more. A running toilet gets through that entire annual figure in
+            <strong>{fmt(toiletDaysToEpa, 1)} days</strong>. The dripping faucet takes
+            {" "}{fmt(faucetDaysToEpa)} days — a little under five years.
+          </p>
+
+          <p class="mt-6 text-sm text-slate-500">
+            Sources &amp; standards: the drip conversion uses the <a
+              class="underline hover:text-rose-600"
+              href="https://www.usgs.gov/special-topics/water-science-school"
+              target="_blank"
+              rel="noopener">USGS</a
+            > figure of {fmt(DRIPS_PER_GALLON)} drips per gallon, and every other volume on this page is arithmetic
+            from it. Household leak volumes and the {fmt(EPA_HOUSEHOLD_LEAK_GAL_PER_YEAR)} gallon household figure
+            are EPA WaterSense estimates, quoted for scale rather than measured here. Water, sewer and energy rates
+            are editable defaults, not published figures — bills are frequently tiered and vary enormously between
+            utilities. The energy calculation heats the hot share of the wasted water through your temperature rise
+            at your heater's efficiency. None of this is code; it is arithmetic on your own bill.
+          </p>
+        </div>
+      </section>
+
+      <CalculatorFaqSection
+        faqs={faqs}
+        accent="rose"
+        subtitle="Common questions about leak volumes, finding leaks, and what they actually cost."
+      />
+
+      <CalculatorTradesQuoteCta heading={ctaHeading} description={ctaDescription} />
+
+      <RelatedCalculators
+        calculators={relatedCalculators}
+        styles={styles}
+        heading="More plumbing calculators"
+      />
+    </main>
+
+    <Footer />
+  </div>
+
+  <script>
+    import { initPlumbingLeakWaterWasteCalculator } from "@/scripts/calculators/plumbing-leak-water-waste-calculator";
+    initPlumbingLeakWaterWasteCalculator();
+  </script>
+</Layout>
+
+<style>
+  .plumb-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+  }
+  .plumb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+  .plumb-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: #e11d48;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, usd, fmt } from "@/lib/plumbing";
+
+/**
+ * The per-job gap is easy to shrug off. Annualised it is not, and that is the
+ * argument that actually lands with an owner.
+ *
+ * Base copied from plumbing-estimate-calculator/index.astro.
+ */
+const BASE = {
+  labourHours: 10,
+  labourRate: 110,
+  fixtureCost: 850,
+  materialCost: 450,
+  overheadPercent: 15,
+};
+
+const JOBS_PER_WEEK = 4;
+const WEEKS = 48;
+const JOBS_PER_YEAR = JOBS_PER_WEEK * WEEKS;
+
+const rows = [20, 25, 30, 40].map((rate) => {
+  const r = estimateJob({ ...BASE, marginPercent: rate });
+  const gap = r.price - r.markupPrice;
+  return { rate, gap, annual: gap * JOBS_PER_YEAR, delivered: r.effectiveMargin };
+});
+
+const maxAnnual = Math.max(...rows.map((r) => r.annual));
+const typical = rows[1];
+
+const BAR_X = 232;
+const BAR_MAX = 240;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" fill="none" aria-hidden="true">
+  <title>The markup and margin gap annualised</title>
+  <desc>
+    A gap of a couple of hundred dollars a job is easy to dismiss. Multiplied by a year of ordinary work it is not.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="246" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Per job it is a shrug. Per year it is a van.</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${JOBS_PER_WEEK} jobs a week across ${WEEKS} weeks — ${fmt(JOBS_PER_YEAR)} jobs a year at this size.`}
+  </text>
+
+  {rows.map((row, i) => {
+    const y = 78 + i * 34;
+    const w = Math.max(3, (row.annual / maxAnnual) * BAR_MAX);
+    const common = row.rate === 25;
+    const tone = common ? C.red : C.orange;
+    return (
+      <g>
+        <text x="28" y={y + 14} fill={C.dark} font-family={FONT} font-size="10.5" font-weight={common ? 800 : 700}>
+          {`Intending ${row.rate}%, applying it as a markup`}
+        </text>
+        <text x="28" y={y + 26} fill={C.muted} font-family={FONT} font-size="9">
+          {`actually delivers ${fmt(row.delivered, 1)}% · ${usd(row.gap)} a job`}
+        </text>
+        <rect x={BAR_X} y={y + 2} width={BAR_MAX} height="20" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 2} width={w} height="20" rx="5" fill={tone} opacity="0.75" />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 17} fill={tone} font-family={FONT} font-size="11" font-weight="800">
+          {`${usd(row.annual)} a year`}
+        </text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="216" width="672" height="30" rx="8" fill={C.redLight} stroke={C.red} stroke-width="1.6" />
+  <text x="36" y="232" fill={C.red} font-family={FONT} font-size="10.5" font-weight="800">
+    {`At a 25% target, the ${usd(typical.gap)} nobody notices per job is ${usd(typical.annual)} a year — from one operator on a keyboard.`}
+  </text>
+  <text x="36" y="244" fill={C.dark} font-family={FONT} font-size="9.5">
+    Nothing else about the business changes. No job is priced differently on site, no material is bought worse, nobody works slower.
+  </text>
+</svg>

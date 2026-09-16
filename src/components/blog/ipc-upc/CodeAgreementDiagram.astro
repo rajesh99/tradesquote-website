@@ -1,0 +1,75 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  MIN_SLOPE_IN_PER_FT,
+  minSlope,
+  slopeToPercent,
+  TABLE_909_1,
+  MIN_VENT_SIZE,
+  MIN_BUILDING_DRAIN_WITH_WC,
+  PRV_THRESHOLD_PSI,
+  sizeLabel,
+  fmt,
+} from "@/lib/plumbing";
+
+/**
+ * Where the two codes broadly agree. Everything on this figure is read from the
+ * IPC values this site computes with — the point being that these are the ones
+ * a UPC jurisdiction is least likely to move.
+ */
+const slopeRows = MIN_SLOPE_IN_PER_FT.map((r) => ({
+  band: Number.isFinite(r.maxSize) ? `${sizeLabel(r.maxSize)} and under` : "over 6 inch",
+  slope: r.slope,
+  percent: slopeToPercent(r.slope),
+}));
+
+const trapArms = TABLE_909_1.map((r) => `${sizeLabel(r.size)} → ${r.maxFeet} ft`);
+
+const PRINCIPLES = [
+  "Every trap needs a vent, and every system needs a vent to open air",
+  "Drainage flows by gravity, sized on fixture units, sloped to keep solids moving",
+  `Traps hold a water seal; a trap arm has a maximum length (${sizeLabel(2)} → ${TABLE_909_1.find((r) => r.size === 2)?.maxFeet} ft)`,
+  `A vent is never smaller than ${sizeLabel(MIN_VENT_SIZE)}, and never under half the drain it serves`,
+  `A building drain carrying a water closet is never under ${sizeLabel(MIN_BUILDING_DRAIN_WITH_WC)}`,
+  `Pressure above ${PRV_THRESHOLD_PSI} psi needs a reducing valve, and a closed system needs expansion control`,
+  "Cross connections are controlled by hazard class and direction of possible backflow",
+];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>What the IPC and the UPC agree on</title>
+  <desc>
+    The physics and the core principles are shared between the two model codes. Slope bands and trap arm limits are the
+    numbers a jurisdiction is least likely to change.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Most of plumbing is not in dispute</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    Both codes are gravity drainage, trap seals, vented systems and hazard-based cross-connection control. The physics does not have an edition.
+  </text>
+
+  {PRINCIPLES.map((line, i) => {
+    const y = 74 + i * 21;
+    return (
+      <g>
+        <circle cx="34" cy={y + 5} r="4.5" fill={C.primary} opacity="0.8" />
+        <text x="48" y={y + 9} fill={C.dark} font-family={FONT} font-size="10">{line}</text>
+      </g>
+    );
+  })}
+
+  <rect x="24" y="230" width="330" height="72" rx="9" fill={C.primaryLight} stroke={C.primary} stroke-width="1.6" />
+  <text x="38" y="248" fill={C.primary} font-family={FONT} font-size="8.5" font-weight="700">MINIMUM DRAIN SLOPE — SHARED BANDS</text>
+  {slopeRows.map((row, i) => (
+    <text x="38" y={266 + i * 14} fill={C.dark} font-family={FONT} font-size="9.5">
+      {`${row.band}: ${row.slope} in/ft (${fmt(row.percent, 2)}%)`}
+    </text>
+  ))}
+
+  <rect x="366" y="230" width="330" height="72" rx="9" fill={C.blueLight} stroke={C.blue} stroke-width="1.6" />
+  <text x="380" y="248" fill={C.blue} font-family={FONT} font-size="8.5" font-weight="700">MAXIMUM TRAP ARM — IPC TABLE 909.1</text>
+  <text x="380" y="266" fill={C.dark} font-family={FONT} font-size="9.5">{trapArms.slice(0, 3).join(" · ")}</text>
+  <text x="380" y="280" fill={C.dark} font-family={FONT} font-size="9.5">{trapArms.slice(3).join(" · ")}</text>
+  <text x="380" y="295" fill={C.muted} font-family={FONT} font-size="8.5">measured trap weir to vent fitting — but see where the UPC measures from</text>
+</svg>

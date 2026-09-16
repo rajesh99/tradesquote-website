@@ -1,0 +1,81 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { septicSizing, DEFAULT_GAL_PER_BEDROOM, SEPTIC_RETENTION_DAYS, fmt } from "@/lib/plumbing";
+
+/**
+ * Tank size against bedroom count. The point of the figure is which of the two
+ * candidates wins: the jurisdictional minimum governs every house up to four
+ * bedrooms, and the retention calculation only takes over at five.
+ */
+const BEDROOMS = [2, 3, 4, 5, 6];
+const rows = BEDROOMS.map((bedrooms) => {
+  const r = septicSizing({
+    bedrooms,
+    galPerBedroom: DEFAULT_GAL_PER_BEDROOM,
+    applicationRate: 0.8,
+    trenchWidthFt: 3,
+  });
+  return {
+    label: `${bedrooms} bedroom${bedrooms === 1 ? "" : "s"}`,
+    flow: `${fmt(r.dailyFlow)} gpd`,
+    retention: fmt(r.retentionTank),
+    minimum: fmt(r.minimumTank),
+    tank: `${fmt(r.tank)} gal`,
+    governedBy: r.governedBy,
+  };
+});
+
+const ROW_H = 30;
+const TOP = 92;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Septic tank size by bedroom count</title>
+  <desc>
+    Two candidates compete for every house: two days of retention on the design flow, and the jurisdictional minimum
+    for the bedroom count. The larger wins, and below five bedrooms that is always the minimum.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Two candidates, and the larger one wins</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Design flow at ${DEFAULT_GAL_PER_BEDROOM} gallons per bedroom per day, held for ${SEPTIC_RETENTION_DAYS} days, against the common minimum for that bedroom count`}
+  </text>
+
+  <text x="28" y="80" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">HOUSE</text>
+  <text x="188" y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">DESIGN FLOW</text>
+  <text x={318} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">2-DAY RETENTION</text>
+  <text x={448} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">MINIMUM</text>
+  <text x={604} y="80" text-anchor="middle" fill={C.muted} font-family={FONT} font-size="8" font-weight="700">TANK REQUIRED</text>
+
+  {rows.map((row, i) => {
+    const y = TOP + i * ROW_H;
+    const retentionWins = row.governedBy === "retention";
+    return (
+      <g>
+        <text x="28" y={y + 16} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <text x={188} y={y + 16} text-anchor="middle" fill={C.muted} font-family={FONT} font-size="10.5">{row.flow}</text>
+
+        <rect x={258} y={y} width={120} height="24" rx="6" fill={retentionWins ? C.primary : C.border} opacity={retentionWins ? 0.14 : 0.2} />
+        <rect x={258} y={y} width={120} height="24" rx="6" fill="none" stroke={retentionWins ? C.primary : C.border} stroke-width={retentionWins ? 2 : 1} />
+        <text x={318} y={y + 16} text-anchor="middle" fill={retentionWins ? C.primary : C.muted} font-family={FONT} font-size="10.5" font-weight={retentionWins ? 800 : 600}>{row.retention}</text>
+
+        <rect x={388} y={y} width={120} height="24" rx="6" fill={retentionWins ? C.border : C.orange} opacity={retentionWins ? 0.2 : 0.14} />
+        <rect x={388} y={y} width={120} height="24" rx="6" fill="none" stroke={retentionWins ? C.border : C.orange} stroke-width={retentionWins ? 1 : 2} />
+        <text x={448} y={y + 16} text-anchor="middle" fill={retentionWins ? C.muted : C.orange} font-family={FONT} font-size="10.5" font-weight={retentionWins ? 600 : 800}>{row.minimum}</text>
+
+        <text x={530} y={y + 16} fill={C.muted} font-family={FONT} font-size="11">→</text>
+        <text x={604} y={y + 16} text-anchor="middle" fill={C.dark} font-family={FONT} font-size="11.5" font-weight="800">{row.tank}</text>
+      </g>
+    );
+  })}
+
+  <rect x={258} y={TOP + rows.length * ROW_H + 6} width={120} height="16" rx="4" fill={C.primary} opacity="0.14" />
+  <text x={318} y={TOP + rows.length * ROW_H + 18} text-anchor="middle" fill={C.primary} font-family={FONT} font-size="9" font-weight="700">retention governs</text>
+  <rect x={388} y={TOP + rows.length * ROW_H + 6} width={120} height="16" rx="4" fill={C.orange} opacity="0.14" />
+  <text x={448} y={TOP + rows.length * ROW_H + 18} text-anchor="middle" fill={C.orange} font-family={FONT} font-size="9" font-weight="700">minimum governs</text>
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    Below five bedrooms the calculation never decides anything — the floor does. That is why bedroom count is the input.
+  </text>
+</svg>

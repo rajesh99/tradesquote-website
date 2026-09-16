@@ -1,0 +1,94 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, costBand, fmt, usd, COST_BAND } from "@/lib/plumbing";
+
+/**
+ * Five service levels priced on one basis. Almost the entire difference is
+ * crew hours plus access — the machine on the van barely shows up in the
+ * number, which is not what the price list implies.
+ *
+ * Rate, overhead and margin copied from plumbing-estimate-calculator.
+ */
+const LABOUR_RATE = 110;
+const OVERHEAD_PERCENT = 15;
+const MARGIN_PERCENT = 25;
+
+const SERVICES = [
+  { label: "Camera inspection only", hours: 1.5, material: 0, note: "diagnosis, no clearing", colour: C.primary },
+  { label: "Snake, accessible cleanout", hours: 1.5, material: 25, note: "the ordinary blocked drain", colour: C.blue },
+  { label: "Snake, roof vent access", hours: 2.5, material: 25, note: "no cleanout — ladder and roof work", colour: C.orange },
+  { label: "Hydro-jetting", hours: 3, material: 75, note: "grease or scale, not a single blockage", colour: C.red },
+  { label: "Jet, camera and report", hours: 4.5, material: 75, note: "the pre-purchase or recurring-problem job", colour: C.muted },
+];
+
+const rows = SERVICES.map((s) => {
+  const r = estimateJob({
+    labourHours: s.hours,
+    labourRate: LABOUR_RATE,
+    fixtureCost: 0,
+    materialCost: s.material,
+    overheadPercent: OVERHEAD_PERCENT,
+    marginPercent: MARGIN_PERCENT,
+  });
+  const band = costBand(r.price);
+  return { ...s, price: r.price, breakEven: r.breakEven, low: band.low, high: band.high };
+});
+
+const maxHigh = Math.max(...rows.map((r) => r.high));
+const BAR_X = 226;
+const BAR_MAX = 300;
+const scale = (v: number) => (v / maxHigh) * BAR_MAX;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 106 + i * 34,
+  lowX: BAR_X + scale(r.low),
+  priceX: BAR_X + scale(r.price),
+  bandW: Math.max(4, scale(r.high) - scale(r.low)),
+}));
+
+const snake = rows[1];
+const roof = rows[2];
+const accessPremium = ((roof.price - snake.price) / snake.price) * 100;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" fill="none" aria-hidden="true">
+  <title>Price of five drain clearing and inspection services on one costing basis</title>
+  <desc>
+    An ordinary snaking through an accessible cleanout prices around 291 dollars. The same work reached from a
+    roof vent is 460, a 58 percent premium bought entirely by access rather than by equipment.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="280" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">You are buying hours and access, not the machine</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Priced at ${usd(LABOUR_RATE)} an hour with ${fmt(OVERHEAD_PERCENT, 0)}% overhead and ${fmt(MARGIN_PERCENT, 0)}% margin. Bars are the ±${fmt(COST_BAND * 100, 0)}% quoting band; the tick is the price.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    Consumables are tiny — under a hundred dollars on every line. What separates these prices is time on site.
+  </text>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">SERVICE</text>
+  <text x={BAR_X + BAR_MAX + 12} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">PRICE · BAND</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="28" y={row.y + 23} fill={C.muted} font-family={FONT} font-size="8">
+        {`${fmt(row.hours, 1)} h · ${row.note}`}
+      </text>
+      <rect x={row.lowX} y={row.y + 1} width={row.bandW} height="13" rx="4" fill={row.colour} opacity="0.24" />
+      <rect x={row.priceX - 1} y={row.y - 1} width="2.5" height="17" rx="1" fill={row.colour} />
+      <text x={BAR_X + BAR_MAX + 12} y={row.y + 12} fill={row.colour} font-family={FONT} font-size="10" font-weight="700">
+        {usd(row.price)}
+      </text>
+      <text x={BAR_X + BAR_MAX + 12} y={row.y + 23} fill={C.muted} font-family={FONT} font-size="8">
+        {`${usd(row.low)} to ${usd(row.high)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="278" fill={C.muted} font-family={FONT} font-size="10">
+    {`No accessible cleanout costs ${fmt(accessPremium, 0)}% more — ${usd(roof.price)} against ${usd(snake.price)} — every single time anyone clears that drain.`}
+  </text>
+</svg>

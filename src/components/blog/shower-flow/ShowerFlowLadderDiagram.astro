@@ -1,0 +1,108 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { mixedFlow, leakCost, fmt, usd, usd2 } from "@/lib/plumbing";
+
+/**
+ * What a showerhead's rating actually costs over a year. The hot fraction is
+ * COMPUTED from the delivery basis rather than assumed, because most of the
+ * money in a shower is the heating, not the water.
+ *
+ * Basis: 140 stored, 50 cold, 105 delivered — the mixing valve calculator's
+ * temperatures with a realistic shower setpoint. Rates from the leak
+ * calculator, with the heating rise at 90 to match the storage temperature.
+ */
+const BASIS = { hotF: 140, coldF: 50, mixF: 105, mixedGpm: 2.5 };
+const mix = mixedFlow(BASIS);
+
+const RATES = {
+  waterRatePer1000: 5.5,
+  sewerRatePer1000: 7.0,
+  deltaT: 90,
+  efficiency: 0.8,
+  energyRate: 1.4,
+  fuel: "gas" as const,
+};
+
+const MINUTES = 10;
+const PEOPLE = 4;
+
+const HEADS = [
+  { gpm: 2.5, label: "Federal maximum" },
+  { gpm: 2.0, label: "Common WaterSense head" },
+  { gpm: 1.8, label: "Low-flow head" },
+  { gpm: 1.5, label: "Efficient head" },
+];
+
+const rows = HEADS.map((h) => {
+  const perShower = h.gpm * MINUTES;
+  const gpd = perShower * PEOPLE;
+  const r = leakCost({ gallonsPerDay: gpd, ...RATES, hotFraction: mix.hotFraction });
+  return {
+    ...h,
+    perShower,
+    gpd,
+    cost: r.totalCost,
+    energyShare: r.energyShare,
+    isMax: h.gpm === 2.5,
+  };
+});
+
+const maxCost = Math.max(...rows.map((r) => r.cost));
+const BAR_X = 234;
+const BAR_MAX = 246;
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 104 + i * 32,
+  w: Math.max(3, (r.cost / maxCost) * BAR_MAX),
+  waterW: Math.max(2, (r.cost * (1 - r.energyShare / 100) / maxCost) * BAR_MAX),
+  colour: r.isMax ? C.orange : C.blue,
+  weight: r.isMax ? 800 : 600,
+}));
+
+const top = rows[0];
+const bottom = rows[rows.length - 1];
+const saving = top.cost - bottom.cost;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" fill="none" aria-hidden="true">
+  <title>Annual cost of showering against showerhead flow rate</title>
+  <desc>
+    A 2.5 gallon per minute head uses 25 gallons in a ten-minute shower and costs a four-person household about
+    749 dollars a year, of which 39 percent is the gas to heat it. A 1.5 gpm head costs 449.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="284" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Most of a shower is the heating, not the water</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`${fmt(MINUTES, 0)} minute showers, ${fmt(PEOPLE, 0)} people a day. Hot share computed at ${fmt(BASIS.mixF, 0)} °F delivered from ${fmt(BASIS.hotF, 0)} °F stored and ${fmt(BASIS.coldF, 0)} °F cold.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    {`${usd2(RATES.waterRatePer1000)} water and ${usd2(RATES.sewerRatePer1000)} sewer per 1,000 gal, gas at ${usd2(RATES.energyRate)} a therm. The pale part of each bar is water and sewer; the rest is fuel.`}
+  </text>
+
+  <text x="28" y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">HEAD RATING</text>
+  <text x={BAR_X + BAR_MAX + 10} y="96" fill={C.muted} font-family={FONT} font-size="9" font-weight="700">GAL/SHOWER · $/YEAR</text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 13} fill={C.dark} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {`${fmt(row.gpm, 1)} gpm`}
+      </text>
+      <text x="84" y={row.y + 13} fill={C.muted} font-family={FONT} font-size="9">{row.label}</text>
+      <rect x={BAR_X} y={row.y} width={BAR_MAX} height="17" rx="4" fill={C.border} opacity="0.24" />
+      <rect x={BAR_X} y={row.y} width={row.w} height="17" rx="4" fill={row.colour} opacity="0.72" />
+      <rect x={BAR_X} y={row.y} width={row.waterW} height="17" rx="4" fill={C.white} opacity="0.46" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 13} fill={row.colour} font-family={FONT} font-size="10" font-weight={row.weight}>
+        {`${fmt(row.perShower, 1)} gal · ${usd(row.cost)}`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="264" fill={C.muted} font-family={FONT} font-size="10">
+    {`Energy is ${fmt(top.energyShare, 0)}% of the total at every flow rate — the split does not move, because a fixed share of every gallon is heated.`}
+  </text>
+  <text x="24" y="282" fill={C.dark} font-family={FONT} font-size="10" font-weight="700">
+    {`Going from ${fmt(top.gpm, 1)} to ${fmt(bottom.gpm, 1)} gpm saves ${usd(saving)} a year on this household — and shortens no showers.`}
+  </text>
+</svg>

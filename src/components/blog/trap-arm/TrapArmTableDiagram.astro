@@ -1,0 +1,49 @@
+---
+import { C, FONT } from "../infographicTokens";
+import {
+  TABLE_909_1, sizeLabel,
+} from "@/lib/plumbing";
+/** Table 909.1 verbatim, read out of the lib rather than transcribed — the
+ * maximum developed length from the trap weir to the vent fitting. */
+const maxFeet = Math.max(...TABLE_909_1.map((r) => r.maxFeet));
+const fractions: Record<string, string> = { "0.25": "1/4 in/ft", "0.125": "1/8 in/ft" };
+
+const rows = TABLE_909_1.map((r) => ({
+  label: sizeLabel(r.size),
+  value: r.maxFeet,
+  frac: r.maxFeet / maxFeet,
+  display: `${r.maxFeet} ft maximum  ·  at ${fractions[String(r.slope)] ?? r.slope + " in/ft"}`,
+  highlight: r.size === 2,
+}));
+
+/* Bar geometry. The value label is drawn at BAR_X + width + 10, so BAR_MAX is
+   chosen to leave room for the longest label inside the 720-wide viewBox. */
+const BAR_X = 110;
+const BAR_MAX = 250;
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 278" fill="none" aria-hidden="true">
+  <title>Maximum trap arm length — IPC Table 909.1</title>
+  <desc>Developed length from the trap weir to the inner edge of the vent fitting</desc>
+
+  <rect x="8" y="8" width="704" height="264" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">Maximum trap arm length — IPC Table 909.1</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">Developed length from the trap weir to the inner edge of the vent fitting</text>
+
+  {rows.map((row, i) => {
+    const y = 82 + i * 30;
+    const w = Math.max(2, row.frac * BAR_MAX);
+    return (
+      <g>
+        <text x="28" y={y + 15} fill={C.dark} font-family={FONT} font-size="10.5" font-weight="700">{row.label}</text>
+        <rect x={BAR_X} y={y + 3} width={BAR_MAX} height="18" rx="5" fill={C.border} opacity="0.28" />
+        <rect x={BAR_X} y={y + 3} width={w} height="18" rx="5" fill={row.highlight ? C.primary : C.orange} opacity={row.highlight ? 0.95 : 0.62} />
+        <text x={BAR_X + BAR_MAX + 10} y={y + 16} fill={row.highlight ? C.primary : C.dark} font-family={FONT} font-size="10.5" font-weight={row.highlight ? 800 : 600}>
+          {row.display}
+        </text>
+      </g>
+    );
+  })}
+
+  <text x="24" y="258" fill={C.muted} font-family={FONT} font-size="10">A 2 inch arm reaches 8 ft, which is why an island sink so often needs an air admittance valve or a loop vent instead.</text>
+</svg>

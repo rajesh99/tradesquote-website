@@ -1,0 +1,116 @@
+---
+import { C, FONT } from "../infographicTokens";
+import { estimateJob, fmt, usd } from "@/lib/plumbing";
+
+/**
+ * When clearing stops being the cheap option. Cumulative clearing cost against
+ * the two one-off fixes, so the crossover is visible rather than asserted.
+ *
+ * Rate, overhead and margin copied from plumbing-estimate-calculator; the
+ * repair scopes match the sewer replacement cost post so the two agree.
+ */
+const LABOUR_RATE = 110;
+const OVERHEAD_PERCENT = 15;
+const MARGIN_PERCENT = 25;
+
+const priceFor = (hours: number, material: number) =>
+  estimateJob({
+    labourHours: hours,
+    labourRate: LABOUR_RATE,
+    fixtureCost: 0,
+    materialCost: material,
+    overheadPercent: OVERHEAD_PERCENT,
+    marginPercent: MARGIN_PERCENT,
+  }).price;
+
+const clearing = priceFor(1.5, 25);
+const spotRepair = priceFor(16, 900);
+const replacement = priceFor(40, 2600);
+
+const FREQUENCIES = [
+  { perYear: 1, label: "Once a year", colour: C.primary },
+  { perYear: 2, label: "Twice a year", colour: C.blue },
+  { perYear: 3, label: "Three times a year", colour: C.orange },
+  { perYear: 4, label: "Four times a year", colour: C.red },
+];
+
+const YEARS = 10;
+
+const rows = FREQUENCIES.map((f) => {
+  const annual = clearing * f.perYear;
+  return {
+    ...f,
+    annual,
+    fiveYear: annual * 5,
+    tenYear: annual * YEARS,
+    yearsToSpot: spotRepair / annual,
+    yearsToReplacement: replacement / annual,
+  };
+});
+
+const maxCost = Math.max(replacement, ...rows.map((r) => r.tenYear));
+const BAR_X = 168;
+const BAR_MAX = 350;
+const scale = (v: number) => (v / maxCost) * BAR_MAX;
+
+const spotX = BAR_X + scale(spotRepair);
+const replacementX = BAR_X + scale(replacement);
+
+const plotted = rows.map((r, i) => ({
+  ...r,
+  y: 122 + i * 36,
+  fiveW: Math.max(3, scale(r.fiveYear)),
+  tenW: Math.max(3, scale(r.tenYear)),
+}));
+
+const twice = rows[1];
+const fourTimes = rows[3];
+---
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" fill="none" aria-hidden="true">
+  <title>Cumulative drain clearing cost against the price of fixing the cause</title>
+  <desc>
+    At twice a year, repeated clearing passes the cost of a spot repair in seven years. At four times a year it
+    passes a full forty foot replacement in about nine years, which is when clearing stops being the cheap option.
+  </desc>
+
+  <rect x="8" y="8" width="704" height="304" rx="12" fill={C.panelBg} stroke={C.border} />
+  <text x="24" y="34" fill={C.dark} font-family={FONT} font-size="14" font-weight="700">When clearing stops being the cheap option</text>
+  <text x="24" y="52" fill={C.muted} font-family={FONT} font-size="11">
+    {`Cumulative cost of clearing at ${usd(clearing)} a visit. Pale bar is five years, dark bar is ten. Vertical lines are the one-off fixes.`}
+  </text>
+  <text x="24" y="70" fill={C.muted} font-family={FONT} font-size="11">
+    Every clearing is also a day off work and a risk of a backup you did not schedule — neither of which is in the bars.
+  </text>
+
+  <line x1={spotX} y1="88" x2={spotX} y2="272" stroke={C.green} stroke-width="1.6" stroke-dasharray="4 3" />
+  <text x={spotX + 6} y="100" fill={C.green} font-family={FONT} font-size="9" font-weight="700">
+    {`spot repair ${usd(spotRepair)}`}
+  </text>
+
+  <line x1={replacementX} y1="88" x2={replacementX} y2="272" stroke={C.red} stroke-width="1.6" stroke-dasharray="4 3" />
+  <text x={replacementX + 6} y="112" fill={C.red} font-family={FONT} font-size="9" font-weight="700">
+    {`full replacement ${usd(replacement)}`}
+  </text>
+
+  {plotted.map((row) => (
+    <g>
+      <text x="28" y={row.y + 12} fill={C.dark} font-family={FONT} font-size="10" font-weight="700">{row.label}</text>
+      <text x="28" y={row.y + 24} fill={C.muted} font-family={FONT} font-size="8">
+        {`${usd(row.annual)} a year`}
+      </text>
+      <rect x={BAR_X} y={row.y} width={row.tenW} height="9" rx="2" fill={row.colour} opacity="0.72" />
+      <rect x={BAR_X} y={row.y + 11} width={row.fiveW} height="9" rx="2" fill={row.colour} opacity="0.34" />
+      <text x={BAR_X + BAR_MAX + 10} y={row.y + 17} fill={row.colour} font-family={FONT} font-size="9" font-weight="700">
+        {`${usd(row.tenYear)} / 10 yr`}
+      </text>
+    </g>
+  ))}
+
+  <text x="24" y="292" fill={C.muted} font-family={FONT} font-size="10">
+    {`${twice.label.toLowerCase()} passes the spot repair in ${fmt(twice.yearsToSpot, 1)} years; ${fourTimes.label.toLowerCase()} passes a full replacement in ${fmt(fourTimes.yearsToReplacement, 1)}.`}
+  </text>
+  <text x="24" y="306" fill={C.dark} font-family={FONT} font-size="9" font-weight="700">
+    {`Two clearings a year is the signal to buy a camera survey — not a third clearing.`}
+  </text>
+</svg>
