@@ -1,28 +1,159 @@
 ---
-import SearchBar from "@/layouts/helpers/SearchBar";
 import Base from "@/layouts/Base.astro";
-import { getSinglePage } from "@/lib/contentParser.astro";
 
-// Retrieve all articles
-const posts = await getSinglePage("posts");
-
-// List of items to search in
-const searchList = posts.map((item) => ({
-  slug: item.id,
-  data: item.data,
-  content: item.body,
-}));
+export const prerender = true;
 ---
 
 <Base
   title="Search"
-  meta_title="Search the Blog | TradesQuote"
-  description="Search the TradesQuote blog for HVAC and electrical guides on sizing, code, estimating, cost, and field diagnostics."
+  meta_title="Search | TradesQuote"
+  description="Search TradesQuote calculators, guides, and pages."
+  noindex
 >
-  <section class="section">
-    <div class="container">
-      <h1 class="h2 page-heading">Search</h1>
-      <SearchBar client:load searchList={searchList} />
+  <section class="w-full px-6 pb-20 pt-16">
+    <div class="mx-auto flex max-w-3xl flex-col gap-8">
+      <div class="flex flex-col gap-3 text-center">
+        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">Search</h1>
+        <p class="text-lg text-gray-500">Calculators, guides, and pages.</p>
+      </div>
+
+      <form action="/search/" method="get" class="flex gap-2">
+        <label for="q" class="sr-only">Search</label>
+        <input
+          id="q"
+          name="q"
+          type="search"
+          placeholder="Search calculators, guides, and pages"
+          autocomplete="off"
+          spellcheck="false"
+          class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+        />
+        <button
+          type="submit"
+          class="inline-flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+        >
+          Search
+        </button>
+      </form>
+
+      <p id="search-page-message" class="text-sm text-gray-500" aria-live="polite">
+        Search calculators, guides, and pages.
+      </p>
+      <ul id="search-page-results" class="flex flex-col divide-y divide-gray-100"></ul>
     </div>
   </section>
 </Base>
+
+<script>
+  import { loadSearchIndex } from "@/lib/search/loadIndex";
+  import { rankSearch, SEARCH_PAGE_LIMIT, type SearchResult } from "@/lib/search/rank";
+
+  const HINT = "Search calculators, guides, and pages.";
+
+  const mount = () => {
+    const input = document.getElementById("q") as HTMLInputElement | null;
+    const message = document.getElementById("search-page-message");
+    const list = document.getElementById("search-page-results");
+    const form = input?.form;
+
+    if (!input || !message || !list) return;
+    if (input.dataset.searchMounted === "true") return;
+    input.dataset.searchMounted = "true";
+
+    const params = new URLSearchParams(window.location.search);
+    input.value = params.get("q") ?? "";
+
+    const paint = (items: SearchResult[]) => {
+      list.replaceChildren();
+      for (const item of items) {
+        const row = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = item.url;
+        link.className = "flex flex-col gap-1 py-5 hover:text-indigo-600";
+
+        const meta = document.createElement("span");
+        meta.className = "text-[11px] font-semibold uppercase tracking-wide text-indigo-600";
+        meta.textContent = item.category ? `${item.kind} / ${item.category}` : item.kind;
+
+        const title = document.createElement("span");
+        title.className = "text-lg font-semibold text-gray-900";
+        title.textContent = item.title;
+
+        const snippet = document.createElement("span");
+        snippet.className = "text-sm leading-relaxed text-gray-500";
+        snippet.textContent = item.snippet;
+
+        link.append(meta, title, snippet);
+        row.append(link);
+        list.append(row);
+      }
+    };
+
+    const showMessage = (text: string, withLinks: boolean) => {
+      message.replaceChildren(document.createTextNode(text));
+      if (!withLinks) return;
+      message.append(
+        document.createTextNode(" Browse the "),
+        pageLink("/calculators/", "calculators"),
+        document.createTextNode(" or the "),
+        pageLink("/blog/", "blog"),
+        document.createTextNode("."),
+      );
+    };
+
+    const run = async () => {
+      const query = input.value.trim();
+      const url = new URL(window.location.href);
+      if (query) url.searchParams.set("q", query);
+      else url.searchParams.delete("q");
+      window.history.replaceState({}, "", url);
+
+      if (!query) {
+        list.replaceChildren();
+        showMessage(HINT, false);
+        return;
+      }
+
+      showMessage("Loading search…", false);
+      list.replaceChildren();
+
+      try {
+        const documents = await loadSearchIndex();
+        if (input.value.trim() !== query) return;
+        const items = rankSearch(documents, query, SEARCH_PAGE_LIMIT);
+        if (items.length === 0) {
+          list.replaceChildren();
+          showMessage(`No matches for “${query}”.`, true);
+          return;
+        }
+        const noun = items.length === 1 ? "result" : "results";
+        showMessage(`${items.length} ${noun} for “${query}”.`, false);
+        paint(items);
+      } catch {
+        if (input.value.trim() !== query) return;
+        list.replaceChildren();
+        showMessage("Search is unavailable right now.", true);
+      }
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      void run();
+    });
+    input.addEventListener("input", () => {
+      void run();
+    });
+    void run();
+  };
+
+  mount();
+  document.addEventListener("astro:page-load", mount);
+
+  function pageLink(href: string, label: string): HTMLAnchorElement {
+    const anchor = document.createElement("a");
+    anchor.href = href;
+    anchor.className = "font-semibold text-indigo-600 hover:underline";
+    anchor.textContent = label;
+    return anchor;
+  }
+</script>
