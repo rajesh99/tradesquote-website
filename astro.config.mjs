@@ -44,7 +44,16 @@ export default defineConfig({
       },
     },
   },
-  integrations: [react(), sitemap(), mdx()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        return path !== "/search" && path !== "/search/" && !path.endsWith("/search-index.json");
+      },
+    }),
+    mdx(),
+  ],
   markdown: {
     remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
     shikiConfig: { theme: "one-dark-pro", wrap: true },
