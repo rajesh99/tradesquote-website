@@ -1,0 +1,340 @@
+---
+// Rendered after the header so backdrop-blur does not trap this fixed dialog.
+---
+
+<div
+  id="search-dialog"
+  class="fixed inset-0 z-[80]"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-dialog-label"
+  hidden
+>
+  <button
+    type="button"
+    class="absolute inset-0 bg-gray-900/40"
+    aria-label="Close search"
+    data-search-backdrop
+  ></button>
+
+  <div class="relative mx-auto mt-[12vh] w-full max-w-xl px-4">
+    <div
+      class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl"
+      data-search-panel
+    >
+      <div class="flex items-center gap-3 border-b border-gray-100 px-4">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="shrink-0 text-gray-400"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <label id="search-dialog-label" for="search-input" class="sr-only">Search</label>
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search calculators, guides, and pages"
+          autocomplete="off"
+          spellcheck="false"
+          class="w-full bg-transparent py-4 text-sm text-gray-900 outline-none placeholder:text-gray-400"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="search-results"
+        />
+        <kbd
+          class="hidden sm:inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[11px] font-medium text-gray-400"
+        >
+          Esc
+        </kbd>
+      </div>
+
+      <p id="search-status" class="px-4 py-3 text-sm text-gray-500" aria-live="polite">
+        Search calculators, guides, and pages.
+      </p>
+      <ul id="search-results" role="listbox" class="max-h-[50vh] overflow-y-auto"></ul>
+      <div id="search-see-all-wrap" class="hidden border-t border-gray-100">
+        <a
+          id="search-see-all"
+          href="/search/"
+          class="flex items-center justify-between px-4 py-3 text-sm font-semibold text-indigo-600 hover:bg-indigo-50"
+        >
+          See all results
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { loadSearchIndex } from "@/lib/search/loadIndex";
+  import { rankSearch, SEARCH_DIALOG_LIMIT, type SearchResult } from "@/lib/search/rank";
+
+  const HINT = "Search calculators, guides, and pages.";
+  let onKeyDown: ((event: KeyboardEvent) => void) | null = null;
+
+  const mount = () => {
+    const dialog = document.getElementById("search-dialog");
+    const input = document.getElementById("search-input") as HTMLInputElement | null;
+    const status = document.getElementById("search-status");
+    const results = document.getElementById("search-results");
+    const seeAllWrap = document.getElementById("search-see-all-wrap");
+    const seeAll = document.getElementById("search-see-all") as HTMLAnchorElement | null;
+    const panel = dialog?.querySelector("[data-search-panel]");
+    const openButtons = [
+      ...document.querySelectorAll<HTMLButtonElement>("[data-search-open]"),
+    ];
+
+    if (!dialog || !input || !status || !results || !seeAllWrap || !seeAll || !panel) return;
+    if (dialog.dataset.searchMounted === "true") return;
+    dialog.dataset.searchMounted = "true";
+
+    let activeIndex = -1;
+    let restoreFocus: HTMLElement | null = null;
+
+    const setExpanded = (open: boolean) => {
+      for (const button of openButtons) {
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+      }
+      input.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+
+    const setOpen = (open: boolean) => {
+      dialog.hidden = !open;
+      setExpanded(open);
+      if (open) {
+        restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        closeMobileMenu();
+        input.focus();
+        input.select();
+      } else if (restoreFocus) {
+        restoreFocus.focus();
+        restoreFocus = null;
+      }
+    };
+
+    const closeMobileMenu = () => {
+      document.getElementById("mobile-menu")?.classList.add("hidden");
+      document.getElementById("menu-icon-open")?.classList.remove("hidden");
+      document.getElementById("menu-icon-close")?.classList.add("hidden");
+      document.getElementById("mobile-menu-btn")?.setAttribute("aria-expanded", "false");
+    };
+
+    const paint = (items: SearchResult[]) => {
+      results.replaceChildren();
+      activeIndex = -1;
+      input.removeAttribute("aria-activedescendant");
+
+      for (const [index, item] of items.entries()) {
+        const option = document.createElement("a");
+        option.id = `search-result-${index}`;
+        option.href = item.url;
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", "false");
+        option.className =
+          "flex flex-col gap-1 border-t border-gray-100 px-4 py-3 first:border-t-0 hover:bg-gray-50";
+
+        const meta = document.createElement("span");
+        meta.className = "text-[11px] font-semibold uppercase tracking-wide text-indigo-600";
+        meta.textContent = item.category ? `${item.kind} / ${item.category}` : item.kind;
+
+        const title = document.createElement("span");
+        title.className = "text-sm font-semibold text-gray-900";
+        title.textContent = item.title;
+
+        const snippet = document.createElement("span");
+        snippet.className = "line-clamp-2 text-sm text-gray-500";
+        snippet.textContent = item.snippet;
+
+        option.append(meta, title, snippet);
+        results.append(option);
+      }
+    };
+
+    const setActive = (index: number) => {
+      const options = results.querySelectorAll<HTMLAnchorElement>('[role="option"]');
+      if (options.length === 0) {
+        activeIndex = -1;
+        input.removeAttribute("aria-activedescendant");
+        return;
+      }
+      activeIndex = (index + options.length) % options.length;
+      options.forEach((option, optionIndex) => {
+        const selected = optionIndex === activeIndex;
+        option.setAttribute("aria-selected", selected ? "true" : "false");
+        option.classList.toggle("bg-indigo-50", selected);
+      });
+      const active = options[activeIndex];
+      input.setAttribute("aria-activedescendant", active.id);
+      active.scrollIntoView({ block: "nearest" });
+    };
+
+    const showHint = (message: string) => {
+      status.className = "px-4 py-3 text-sm text-gray-500";
+      status.hidden = false;
+      status.textContent = message;
+      seeAllWrap.classList.add("hidden");
+      paint([]);
+    };
+
+    const runQuery = async () => {
+      const query = input.value.trim();
+      if (!query) {
+        showHint(HINT);
+        return;
+      }
+
+      seeAll.href = `/search/?q=${encodeURIComponent(query)}`;
+      status.className = "px-4 py-3 text-sm text-gray-500";
+      status.hidden = false;
+      status.textContent = "Loading search…";
+      seeAllWrap.classList.add("hidden");
+      paint([]);
+
+      try {
+        const documents = await loadSearchIndex();
+        if (input.value.trim() !== query) return;
+
+        const items = rankSearch(documents, query, SEARCH_DIALOG_LIMIT);
+        if (items.length === 0) {
+          showHint(`No matches for “${query}”.`);
+          const links = document.createElement("span");
+          links.append(
+            document.createTextNode(" Browse the "),
+            linkTo("/calculators/", "calculators"),
+            document.createTextNode(" or the "),
+            linkTo("/blog/", "blog"),
+            document.createTextNode("."),
+          );
+          status.append(links);
+          return;
+        }
+
+        status.className = "sr-only";
+        status.hidden = false;
+        status.textContent = items.length === 1 ? "1 result" : `${items.length} results`;
+        seeAllWrap.classList.remove("hidden");
+        paint(items);
+      } catch {
+        if (input.value.trim() !== query) return;
+        showHint("Search is unavailable right now.");
+      }
+    };
+
+    for (const button of openButtons) {
+      button.addEventListener("click", () => setOpen(dialog.hidden));
+    }
+    dialog.querySelector("[data-search-backdrop]")?.addEventListener("click", () => setOpen(false));
+
+    input.addEventListener("input", () => {
+      void runQuery();
+    });
+
+    if (onKeyDown) document.removeEventListener("keydown", onKeyDown);
+    onKeyDown = (event) => {
+      const key = event.key;
+      const metaK = (event.metaKey || event.ctrlKey) && key.toLowerCase() === "k";
+
+      if (metaK) {
+        const target = event.target;
+        const typing =
+          target instanceof HTMLElement &&
+          (target.tagName === "INPUT" ||
+            target.tagName === "TEXTAREA" ||
+            target.tagName === "SELECT" ||
+            target.isContentEditable);
+        if (typing) return;
+        event.preventDefault();
+        setOpen(true);
+        return;
+      }
+
+      if (dialog.hidden) return;
+
+      if (key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+
+      if (key === "ArrowDown") {
+        event.preventDefault();
+        setActive(activeIndex + 1);
+        return;
+      }
+
+      if (key === "ArrowUp") {
+        event.preventDefault();
+        setActive(activeIndex - 1);
+        return;
+      }
+
+      if (key === "Enter") {
+        if (activeIndex >= 0) {
+          event.preventDefault();
+          const option = results.querySelectorAll("a")[activeIndex];
+          if (option instanceof HTMLAnchorElement) window.location.href = option.href;
+          return;
+        }
+        const query = input.value.trim();
+        if (query) {
+          event.preventDefault();
+          window.location.href = `/search/?q=${encodeURIComponent(query)}`;
+        }
+        return;
+      }
+
+      if (key === "Tab") {
+        const focusable = [
+          ...panel.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ].filter((el) => el.getClientRects().length > 0);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+  };
+
+  mount();
+  document.addEventListener("astro:page-load", mount);
+
+  function linkTo(href: string, label: string): HTMLAnchorElement {
+    const anchor = document.createElement("a");
+    anchor.href = href;
+    anchor.className = "font-semibold text-indigo-600 hover:underline";
+    anchor.textContent = label;
+    return anchor;
+  }
+</script>
